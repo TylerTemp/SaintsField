@@ -57,9 +57,8 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             return height;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             SerializedProperty callStateProp = property.FindPropertyRelative(PropNameCallState());
             SerializedProperty isStaticProp = property.FindPropertyRelative(nameof(PersistentCall.isStatic));
@@ -73,6 +72,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 height = EditorGUIUtility.singleLineHeight,
             };
             DrawTargetRow(rowRect, property, callStateProp, isStaticProp, targetProp, typeNameProp);
+            DrawOverrideRichText(rowRect, label, overrideRichTextChunks);
 
             Rect methodRect = new Rect(position)
             {

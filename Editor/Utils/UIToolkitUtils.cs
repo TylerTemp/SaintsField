@@ -456,6 +456,7 @@ namespace SaintsField.Editor.Utils
             bool inHorizontalLayout,
             IMakeRenderer makeRenderer,
             IDOTweenPlayRecorder doTweenPlayRecorder,
+            IRichTextTagProvider richTextTagProvider,
             VisualElement originalField,
             bool mergeDec,
             object parent)
@@ -474,6 +475,7 @@ namespace SaintsField.Editor.Utils
                     inHorizontalLayout,
                     makeRenderer,
                     doTweenPlayRecorder,
+                    richTextTagProvider,
                     originalField,
                     parent
                 );
@@ -669,6 +671,7 @@ namespace SaintsField.Editor.Utils
           bool inHorizontalLayout,
           IMakeRenderer makeRenderer,
           IDOTweenPlayRecorder doTweenPlayRecorder,
+          IRichTextTagProvider richTextTagProvider,
           VisualElement originalField,
           object parent)
         {
@@ -758,7 +761,7 @@ namespace SaintsField.Editor.Utils
                                         allAttributes.Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute).ToArray(),
                                         ReflectUtils.GetElementType(rawType),
                                         itemProp.displayName,
-                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, false, parent);
+                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, richTextTagProvider, null, false, parent);
                                     // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");
                                     if (result != null)
                                     {
@@ -803,8 +806,7 @@ namespace SaintsField.Editor.Utils
                                                 {
                                                     defaultName = itemProp.displayName;
                                                     ChangeLabel(result,
-                                                        RichTextDrawer.ParseRichXml(defaultName, label, property,
-                                                            fieldInfo, parent), new RichTextDrawer(), 0);
+                                                        RichTextDrawer.ParseRichXmlWithProvider(defaultName, richTextTagProvider), new RichTextDrawer(), 0);
                                                 }
                                             }).Every(150);
                                         }

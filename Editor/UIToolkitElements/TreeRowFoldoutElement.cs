@@ -62,7 +62,7 @@ namespace SaintsField.Editor.UIToolkitElements
             if (!string.IsNullOrEmpty(label))
             {
                 _labelLow = label.ToLower();
-                UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXml(label, "", null, null, null), _richTextDrawer);
+                UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXmlWithProvider(label, new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
                 foreach (Label subLabel in labelElement.Query<Label>().ToList())
                 {
                     subLabel.style.whiteSpace = WhiteSpace.NoWrap;

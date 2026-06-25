@@ -32,6 +32,11 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
+            if (overrideRichTextChunks != null)
+            {
+                return;
+            }
+
             FieldLabelTextAttribute targetAttribute = (FieldLabelTextAttribute)saintsAttribute;
 
             (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
@@ -43,10 +48,10 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
                 return;
             }
 
-            string labelText = label.text;
-#if SAINTSFIELD_NAUGHYTATTRIBUTES
-            labelText = property.displayName;
-#endif
+//             string labelText = label.text;
+// #if SAINTSFIELD_NAUGHYTATTRIBUTES
+//             labelText = property.displayName;
+// #endif
 
             RichTextDrawer.RichTextChunk[] parsedXmlNode =
                 RichTextDrawer.ParseRichXmlWithProvider(labelXml, this).ToArray();

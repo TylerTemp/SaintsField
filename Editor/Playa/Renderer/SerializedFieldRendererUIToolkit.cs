@@ -46,6 +46,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 InAnyHorizontalLayout,
                 this,
                 this,
+                this,
                 null,
                 true,
                 FieldWithInfo.Targets[0]
@@ -260,6 +261,10 @@ namespace SaintsField.Editor.Playa.Renderer
         public IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
+        }
+
+        public override void OnDestroyUIToolkit()
+        {
         }
     }
 }

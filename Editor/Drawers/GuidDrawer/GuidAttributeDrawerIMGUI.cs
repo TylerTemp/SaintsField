@@ -44,9 +44,9 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
         protected override bool UseCreateFieldIMGUI => true;
 
-        private static InfoIMGUI EnsureKey(SerializedProperty property, int index)
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
         {
-            string key = $"{SerializedUtils.GetUniqueId(property)}[{index}]";
+            string key = SerializedUtils.GetUniqueId(property);
             if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
             {
                 return infoCache;
@@ -67,24 +67,30 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             SerializedProperty stringProperty = TryGetStringProperty(property);
             if (stringProperty == null)
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
-            InfoIMGUI cache = EnsureKey(property, index);
+            InfoIMGUI cache = EnsureKey(property);
             SyncCache(cache, stringProperty.stringValue);
 
             bool isSerializedActual = !ReferenceEquals(stringProperty, property);
-            DrawGuidField(position, label, cache, property, stringProperty, changedValue =>
+            Rect fieldRect = DrawGuidField(position, label, cache, property, stringProperty, changedValue =>
             {
                 TriggerChangedIMGUI(property, isSerializedActual ? new Guid(changedValue) : changedValue);
             });
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
         }
 
         internal static SerializedProperty TryGetStringProperty(SerializedProperty property)
@@ -97,7 +103,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             return property.FindPropertyRelative(nameof(SaintsSerializedProperty.stringValue));
         }
 
-        private static void DrawGuidField(Rect position, GUIContent label, InfoIMGUI cache, SerializedProperty rootProperty,
+        private static Rect DrawGuidField(Rect position, GUIContent label, InfoIMGUI cache, SerializedProperty rootProperty,
             SerializedProperty stringProperty, Action<string> onValueChanged)
         {
             EnsureIconContent();
@@ -149,6 +155,8 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                 ApplyValue(cache, stringProperty, updatedMergedValue);
                 onValueChanged?.Invoke(updatedMergedValue);
             }
+
+            return fieldRect;
         }
 
         private static void SyncCache(InfoIMGUI cache, string propertyValue)

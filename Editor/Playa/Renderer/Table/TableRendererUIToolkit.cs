@@ -218,6 +218,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             foldout.Add(listViewFooter);
         }
+
+        public override void OnDestroyUIToolkit()
+        {
+        }
     }
 }
 #endif

@@ -20,9 +20,9 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 
         private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
 
-        private static InfoIMGUI EnsureKey(SerializedProperty property, int index)
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
         {
-            string key = $"{SerializedUtils.GetUniqueId(property)}[{index}]";
+            string key = SerializedUtils.GetUniqueId(property);
             if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
             {
                 return infoCache;
@@ -69,25 +69,29 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                 return EditorGUI.GetPropertyHeight(property, label, true);
             }
 
-            EnsureExpandedInitialized(property, index, info);
+            EnsureExpandedInitialized(property, info);
             return GetImGuiFieldHeight(property.isExpanded);
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             SerializedProperty ticksProperty = TryGetTicksProperty(property);
             if (ticksProperty == null)
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(new Rect(position)
+                {
+                    height = SingleLineHeight,
+                }, label, overrideRichTextChunks);
                 return;
             }
 
-            EnsureExpandedInitialized(property, index, info);
+            EnsureExpandedInitialized(property, info);
 
             bool isSerializedActual = !ReferenceEquals(ticksProperty, property);
-            DrawTicksField(position, label, ticksProperty.longValue, property.isExpanded,
+            Rect fieldRect = DrawTicksField(position, label, ticksProperty.longValue, property.isExpanded,
                 expanded => property.isExpanded = expanded,
                 newTicks =>
                 {
@@ -95,6 +99,12 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                     property.serializedObject.ApplyModifiedProperties();
                     TriggerChangedIMGUI(property, isSerializedActual ? new TimeSpan(newTicks) : newTicks);
                 });
+            Rect labelRect = new Rect(position)
+            {
+                height = SingleLineHeight,
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
         }
 
         internal static float GetImGuiFieldHeight(bool expanded)
@@ -114,7 +124,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             return property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
         }
 
-        internal static void DrawTicksField(Rect position, GUIContent label, long ticks, bool expanded,
+        internal static Rect DrawTicksField(Rect position, GUIContent label, long ticks, bool expanded,
             Action<bool> onExpandedChanged, Action<long> onValueChanged)
         {
             EnsureIconContent();
@@ -132,11 +142,13 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             {
                 onValueChanged?.Invoke(newTicks);
             }
+
+            return fieldRect;
         }
 
-        private static void EnsureExpandedInitialized(SerializedProperty property, int index, FieldInfo info)
+        private static void EnsureExpandedInitialized(SerializedProperty property, FieldInfo info)
         {
-            InfoIMGUI infoCache = EnsureKey(property, index);
+            InfoIMGUI infoCache = EnsureKey(property);
             if (infoCache.ExpandedInitialized)
             {
                 return;

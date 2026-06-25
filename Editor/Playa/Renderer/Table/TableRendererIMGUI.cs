@@ -266,7 +266,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             }
         }
 
-        public override void OnDestroy()
+        public override void OnDestroyIMGUI()
         {
             if (_applicationChangedListenerAddedIMGUI)
             {

@@ -13,6 +13,10 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         private UnityEditor.Editor _editor;
         private Object _curTarget;
 
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             return 0.1f;

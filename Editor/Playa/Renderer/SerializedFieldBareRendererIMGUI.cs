@@ -5,6 +5,10 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class SerializedFieldBareRenderer
     {
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);

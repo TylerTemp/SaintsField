@@ -17,12 +17,9 @@ namespace SaintsField.Editor.Drawers.SepTitleDrawer
             // ReSharper disable once InvertIf
             if (!string.IsNullOrEmpty(sepTitleAttribute.Title))
             {
-                IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXml(
+                IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
                     $"<color=#{ColorUtility.ToHtmlStringRGBA(sepTitleAttribute.Color)}>{sepTitleAttribute.Title}</color>",
-                    "",
-                    null,
-                    null,
-                    null);
+                    new RichTextDrawer.EmptyRichTextTagProvider());
                 RichTextDrawer richTextDrawer = new RichTextDrawer();
                 foreach (VisualElement rich in richTextDrawer.DrawChunksUIToolKit(chunks))
                 {

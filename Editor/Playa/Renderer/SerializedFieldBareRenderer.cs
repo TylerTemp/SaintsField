@@ -18,11 +18,6 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override bool AllowGuiColor => false;
 
-        public override void OnDestroy()
-        {
-
-        }
-
 #if UNITY_2021_3_OR_NEWER
         private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
 #endif

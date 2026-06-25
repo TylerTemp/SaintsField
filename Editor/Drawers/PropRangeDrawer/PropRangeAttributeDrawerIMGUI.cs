@@ -37,7 +37,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parentTarget)
         {
@@ -52,6 +51,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 cacheInfo.Error = metaInfo.Error;
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -67,6 +67,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     metaInfo.Error = curValueInfo.error;
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
                 float curValue = (float)curValueInfo.value;
@@ -78,6 +79,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     metaInfo.Error = minValueInfo.error;
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
                 float minValue = (float)minValueInfo.value;
@@ -87,6 +89,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     metaInfo.Error = maxValueInfo.error;
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
                 float maxValue = (float)maxValueInfo.value;
@@ -95,6 +98,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 Debug.Log($"#PropRange# #DrawField# for {property.propertyPath}: {minValue}~{maxValue} {curValue}");
 #endif
                 float adaptedValue = EditorGUI.Slider(position, label, curValue, minValue, maxValue);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 (string error, double value) postValueInfo = GetPostValue(adaptedValue, adaptAttribute);
                 if (postValueInfo.error != "")
                 {

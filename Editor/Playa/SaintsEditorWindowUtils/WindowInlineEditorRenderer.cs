@@ -18,11 +18,6 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 
         protected override bool AllowGuiColor => true;
 
-        public override void OnDestroy()
-        {
-
-        }
-
         public override void OnSearchField(string searchString)
         {
         }

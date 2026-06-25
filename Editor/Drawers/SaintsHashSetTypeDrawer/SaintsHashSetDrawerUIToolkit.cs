@@ -640,7 +640,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                             .Where(each => each is PropertyAttribute or InjectAttributeBase)
                             .ToArray(),
                         injectAttributes,
-                        hasSerializeReference, this, this, wrapParent
+                        hasSerializeReference, this, this, this, wrapParent
                     );
                 ElementField elementField = new ElementField($"Element {propIndex}", resultElement);
                 element.Add(elementField);

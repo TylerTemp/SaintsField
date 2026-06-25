@@ -24,7 +24,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             _richTextDrawer = null;
         }
 
-        public override void OnDestroy()
+
+        public override void OnDestroyIMGUI()
         {
             if (_asyncSearchItems?.SourceGenerator != null)
             {
@@ -937,6 +938,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 PageCount = pageCount,
             };
         }
+
+
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {

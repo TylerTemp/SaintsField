@@ -158,6 +158,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                                 true,
                                 this,
                                 this,
+                                this,
                                 null,
                                 true,
                                 valueParent

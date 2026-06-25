@@ -8,6 +8,10 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
     {
         private string _errorIMGUI = "";
 
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown)

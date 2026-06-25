@@ -348,7 +348,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             DrawPayload refDrawPayload = (DrawPayload)dropdownButton.userData;
             string label = DrawEnumGetButtonLabel(refDrawPayload);
             Label btnLabel = dropdownButton.ButtonLabelElement;
-            UIToolkitUtils.SetLabel(btnLabel, RichTextDrawer.ParseRichXml(label, "", null, null, null), new RichTextDrawer());
+            UIToolkitUtils.SetLabel(btnLabel, RichTextDrawer.ParseRichXmlWithProvider(label, new RichTextDrawer.EmptyRichTextTagProvider()), new RichTextDrawer());
         }
 
         private static string DrawEnumGetButtonLabel(DrawPayload refDrawPayload)

@@ -9,12 +9,5 @@ namespace SaintsField.Editor.Playa.Renderer
         public SerializedFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
         }
-
-        public override void OnDestroy()
-        {
-        }
-
-        // private string _curXml;
-        // private RichTextDrawer.RichTextChunk[] _curXmlChunks;
     }
 }

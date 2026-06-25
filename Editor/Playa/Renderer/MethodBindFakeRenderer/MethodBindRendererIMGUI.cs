@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             RefreshCheckMethodBind().fixer?.Invoke();
         }
 
-        public override void OnDestroy()
+        public override void OnDestroyIMGUI()
         {
             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(OnApplicationChanged);
         }

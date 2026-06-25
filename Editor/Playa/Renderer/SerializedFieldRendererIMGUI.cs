@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer
         private IReadOnlyList<Attribute> _imguiAllAttributes;
         private string _imguiLabel;
         private GUIContent _imguiContent;
+        private RichTextDrawer _imguiRichTextDrawer;
 
         private void EnsureInit()
         {
@@ -27,6 +28,8 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             _imguiInit = true;
+
+            _imguiRichTextDrawer = new RichTextDrawer();
 
             _imguiLabel = null;
             if (!NoLabel)
@@ -46,6 +49,10 @@ namespace SaintsField.Editor.Playa.Renderer
             _imguiAllAttributes = ReflectCache.GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo);
 
             _imguiDrawer = IMGUIRawDraw.GetAndCacheDrawer(FieldWithInfo.SerializedProperty, _imguiAllAttributes, FieldWithInfo.FieldInfo, _imguiLabel);
+        }
+
+        public override void OnDestroyIMGUI()
+        {
         }
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
@@ -85,9 +92,19 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            GUIContent useGUIContent = preCheckResult.HasRichLabel
-                ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length), tooltip: FieldWithInfo.SerializedProperty.tooltip)
-                : _imguiContent;
+            GUIContent useGUIContent;
+            IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks;
+            if (preCheckResult.HasRichLabel)
+            {
+                useGUIContent = new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length),
+                    tooltip: FieldWithInfo.SerializedProperty.tooltip);
+                richTextChunks = ParseRichXmlWithProviderIMGUI(preCheckResult.RichLabelXml);
+            }
+            else
+            {
+                useGUIContent = _imguiContent;
+                richTextChunks = null;
+            }
 
             IMGUIRawDraw.OnGUI(_imguiDrawer,
                 position,
@@ -95,6 +112,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 _imguiAllAttributes,
                 FieldWithInfo.FieldInfo.FieldType,
                 useGUIContent,
+                richTextChunks,
                 FieldWithInfo.FieldInfo,
                 InAnyHorizontalLayout,
                 false);

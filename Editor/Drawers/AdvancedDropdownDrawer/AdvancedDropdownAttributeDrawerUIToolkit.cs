@@ -156,7 +156,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             if((string)dropdownButton.ButtonLabelElement.userData != display)
             {
                 dropdownButton.ButtonLabelElement.userData = display;
-                UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
+                UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXmlWithProvider(display, new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
             }
         }
 
@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             if((string)dropdownButton.ButtonLabelElement.userData != display)
             {
                 dropdownButton.ButtonLabelElement.userData = display;
-                UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
+                UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXmlWithProvider(display, new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
             }
         }
     }

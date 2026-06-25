@@ -385,6 +385,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     InAnyHorizontalLayout,
                     this,
                     this,
+                    this,
                     null,
                     false,
                     FieldWithInfo.Targets[0]
@@ -1116,6 +1117,10 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     root.style.display = display;
                 }
             }
+        }
+
+        public override void OnDestroyUIToolkit()
+        {
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

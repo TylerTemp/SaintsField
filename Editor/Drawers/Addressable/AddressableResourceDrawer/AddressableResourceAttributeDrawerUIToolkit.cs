@@ -322,7 +322,13 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 }
                 genericDropdownMenu.AddSeparator("");
                 genericDropdownMenu.AddItem("Edit Groups...", false, AddressableUtil.OpenGroupEditor);
-                genericDropdownMenu.DropDown(groupDown.ButtonElement.worldBound, groupDown, true);
+                genericDropdownMenu.DropDown(groupDown.ButtonElement.worldBound, groupDown,
+#if UNITY_6000_3_OR_NEWER
+                    DropdownMenuSizeMode.Auto
+#else
+                    true
+#endif
+                );
             };
 
             UIToolkitUtils.DropdownButtonField labelDown = container.Q<UIToolkitUtils.DropdownButtonField>(LabelDownName(property));
@@ -418,7 +424,13 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                         nameInput.value = GetObjectName(nameType, curObj);
                     });
                 }
-                genericDropdownMenu.DropDown(nameInputContainer.worldBound, nameInputContainer, true);
+                genericDropdownMenu.DropDown(nameInputContainer.worldBound, nameInputContainer,
+#if UNITY_6000_3_OR_NEWER
+                    DropdownMenuSizeMode.Auto
+#else
+                    true
+#endif
+                );
             };
 
             objField.RegisterValueChangedCallback(evt =>

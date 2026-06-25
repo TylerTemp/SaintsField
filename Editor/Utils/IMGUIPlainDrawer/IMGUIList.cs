@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -19,6 +21,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             public bool InHorizontalLayout;
             public bool LabelGrayColor;
             public ReorderableList ReorderableList;
+            public RichTextDrawer RichTextDrawer;
         }
 
         private static readonly Dictionary<IMGUIDrawerCache.DrawerId, ListContext> CachedContexts =
@@ -73,7 +76,8 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             return reorderableList;
         }
 
-        private static void DrawHeader(Rect rect, ListContext context)
+        private static void DrawHeader(Rect rect, ListContext context,
+            IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks)
         {
             const float sizeWidth = 36f;
             const float sizeGap = 4f;
@@ -92,7 +96,17 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             };
 
             context.Property.isExpanded =
-                EditorGUI.Foldout(foldoutRect, context.Property.isExpanded, context.Label, true);
+                EditorGUI.Foldout(
+                    foldoutRect,
+                    context.Property.isExpanded,
+                    context.Label,
+                    true);
+
+            if (richTextChunks != null)
+            {
+                RichTextDrawer textDrawer = context.RichTextDrawer ?? new RichTextDrawer();
+                textDrawer.DrawChunks(foldoutRect, richTextChunks);
+            }
 
             SerializedProperty sizeProp = context.Property.FindPropertyRelative("Array.size");
             if (sizeProp != null)
@@ -144,9 +158,12 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             SerializedProperty itemProp = context.Property.GetArrayElementAtIndex(index);
             Type itemType = ReflectUtils.GetElementType(context.RawType);
             string itemLabel = $"Element {index}";
+            Attribute[] childProp = context.AllAttributes
+                .Where(each => each is SerializeReference || each is PropertyAttribute)
+                .ToArray();
             PropertyDrawer itemDrawer =
-                IMGUIRawDraw.GetAndCacheDrawer(itemProp, context.AllAttributes, context.FieldInfo, itemLabel);
-            IMGUIRawDraw.OnGUI(itemDrawer, rect, itemProp, context.AllAttributes, itemType, new GUIContent(itemLabel),
+                IMGUIRawDraw.GetAndCacheDrawer(itemProp, childProp, context.FieldInfo, itemLabel);
+            IMGUIRawDraw.OnGUI(itemDrawer, rect, itemProp, childProp, itemType, new GUIContent(itemLabel), null,
                 context.FieldInfo, context.InHorizontalLayout, context.LabelGrayColor);
         }
 
@@ -193,7 +210,8 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         }
 
         public static void DrawField(Rect position, SerializedProperty property, IReadOnlyList<Attribute> allAttributes,
-            Type rawType, GUIContent label, FieldInfo fieldInfo, bool inHorizontalLayout, bool labelGrayColor)
+            Type rawType, GUIContent label, IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks,
+            FieldInfo fieldInfo, bool inHorizontalLayout, bool labelGrayColor)
         {
             ListContext context = EnsureContext(property, allAttributes, rawType, label, fieldInfo, inHorizontalLayout,
                 labelGrayColor);
@@ -210,7 +228,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     height = EditorGUIUtility.singleLineHeight,
                 };
-                DrawHeader(headerRect, context);
+                DrawHeader(headerRect, context, richTextChunks);
 
                 if (!context.Property.isExpanded)
                 {

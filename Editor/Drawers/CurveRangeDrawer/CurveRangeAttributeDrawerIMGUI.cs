@@ -42,7 +42,6 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -51,6 +50,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
             if (cachedInfo.Error != "")
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -68,6 +68,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
                 curveRangeAttribute.Color.GetColor(),
                 curveRanges,
                 label);
+            DrawOverrideRichText(position, label, overrideRichTextChunks);
         }
 
         private static Rect GetRanges(CurveRangeAttribute curveRangeAttribute)

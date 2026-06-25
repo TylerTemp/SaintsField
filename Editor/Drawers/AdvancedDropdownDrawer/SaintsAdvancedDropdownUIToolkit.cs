@@ -384,7 +384,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         ? matchedValueOption.display
                         : $"{matchedValueOption.display} <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>({stackDisplay})</color>";
 
-                    UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(labelText, "", null, null, null), _richTextDrawer);
+                    UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXmlWithProvider(labelText, new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                     // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
                     bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, matchedValueOption.value)) ;
@@ -465,7 +465,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         sb.Append(")</color>");
                     }
 
-                    UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(sb.ToString(), "", null, null, null), _richTextDrawer);
+                    UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXmlWithProvider(sb.ToString(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                     Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
                     iconImages.Add(itemIconImage);
@@ -793,7 +793,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     : _checkIcon;
                 // allSelectImage.Add(selectImage);
 
-                UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(dropdownItem.displayName, "", null, null, null), _richTextDrawer);
+                UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXmlWithProvider(dropdownItem.displayName, new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                 Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
                 iconImages.Add(itemIconImage);

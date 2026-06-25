@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                    SaintsRowAttributeDrawer.GetManagedReferenceBodyHeight(cache.BodyInfo, width - IndentWidth);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, int index,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
@@ -141,6 +141,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             if (cache.Error != "")
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -149,6 +150,11 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 height = SingleLineHeight,
             };
             Rect contentRect = EditorGUI.PrefixLabel(lineRect, label);
+            Rect labelRect = new Rect(lineRect)
+            {
+                width = lineRect.width - contentRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             Rect modeRect = new Rect(contentRect)
             {
                 width = ModeButtonWidth,

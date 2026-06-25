@@ -15,10 +15,6 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             _playaInfoBoxAttribute = playaInfoBoxAttribute;
         }
 
-        public override void OnDestroy()
-        {
-        }
-
         public override void OnSearchField(string searchString)
         {
         }

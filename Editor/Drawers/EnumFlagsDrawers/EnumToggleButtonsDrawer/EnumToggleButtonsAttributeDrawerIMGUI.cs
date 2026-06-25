@@ -158,7 +158,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
@@ -172,6 +171,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     parent, out ImGuiInfo cache, out ValueButtonRawInfo[] rawInfos);
 
                 Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+                Rect labelRect = new Rect(position)
+                {
+                    width = position.width - fieldRect.width,
+                };
+                DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
                 ValueButtonsAttributeDrawer.ImGuiButtonLayout layout =
                     ValueButtonsAttributeDrawer.UtilGetButtonLayout(fieldRect.width, fieldRect.width,
                         !enumToggleButtonsAttribute.NoFold && !property.isExpanded, rawInfos, cache.RichTextDrawer);
@@ -208,6 +212,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             ValueButtonRawInfo[] flagRawInfos = GetFlagRawInfos(metaInfoFlags, this);
 
             Rect flagsFieldRect = EditorGUI.PrefixLabel(position, label);
+            Rect flagsLabelRect = new Rect(position)
+            {
+                width = position.width - flagsFieldRect.width,
+            };
+            DrawOverrideRichText(flagsLabelRect, label, overrideRichTextChunks);
             bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
             float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
 

@@ -123,6 +123,8 @@ namespace SaintsField.Editor.Core
             return showAndResults.Count == 0 || showAndResults.Any(each => each);
         }
 
+        public IEnumerable<RichTextDrawer.RichTextChunk> overrideRichTextChunks = null;
+
         #region IMGUI Drawer
 
         #region GetPropertyHeight
@@ -457,7 +459,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
                 // EditorGUI.PropertyField(position, property, label, true);
-                UnityDraw(position, property, label, fieldInfo, GetPreferredLabel(property), InHorizontalLayout);
+                UnityDraw(position, property, label, overrideRichTextChunks, fieldInfo, GetPreferredLabel(property), InHorizontalLayout);
                 return;
             }
 
@@ -794,8 +796,7 @@ namespace SaintsField.Editor.Core
                     bool drawFieldBySaints = false;
                     if (UseCreateFieldIMGUI && fieldDrawer == null)
                     {
-                        DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            fieldAttributeWithIndex.Index, null, allAttributes, fieldInfo, parent);
+                        DrawField(fieldUseRectNoPost, property, useGuiContent, null, allAttributes, fieldInfo, parent);
                         drawFieldBySaints = true;
                     }
                     else if (fieldDrawer == null)
@@ -808,8 +809,7 @@ namespace SaintsField.Editor.Core
                         SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(property, fieldAttributeWithIndex, GetPreferredLabel(property));
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
-                        fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            fieldAttributeWithIndex.Index, fieldAttributeWithIndex.SaintsAttribute, allAttributes,
+                        fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent, fieldAttributeWithIndex.SaintsAttribute, allAttributes,
                             fieldInfo, parent);
                         drawFieldBySaints = true;
                         // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
@@ -1072,14 +1072,6 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
-        {
-            DrawField(position, property, label, saintsAttribute, allAttributes, info, parent);
-        }
-
-        protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -1202,6 +1194,7 @@ namespace SaintsField.Editor.Core
                 info.FieldType,
                 label,
                 info,
+                null,
                 InHorizontalLayout,
                 false);
         }
@@ -1283,7 +1276,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"use unity draw: {property.propertyType}");
 #endif
-            UnityDraw(position, property, label, info, GetPreferredLabel(property), InHorizontalLayout);
+            UnityDraw(position, property, label, overrideRichTextChunks, info, GetPreferredLabel(property), InHorizontalLayout);
 
             // EditorGUI.PropertyField(position, property, GUIContent.none, true);
             // if (property.propertyType == SerializedPropertyType.Generic)
@@ -1296,32 +1289,34 @@ namespace SaintsField.Editor.Core
             // }
         }
 
-        private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo, string preferredLabel, bool inHorizontalLayout)
+        private void UnityDraw(Rect position, SerializedProperty property, GUIContent label, IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks, FieldInfo fInfo, string prefLabel, bool inHorizontalLayout)
         {
             // Wait... it works now?
-            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(ReflectCache.GetCustomAttributes(fieldInfo));
+            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(ReflectCache.GetCustomAttributes(fInfo));
 
             if(attributeDrawerType != null)
             {
                 PropertyDrawer propertyDrawerInstance =
-                    MakePropertyDrawer(attributeDrawerType, fieldInfo, attributeInstance, preferredLabel);
+                    MakePropertyDrawer(attributeDrawerType, fInfo, attributeInstance, prefLabel);
                 if (propertyDrawerInstance != null)
                 {
                     propertyDrawerInstance.OnGUI(position, property, label);
+                    DrawOverrideRichText(position, label, richTextChunks);
                     return;
                 }
             }
             else  // not attribute drawer, use type drawer
             {
-                Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fieldInfo.FieldType) : fieldInfo.FieldType);
+                Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fInfo.FieldType) : fInfo.FieldType);
                 if (drawerType != null)
                 {
                     // type drawer has no attribute
-                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null, preferredLabel);
+                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fInfo, null, prefLabel);
                     if (drawerInstance != null)
                     {
                         // drawerInstance.GetPropertyHeight(property, label);
                         drawerInstance.OnGUI(position, property, label);
+                        DrawOverrideRichText(position, label, richTextChunks);
                         return;
                     }
                 }
@@ -1330,10 +1325,11 @@ namespace SaintsField.Editor.Core
             IMGUIRawDraw.OnGUIRawFallback(
                 position,
                 property,
-                ReflectCache.GetCustomAttributes<Attribute>(fieldInfo),
-                fieldInfo.FieldType,
+                ReflectCache.GetCustomAttributes<Attribute>(fInfo),
+                fInfo.FieldType,
                 label,
-                fieldInfo,
+                fInfo,
+                richTextChunks,
                 inHorizontalLayout,
                 false
             );
@@ -1383,6 +1379,30 @@ namespace SaintsField.Editor.Core
 //                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
 //             }
 //             // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");
+        }
+
+        private RichTextDrawer _richTextDrawerIMGUI;
+
+        protected void DrawOverrideRichText(Rect position, GUIContent label, IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks)
+        {
+            if (richTextChunks == null)
+            {
+                return;
+            }
+
+            if (label.text == "")
+            {
+                return;
+            }
+
+            float labelWidth = Mathf.Min(EditorGUIUtility.labelWidth, position.width);
+            Rect labelRect = new Rect(position)
+            {
+                width = labelWidth,
+            };
+
+            _richTextDrawerIMGUI ??= new RichTextDrawer();
+            _richTextDrawerIMGUI.DrawChunks(labelRect, richTextChunks);
         }
     }
 }

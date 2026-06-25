@@ -23,11 +23,11 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
 
         protected override bool AllowGuiColor => true;
 
-        public override void OnDestroy()
+        public override void OnSearchField(string searchString)
         {
         }
 
-        public override void OnSearchField(string searchString)
+        public override void OnDestroyIMGUI()
         {
         }
 
@@ -41,6 +41,10 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
         }
 
 #if UNITY_2021_3_OR_NEWER
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot, VisualElement container)
         {
             throw new NotSupportedException("Should not be called");

@@ -239,6 +239,12 @@ namespace SaintsField.Utils
 
         public static IEnumerable<RichTextParsedChunk> ParseRichXml(string richXml)
         {
+            if (!richXml.Contains("<") || !richXml.Contains(">"))
+            {
+                yield return new RichTextParsedChunk(richXml, ChunkType.Text);
+                yield break;
+            }
+
             // Debug.Log($"get rich xml: `{richXml}`");
             List<string> colors = new List<string>();
 
@@ -251,13 +257,14 @@ namespace SaintsField.Utils
 
             // List<string> colorPresent = new List<string>();
             // List<string> stringPresent = new List<string>();
-            List<(string tagName, string tagValueOrNull, string rawContent)> openTags = new List<(string tagName, string tagValueOrNull, string rawContent)>();
-            List<(string tagName, string tagValueOrNull, string rawContent)> needReopenTags = new List<(string tagName, string tagValueOrNull, string rawContent)>();
+            List<(string tagName, string tagValueOrNull, string rawContent)> openTags =
+                new List<(string tagName, string tagValueOrNull, string rawContent)>();
+            List<(string tagName, string tagValueOrNull, string rawContent)> needReopenTags =
+                new List<(string tagName, string tagValueOrNull, string rawContent)>();
             StringBuilder richText = new StringBuilder();
             // List<RichTextChunk> richTextChunks = new List<RichTextChunk>();
             foreach (string part in splitByTags.Where(each => each != ""))
             {
-
                 foreach ((string tagName, string tagValueOrNull, string rawContent) reOpenTag in needReopenTags)
                 {
                     yield return new RichTextParsedChunk(
@@ -267,15 +274,18 @@ namespace SaintsField.Utils
                         tagName: reOpenTag.tagName,
                         tagValue: reOpenTag.tagValueOrNull);
                 }
+
                 needReopenTags.Clear();
 
-                (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
+                (RichPartType partType, string content, string value, bool isSelfClose) parsedResult =
+                    ParsePart(part);
 
                 // Debug.Log($"{parsedResult.partType}: {parsedResult.content}/{parsedResult.value}/{parsedResult.isSelfClose}");
 
                 // ReSharper disable once MergeIntoPattern
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
+                if (parsedResult.partType == RichPartType.Content && parsedResult.value == null &&
+                    !parsedResult.isSelfClose)
                 {
                     richText.Append(parsedResult.content);
                 }
@@ -287,6 +297,7 @@ namespace SaintsField.Utils
                     {
                         yield return new RichTextParsedChunk(curContent, ChunkType.Text);
                     }
+
                     richText = new StringBuilder();
 
                     // Debug.Log($"parse={parsedResult.content}, {parsedResult.value}");
@@ -331,13 +342,16 @@ namespace SaintsField.Utils
 
                         // Debug.Log("processing richText");
                         richText = new StringBuilder();
-                        List<(string tagName, string tagValueOrNull, string rawContent)> openTagsCopy = openTags.ToList();
+                        List<(string tagName, string tagValueOrNull, string rawContent)> openTagsCopy =
+                            openTags.ToList();
 
                         for (int index = 0; index < openTagsCopy.Count; index++)
                         {
-                            (string tagName, string tagValueOrNull, string rawContent) closeTag = openTagsCopy[openTagsCopy.Count - index - 1];
+                            (string tagName, string tagValueOrNull, string rawContent) closeTag =
+                                openTagsCopy[openTagsCopy.Count - index - 1];
                             yield return new RichTextParsedChunk($"</{closeTag.tagName}>", ChunkType.NormalTag,
-                                tagType: TagType.EndTag, tagName: closeTag.tagName, tagValue: closeTag.tagValueOrNull);
+                                tagType: TagType.EndTag, tagName: closeTag.tagName,
+                                tagValue: closeTag.tagValueOrNull);
                         }
 
                         var color = colors.Count > 0 ? colors[colors.Count - 1] : null;

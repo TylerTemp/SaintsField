@@ -6,7 +6,6 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
-using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -31,42 +30,51 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             RenderPositionTargetIMGUI(rect, preCheckResult);
         }
 
-        private static IReadOnlyList<(string, List<IPlayaAttribute>)> GroupAttributesIMGUI(IEnumerable<IPlayaAttribute> playaAttributes)
-        {
-            List<(string, List<IPlayaAttribute>)> groupWithAttributes = new List<(string, List<IPlayaAttribute>)>();
-            Dictionary<string, List<IPlayaAttribute>> groupToAttributes = new Dictionary<string, List<IPlayaAttribute>>();
+        // private static IReadOnlyList<(string, List<IPlayaAttribute>)> GroupAttributesIMGUI(IEnumerable<IPlayaAttribute> playaAttributes)
+        // {
+        //     List<(string, List<IPlayaAttribute>)> groupWithAttributes = new List<(string, List<IPlayaAttribute>)>();
+        //     Dictionary<string, List<IPlayaAttribute>> groupToAttributes = new Dictionary<string, List<IPlayaAttribute>>();
+        //
+        //     foreach (IPlayaAttribute playaAttribute in playaAttributes)
+        //     {
+        //         string groupBy = "";
+        //         if (playaAttribute is IPlayaIMGUIGroupBy imguiGroupBy)
+        //         {
+        //             groupBy = imguiGroupBy.GroupBy;
+        //         }
+        //
+        //         if (string.IsNullOrEmpty(groupBy))
+        //         {
+        //             groupWithAttributes.Add(("", new List<IPlayaAttribute>(){playaAttribute}));
+        //         }
+        //         else
+        //         {
+        //             if (!groupToAttributes.TryGetValue(groupBy, out List<IPlayaAttribute> list))
+        //             {
+        //                 list = new List<IPlayaAttribute>();
+        //                 groupToAttributes.Add(groupBy, list);
+        //                 groupWithAttributes.Add((groupBy, list));
+        //             }
+        //
+        //             list.Add(playaAttribute);
+        //         }
+        //     }
+        //
+        //     return groupWithAttributes;
+        // }
 
-            foreach (IPlayaAttribute playaAttribute in playaAttributes)
-            {
-                string groupBy = "";
-                if (playaAttribute is IPlayaIMGUIGroupBy imguiGroupBy)
-                {
-                    groupBy = imguiGroupBy.GroupBy;
-                }
-
-                if (string.IsNullOrEmpty(groupBy))
-                {
-                    groupWithAttributes.Add(("", new List<IPlayaAttribute>(){playaAttribute}));
-                }
-                else
-                {
-                    if (!groupToAttributes.TryGetValue(groupBy, out List<IPlayaAttribute> list))
-                    {
-                        list = new List<IPlayaAttribute>();
-                        groupToAttributes.Add(groupBy, list);
-                        groupWithAttributes.Add((groupBy, list));
-                    }
-
-                    list.Add(playaAttribute);
-                }
-            }
-
-            return groupWithAttributes;
-        }
+        private bool _projectChangeInit;
 
         public virtual float GetHeightIMGUI(float width)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
+
+            if (!_projectChangeInit)
+            {
+                _projectChangeInit = true;
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(OnApplicationChangedIMGUI);
+            }
+
             if (!preCheckResult.IsShown)
             {
                 return 0;
@@ -75,29 +83,25 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return GetFieldHeightIMGUI(width, preCheckResult);
         }
 
+        private void OnDestroyIMGUIAbsCallback()
+        {
+            SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(OnApplicationChangedIMGUI);
+        }
+
+
+
+        public abstract void OnDestroyIMGUI();
+
 
         protected abstract float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult);
 
         public void RenderPositionIMGUI(Rect position)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
-            Rect aboveRect = RenderAbovePosition(position);
-            float targetHeight = GetFieldHeightIMGUI(position.width, preCheckResult);
-            (Rect targetRect, Rect belowRect) = RectUtils.SplitHeightRect(aboveRect, targetHeight);
-            RenderPositionTargetIMGUI(targetRect, preCheckResult);
-            RenderPositionBelow(belowRect);
-        }
-
-        protected virtual Rect RenderAbovePosition(Rect position)
-        {
-            return position;
+            RenderPositionTargetIMGUI(position, preCheckResult);
         }
 
         protected abstract void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult);
-
-        protected virtual void RenderPositionBelow(Rect position)
-        {
-        }
 
         protected static float FieldHeight(object value, string label)
         {
@@ -480,6 +484,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 // return isDrawn;
             }
+        }
+
+        private void OnApplicationChangedIMGUI()
+        {
+            _cachedRichTextChunks = null;
+        }
+
+        private IReadOnlyList<RichTextDrawer.RichTextChunk> _cachedRichTextChunks;
+
+        protected IReadOnlyList<RichTextDrawer.RichTextChunk> ParseRichXmlWithProviderIMGUI(string richLabelXml)
+        {
+            if (_cachedRichTextChunks == null || richLabelXml.Contains("<field"))
+            {
+                _cachedRichTextChunks = RichTextDrawer.ParseRichXmlWithProvider(richLabelXml, this).ToArray();
+            }
+            return _cachedRichTextChunks;
         }
     }
 }

@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
 
                 IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = nowXml == null
                     ? null
-                    : RichTextDrawer.ParseRichXml(nowXml, property.displayName, property, info, parent).ToArray();
+                    : RichTextDrawer.ParseRichXmlWithProvider(nowXml, this).ToArray();
 
                 bool tryProcess = payload.TargetField != null;
 

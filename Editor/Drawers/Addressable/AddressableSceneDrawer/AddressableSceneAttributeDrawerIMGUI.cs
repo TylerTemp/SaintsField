@@ -56,7 +56,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -69,6 +68,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             {
                 Object newObj = EditorGUI.ObjectField(position, label, sceneEntry?.MainAsset as SceneAsset,
                     typeof(SceneAsset), false);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {

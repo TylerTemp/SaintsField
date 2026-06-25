@@ -744,7 +744,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keyWrapType, keysField, keyType, elementProp, keyInjectCreatedAttributes, keyInjectAttributes, keyHasSerializeReference, this, this, keysParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keyWrapType, keysField, keyType, elementProp, keyInjectCreatedAttributes, keyInjectAttributes, keyHasSerializeReference, this, this, this, keysParent);
                     keyContainer.Add(resultElement);
 
                     keyContainer.TrackPropertyValue(keysProp, _ =>
@@ -883,7 +883,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     // Debug.Log($"elementProp={elementProp.propertyPath}, valueWrapType={valueWrapType}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, valueInjectCreatedAttributes, valueInjectAttributes, valueHasSerializeReference, this, this, valuesParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, valueInjectCreatedAttributes, valueInjectAttributes, valueHasSerializeReference, this, this, this, valuesParent);
 
                     element.Add(resultElement);
 

@@ -245,7 +245,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
             => DrawRowField(position, property, label, info, (SaintsRowAttribute)saintsAttribute);
@@ -258,10 +257,12 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             if (!saintsRowAttribute.Inline)
             {
                 // Debug.Log($"render foldout {position.x}, {position.y}");
-                property.isExpanded = EditorGUI.Foldout(new Rect(position)
+                Rect foldoutRect = new Rect(position)
                 {
                     height = SaintsPropertyDrawer.SingleLineHeight,
-                }, property.isExpanded, label, true);
+                };
+                property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
+                DrawOverrideRichText(foldoutRect, label, overrideRichTextChunks);
             }
 
             if (!saintsRowAttribute.Inline && !property.isExpanded)

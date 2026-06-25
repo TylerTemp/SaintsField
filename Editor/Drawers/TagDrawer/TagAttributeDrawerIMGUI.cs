@@ -18,13 +18,13 @@ namespace SaintsField.Editor.Drawers.TagDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -32,6 +32,7 @@ namespace SaintsField.Editor.Drawers.TagDrawer
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 string result = EditorGUI.TagField(position, label, property.stringValue);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 if (changed.changed)
                 {
                     property.stringValue = result;

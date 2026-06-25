@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
@@ -91,6 +87,7 @@ namespace SaintsField.Editor.Core
 
         public readonly struct RichTextChunk: IEquatable<RichTextChunk>
         {
+            // ReSharper disable once MemberCanBePrivate.Global
             public readonly string RawContent;
 
             public readonly bool IsIcon;
@@ -131,259 +128,266 @@ namespace SaintsField.Editor.Core
 
         // NOTE: Unity rich text is NOT xml; This is not Unity rich text as
         // Unity will treat invalid rich text as plain text. This will try to fix the broken xml
-        // TODO: use RuntimeUtil.ParseRichXml parser
-        public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, SerializedProperty property, MemberInfo fieldInfo, object parent)
+//         [Obsolete]
+//         public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, SerializedProperty property, MemberInfo fieldInfo, object parent)
+//         {
+//             List<string> colors = new List<string>();
+//
+//             // // Define a regular expression pattern to match the tags
+//             // const string pattern = "(<[^>]+>)";
+//             //
+//             // // Use Regex.Split to split the string by tags
+//             // string[] splitByTags = Regex.Split(richXml, pattern);
+//             string[]  splitByTags = RuntimeUtil.SplitByTags(richXml).Select(each => each.stringChunk).ToArray();
+//
+//             // List<string> colorPresent = new List<string>();
+//             // List<string> stringPresent = new List<string>();
+//             List<(string tagName, string tagValueOrNull, string rawContent)> openTags = new List<(string tagName, string tagValueOrNull, string rawContent)>();
+//             StringBuilder richText = new StringBuilder();
+//             // List<RichTextChunk> richTextChunks = new List<RichTextChunk>();
+//             foreach (string part in splitByTags.Where(each => each != ""))
+//             {
+//                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
+//
+//                 // Debug.Log($"parse: {part} -> {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
+//
+//                 // ReSharper disable once MergeIntoPattern
+//                 // ReSharper disable once ConvertIfStatementToSwitchStatement
+//                 if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
+//                 {
+//                     richText.Append(parsedResult.content);
+//                 }
+//                 // ReSharper disable once MergeIntoPattern
+//                 else if (parsedResult.partType == RichPartType.StartTag && !parsedResult.isSelfClose)
+//                 {
+//                     // Debug.Log($"parse={parsedResult.content}, {parsedResult.value}");
+//                     openTags.Add((parsedResult.content, parsedResult.value, part));
+//                     if (parsedResult.content == "color")
+//                     {
+//                         colors.Add(parsedResult.value);
+//                         // richText.Append(Colors.ColorNameSupported(parsedResult.value)
+//                         //     ? part
+//                         //     : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
+//                         // richText.Append(
+//                         //     $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");、
+//                         richText.Append(
+//                             $"<color={parsedResult.value}>");
+//                     }
+//                     else
+//                     {
+//                         richText.Append(part);
+//                     }
+//                 }
+//                 else if (parsedResult.partType == RichPartType.EndTag)
+//                 {
+//                     if (!parsedResult.isSelfClose)
+//                     {
+//                         // ReSharper disable once UseIndexFromEndExpression
+// #if SAINTSFIELD_DEBUG
+//                         Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content, parsedResult.content);
+// #endif
+//                         if(openTags.Count > 0)
+//                         {
+//                             openTags.RemoveAt(openTags.Count - 1);
+//                         }
+//                     }
+//
+//                     switch (parsedResult.content)
+//                     {
+//                         case "color" when colors.Count == 0:
+// #if SAINTSFIELD_DEBUG
+//                             Debug.LogError($"missing open color tag for {richText}");
+// #endif
+//                             break;
+//                         case "color" when colors.Count > 0:
+//                             colors.RemoveAt(colors.Count - 1);
+//
+//                             richText.Append(part);
+//                             break;
+//                         case "label":
+//                             richText.Append(labelText);
+//                             break;
+//                         case "container.Type":
+//                         {
+//                             Type decType = fieldInfo?.DeclaringType;
+//                             richText.Append(decType == null ? "" : decType.Name);
+//                         }
+//                             break;
+//                         case "container.Type.BaseType":
+//                         {
+//                             Type baseType = fieldInfo?.DeclaringType?.BaseType;
+//                             richText.Append(baseType == null? "": baseType.Name);
+//                         }
+//                             break;
+//                         case "index":
+//                         {
+//                             if (property != null && SerializedUtils.IsOk(property))
+//                             {
+//                                 int index = SerializedUtils.PropertyPathIndex(property.propertyPath);
+//                                 if (index >= 0)
+//                                 {
+//                                     richText.Append(TagStringFormatter(index, parsedResult.value));
+//                                 }
+//                             }
+//                         }
+//                             break;
+//                         case "icon":
+//                         {
+//                             Debug.Assert(parsedResult.value != null);
+//                             // process ending
+//                             string curContent = richText.ToString();
+//                             if (curContent != "")
+//                             {
+//                                 string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
+//                                 yield return new RichTextChunk(isIcon: false, content: $"{curContent}{endTagsString}");
+//                                 // {
+//                                 //     IsIcon = false,
+//                                 //     Content = $"{curContent}{endTagsString}",
+//                                 // };
+//                             }
+//
+//                             yield return new RichTextChunk(isIcon: true, content: parsedResult.value,
+//                                 iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
+//                             // {
+//                             //     IsIcon = true,
+//                             //     Content = parsedResult.value,
+//                             //     // ReSharper disable once UseIndexFromEndExpression
+//                             //     IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
+//                             // };
+//
+//                             // string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
+//                             string textOpeningTags = string.Join("", openTags.Select(each => $"<{each.tagName}{(each.tagValueOrNull==null? "": $"={each.tagValueOrNull}")}>"));
+//                             richText = new StringBuilder(textOpeningTags);
+//                         }
+//                             break;
+//                         default:
+//                         {
+//                             // Debug.Log(parsedResult.content);
+//                             if (parsedResult.content != null && (parsedResult.content == "field" ||
+//                                                                  parsedResult.content.StartsWith("field.")))
+//                             {
+//                                 (string error, int index, object value) fieldValue = Util.GetValue(property, fieldInfo, parent);
+//                                 if (fieldValue.error != "")
+//                                 {
+// #if SAINTSFIELD_DEBUG
+//                                     Debug.LogError(fieldValue.error);
+// #endif
+//                                 }
+//                                 else
+//                                 {
+//                                     object finalValue = null;
+//                                     bool hasError = false;
+//                                     if(parsedResult.content == "field")
+//                                     {
+//                                         // richText.Append(RuntimeUtil.IsNull(fieldValue.value)
+//                                         //     ? ""
+//                                         //     : $"{fieldValue.value}");
+//                                         finalValue = fieldValue.value;
+//                                     }
+//                                     else
+//                                     {
+//                                         object accParent = fieldValue.value;
+//                                         // Debug.Log(parsedResult.content);
+//                                         (string error, int index, object value) accResult = ("Field value is null", -1, null);
+//                                         if(!RuntimeUtil.IsNull(accParent))
+//                                         {
+//                                             // ReSharper disable once ReplaceSubstringWithRangeIndexer
+//                                             string[] subFields = parsedResult.content.Substring("field.".Length).Split(SerializedUtils.DotSplitSeparator);
+//                                             foreach (string attrName in subFields)
+//                                             {
+//                                                 MemberInfo accMemberInfo = null;
+//                                                 foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
+//                                                 {
+//                                                     foreach (MemberInfo info in type.GetMember(attrName,
+//                                                                  BindingFlags.Public | BindingFlags.NonPublic |
+//                                                                  BindingFlags.Instance | BindingFlags.Static |
+//                                                                  BindingFlags.FlattenHierarchy))
+//                                                     {
+//                                                         if (info == null) continue;
+//                                                         accMemberInfo = info;
+//                                                         break;
+//                                                     }
+//                                                 }
+//
+//                                                 accResult = Util.GetValueAtIndex(-1, accMemberInfo, accParent);
+//                                                 if (accResult.error != "")
+//                                                 {
+// #if SAINTSFIELD_DEBUG
+//                                                     Debug.LogError($"{attrName} from {accParent}: {accResult.error}");
+// #endif
+//                                                     break;
+//                                                 }
+//
+//                                                 accParent = accResult.value;
+//                                                 if (accParent == null)
+//                                                 {
+//                                                     accResult = ($"No target found for {attrName}", -1, null);
+//                                                     break;
+//                                                 }
+//                                             }
+//                                         }
+//
+//                                         if (accResult.error == "")
+//                                         {
+//                                             // Debug.Log($"{parsedResult.content}: {accResult.value}");
+//                                             // Debug.Log($"accResult.value={accResult.value}");
+//                                             finalValue = accResult.value;
+//                                         }
+//                                         else
+//                                         {
+//                                             hasError = true;
+//                                         }
+//                                         //
+//                                         // Debug.Log(string.Join(".", subFields));
+//                                     }
+//
+//                                     if (!hasError)
+//                                     {
+//                                         string tagFinalResult = TagStringFormatter(finalValue, parsedResult.value);
+//                                         richText.Append(tagFinalResult);
+//                                     }
+//                                 }
+//                             }
+//                             else
+//                             {
+//                                 richText.Append(part);
+//                             }
+//                         }
+//                             break;
+//                     }
+//                 }
+//
+//             }
+//
+//             string leftContent = richText.ToString();
+//
+//             // ReSharper disable once InvertIf
+//             if (leftContent != "")
+//             {
+//                 string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
+// #if EXT_INSPECTOR_LOG
+//                 Debug.Log($"chunk added left: {leftContent}{endTagsString}");
+// #endif
+//                 yield return new RichTextChunk(isIcon: false, content: $"{leftContent}{endTagsString}");
+//                 // {
+//                 //     IsIcon = false,
+//                 //     Content = $"{leftContent}{endTagsString}",
+//                 // };
+//             }
+//
+//             // return richTextChunks;
+//         }
+
+        public readonly struct EmptyRichTextTagProvider: IRichTextTagProvider
         {
-            List<string> colors = new List<string>();
+            private readonly string _label;
 
-            // // Define a regular expression pattern to match the tags
-            // const string pattern = "(<[^>]+>)";
-            //
-            // // Use Regex.Split to split the string by tags
-            // string[] splitByTags = Regex.Split(richXml, pattern);
-            string[]  splitByTags = RuntimeUtil.SplitByTags(richXml).Select(each => each.stringChunk).ToArray();
-
-            // List<string> colorPresent = new List<string>();
-            // List<string> stringPresent = new List<string>();
-            List<(string tagName, string tagValueOrNull, string rawContent)> openTags = new List<(string tagName, string tagValueOrNull, string rawContent)>();
-            StringBuilder richText = new StringBuilder();
-            // List<RichTextChunk> richTextChunks = new List<RichTextChunk>();
-            foreach (string part in splitByTags.Where(each => each != ""))
+            public EmptyRichTextTagProvider(string label)
             {
-                (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
-
-                // Debug.Log($"parse: {part} -> {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
-
-                // ReSharper disable once MergeIntoPattern
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
-                {
-                    richText.Append(parsedResult.content);
-                }
-                // ReSharper disable once MergeIntoPattern
-                else if (parsedResult.partType == RichPartType.StartTag && !parsedResult.isSelfClose)
-                {
-                    // Debug.Log($"parse={parsedResult.content}, {parsedResult.value}");
-                    openTags.Add((parsedResult.content, parsedResult.value, part));
-                    if (parsedResult.content == "color")
-                    {
-                        colors.Add(parsedResult.value);
-                        // richText.Append(Colors.ColorNameSupported(parsedResult.value)
-                        //     ? part
-                        //     : $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");
-                        // richText.Append(
-                        //     $"<color={Colors.ToHtmlHexString(Colors.GetColorByStringPresent(parsedResult.value))}>");、
-                        richText.Append(
-                            $"<color={parsedResult.value}>");
-                    }
-                    else
-                    {
-                        richText.Append(part);
-                    }
-                }
-                else if (parsedResult.partType == RichPartType.EndTag)
-                {
-                    if (!parsedResult.isSelfClose)
-                    {
-                        // ReSharper disable once UseIndexFromEndExpression
-#if SAINTSFIELD_DEBUG
-                        Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content, parsedResult.content);
-#endif
-                        if(openTags.Count > 0)
-                        {
-                            openTags.RemoveAt(openTags.Count - 1);
-                        }
-                    }
-
-                    switch (parsedResult.content)
-                    {
-                        case "color" when colors.Count == 0:
-#if SAINTSFIELD_DEBUG
-                            Debug.LogError($"missing open color tag for {richText}");
-#endif
-                            break;
-                        case "color" when colors.Count > 0:
-                            colors.RemoveAt(colors.Count - 1);
-
-                            richText.Append(part);
-                            break;
-                        case "label":
-                            richText.Append(labelText);
-                            break;
-                        case "container.Type":
-                        {
-                            Type decType = fieldInfo?.DeclaringType;
-                            richText.Append(decType == null ? "" : decType.Name);
-                        }
-                            break;
-                        case "container.Type.BaseType":
-                        {
-                            Type baseType = fieldInfo?.DeclaringType?.BaseType;
-                            richText.Append(baseType == null? "": baseType.Name);
-                        }
-                            break;
-                        case "index":
-                        {
-                            if (property != null && SerializedUtils.IsOk(property))
-                            {
-                                int index = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                                if (index >= 0)
-                                {
-                                    richText.Append(TagStringFormatter(index, parsedResult.value));
-                                }
-                            }
-                        }
-                            break;
-                        case "icon":
-                        {
-                            Debug.Assert(parsedResult.value != null);
-                            // process ending
-                            string curContent = richText.ToString();
-                            if (curContent != "")
-                            {
-                                string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
-                                yield return new RichTextChunk(isIcon: false, content: $"{curContent}{endTagsString}");
-                                // {
-                                //     IsIcon = false,
-                                //     Content = $"{curContent}{endTagsString}",
-                                // };
-                            }
-
-                            yield return new RichTextChunk(isIcon: true, content: parsedResult.value,
-                                iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
-                            // {
-                            //     IsIcon = true,
-                            //     Content = parsedResult.value,
-                            //     // ReSharper disable once UseIndexFromEndExpression
-                            //     IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
-                            // };
-
-                            // string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
-                            string textOpeningTags = string.Join("", openTags.Select(each => $"<{each.tagName}{(each.tagValueOrNull==null? "": $"={each.tagValueOrNull}")}>"));
-                            richText = new StringBuilder(textOpeningTags);
-                        }
-                            break;
-                        default:
-                        {
-                            // Debug.Log(parsedResult.content);
-                            if (parsedResult.content != null && (parsedResult.content == "field" ||
-                                                                 parsedResult.content.StartsWith("field.")))
-                            {
-                                (string error, int index, object value) fieldValue = Util.GetValue(property, fieldInfo, parent);
-                                if (fieldValue.error != "")
-                                {
-#if SAINTSFIELD_DEBUG
-                                    Debug.LogError(fieldValue.error);
-#endif
-                                }
-                                else
-                                {
-                                    object finalValue = null;
-                                    bool hasError = false;
-                                    if(parsedResult.content == "field")
-                                    {
-                                        // richText.Append(RuntimeUtil.IsNull(fieldValue.value)
-                                        //     ? ""
-                                        //     : $"{fieldValue.value}");
-                                        finalValue = fieldValue.value;
-                                    }
-                                    else
-                                    {
-                                        object accParent = fieldValue.value;
-                                        // Debug.Log(parsedResult.content);
-                                        (string error, int index, object value) accResult = ("Field value is null", -1, null);
-                                        if(!RuntimeUtil.IsNull(accParent))
-                                        {
-                                            // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split(SerializedUtils.DotSplitSeparator);
-                                            foreach (string attrName in subFields)
-                                            {
-                                                MemberInfo accMemberInfo = null;
-                                                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
-                                                {
-                                                    foreach (MemberInfo info in type.GetMember(attrName,
-                                                                 BindingFlags.Public | BindingFlags.NonPublic |
-                                                                 BindingFlags.Instance | BindingFlags.Static |
-                                                                 BindingFlags.FlattenHierarchy))
-                                                    {
-                                                        if (info == null) continue;
-                                                        accMemberInfo = info;
-                                                        break;
-                                                    }
-                                                }
-
-                                                accResult = Util.GetValueAtIndex(-1, accMemberInfo, accParent);
-                                                if (accResult.error != "")
-                                                {
-#if SAINTSFIELD_DEBUG
-                                                    Debug.LogError($"{attrName} from {accParent}: {accResult.error}");
-#endif
-                                                    break;
-                                                }
-
-                                                accParent = accResult.value;
-                                                if (accParent == null)
-                                                {
-                                                    accResult = ($"No target found for {attrName}", -1, null);
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        if (accResult.error == "")
-                                        {
-                                            // Debug.Log($"{parsedResult.content}: {accResult.value}");
-                                            // Debug.Log($"accResult.value={accResult.value}");
-                                            finalValue = accResult.value;
-                                        }
-                                        else
-                                        {
-                                            hasError = true;
-                                        }
-                                        //
-                                        // Debug.Log(string.Join(".", subFields));
-                                    }
-
-                                    if (!hasError)
-                                    {
-                                        string tagFinalResult = TagStringFormatter(finalValue, parsedResult.value);
-                                        richText.Append(tagFinalResult);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                richText.Append(part);
-                            }
-                        }
-                            break;
-                    }
-                }
-
+                _label = label;
             }
 
-            string leftContent = richText.ToString();
-
-            // ReSharper disable once InvertIf
-            if (leftContent != "")
-            {
-                string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
-#if EXT_INSPECTOR_LOG
-                Debug.Log($"chunk added left: {leftContent}{endTagsString}");
-#endif
-                yield return new RichTextChunk(isIcon: false, content: $"{leftContent}{endTagsString}");
-                // {
-                //     IsIcon = false,
-                //     Content = $"{leftContent}{endTagsString}",
-                // };
-            }
-
-            // return richTextChunks;
-        }
-
-        public struct EmptyRichTextTagProvider: IRichTextTagProvider
-        {
-            public string GetLabel() => "";
+            public string GetLabel() => _label ?? "";
 
             public string GetContainerType() => "";
 
@@ -575,73 +579,73 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        private enum RichPartType
-        {
-            Content,
-            StartTag,
-            EndTag,
-        }
+        // private enum RichPartType
+        // {
+        //     Content,
+        //     StartTag,
+        //     EndTag,
+        // }
 
-        private static (RichPartType partType, string content, string value, bool isSelfClose) ParsePart(string part)
-        {
-            if (!part.StartsWith("<") || !part.EndsWith(">"))  // content
-            {
-                return (RichPartType.Content, part, null, false);
-            }
+        // private static (RichPartType partType, string content, string value, bool isSelfClose) ParsePart(string part)
+        // {
+        //     if (!part.StartsWith("<") || !part.EndsWith(">"))  // content
+        //     {
+        //         return (RichPartType.Content, part, null, false);
+        //     }
+        //
+        //     if (part.StartsWith("</"))  // close
+        //     {
+        //         string endTagRawContent = part.Substring(2, part.Length - 3).Trim();
+        //         if (endTagRawContent.Length > 0)
+        //         {
+        //             return (RichPartType.EndTag, endTagRawContent.Trim(), null, false);
+        //         }
+        //         return (RichPartType.Content, part, null, false);
+        //     }
+        //     if (part.EndsWith("/>"))  // self close
+        //     {
+        //         string endTagRawContent = part.Substring(1, part.Length - 3).Trim();
+        //         (string endTagName, string endTagValue) = ParseTag(endTagRawContent);
+        //         return endTagName.Length > 0
+        //             ? (RichPartType.EndTag, endTagName, endTagValue, true)
+        //             : (RichPartType.Content, part, null, false);
+        //     }
+        //
+        //     // open tag
+        //     string tagRawContent = part.Substring(1, part.Length - 2);
+        //     (string tagName, string tagValue) = ParseTag(tagRawContent);
+        //     return tagName.Length > 0
+        //         ? (RichPartType.StartTag, tagName, tagValue, false)
+        //         : (RichPartType.Content, part, null, false);
+        // }
 
-            if (part.StartsWith("</"))  // close
-            {
-                string endTagRawContent = part.Substring(2, part.Length - 3).Trim();
-                if (endTagRawContent.Length > 0)
-                {
-                    return (RichPartType.EndTag, endTagRawContent.Trim(), null, false);
-                }
-                return (RichPartType.Content, part, null, false);
-            }
-            if (part.EndsWith("/>"))  // self close
-            {
-                string endTagRawContent = part.Substring(1, part.Length - 3).Trim();
-                (string endTagName, string endTagValue) = ParseTag(endTagRawContent);
-                return endTagName.Length > 0
-                    ? (RichPartType.EndTag, endTagName, endTagValue, true)
-                    : (RichPartType.Content, part, null, false);
-            }
-
-            // open tag
-            string tagRawContent = part.Substring(1, part.Length - 2);
-            (string tagName, string tagValue) = ParseTag(tagRawContent);
-            return tagName.Length > 0
-                ? (RichPartType.StartTag, tagName, tagValue, false)
-                : (RichPartType.Content, part, null, false);
-        }
-
-        private static (string tagName, string tagValue) ParseTag(string tagRaw)
-        {
-            // const string reg = @"(\w+)=(.+)";
-            const string reg = @"([^\=]+)=(.+)";
-            Match match = Regex.Match(tagRaw, reg);
-            if (!match.Success)
-            {
-                return (tagRaw.Trim(), null);
-            }
-
-            string tagName = match.Groups[1].Value;
-            string tagValue = match.Groups[2].Value;
-            if ((tagValue.StartsWith("'") && tagValue.EndsWith("'")) ||
-                (tagValue.StartsWith("\"") && tagValue.EndsWith("\"")))
-            {
-                tagValue = tagValue.Substring(1, tagValue.Length - 2);
-            }
-
-            string tagNameStrip = tagName.Trim();
-
-            if (tagNameStrip == "color")
-            {
-                tagValue = Colors.ToHtmlHexString(Colors.GetColorByStringPresent(tagValue));
-                // Debug.Log(tagValue);
-            }
-            return (tagNameStrip, tagValue);
-        }
+        // private static (string tagName, string tagValue) ParseTag(string tagRaw)
+        // {
+        //     // const string reg = @"(\w+)=(.+)";
+        //     const string reg = @"([^\=]+)=(.+)";
+        //     Match match = Regex.Match(tagRaw, reg);
+        //     if (!match.Success)
+        //     {
+        //         return (tagRaw.Trim(), null);
+        //     }
+        //
+        //     string tagName = match.Groups[1].Value;
+        //     string tagValue = match.Groups[2].Value;
+        //     if ((tagValue.StartsWith("'") && tagValue.EndsWith("'")) ||
+        //         (tagValue.StartsWith("\"") && tagValue.EndsWith("\"")))
+        //     {
+        //         tagValue = tagValue.Substring(1, tagValue.Length - 2);
+        //     }
+        //
+        //     string tagNameStrip = tagName.Trim();
+        //
+        //     if (tagNameStrip == "color")
+        //     {
+        //         tagValue = Colors.ToHtmlHexString(Colors.GetColorByStringPresent(tagValue));
+        //         // Debug.Log(tagValue);
+        //     }
+        //     return (tagNameStrip, tagValue);
+        // }
 
         public float GetWidth(GUIContent oldLabel, float height, IEnumerable<RichTextChunk> payloads)
         {

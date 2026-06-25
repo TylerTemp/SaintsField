@@ -19,6 +19,10 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             public RichTextDrawer RichTextDrawer;
         }
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

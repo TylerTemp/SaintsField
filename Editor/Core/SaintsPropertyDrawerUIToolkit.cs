@@ -659,7 +659,7 @@ namespace SaintsField.Editor.Core
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
                 return UIToolkitUtils.CreateOrUpdateFieldRawFallback(property, allAttributes, rawType, passedPreferredLabel,
-                    info, InHorizontalLayout, this, this, null, parent);
+                    info, InHorizontalLayout, this, this, this, null, parent);
             }
 
             // return PropertyFieldFallbackUIToolkit(property);

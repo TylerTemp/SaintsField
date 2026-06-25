@@ -43,7 +43,6 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -61,6 +60,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 Debug.LogError(cacheInfo.Error);
 #endif
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -118,12 +118,14 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     Debug.LogError(preMinValue.error);
 #endif
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
 
                 using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
                     float sliderX = EditorGUI.FloatField(labelWithMinFieldRect, label, preMinValue.value);
+                    DrawOverrideRichText(labelWithMinFieldRect, label, overrideRichTextChunks);
                     if (changed.changed)
                     {
                         (string error, float value) postMinValue = PropRangeAttributeDrawer.GetPostValue(sliderX, adaptAttribute);
@@ -156,6 +158,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     Debug.LogError(preMaxValue.error);
 #endif
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
 
@@ -216,12 +219,14 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     Debug.LogError(preMinValue.error);
 #endif
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
 
                 using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
                     int sliderX = EditorGUI.IntField(labelWithMinFieldRect, label, preMinValue.value);
+                    DrawOverrideRichText(labelWithMinFieldRect, label, overrideRichTextChunks);
                     if (changed.changed)
                     {
                         (string error, int value) postMinValue = PropRangeAttributeDrawer.GetPostValue(sliderX, adaptAttribute);
@@ -254,6 +259,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     Debug.LogError(preMaxValue.error);
 #endif
                     RawDefaultDrawer(position, property, allAttributes, label, info);
+                    DrawOverrideRichText(position, label, overrideRichTextChunks);
                     return;
                 }
 

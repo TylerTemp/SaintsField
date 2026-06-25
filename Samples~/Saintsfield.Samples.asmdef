@@ -18,7 +18,8 @@
         "com.inter-illusion.i2",
         "SaintsField.Runtime.TypeReference",
         "SaintsField.Runtime.Events",
-        "SaintsField.Runtime.I2Loc"
+        "SaintsField.Runtime.I2Loc",
+        "SaintsField.Runtime.Spine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -67,9 +68,14 @@
             "define": "SAINTSFIELD_NEWTONSOFT_JSON"
         },
         {
-            "name": "com.unity.nuget.newtonsoft-json",
+            "name": "com.esotericsoftware.spine.spine-csharp",
             "expression": "",
-            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
+            "define": "SAINTSFIELD_SPINE_CSHARP"
+        },
+        {
+            "name": "com.esotericsoftware.spine.spine-unity",
+            "expression": "",
+            "define": "SAINTSFIELD_SPINE_UNITY"
         }
     ],
     "noEngineReferences": false

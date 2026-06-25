@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             if (displayInfo.HasRichName)
             {
                 // Debug.Log($"add rich {displayInfo.RichName}");
-                foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(displayInfo.RichName, displayInfo.Name, null, null, null)))
+                foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXmlWithProvider(displayInfo.RichName, new RichTextDrawer.EmptyRichTextTagProvider(displayInfo.Name))))
                 {
                     label.Add(chunk);
                 }

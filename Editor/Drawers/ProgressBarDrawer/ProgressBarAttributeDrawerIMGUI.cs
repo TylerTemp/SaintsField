@@ -42,7 +42,6 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info,
@@ -81,6 +80,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             };
 
             EditorGUI.DrawRect(fillRect, metaInfo.Color);
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
 
             if (GUI.enabled)
             {

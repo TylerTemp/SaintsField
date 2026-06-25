@@ -201,6 +201,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return null;
         }
 
+        public abstract void OnDestroyUIToolkit();
+
         protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container);
 

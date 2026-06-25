@@ -325,7 +325,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
             fancyButton.MainLabel.Clear();
             parent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(useXml, property.displayName, property, info, parent);
+            IEnumerable<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXmlWithProvider(useXml, this);
             foreach (VisualElement visualElement in RichTextDrawer.DrawChunksUIToolKit(richChunks))
             {
                 fancyButton.MainLabel.Add(visualElement);

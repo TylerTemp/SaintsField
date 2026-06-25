@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             GUIContent actualLabel = GetActualLabel(property, label);
@@ -49,10 +49,12 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
             if (saintsSerializedActual == null)
             {
                 DrawError(position, $"{nameof(SaintsSerializedActualAttribute)} not found");
+                DrawOverrideRichText(position, actualLabel, overrideRichTextChunks);
                 return;
             }
 
-            DrawSerializedActualField(position, saintsSerializedActual, property, actualLabel, index, info, parent);
+            DrawSerializedActualField(position, saintsSerializedActual, property, actualLabel, info, parent);
+            DrawOverrideRichText(position, actualLabel, overrideRichTextChunks);
         }
 
         private float GetSerializedActualFieldHeight(SaintsSerializedActualAttribute saintsSerializedActual,
@@ -101,7 +103,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
         }
 
         private void DrawSerializedActualField(Rect position, SaintsSerializedActualAttribute saintsSerializedActual,
-            SerializedProperty property, GUIContent label, int index, FieldInfo info, object parent)
+            SerializedProperty property, GUIContent label, FieldInfo info, object parent)
         {
             (string error, SaintsPropertyType propertyType) = GetPropertyType(property);
             if (error != "")
@@ -146,7 +148,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
 
                     break;
                 case SaintsPropertyType.TimeSpan:
-                    if (TimeSpanAttributeDrawer.DrawSerializedActualField(position, property, label, index, info,
+                    if (TimeSpanAttributeDrawer.DrawSerializedActualField(position, property, label, info,
                             newValue => TriggerChangedIMGUI(property, newValue)))
                     {
                         return;
@@ -154,7 +156,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
 
                     break;
                 case SaintsPropertyType.Guid:
-                    if (GuidAttributeDrawer.DrawSerializedActualField(position, property, label, index,
+                    if (GuidAttributeDrawer.DrawSerializedActualField(position, property, label,
                             newValue => TriggerChangedIMGUI(property, newValue)))
                     {
                         return;

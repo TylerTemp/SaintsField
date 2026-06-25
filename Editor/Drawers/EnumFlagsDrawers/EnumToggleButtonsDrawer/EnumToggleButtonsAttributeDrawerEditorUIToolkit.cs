@@ -545,7 +545,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         flexDirection = FlexDirection.Row,
                     },
                 };
-                foreach (VisualElement chunk in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(xml, "", null, null, null)))
+                foreach (VisualElement chunk in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXmlWithProvider(xml, new RichTextDrawer.EmptyRichTextTagProvider())))
                 {
                     visualElement.Add(chunk);
                 }

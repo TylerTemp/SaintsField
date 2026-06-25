@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
         // private readonly Action<object> SetValue;
 
-        protected ButtonsGenElement(EnumMetaInfo metaInfo, SerializedProperty property, MemberInfo info, object container, Action<object> setValue)
+        protected ButtonsGenElement(EnumMetaInfo metaInfo, SerializedProperty property, MemberInfo info, object container, Action<object> setValue, IRichTextTagProvider richTextProvider)
         {
             _metaInfo = metaInfo;
 
@@ -200,7 +200,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     },
                 };
 
-                FillButtonText(inlineToggleButton, bitValueToName, property, info, container);
+                FillButtonText(inlineToggleButton, bitValueToName, property, info, container, richTextProvider);
 
                 toggleButtons.Add(inlineToggleButton);
                 Add(inlineToggleButton);
@@ -306,7 +306,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
         private RichTextDrawer _richTextDrawer;
 
-        private void FillButtonText(Button button, EnumMetaInfo.EnumValueInfo displayInfo, SerializedProperty property, MemberInfo info, object p)
+        private void FillButtonText(Button button, EnumMetaInfo.EnumValueInfo displayInfo, SerializedProperty property, MemberInfo info, object p, IRichTextTagProvider richTextTagProvider)
         {
             if (displayInfo.Label != displayInfo.OriginalLabel)
             {
@@ -318,7 +318,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         flexDirection = FlexDirection.Row,
                     },
                 };
-                foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(displayInfo.Label, displayInfo.OriginalLabel, property, info, p)))
+                foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXmlWithProvider(displayInfo.Label, richTextTagProvider)))
                 {
                     visualElement.Add(chunk);
                 }

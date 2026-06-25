@@ -141,6 +141,10 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             return helpBoxRect;
         }
 
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement

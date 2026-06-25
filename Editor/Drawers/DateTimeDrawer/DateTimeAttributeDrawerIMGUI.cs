@@ -48,7 +48,6 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
@@ -56,17 +55,27 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             if (ticksProperty == null)
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(new Rect(position)
+                {
+                    height = SingleLineHeight,
+                }, label, overrideRichTextChunks);
                 return;
             }
 
             bool isSerializedActual = !ReferenceEquals(ticksProperty, property);
-            DrawTicksField(position, label, ticksProperty.longValue, newTicks =>
+            Rect fieldRect = DrawTicksField(position, label, ticksProperty.longValue, newTicks =>
             {
                 ticksProperty.longValue = newTicks;
                 property.serializedObject.ApplyModifiedProperties();
                 object changedValue = isSerializedActual ? new DateTime(newTicks) : newTicks;
                 TriggerChangedIMGUI(property, changedValue);
             });
+            Rect labelRect = new Rect(position)
+            {
+                height = SingleLineHeight,
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
         }
 
         internal static float GetImGuiFieldHeight()
@@ -84,7 +93,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             return property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
         }
 
-        internal static void DrawTicksField(Rect position, GUIContent label, long ticks, Action<long> onValueChanged)
+        internal static Rect DrawTicksField(Rect position, GUIContent label, long ticks, Action<long> onValueChanged)
         {
             EnsureIconContent();
 
@@ -112,6 +121,8 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             {
                 onValueChanged?.Invoke(newTicks);
             }
+
+            return fieldRect;
         }
 
         private static long DrawDateRow(Rect position, long ticks, Action<long> onValueChanged)

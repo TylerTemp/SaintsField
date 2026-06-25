@@ -102,6 +102,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             return _buttonUserDataIMGUI;
         }
 
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown || _buttonAttribute == null)

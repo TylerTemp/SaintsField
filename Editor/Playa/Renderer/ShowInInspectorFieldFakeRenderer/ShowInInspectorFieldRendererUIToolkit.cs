@@ -79,6 +79,10 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             return result;
         }
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container1)
         {

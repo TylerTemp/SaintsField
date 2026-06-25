@@ -45,13 +45,14 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             DecimalStatusIMGUI cache = RefreshCache(property);
             if (cache.Error != "")
             {
                 ImGuiHelpBox.Draw(position, cache.Error, MessageType.Error);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -71,6 +72,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
                 TriggerChangedIMGUI(property, new SaintsDecimal(newValue));
             });
+            DrawOverrideRichText(position, label, overrideRichTextChunks);
         }
 
         private static DecimalStatusIMGUI RefreshCache(SerializedProperty property)

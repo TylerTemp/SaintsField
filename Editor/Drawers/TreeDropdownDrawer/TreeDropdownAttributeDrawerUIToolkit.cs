@@ -148,7 +148,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 if((string)dropdownButtonField.ButtonLabelElement.userData != display)
                 {
                     dropdownButtonField.ButtonLabelElement.userData = display;
-                    UIToolkitUtils.SetLabel(dropdownButtonField.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
+                    UIToolkitUtils.SetLabel(dropdownButtonField.ButtonLabelElement, RichTextDrawer.ParseRichXmlWithProvider(display, new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
                 }
             }
         }

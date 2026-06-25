@@ -83,6 +83,10 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 : null;
         }
 
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown)

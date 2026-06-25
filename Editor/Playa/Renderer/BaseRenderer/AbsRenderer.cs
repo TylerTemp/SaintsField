@@ -388,7 +388,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return (result.error, result.result);
         }
 
-        public abstract void OnDestroy();
+        public void OnDestroy()
+        {
+            OnDestroyIMGUIAbsCallback();
+            OnDestroyIMGUI();
+#if UNITY_2021_3_OR_NEWER
+
+#endif
+        }
         public abstract void OnSearchField(string searchString);
 
         protected SerializedProperty _serializedProperty;

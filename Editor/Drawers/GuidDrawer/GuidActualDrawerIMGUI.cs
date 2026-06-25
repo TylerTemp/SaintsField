@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
         }
 
         internal static bool DrawSerializedActualField(Rect position, SerializedProperty property, GUIContent label,
-            int index, Action<object> onValueChanged)
+            Action<object> onValueChanged)
         {
             SerializedProperty stringProperty = TryGetStringProperty(property);
             if (stringProperty == null)
@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                 return false;
             }
 
-            InfoIMGUI cache = EnsureKey(property, index);
+            InfoIMGUI cache = EnsureKey(property);
             SyncCache(cache, stringProperty.stringValue);
             DrawGuidField(position, label, cache, property, stringProperty, changedValue =>
             {

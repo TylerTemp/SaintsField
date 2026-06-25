@@ -110,7 +110,6 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -120,6 +119,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             if (cache.Error != "")
             {
                 RenderErrorFallback(position, label, property);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -176,6 +176,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 {
                     EditorGUI.LabelField(labelRect, label);
                 }
+                DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             }
 
             GUI.SetNextControlName(FieldControlName);

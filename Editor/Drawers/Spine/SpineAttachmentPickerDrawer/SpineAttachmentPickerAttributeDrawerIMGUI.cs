@@ -62,7 +62,6 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -76,6 +75,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             #region Dropdown
 
             Rect leftRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - leftRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
 
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(property.stringValue)

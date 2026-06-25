@@ -48,7 +48,6 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index1,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -73,6 +72,11 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             }
 
             Rect starsRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - starsRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             // if (!string.IsNullOrEmpty(label.text))
             // {
             //     (Rect labelRect, Rect leftRect) = RectUtils.SplitWidthRect(position, EditorGUIUtility.labelWidth);

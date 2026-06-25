@@ -18,6 +18,10 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
         private string _richXmlIMGUI;
         private RichTextDrawer.RichTextChunk[] _richTextChunksIMGUI = Array.Empty<RichTextDrawer.RichTextChunk>();
 
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown)

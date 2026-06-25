@@ -57,7 +57,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index1,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -66,6 +65,11 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 UpdateStatus(property, addressableAddressAttribute, out AddressableAddressStatusIMGUI cache);
 
             Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             if (!dropdownInfo.IsString)
             {
                 GUI.Label(fieldRect, GUIContent.none);

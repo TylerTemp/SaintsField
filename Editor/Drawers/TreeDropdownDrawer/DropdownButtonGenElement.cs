@@ -340,7 +340,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     _richTextDrawer ??= new RichTextDrawer();
                     // Debug.Log($"add rich {displayInfo.RichName}");
                     RichTextDrawer.RichTextChunk[] xmlNodes = RichTextDrawer
-                        .ParseRichXml(info.Label, info.OriginalLabel, null, null, null).ToArray();
+                        .ParseRichXmlWithProvider(info.Label, new RichTextDrawer.EmptyRichTextTagProvider(info.OriginalLabel)).ToArray();
                     foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(xmlNodes))
                     {
                         label.Add(chunk);

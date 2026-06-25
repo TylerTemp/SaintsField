@@ -13,6 +13,10 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
         private string _richXml;
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

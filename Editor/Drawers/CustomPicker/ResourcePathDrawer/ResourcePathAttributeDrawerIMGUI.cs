@@ -43,7 +43,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -51,6 +50,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
             if (property.propertyType != SerializedPropertyType.String)
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 cache.Error = $"Expecting string, got {property.propertyType}";
                 return;
             }
@@ -61,6 +61,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 Object fieldResult = EditorGUI.ObjectField(position, label, currentValue, resourcePathAttribute.CompType, false);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 if (!changed.changed)
                 {
                     return;

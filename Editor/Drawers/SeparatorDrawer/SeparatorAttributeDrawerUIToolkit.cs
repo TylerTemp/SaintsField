@@ -201,7 +201,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             }
         }
 
-        private static string UpdateSeparatorUIToolkit(SerializedProperty property, string title, bool isCallback, string color,
+        private string UpdateSeparatorUIToolkit(SerializedProperty property, string title, bool isCallback, string color,
             VisualElement titleElement, FieldInfo info, RichTextDrawer richTextDrawer)
         {
             string error = "";
@@ -239,8 +239,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                     }
 
                     foreach (VisualElement rich in richTextDrawer.DrawChunksUIToolKit(
-                                 RichTextDrawer.ParseRichXml(curTitleXml, property.displayName, property, info,
-                                     parent)))
+                                 RichTextDrawer.ParseRichXmlWithProvider(curTitleXml, this)))
                     {
                         titleElement.Add(rich);
                     }

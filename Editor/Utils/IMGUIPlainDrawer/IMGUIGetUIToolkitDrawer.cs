@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             return ImGuiHelpBox.GetHeight(GetErrorMessage(property), width, EMessageType.Error);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, int index,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {

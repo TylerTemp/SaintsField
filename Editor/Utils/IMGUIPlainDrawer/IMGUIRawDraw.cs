@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+#if UNITY_2021_3_OR_NEWER
+using SaintsField.Editor.Drawers.ReferencePicker;
+#endif
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using UnityEditor;
 using UnityEngine;
@@ -12,8 +15,77 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
     public static class IMGUIRawDraw
     {
         public static readonly Color LabelGrayColor = EColor.EditorSeparator.GetColor();
+        private const float VerticalPadding = 1f;
+        private static RichTextDrawer _richTextDrawer;
 
         public static bool UseWideMode() => EditorGUIUtility.wideMode || EditorGUIUtility.currentViewWidth > 330f;
+
+        private static float GetSingleLineHeight(bool inHorizontalLayout) =>
+            EditorGUIUtility.singleLineHeight * (inHorizontalLayout ? 2 : 1) + VerticalPadding * 2;
+
+        private static float GetResponsiveMultiLineHeight(bool inHorizontalLayout, int narrowRows) =>
+            EditorGUIUtility.singleLineHeight * ((inHorizontalLayout || !UseWideMode()) ? narrowRows : 1) +
+            VerticalPadding * 2;
+
+        private static Rect GetContentRect(Rect position) => new Rect(position)
+        {
+            y = position.y + VerticalPadding,
+            height = Mathf.Max(0f, position.height - VerticalPadding * 2),
+        };
+
+        private static void DrawRichText(Rect labelRect, IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks)
+        {
+            if (richTextChunks == null)
+            {
+                return;
+            }
+
+            _richTextDrawer ??= new RichTextDrawer();
+            _richTextDrawer.DrawChunks(labelRect, richTextChunks);
+        }
+
+        private static void DrawSingleLineRichText(Rect position, GUIContent label,
+            IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks, bool inHorizontalLayout)
+        {
+            if (richTextChunks == null)
+            {
+                return;
+            }
+
+            Rect contentRect = GetContentRect(position);
+            Rect labelRect = new Rect(contentRect)
+            {
+                height = EditorGUIUtility.singleLineHeight,
+            };
+
+            if (!inHorizontalLayout)
+            {
+                labelRect.width = label.text == "" ? 0f : Mathf.Min(EditorGUIUtility.labelWidth, contentRect.width);
+            }
+
+            DrawRichText(labelRect, richTextChunks);
+        }
+
+        private static void DrawResponsiveRichText(Rect position, GUIContent label,
+            IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks, bool inHorizontalLayout)
+        {
+            if (richTextChunks == null)
+            {
+                return;
+            }
+
+            Rect labelRect = new Rect(position)
+            {
+                height = EditorGUIUtility.singleLineHeight,
+            };
+
+            if (!inHorizontalLayout && UseWideMode())
+            {
+                labelRect.width = label.text == "" ? 0f : Mathf.Min(EditorGUIUtility.labelWidth, position.width);
+            }
+
+            DrawRichText(labelRect, richTextChunks);
+        }
 
         public static (Type drawerType, Attribute drawerAttribute) GetDrawerAndAttribute(
             SerializedProperty property,
@@ -94,6 +166,29 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             return IMGUIDrawerCache.CachedSaintsRowDrawers[drawerKey] = saintsRowDrawer;
         }
 
+#if UNITY_2021_3_OR_NEWER
+        private static bool NeedReferencePickerDrawer(SerializedProperty property, IReadOnlyList<Attribute> allAttributes)
+            => property.propertyType == SerializedPropertyType.ManagedReference &&
+               allAttributes.All(each => each is not ReferencePickerAttribute);
+
+        private static ReferencePickerAttributeDrawer GetAndCacheReferencePickerDrawer(SerializedProperty property,
+            FieldInfo fieldInfo, string label, bool inHorizontalLayout)
+        {
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 2);
+            if (IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer))
+            {
+                return (ReferencePickerAttributeDrawer)drawer;
+            }
+
+            ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
+            ReferencePickerAttributeDrawer referencePickerDrawer =
+                (ReferencePickerAttributeDrawer)SaintsPropertyDrawer.MakePropertyDrawer(
+                    typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label);
+            referencePickerDrawer.InHorizontalLayout = inHorizontalLayout;
+            return (ReferencePickerAttributeDrawer)(IMGUIDrawerCache.CachedDrawers[drawerKey] = referencePickerDrawer);
+        }
+#endif
+
         public static float GetPropertyHeight(
             PropertyDrawer imguiDrawer,
             GUIContent useGUIContent,
@@ -135,6 +230,15 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                             inHorizontalLayout, false);
                     }
 
+#if UNITY_2021_3_OR_NEWER
+                    if (NeedReferencePickerDrawer(property, allAttributes))
+                    {
+                        float fullWidth = EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15;
+                        return GetAndCacheReferencePickerDrawer(property, fieldInfo, label.text, inHorizontalLayout)
+                            .GetReferencePickerHeight(property, label, fullWidth, allAttributes, fieldInfo);
+                    }
+#endif
+
                     return GetAndCacheSaintsRowDrawer(property, fieldInfo, label.text, inHorizontalLayout)
                         .GetRowFieldHeight(property, label, fieldInfo);
                 }
@@ -154,7 +258,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.ExposedReference:
                 case SerializedPropertyType.FixedBufferSize:
                 case SerializedPropertyType.Hash128:
-                    return IMGUIShared.GetSingleLineHeight(inHorizontalLayout);
+                    return GetSingleLineHeight(inHorizontalLayout);
                 case SerializedPropertyType.Vector2:
                 {
                     return IMGUIVector2.GetHeight(inHorizontalLayout);
@@ -164,7 +268,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Quaternion:
                 case SerializedPropertyType.Vector2Int:
                 case SerializedPropertyType.Vector3Int:
-                    return IMGUIShared.GetResponsiveMultiLineHeight(inHorizontalLayout, 2);
+                    return GetResponsiveMultiLineHeight(inHorizontalLayout, 2);
                 case SerializedPropertyType.Rect:
                     return IMGUIRect.GetHeight();
                 case SerializedPropertyType.Bounds:
@@ -185,6 +289,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             IReadOnlyList<Attribute> allAttributes,
             Type rawType,
             GUIContent label,
+            IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks,
             FieldInfo fieldInfo,
             bool inHorizontalLayout,
             bool labelGrayColor)
@@ -194,23 +299,52 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 OnGUIRawFallback(
                     position,
                     property,
-                    allAttributes, rawType, label, fieldInfo, inHorizontalLayout, labelGrayColor
+                    allAttributes,
+                    rawType,
+                    label,
+                    fieldInfo,
+                    richTextChunks,
+                    inHorizontalLayout,
+                    labelGrayColor
                 );
             }
             else
             {
+                bool isSaintsDrawer = false;
+                if (imguiDrawer is SaintsPropertyDrawer saintsDrawer)
+                {
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    saintsDrawer.overrideRichTextChunks = richTextChunks;
+                    isSaintsDrawer = true;
+                }
+
                 imguiDrawer.OnGUI(position, property, label);
+
+                if (richTextChunks != null && !isSaintsDrawer)
+                {
+                    Rect labelRect = new Rect(position)
+                    {
+                        y = position.y + 1,
+                        height = EditorGUIUtility.singleLineHeight,
+                        width = position.width - EditorGUI.PrefixLabel(position, new GUIContent(" ")).width,
+                    };
+
+                    DrawRichText(
+                        labelRect,
+                        // ReSharper disable once PossibleMultipleEnumeration
+                        richTextChunks);
+                }
             }
 
         }
 
-        public static void OnGUIRawFallback(
-            Rect position,
+        public static void OnGUIRawFallback(Rect position,
             SerializedProperty property,
             IReadOnlyList<Attribute> allAttributes,
             Type rawType,
             GUIContent label,
             FieldInfo fieldInfo,
+            IEnumerable<RichTextDrawer.RichTextChunk> richTextChunks,
             bool inHorizontalLayout,
             bool labelGrayColor)
         {
@@ -223,12 +357,34 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     if (property.isArray)
                     {
-                        IMGUIList.DrawField(position, property, allAttributes, rawType, label, fieldInfo,
-                            inHorizontalLayout, labelGrayColor);
+                        IMGUIList.DrawField(
+                            position,
+                            property,
+                            allAttributes,
+                            rawType,
+                            label,
+                            richTextChunks,
+                            fieldInfo,
+                            inHorizontalLayout,
+                            labelGrayColor);
                         return;
                     }
+#if UNITY_2021_3_OR_NEWER
+                    if (NeedReferencePickerDrawer(property, allAttributes))
+                    {
+                        ReferencePickerAttributeDrawer referencePickerDrawer =
+                            GetAndCacheReferencePickerDrawer(property, fieldInfo, label.text, inHorizontalLayout);
+                        referencePickerDrawer.overrideRichTextChunks = richTextChunks;
+                        referencePickerDrawer.DrawReferencePicker(position, property, label, allAttributes, fieldInfo);
+                        return;
+                    }
+#endif
                     GetAndCacheSaintsRowDrawer(property, fieldInfo, label.text, inHorizontalLayout)
                         .DrawRowField(position, property, label, fieldInfo);
+                    DrawRichText(new Rect(position)
+                    {
+                        height = EditorGUIUtility.singleLineHeight,
+                    }, richTextChunks);
                     return;
                 }
                 case SerializedPropertyType.Vector2:
@@ -237,6 +393,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
 
                     Vector2 result = IMGUIVector2.DrawField(position, label, property.vector2Value,
                         inHorizontalLayout, labelGrayColor);
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -250,6 +407,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     long result = IMGUIInteger.DrawLongField(position, label, property.longValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -290,6 +448,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     bool result = IMGUIBool.DrawField(position, label, property.boolValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -305,6 +464,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     double result = rawType == typeof(double)
                         ? IMGUIFloat.DrawDoubleField(position, label, property.doubleValue, inHorizontalLayout, labelGrayColor)
                         : IMGUIFloat.DrawFloatField(position, label, property.floatValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -324,7 +484,11 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.String:
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    string result = IMGUIText.DrawField(position, label, property.stringValue, inHorizontalLayout, labelGrayColor);
+                    string result = IMGUIText.DrawField(position, label, richTextChunks, property.stringValue, inHorizontalLayout, labelGrayColor);
+                    if (inHorizontalLayout)
+                    {
+                        DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
+                    }
 
                     if (changed.changed)
                     {
@@ -338,6 +502,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     Color result = IMGUIColor.DrawField(position, label, property.colorValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -354,6 +519,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                         : typeof(UnityEngine.Object);
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     UnityEngine.Object result = IMGUIObject.DrawField(position, label, property.objectReferenceValue, objectType, true, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -366,9 +532,35 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.LayerMask:
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    int result = IMGUIShared.DrawStackedField(position, label, inHorizontalLayout, labelGrayColor,
-                        (rect, content) => EditorGUI.LayerField(rect, content, property.intValue),
-                        rect => EditorGUI.LayerField(rect, property.intValue));
+                    Rect contentRect = GetContentRect(position);
+                    int result;
+                    if (!inHorizontalLayout)
+                    {
+                        using(new LabelColorScoop(labelGrayColor))
+                        {
+                            result = EditorGUI.LayerField(contentRect, label, property.intValue);
+                        }
+                    }
+                    else
+                    {
+                        Rect labelRect = new Rect(contentRect)
+                        {
+                            height = EditorGUIUtility.singleLineHeight,
+                        };
+
+                        Rect fieldRect = new Rect(contentRect)
+                        {
+                            y = contentRect.y + EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
+                        };
+
+                        using(new LabelColorScoop(labelGrayColor))
+                        {
+                            EditorGUI.HandlePrefixLabel(contentRect, labelRect, label, 0);
+                        }
+                        result = EditorGUI.LayerField(fieldRect, property.intValue);
+                    }
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -383,6 +575,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     GUIContent[] enumContents = property.enumDisplayNames.Select(each => new GUIContent(each)).ToArray();
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     int result = IMGUIEnum.DrawField(position, label, property.enumValueIndex, enumContents, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -395,26 +588,13 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Vector3:
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    Vector3 result = IMGUIShared.WithLabelColor(labelGrayColor, () =>
+                    Vector3 result;
+                    using(new InHorizontalLayoutScoop(inHorizontalLayout, position))
+                    using(new LabelColorScoop(labelGrayColor))
                     {
-                        bool oldWideMode = EditorGUIUtility.wideMode;
-                        float oldLabelWidth = EditorGUIUtility.labelWidth;
-                        try
-                        {
-                            if (inHorizontalLayout)
-                            {
-                                EditorGUIUtility.wideMode = false;
-                                EditorGUIUtility.labelWidth = position.width;
-                            }
-
-                            return EditorGUI.Vector3Field(position, label, property.vector3Value);
-                        }
-                        finally
-                        {
-                            EditorGUIUtility.wideMode = oldWideMode;
-                            EditorGUIUtility.labelWidth = oldLabelWidth;
-                        }
-                    });
+                        result = EditorGUI.Vector3Field(position, label, property.vector3Value);
+                    }
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -427,26 +607,13 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Vector4:
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    Vector4 result = IMGUIShared.WithLabelColor(labelGrayColor, () =>
+                    Vector4 result;
+                    using(new InHorizontalLayoutScoop(inHorizontalLayout, position))
+                    using(new LabelColorScoop(labelGrayColor))
                     {
-                        bool oldWideMode = EditorGUIUtility.wideMode;
-                        float oldLabelWidth = EditorGUIUtility.labelWidth;
-                        try
-                        {
-                            if (inHorizontalLayout)
-                            {
-                                EditorGUIUtility.wideMode = false;
-                                EditorGUIUtility.labelWidth = position.width;
-                            }
-
-                            return EditorGUI.Vector4Field(position, label, property.vector4Value);
-                        }
-                        finally
-                        {
-                            EditorGUIUtility.wideMode = oldWideMode;
-                            EditorGUIUtility.labelWidth = oldLabelWidth;
-                        }
-                    });
+                        result = EditorGUI.Vector4Field(position, label, property.vector4Value);
+                    }
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -460,6 +627,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     Rect result = IMGUIRect.DrawField(position, label, property.rectValue, inHorizontalLayout, labelGrayColor);
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -473,6 +641,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     int result = IMGUIInteger.DrawIntField(position, label, property.intValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -486,7 +655,11 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     string current = property.intValue == 0 ? "" : ((char)property.intValue).ToString();
-                    string result = IMGUIText.DrawField(position, label, current, inHorizontalLayout, labelGrayColor);
+                    string result = IMGUIText.DrawField(position, label, richTextChunks, current, inHorizontalLayout, labelGrayColor);
+                    if (inHorizontalLayout)
+                    {
+                        DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
+                    }
 
                     if (changed.changed)
                     {
@@ -500,6 +673,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     AnimationCurve result = IMGUIAnimationCurve.DrawField(position, label, property.animationCurveValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -513,6 +687,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     Bounds result = IMGUIBounds.DrawField(position, label, property.boundsValue, inHorizontalLayout, labelGrayColor);
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -526,6 +701,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     Gradient result = IMGUIGradient.DrawField(position, label, property.gradientValue, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -539,26 +715,13 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     Quaternion current = property.quaternionValue;
-                    Vector4 result = IMGUIShared.WithLabelColor(labelGrayColor, () =>
+                    Vector4 result;
+                    using(new InHorizontalLayoutScoop(inHorizontalLayout, position))
+                    using(new LabelColorScoop(labelGrayColor))
                     {
-                        bool oldWideMode = EditorGUIUtility.wideMode;
-                        float oldLabelWidth = EditorGUIUtility.labelWidth;
-                        try
-                        {
-                            if (inHorizontalLayout)
-                            {
-                                EditorGUIUtility.wideMode = false;
-                                EditorGUIUtility.labelWidth = position.width;
-                            }
-
-                            return EditorGUI.Vector4Field(position, label, new Vector4(current.x, current.y, current.z, current.w));
-                        }
-                        finally
-                        {
-                            EditorGUIUtility.wideMode = oldWideMode;
-                            EditorGUIUtility.labelWidth = oldLabelWidth;
-                        }
-                    });
+                        result = EditorGUI.Vector4Field(position, label, new Vector4(current.x, current.y, current.z, current.w));
+                    }
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -575,6 +738,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                         : typeof(UnityEngine.Object);
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     UnityEngine.Object result = IMGUIObject.DrawField(position, label, property.exposedReferenceValue, objectType, true, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -590,32 +754,20 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     {
                         IMGUIInteger.DrawIntField(position, label, property.fixedBufferSize, inHorizontalLayout, labelGrayColor);
                     }
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     return;
                 }
                 case SerializedPropertyType.Vector2Int:
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    Vector2Int result = IMGUIShared.WithLabelColor(labelGrayColor, () =>
+                    Vector2Int result;
+                    using(new InHorizontalLayoutScoop(inHorizontalLayout, position))
+                    using(new LabelColorScoop(labelGrayColor))
                     {
-                        bool oldWideMode = EditorGUIUtility.wideMode;
-                        float oldLabelWidth = EditorGUIUtility.labelWidth;
-                        try
-                        {
-                            if (inHorizontalLayout)
-                            {
-                                EditorGUIUtility.wideMode = false;
-                                EditorGUIUtility.labelWidth = position.width;
-                            }
-
-                            return EditorGUI.Vector2IntField(position, label, property.vector2IntValue);
-                        }
-                        finally
-                        {
-                            EditorGUIUtility.wideMode = oldWideMode;
-                            EditorGUIUtility.labelWidth = oldLabelWidth;
-                        }
-                    });
+                        result = EditorGUI.Vector2IntField(position, label, property.vector2IntValue);
+                    }
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -628,26 +780,13 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Vector3Int:
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    Vector3Int result = IMGUIShared.WithLabelColor(labelGrayColor, () =>
+                    Vector3Int result;
+                    using(new InHorizontalLayoutScoop(inHorizontalLayout, position))
+                    using(new LabelColorScoop(labelGrayColor))
                     {
-                        bool oldWideMode = EditorGUIUtility.wideMode;
-                        float oldLabelWidth = EditorGUIUtility.labelWidth;
-                        try
-                        {
-                            if (inHorizontalLayout)
-                            {
-                                EditorGUIUtility.wideMode = false;
-                                EditorGUIUtility.labelWidth = position.width;
-                            }
-
-                            return EditorGUI.Vector3IntField(position, label, property.vector3IntValue);
-                        }
-                        finally
-                        {
-                            EditorGUIUtility.wideMode = oldWideMode;
-                            EditorGUIUtility.labelWidth = oldLabelWidth;
-                        }
-                    });
+                        result = EditorGUI.Vector3IntField(position, label, property.vector3IntValue);
+                    }
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -661,6 +800,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     RectInt result = IMGUIRectInt.DrawField(position, label, property.rectIntValue, inHorizontalLayout, labelGrayColor);
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -674,6 +814,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     BoundsInt result = IMGUIBoundsInt.DrawField(position, label, property.boundsIntValue, inHorizontalLayout, labelGrayColor);
+                    DrawResponsiveRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {
@@ -687,6 +828,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 {
                     using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
                     string result = IMGUIHash128.DrawField(position, label, property.hash128Value, inHorizontalLayout, labelGrayColor);
+                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
 
                     if (changed.changed)
                     {

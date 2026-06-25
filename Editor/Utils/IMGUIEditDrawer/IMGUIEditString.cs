@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
         {
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                string result = IMGUIText.DrawField(position, new GUIContent(label), value ?? "", inHorizontalLayout,
+                string result = IMGUIText.DrawField(position, new GUIContent(label), null, value ?? "", inHorizontalLayout,
                     labelGrayColor);
                 if (changed.changed && setterOrNull != null)
                 {

@@ -50,6 +50,10 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
         private OnEventWithErrorElement _onEventWithErrorElement;
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

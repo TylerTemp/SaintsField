@@ -41,7 +41,6 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -51,6 +50,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             {
                 _error = $"expect string, get {property.propertyType}";
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -75,6 +75,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                     (Rect labelFieldRect, Rect textAreaRect) =
                         RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
                     EditorGUI.LabelField(labelFieldRect, label);
+                    DrawOverrideRichText(labelFieldRect, label, overrideRichTextChunks);
                     position = textAreaRect;
                 }
 

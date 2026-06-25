@@ -12,6 +12,10 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         private VisualElement _container;
         private Object _value;
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

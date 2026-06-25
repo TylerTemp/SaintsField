@@ -58,9 +58,8 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) =>
             EditorGUIUtility.singleLineHeight;
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             SerializedProperty callTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.callType));
             SerializedProperty isOptionalProp = property.FindPropertyRelative(nameof(PersistentArgument.isOptional));
@@ -100,6 +99,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             };
 
             GUI.Label(labelRect, GetArgumentLabel(property, argumentType), RichLabelStyle);
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             DrawValue(valueRect, property, (PersistentArgument.CallType)callTypeProp.intValue, argumentType,
                 eventContext, callTypeProp, invokedParameterIndexProp, isUnityObjectProp, unityObjectProp,
                 serializeJsonDataProp);

@@ -8,7 +8,6 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
-using UnityEngine.Windows;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
@@ -113,7 +112,9 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         public static readonly ObjectBaseInfo NoneObjectInfo = new ObjectBaseInfo(null, "None", "", "");
 
+        [NonSerialized]
         public List<ObjectInfo> SceneObjects = new List<ObjectInfo>();
+        [NonSerialized]
         public List<ObjectInfo> AssetsObjects = new List<ObjectInfo>();
 
         private VisualTreeAsset _listItemAsset;

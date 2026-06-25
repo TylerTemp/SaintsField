@@ -87,7 +87,6 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -106,6 +105,11 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             }
 
             Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
 
             GUI.SetNextControlName(FieldControlName);
             if (GUI.Button(fieldRect, GUIContent.none, EditorStyles.popup))

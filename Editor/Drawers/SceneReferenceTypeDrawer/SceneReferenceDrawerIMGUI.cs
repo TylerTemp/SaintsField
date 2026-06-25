@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             SceneReferenceStatusIMGUI cache = EnsureKey(property);
@@ -93,6 +93,11 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
             }
 
             Rect contentRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - contentRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             Rect buttonRect = new Rect(contentRect)
             {
                 x = contentRect.xMax - EditorGUIUtility.singleLineHeight,

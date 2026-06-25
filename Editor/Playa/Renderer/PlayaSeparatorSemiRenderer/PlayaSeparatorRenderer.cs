@@ -20,10 +20,6 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
             _colorHex = ColorUtility.ToHtmlStringRGB(_playaSeparatorAttribute.Color);
         }
 
-        public override void OnDestroy()
-        {
-        }
-
         public override void OnSearchField(string searchString)
         {
         }

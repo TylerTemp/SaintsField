@@ -2,6 +2,7 @@
 using System;
 using System.Reflection;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine.Events;
 
@@ -9,7 +10,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
     public class ButtonsLongElement: ButtonsGenElement<long>
     {
-        public ButtonsLongElement(EnumMetaInfo metaInfo, SerializedProperty property, MemberInfo info, object container, Action<object> setValue) : base(metaInfo, property, info, container, setValue)
+        public ButtonsLongElement(EnumMetaInfo metaInfo, SerializedProperty property, MemberInfo info, object container, Action<object> setValue, IRichTextTagProvider richTextProvider) : base(metaInfo, property, info, container, setValue, richTextProvider)
         {
         }
     }

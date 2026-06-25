@@ -46,6 +46,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         // private Button _buttonElement;
 
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

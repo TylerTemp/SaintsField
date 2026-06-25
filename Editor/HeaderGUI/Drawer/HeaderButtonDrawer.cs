@@ -81,7 +81,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 if(rawTitle.Contains("<field") || !CacheAndUtil.ParsedXmlCache.TryGetValue(rawTitle, out titleChunks))
                 {
                     CacheAndUtil.ParsedXmlCache[rawTitle] = titleChunks =
-                        RichTextDrawer.ParseRichXml(rawTitle, method.Name, null, method, target).ToArray();
+                        RichTextDrawer.ParseRichXmlWithProvider(rawTitle, new HeaderGUIRichTextProvider(method.Name, renderTargetInfo, target)).ToArray();
                 }
             }
             GUIContent oldLabel = new GUIContent(friendlyName);

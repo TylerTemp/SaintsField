@@ -298,7 +298,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                     : cellRect;
                 IMGUIRawDraw.OnGUI(cellInfo.Drawer, useRect, cellInfo.Property, cellInfo.Attributes, cellInfo.RawType,
-                    GUIContent.none, cellInfo.Info, false, false);
+                    GUIContent.none, null, cellInfo.Info, false, false);
             }
 
             private bool IsKeyConflicted(int index)
@@ -394,9 +394,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         protected override bool UseCreateFieldIMGUI => true;
 
-        private static InfoIMGUI EnsureKey(SerializedProperty property, int index)
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
         {
-            string key = $"{SerializedUtils.GetUniqueId(property)}[{index}]";
+            string key = SerializedUtils.GetUniqueId(property);
             if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI cache))
             {
                 return cache;
@@ -422,7 +422,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 return GetContextErrorHeight(width, contextError);
             }
 
-            InfoIMGUI cache = EnsureKey(property, index);
+            InfoIMGUI cache = EnsureKey(property);
             cache.Context = context;
 
             EnsureSearchState(cache, context.KeysProp, context.ValuesProp, context.Attribute);
@@ -440,7 +440,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
             (string contextError, DictionaryContextIMGUI context) =
@@ -451,7 +451,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 return;
             }
 
-            InfoIMGUI cache = EnsureKey(property, index);
+            InfoIMGUI cache = EnsureKey(property);
             cache.Context = context;
 
             EnsureSearchState(cache, context.KeysProp, context.ValuesProp, context.Attribute);
@@ -482,6 +482,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             Rect foldoutUseRect = ShrinkRect(foldoutRect);
             property.isExpanded = EditorGUI.Foldout(foldoutUseRect, property.isExpanded, context.Label, true);
+            DrawOverrideRichText(foldoutUseRect, label, overrideRichTextChunks);
 
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
@@ -832,11 +833,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             CellContextIMGUI keyCellContext = BuildKeyCellContext(property, info, keysField);
             CellContextIMGUI valueCellContext = BuildValueCellContext(property, info, valuesField);
 
-            string labelText = string.IsNullOrWhiteSpace(label?.text) ? GetPreferredLabel(property) : label.text;
-            if (string.IsNullOrEmpty(labelText))
-            {
-                labelText = "Value";
-            }
+            // string labelText = string.IsNullOrWhiteSpace(label?.text) ? GetPreferredLabel(property) : label.text;
+            // if (string.IsNullOrEmpty(labelText))
+            // {
+            //     labelText = "Value";
+            // }
 
             return ("", new DictionaryContextIMGUI
             {
@@ -846,7 +847,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 Attribute = saintsDictionaryAttribute,
                 Info = info,
                 Parent = parent,
-                Label = labelText,
+                Label = label.text,
                 KeyWidth = saintsDictionaryAttribute?.KeyWidth ?? default,
                 ValueWidth = saintsDictionaryAttribute?.ValueWidth ?? default,
                 KeyCellContext = keyCellContext,

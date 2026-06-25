@@ -155,7 +155,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             if(rawLabel.Contains("<field") || !ParsedXmlCache.TryGetValue(rawLabel, out IReadOnlyList<RichTextDrawer.RichTextChunk> labelChunks))
             {
                 ParsedXmlCache[rawLabel] = labelChunks =
-                    RichTextDrawer.ParseRichXml(rawLabel, labelName, null, renderTargetInfo.MemberInfo, target).ToArray();
+                    RichTextDrawer.ParseRichXmlWithProvider(rawLabel, new HeaderGUIRichTextProvider(labelName, renderTargetInfo, target)).ToArray();
             }
 
             RichTextDrawer richTextDrawer = CacheAndUtil.GetCachedRichTextDrawer();

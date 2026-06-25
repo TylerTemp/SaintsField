@@ -8,6 +8,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 {
     public partial class PlayaInfoBoxRenderer
     {
+        public override void OnDestroyIMGUI()
+        {
+        }
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {

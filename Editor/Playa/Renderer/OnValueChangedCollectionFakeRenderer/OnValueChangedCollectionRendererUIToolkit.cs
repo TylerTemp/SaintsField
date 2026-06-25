@@ -8,6 +8,10 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
     {
         private HelpBox _helpBox;
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

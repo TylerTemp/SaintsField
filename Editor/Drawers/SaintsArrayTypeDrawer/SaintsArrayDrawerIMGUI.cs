@@ -86,16 +86,14 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
         private const float PagerPageLabelWidth = 30f;
         private const float PagerSepWidth = 8f;
 
-        private static Texture2D _iconDownGray;
-        private static Texture2D _iconRightGray;
         private static Texture2D _iconLeft;
         private static Texture2D _iconRight;
 
         protected override bool UseCreateFieldIMGUI => true;
 
-        private static InfoIMGUI EnsureKey(SerializedProperty property, int index)
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
         {
-            string key = $"{SerializedUtils.GetUniqueId(property)}[{index}]";
+            string key = SerializedUtils.GetUniqueId(property);
             if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
             {
                 return infoCache;
@@ -122,7 +120,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 return EditorGUI.GetPropertyHeight(property, label, true);
             }
 
-            InfoIMGUI cache = EnsureKey(property, index);
+            InfoIMGUI cache = EnsureKey(property);
             cache.Context = context;
 
             EnsureSearchState(cache, context.WrapProp, saintsArrayAttribute);
@@ -136,7 +134,8 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
             try
             {
-                return cache.ReorderableList?.GetHeight() ?? SaintsPropertyDrawer.SingleLineHeight;
+                return SaintsPropertyDrawer.SingleLineHeight +
+                       (cache.ReorderableList?.GetHeight() ?? SaintsPropertyDrawer.SingleLineHeight);
             }
             catch (ObjectDisposedException)
             {
@@ -148,11 +147,12 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             }
 
             EnsureReorderableList(cache, saintsArrayAttribute);
-            return cache.ReorderableList?.GetHeight() ?? SaintsPropertyDrawer.SingleLineHeight;
+            return SaintsPropertyDrawer.SingleLineHeight +
+                   (cache.ReorderableList?.GetHeight() ?? SaintsPropertyDrawer.SingleLineHeight);
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             SaintsArrayAttribute saintsArrayAttribute =
@@ -160,10 +160,11 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             if (!TryBuildElementContext(property, label, info, parent, out ElementContext context))
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
-            InfoIMGUI cache = EnsureKey(property, index);
+            InfoIMGUI cache = EnsureKey(property);
             cache.Context = context;
 
             EnsureSearchState(cache, context.WrapProp, saintsArrayAttribute);
@@ -175,31 +176,29 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 height = Mathf.Max(0f, position.height - 2f),
             };
 
+            Rect headerRect = new Rect(usePosition)
+            {
+                height = EditorGUIUtility.singleLineHeight,
+            };
+            DrawHeader(headerRect, cache);
+
             if (!property.isExpanded)
             {
-                GUIStyle headerBackground = "RL Header";
-                if (Event.current.type == EventType.Repaint)
-                {
-                    using (new UnsetGuiStyleFixedHeight(headerBackground))
-                    {
-                        headerBackground.Draw(usePosition, false, false, false, false);
-                    }
-                }
-
-                DrawHeader(new Rect(usePosition)
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                }, cache, saintsArrayAttribute);
                 return;
             }
 
             EnsureReorderableList(cache, saintsArrayAttribute);
+            Rect listRect = new Rect(usePosition)
+            {
+                y = headerRect.yMax,
+                height = Mathf.Max(0f, usePosition.yMax - headerRect.yMax),
+            };
 
             using (new UnsetGuiStyleFixedHeight("RL Header"))
             {
                 try
                 {
-                    cache.ReorderableList?.DoList(usePosition);
+                    cache.ReorderableList?.DoList(listRect);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -220,10 +219,10 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 return;
             }
 
-            float expectedHeaderHeight = SaintsPropertyDrawer.SingleLineHeight *
-                                         ((saintsArrayAttribute.Searchable || saintsArrayAttribute.NumberOfItemsPerPage > 0)
-                                             ? 2
-                                             : 1);
+            bool hasHeaderControls = HasHeaderControls(saintsArrayAttribute);
+            float expectedHeaderHeight = hasHeaderControls
+                ? SaintsPropertyDrawer.SingleLineHeight
+                : 0f;
 
             if (cache.ReorderableList != null)
             {
@@ -231,11 +230,11 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 return;
             }
 
-            cache.ReorderableList = new ReorderableList(context.WrapProp.serializedObject, context.WrapProp, true, true, true, true)
+            cache.ReorderableList = new ReorderableList(context.WrapProp.serializedObject, context.WrapProp, true, hasHeaderControls, true, true)
             {
                 headerHeight = expectedHeaderHeight,
             };
-            cache.ReorderableList.drawHeaderCallback += rect => DrawHeader(rect, cache, saintsArrayAttribute);
+            cache.ReorderableList.drawHeaderCallback += rect => DrawHeaderControls(rect, cache, saintsArrayAttribute);
             cache.ReorderableList.elementHeightCallback += itemIndex => DrawElementHeight(cache, itemIndex);
             cache.ReorderableList.drawElementCallback += (rect, itemIndex, _, _) => DrawElement(rect, cache, itemIndex);
             cache.ReorderableList.onAddCallback += _ =>
@@ -348,7 +347,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 IMGUIRawDraw.OnGUI(cellInfo.Drawer, useRect, cellInfo.Property, cellInfo.Attributes, cellInfo.RawType,
-                    guiContent, cellInfo.Info, context.InHorizontalLayout, false);
+                    guiContent, null, cellInfo.Info, context.InHorizontalLayout, false);
                 if (changed.changed)
                 {
                     ApplyAndTrigger(context.RootProperty, context.Info, context.Parent);
@@ -356,7 +355,10 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             }
         }
 
-        private void DrawHeader(Rect rect, InfoIMGUI cache, SaintsArrayAttribute saintsArrayAttribute)
+        private static bool HasHeaderControls(SaintsArrayAttribute saintsArrayAttribute) =>
+            saintsArrayAttribute.Searchable || saintsArrayAttribute.NumberOfItemsPerPage > 0;
+
+        private void DrawHeader(Rect rect, InfoIMGUI cache)
         {
             ElementContext context = cache.Context;
             if (context == null || context.WrapProp == null)
@@ -365,9 +367,6 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             }
 
             EnsureHeaderIcons();
-
-            bool hasSearch = saintsArrayAttribute.Searchable;
-            bool hasPaging = saintsArrayAttribute.NumberOfItemsPerPage > 0;
 
             Rect titleRect = new Rect(rect)
             {
@@ -393,14 +392,18 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 width = Mathf.Max(0f, titleAreaRect.width - HeaderFoldWidth),
             };
 
-            if (GUI.Button(titleAreaRect, GUIContent.none, GUIStyle.none))
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                context.RootProperty.isExpanded = !context.RootProperty.isExpanded;
-                return;
+                bool expanded = EditorGUI.Foldout(titleAreaRect, context.RootProperty.isExpanded,
+                    context.LabelText, true);
+                if (changed.changed)
+                {
+                    context.RootProperty.isExpanded = expanded;
+                    return;
+                }
             }
 
-            GUI.DrawTexture(titleFoldRect, context.RootProperty.isExpanded ? _iconDownGray : _iconRightGray);
-            EditorGUI.LabelField(titleButtonRect, context.LabelText);
+            DrawOverrideRichText(titleRect, new GUIContent(context.LabelText), overrideRichTextChunks);
 
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
@@ -412,15 +415,27 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     return;
                 }
             }
+        }
 
-            if (!context.RootProperty.isExpanded || (!hasSearch && !hasPaging))
+        private void DrawHeaderControls(Rect rect, InfoIMGUI cache, SaintsArrayAttribute saintsArrayAttribute)
+        {
+            ElementContext context = cache.Context;
+            if (context == null || context.WrapProp == null)
+            {
+                return;
+            }
+
+            EnsureHeaderIcons();
+
+            bool hasSearch = saintsArrayAttribute.Searchable;
+            bool hasPaging = saintsArrayAttribute.NumberOfItemsPerPage > 0;
+            if (!hasSearch && !hasPaging)
             {
                 return;
             }
 
             Rect controlRect = new Rect(rect)
             {
-                y = titleRect.yMax,
                 height = EditorGUIUtility.singleLineHeight,
             };
 
@@ -596,8 +611,6 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
         private static void EnsureHeaderIcons()
         {
-            _iconDownGray ??= Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
-            _iconRightGray ??= Util.LoadResource<Texture2D>("classic-dropdown-right-gray.png");
             _iconLeft ??= Util.LoadResource<Texture2D>("classic-dropdown-left.png");
             _iconRight ??= Util.LoadResource<Texture2D>("classic-dropdown-right.png");
         }
@@ -832,7 +845,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapType"), wrapField,
                     hasSerializeReference);
 
-            string labelText = string.IsNullOrWhiteSpace(label?.text)
+            string labelText = string.IsNullOrEmpty(label?.text)
                 ? GetPreferredLabel(property)
                 : label.text;
             if (string.IsNullOrEmpty(labelText))

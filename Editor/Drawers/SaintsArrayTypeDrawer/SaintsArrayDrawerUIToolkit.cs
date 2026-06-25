@@ -634,6 +634,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                         hasSerializeReference,
                         this,
                         this,
+                        this,
                         wrapParent
                     );
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR

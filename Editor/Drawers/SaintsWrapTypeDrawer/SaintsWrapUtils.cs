@@ -279,7 +279,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
         }
 
 #if UNITY_2021_3_OR_NEWER
-        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes, IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes, IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, IRichTextTagProvider richTextTagProvider, object parent)
         {
             SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
             Debug.Assert(wrapTypeProp != null);
@@ -503,6 +503,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     true,
                     makeRenderer,
                     doTweenPlayRecorder,
+                    richTextTagProvider,
                     null,
                     parent
                 );

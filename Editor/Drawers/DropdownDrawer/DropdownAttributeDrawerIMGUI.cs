@@ -47,7 +47,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -62,6 +61,8 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             };
 
             Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            labelRect.width = position.width - fieldRect.width;
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
 
             GUI.SetNextControlName(FieldControlName);
             string curDisplay = metaInfo.SelectedIndex == -1 ? "-" : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;

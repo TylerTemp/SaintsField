@@ -30,6 +30,47 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
+        public float GetReferencePickerHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<Attribute> allAttributes, FieldInfo info)
+        {
+            ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
+            PropertyAttribute[] propertyAttributes = allAttributes.OfType<PropertyAttribute>().ToArray();
+            (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            float fieldHeight = GetFieldHeight(property, label, width, 0, referencePickerAttribute, info,
+                label.text != "", parent);
+            return fieldHeight + GetBelowExtraHeight(property, label, width, propertyAttributes,
+                referencePickerAttribute, 0, info, parent);
+        }
+
+        public void DrawReferencePicker(Rect position, SerializedProperty property, GUIContent label,
+            IReadOnlyList<Attribute> allAttributes, FieldInfo info)
+        {
+            ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
+            PropertyAttribute[] propertyAttributes = allAttributes.OfType<PropertyAttribute>().ToArray();
+            (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            float fieldHeight = GetFieldHeight(property, label, position.width, 0, referencePickerAttribute, info,
+                label.text != "", parent);
+            float belowHeight = GetBelowExtraHeight(property, label, position.width, propertyAttributes,
+                referencePickerAttribute, 0, info, parent);
+            Rect fieldRect = new Rect(position)
+            {
+                height = fieldHeight,
+            };
+            DrawField(fieldRect, property, label, referencePickerAttribute, propertyAttributes, info, parent);
+
+            if (belowHeight <= 0f)
+            {
+                return;
+            }
+
+            Rect belowRect = new Rect(position)
+            {
+                y = fieldRect.yMax,
+                height = belowHeight,
+            };
+            DrawBelow(belowRect, property, label, referencePickerAttribute, 0, propertyAttributes, info, parent);
+        }
+
         private static void ClearCacheInfo(InfoIMGUI cache)
         {
             SaintsRowAttributeDrawer.ClearManagedReferenceBody(cache.BodyInfo);
@@ -87,7 +128,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -99,6 +139,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             catch (InvalidOperationException e)
             {
                 cache.Error = e.Message;
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -149,6 +190,10 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             else if (!hideLabel)
             {
                 EditorGUI.LabelField(labelRect, label);
+            }
+            if (!hideLabel)
+            {
+                DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             }
 
             GUI.SetNextControlName(FieldControlName);

@@ -15,6 +15,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonCustomContextMenuFakeRenderer
         private IVisualElementScheduledItem _buttonTask;
         private IEnumerator _enumerator;
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

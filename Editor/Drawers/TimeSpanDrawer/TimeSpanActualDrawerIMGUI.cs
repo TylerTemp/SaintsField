@@ -23,12 +23,12 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                 return EditorGUI.GetPropertyHeight(property, label, true);
             }
 
-            EnsureExpandedInitialized(property, index, info);
+            EnsureExpandedInitialized(property, info);
             return GetImGuiFieldHeight(property.isExpanded);
         }
 
         internal static bool DrawSerializedActualField(Rect position, SerializedProperty property, GUIContent label,
-            int index, FieldInfo info, Action<object> onValueChanged)
+            FieldInfo info, Action<object> onValueChanged)
         {
             SerializedProperty ticksProperty = TryGetTicksProperty(property);
             if (ticksProperty == null)
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                 return false;
             }
 
-            EnsureExpandedInitialized(property, index, info);
+            EnsureExpandedInitialized(property, info);
             DrawTicksField(position, label, ticksProperty.longValue, property.isExpanded,
                 expanded => property.isExpanded = expanded,
                 newTicks =>

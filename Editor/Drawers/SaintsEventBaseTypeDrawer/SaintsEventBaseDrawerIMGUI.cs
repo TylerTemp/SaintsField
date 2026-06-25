@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -17,6 +18,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         {
             public string Error = "";
             public SaintsEventContext Context;
+            public GUIContent Label = GUIContent.none;
             public ReorderableList ReorderableList;
             public UnityAction<object> ChildWatcher;
         }
@@ -63,14 +65,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             return (cache.ReorderableList?.GetHeight() ?? EditorGUIUtility.singleLineHeight) + FooterHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             SaintsEventStatusIMGUI cache = RefreshCache(property, label, info, parent);
             if (cache.Error != "")
             {
                 ImGuiHelpBox.Draw(position, cache.Error, MessageType.Error);
+                DrawOverrideRichText(position, label, overrideRichTextChunks);
                 return;
             }
 
@@ -106,6 +108,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             (string error, SaintsEventContext context) = GetSaintsEventContext(property, label, info, parent);
             cache.Error = error;
             cache.Context = context;
+            cache.Label = label == null ? GUIContent.none : new GUIContent(label);
             if (error != "")
             {
                 cache.ReorderableList = null;
@@ -138,11 +141,15 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             if (cache.ReorderableList != null)
             {
+                cache.ReorderableList.footerHeight = 0f;
                 return;
             }
 
             cache.ReorderableList = new ReorderableList(context.PersistentCallsProp.serializedObject,
-                context.PersistentCallsProp, true, true, false, false);
+                context.PersistentCallsProp, true, true, false, false)
+            {
+                footerHeight = 0f,
+            };
             cache.ReorderableList.drawHeaderCallback += rect => DrawHeader(rect, cache);
             cache.ReorderableList.elementHeightCallback += itemIndex => GetElementHeight(cache, itemIndex);
             cache.ReorderableList.drawElementCallback += (rect, itemIndex, _, _) => DrawElement(rect, cache, itemIndex);
@@ -179,9 +186,52 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             EditorGUI.PropertyField(useRect, itemProp, GUIContent.none, true);
         }
 
-        private static void DrawHeader(Rect rect, SaintsEventStatusIMGUI cache)
+        private void DrawHeader(Rect rect, SaintsEventStatusIMGUI cache)
         {
-            EditorGUI.LabelField(rect, cache.Context.Label ?? "");
+            GUIContent label = GetHeaderLabel(cache);
+            EditorGUI.LabelField(rect, label);
+            DrawOverrideRichText(rect, label, GetOverrideRichTextChunks(cache.Context.RootProperty));
+        }
+
+        private GUIContent GetHeaderLabel(SaintsEventStatusIMGUI cache)
+        {
+            if (overrideRichTextChunks != null)
+            {
+                return cache.Label ?? GUIContent.none;
+            }
+
+            return new GUIContent(cache.Context.Label ?? "");
+        }
+
+        private IEnumerable<RichTextDrawer.RichTextChunk> GetOverrideRichTextChunks(SerializedProperty property)
+        {
+            if (overrideRichTextChunks == null)
+            {
+                return null;
+            }
+
+            IReadOnlyList<Type> types = GetEventParamTypes(property);
+            if (types.Count == 0)
+            {
+                return overrideRichTextChunks;
+            }
+
+            List<RichTextDrawer.RichTextChunk> chunks = new List<RichTextDrawer.RichTextChunk>(overrideRichTextChunks)
+            {
+                new RichTextDrawer.RichTextChunk(content: $" ({GetEventParamTypesLabel(types)})"),
+            };
+            return chunks;
+        }
+
+        private static string GetEventParamTypesLabel(IReadOnlyList<Type> types)
+        {
+            string[] names = new string[types.Count];
+            for (int index = 0; index < types.Count; index++)
+            {
+                names[index] = SaintsEventUtils.StringifyType(types[index]);
+            }
+
+            return string.Join(", ", names);
         }
 
         private void DrawFooter(Rect rect, SaintsEventStatusIMGUI cache)

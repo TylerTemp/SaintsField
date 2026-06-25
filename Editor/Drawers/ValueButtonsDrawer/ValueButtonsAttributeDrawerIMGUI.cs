@@ -412,7 +412,6 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
@@ -421,6 +420,11 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 out InfoIMGUI cache, out ValueButtonRawInfo[] rawInfos);
 
             Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
             ImGuiButtonLayout layout = UtilGetButtonLayout(fieldRect.width, fieldRect.width,
                 !valueButtonsAttribute.NoFold && !property.isExpanded, rawInfos, cache.RichTextDrawer);
 

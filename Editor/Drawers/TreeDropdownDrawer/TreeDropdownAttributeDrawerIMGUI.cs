@@ -41,7 +41,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -52,6 +51,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             cachedInfo.Error = metaInfo.Error;
 
             Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            Rect labelRect = new Rect(position)
+            {
+                width = position.width - fieldRect.width,
+            };
+            DrawOverrideRichText(labelRect, label, overrideRichTextChunks);
 
             GUI.SetNextControlName(FieldControlName);
             string display = AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(metaInfo);

@@ -117,7 +117,7 @@ namespace SaintsField.Editor.Drawers.PostFieldRichLabelDrawer
                 if (xml != null)
                 {
                     IReadOnlyList<RichTextDrawer.RichTextChunk> payloads = RichTextDrawer
-                        .ParseRichXml(xml, property.displayName, property, info, parent).ToArray();
+                        .ParseRichXmlWithProvider(xml, this).ToArray();
                     foreach (VisualElement richChunk in _richTextDrawer.DrawChunksUIToolKit(payloads))
                     {
                         richLabel.Add(richChunk);

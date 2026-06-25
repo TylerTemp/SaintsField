@@ -34,6 +34,10 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
             public bool AlwaysCheckUpdate;
         }
 
+        public override void OnDestroyUIToolkit()
+        {
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

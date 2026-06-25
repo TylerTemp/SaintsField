@@ -5,6 +5,10 @@ namespace SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer
 {
     public partial class EmptyRenderer
     {
+        public override void OnDestroyIMGUI()
+        {
+        }
+
         protected override float GetFieldHeightIMGUI(float width, AbsRenderer.PreCheckResult preCheckResult)
         {
             return 0;

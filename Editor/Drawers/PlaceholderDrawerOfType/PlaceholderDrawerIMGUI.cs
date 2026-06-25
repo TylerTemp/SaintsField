@@ -18,10 +18,10 @@ namespace SaintsField.Editor.Drawers.PlaceholderDrawerOfType
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            int index,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
+            DrawOverrideRichText(position, label, overrideRichTextChunks);
         }
     }
 }

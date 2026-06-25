@@ -16,10 +16,6 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             _playaBelowRichLabelAttribute = playaBelowRichLabelAttribute;
         }
 
-        public override void OnDestroy()
-        {
-        }
-
         public override void OnSearchField(string searchString)
         {
         }
