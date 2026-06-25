@@ -52,9 +52,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing.LabelTextForRawFallba
         [LabelText("<color=brown>struct<icon=star.png/>")]
         public RawStruct rawStruct;
 
-        [LabelText("<color=brown>custom IMGUI drawer<icon=star.png/>")]
-        public RawImGuiType rawImGuiType = new RawImGuiType();
-
         [SerializeReference, LabelText("<color=brown>managed reference<icon=star.png/>")]
         public RawManagedBase managedReference = new RawManagedChild();
 
