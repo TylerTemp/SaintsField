@@ -410,11 +410,26 @@ namespace SaintsField.Editor.Utils
                 scrollView.style.backgroundColor = lighterColor;
             }
 
-            List<VisualElement> inputFields = visualElement.Query(className: "unity-property-field__input").ToList();
+            List<VisualElement> propertyInputFields = visualElement.Query(className: "unity-property-field__input").ToList();
 
-            foreach (VisualElement inputField in inputFields)
+            foreach (VisualElement propertyInputField in propertyInputFields)
             {
-                inputField.style.backgroundColor = lighterColor;
+                propertyInputField.style.backgroundColor = lighterColor;
+            }
+
+            foreach (VisualElement textInputField in visualElement.Query(classes: "unity-base-text-field__input").ToList())
+            {
+                textInputField.style.backgroundColor = lighterColor;
+            }
+
+            foreach (VisualElement objectInputField in visualElement.Query(classes: "unity-object-field__object").ToList())
+            {
+                objectInputField.style.backgroundColor = lighterColor;
+            }
+
+            foreach (VisualElement objectInputField in visualElement.Query(classes: "unity-object-field__selector").ToList())
+            {
+                objectInputField.style.unityBackgroundImageTintColor = color;
             }
 
             List<VisualElement> checkMarks = visualElement.Query(className: "unity-toggle__checkmark").ToList();
@@ -423,6 +438,16 @@ namespace SaintsField.Editor.Utils
             {
                 checkMark.style.unityBackgroundImageTintColor = color;
                 checkMark.parent.style.backgroundColor = StyleKeyword.Initial;
+            }
+
+            // foreach (VisualElement objectInputField in visualElement.Query(classes: "unity-base-slider__tracker").ToList())
+            // {
+            //     objectInputField.style.backgroundColor = lighterColor;
+            // }
+
+            foreach (VisualElement objectInputField in visualElement.Query(classes: "unity-base-slider__dragger").ToList())
+            {
+                objectInputField.style.backgroundColor = color;
             }
 
             List<Button> buttons = visualElement.Query<Button>().ToList();

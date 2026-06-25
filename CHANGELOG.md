@@ -1,5 +1,13 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: More attributes for `GUIColor`
+2.  Fix: `ArrowHandleCap` could not correctly pointing at the exactly point
+3.  Fix: Set a bit delay for `MinValue` & `MaxValue` auto correction so when you have both but conflicted values, it now don't trigger a loop call (stack overflow)
+4.  Add: `CompInfoBox` to draw component top info boxes
+5.  Add: `CompText` to draw component top text with `AboveText` behavior
+
 ## 5.19.0 ##
 
 1.  Remove "Build in Data" from Addressable group as it's a reserved group by Unity. Adding anything inside will not be accessible

@@ -34,5 +34,7 @@ namespace SaintsField.Samples.Scripts
             const float c = 207 / 255f;
             return validate < 5 ? Color.red : new Color(c, c, c);
         }
+
+        [GUIColor(EColor.BlueViolet)] public bool toggle;
     }
 }

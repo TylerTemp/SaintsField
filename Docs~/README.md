@@ -233,6 +233,34 @@ public class ClassPlayaAboveRichLabelExample : MonoBehaviour
 
 ![Image](https://github.com/user-attachments/assets/de9e6bf2-5e7b-4a4a-92f5-66801984544e)
 
+#### `CompText` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Draw text at the top of a component inspector, before the Script field.
+
+This uses the same rich text and callback behavior as `AboveText`, but is intended for component-level messages that should always stay at the top of the component inspector.
+
+Parameters:
+
+*   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
+*   `float paddingLeft=4`, `float paddingRight=0`: add pading space for content
+
+```csharp
+using SaintsField;
+
+[CompText("<color=gray>This text is always at the top of this component")]
+[CompText("$" + nameof(dynamicContent))]
+public class CompTextExample : MonoBehaviour
+{
+    [ResizableTextArea]
+    public string dynamicContent;
+}
+```
+
+![](https://github.com/user-attachments/assets/2459da74-6538-46d4-a393-65adb658e52e)
+
 #### `FieldAboveText` / `FieldBelowText` ####
 
 Like `AboveText` /  `BelowText`, but it can be applied to an array/list to draw text above/below each element (instead of the label of array/list itself)
@@ -435,6 +463,50 @@ public class ClassInfoBoxExample : MonoBehaviour  // The info box will show in i
 ```
 
 ![Image](https://github.com/user-attachments/assets/70a8613e-e17f-4463-8653-a6500b9e757f)
+
+#### `CompInfoBox` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Draw an info box at the top of a component inspector, before the Script field.
+
+This uses the same rich text and callback behavior as `InfoBox`, but is intended for component-level messages that should always stay at the top of the component inspector.
+
+Parameters:
+
+*   `string content`
+
+    The content of the info box.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `EMessageType messageType=EMessageType.Info`
+
+    Message icon. Options are
+
+    *   `None`
+    *   `Info`
+    *   `Warning`
+    *   `Error`
+
+*   `string show=null`
+
+    a callback name or property name for show or hide this info box.
+
+```csharp
+using SaintsField;
+
+[CompInfoBox("This info box is always at the top of this component", EMessageType.None)]
+[CompInfoBox("$" + nameof(dynamicContent))]
+public class CompInfoBoxExample : MonoBehaviour
+{
+    [ResizableTextArea]
+    public string dynamicContent;
+}
+```
+
+![](https://github.com/user-attachments/assets/5c6cfb53-98af-4276-be27-9364848d71c1)
 
 #### `FieldInfoBox`/`FieldBelowInfoBox` ####
 

@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
@@ -31,55 +32,42 @@ namespace SaintsField.Editor
             VisualElement root = new VisualElement();
 
             Type objectType = Target.GetType();
-            IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
-
-            // foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(objectType, playaClassAttributes, serializedObject, targets))
-            // {
-            //     VisualElement ve = saintsRenderer.CreateVisualElement();
-            //     if(ve != null)
-            //     {
-            //         root.Add(ve);
-            //     }
-            // }
-
-            MonoScript monoScript = SaintsEditor.GetMonoScript(Target);
-            if(monoScript && _editorShowMonoScript)
+            List<ISaintsRenderer> compTopRenderer = new List<ISaintsRenderer>();
+            foreach (Attribute attr in ReflectCache.GetCustomAttributes<Attribute>(objectType))
             {
-                ObjectField objectField = new ObjectField("Script")
+                switch (attr)
                 {
-                    bindingPath = "m_Script",
-                    value = monoScript,
-                    allowSceneObjects = false,
-                    objectType = typeof(MonoScript),
-                };
-                objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
-                objectField.Bind(SerializedObject);
-                objectField.SetEnabled(false);
-                objectField.AddManipulator(new ContextualMenuManipulator(evt =>
-                        evt.menu.AppendAction("Edit Script", _ => AssetDatabase.OpenAsset(monoScript))
-                    ));
-
-                root.Add(objectField);
-            }
-
-            SearchableAttribute searchableAttribute = null;
-            if (SaintsFieldConfigUtil.GetMonoBehaviorSearchable())
-            {
-                searchableAttribute = new SearchableAttribute();
-            }
-            else
-            {
-                foreach (IPlayaClassAttribute playaClassAttribute in playaClassAttributes)
-                {
-                    if (playaClassAttribute is SearchableAttribute sa)
+                    case CompInfoBoxAttribute compInfoBoxAttribute:
                     {
-                        searchableAttribute = sa;
-                        break;
+                        InfoBoxAttribute infoBoxAttribute = new InfoBoxAttribute(
+                            compInfoBoxAttribute.Content,
+                            compInfoBoxAttribute.MessageType,
+                            compInfoBoxAttribute.ShowCallback,
+                            compInfoBoxAttribute.IsCallback);
+                        PlayaInfoBoxRenderer drawer = new PlayaInfoBoxRenderer(
+                            SerializedObject,
+                            MakeTopCompFieldInfo(objectType, infoBoxAttribute, 0),
+                            infoBoxAttribute);
+                        compTopRenderer.Add(drawer);
                     }
+                        break;
+                    case CompTextAttribute compTextAttribute:
+                    {
+                        AboveTextAttribute aboveTextAttribute = new AboveTextAttribute(
+                            BuildAboveTextContent(compTextAttribute.Content, compTextAttribute.IsCallback),
+                            compTextAttribute.PaddingLeft,
+                            compTextAttribute.PaddingRight);
+                        PlayaFullWidthRichLabelRenderer drawer = new PlayaFullWidthRichLabelRenderer(
+                            SerializedObject,
+                            MakeTopCompFieldInfo(objectType, aboveTextAttribute, 0),
+                            aboveTextAttribute);
+                        compTopRenderer.Add(drawer);
+                    }
+                        break;
                 }
             }
 
-            if (searchableAttribute != null && _editor is ISearchable iSearchable)
+            if (_editor is ISearchable iSearchable)
             {
                 _toolbarSearchField = new ToolbarSearchField
                 {
@@ -105,6 +93,39 @@ namespace SaintsField.Editor
                 DrawHeaderGUI.SaintsEditorEnqueueSearchable(iSearchable);
             }
 
+            List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();
+
+            foreach (ISaintsRenderer drawer in compTopRenderer)
+            {
+                VisualElement ve = drawer.CreateVisualElement(root);
+                // ReSharper disable once InvertIf
+                if(ve != null)
+                {
+                    usedRenderers.Add(drawer);
+                    root.Add(ve);
+                }
+            }
+
+            MonoScript monoScript = SaintsEditor.GetMonoScript(Target);
+            if(monoScript && _editorShowMonoScript)
+            {
+                ObjectField objectField = new ObjectField("Script")
+                {
+                    bindingPath = "m_Script",
+                    value = monoScript,
+                    allowSceneObjects = false,
+                    objectType = typeof(MonoScript),
+                };
+                objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+                objectField.Bind(SerializedObject);
+                objectField.SetEnabled(false);
+                objectField.AddManipulator(new ContextualMenuManipulator(evt =>
+                    evt.menu.AppendAction("Edit Script", _ => AssetDatabase.OpenAsset(monoScript))
+                ));
+
+                root.Add(objectField);
+            }
+
             VisualElement content = new VisualElement
             {
                 style =
@@ -117,11 +138,10 @@ namespace SaintsField.Editor
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            AllRenderersUIToolkit = SaintsEditor.Setup(Array.Empty<string>(), SerializedObject, GetMakeRender(), Targets);
+            IReadOnlyList<ISaintsRenderer> contentRenderers = SaintsEditor.Setup(Array.Empty<string>(), SerializedObject, GetMakeRender(), Targets);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
-            List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();
-            foreach (ISaintsRenderer saintsRenderer in AllRenderersUIToolkit)
+            foreach (ISaintsRenderer saintsRenderer in contentRenderers)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement(root);
@@ -132,6 +152,7 @@ namespace SaintsField.Editor
                 }
             }
 
+            AllRenderersUIToolkit = usedRenderers;
             _hasElementRenderersUIToolkit = usedRenderers;
 
             // root.Add(CreateVisualElement(renderers));
@@ -250,6 +271,42 @@ namespace SaintsField.Editor
             return root;
         }
 #endif
+
+        private SaintsFieldWithInfo MakeTopCompFieldInfo(Type objectType, IPlayaAttribute playaAttribute, int index)
+        {
+            return new SaintsFieldWithInfo
+            {
+                InherentDepth = 0,
+                PlayaAttributes = new[] { playaAttribute },
+                TargetParent = null,
+                TargetMemberInfo = null,
+                TargetMemberIndex = -1,
+                Targets = Targets,
+                RenderType = SaintsRenderType.ClassStruct,
+                MemberId = $"TopComp_{objectType.FullName}_{index}",
+                FieldInfo = null,
+                MethodInfo = null,
+                PropertyInfo = null,
+                ClassStructType = objectType,
+            };
+        }
+
+        private static string BuildAboveTextContent(string content, bool isCallback)
+        {
+            if (isCallback)
+            {
+                return $"${content}";
+            }
+
+            if (string.IsNullOrEmpty(content))
+            {
+                return content;
+            }
+
+            return content[0] == '$' || content[0] == '\\'
+                ? $"\\{content}"
+                : content;
+        }
 
         private static string GetPrefabAssetPathIfAsset(GameObject go)
         {

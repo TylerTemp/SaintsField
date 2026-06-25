@@ -62,7 +62,7 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
                 (IReadOnlyList<string> errors, IReadOnlyList<(string message, Action fix)> checkerResults) = CheckPropertyValue(property, minValueAttribute, onValueChangedCallback, info, parent);
                 foreach ((string _, Action fix)  in checkerResults)
                 {
-                    fix.Invoke();
+                    helpBox.schedule.Execute(fix);
                 }
                 UIToolkitUtils.SetHelpBox(helpBox, string.Join("\n", errors));
             }

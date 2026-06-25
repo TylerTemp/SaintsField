@@ -113,11 +113,13 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.19.0**
+**WIP**
 
-1.  Remove "Build in Data" from Addressable group as it's a reserved group by Unity. Adding anything inside will not be accessible
-2.  [IMGUI]: IMGUI overhaul so most attributes work in custom drawers
-3.  Add: Sign unity package as Unity 6 required
+1.  Fix: More attributes for `GUIColor`
+2.  Fix: `ArrowHandleCap` could not correctly pointing at the exactly point
+3.  Fix: Set a bit delay for `MinValue` & `MaxValue` auto correction so when you have both but conflicted values, it now don't trigger a loop call (stack overflow)
+4.  Add: `CompInfoBox` to draw component top info boxes
+5.  Add: `CompText` to draw component top text with `AboveText` behavior
 
 ## Usage ##
 
@@ -127,10 +129,12 @@ namespace: `SaintsField`
         *   [`FieldLabelText`](https://saintsfield.comes.today/general-attributes/label--text/fieldlabeltext)
         *   [`NoLabel`](https://saintsfield.comes.today/general-attributes/label--text/nolabel)
         *   [`AboveText` / `BelowText`](https://saintsfield.comes.today/general-attributes/label--text/abovetext--belowtext)
+        *   [`CompText`](https://saintsfield.comes.today/general-attributes/label--text/comptext)
         *   [`FieldAboveText` / `FieldBelowText`](https://saintsfield.comes.today/general-attributes/label--text/fieldabovetext--fieldbelowtext)
         *   [`OverlayText`](https://saintsfield.comes.today/general-attributes/label--text/overlaytext)
         *   [`EndText`](https://saintsfield.comes.today/general-attributes/label--text/endtext)
         *   [`InfoBox`/`BelowInfoBox`](https://saintsfield.comes.today/general-attributes/label--text/infoboxbelowinfobox)
+        *   [`CompInfoBox`](https://saintsfield.comes.today/general-attributes/label--text/compinfobox)
         *   [`FieldInfoBox`/`FieldBelowInfoBox`](https://saintsfield.comes.today/general-attributes/label--text/fieldinfoboxfieldbelowinfobox)
         *   [`Separator`/`BelowSeparator`](https://saintsfield.comes.today/general-attributes/label--text/separatorbelowseparator)
         *   [`FieldSeparator` / `FieldBelowSeparator`](https://saintsfield.comes.today/general-attributes/label--text/fieldseparator--fieldbelowseparator)

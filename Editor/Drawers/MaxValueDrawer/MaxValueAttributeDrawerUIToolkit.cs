@@ -62,7 +62,8 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
                 (IReadOnlyList<string> errors, IReadOnlyList<(string message, Action fix)> checkerResults) = CheckPropertyValue(property, maxValueAttribute, onValueChangedCallback, info, parent);
                 foreach ((string _, Action fix)  in checkerResults)
                 {
-                    fix.Invoke();
+                    // fix.Invoke();
+                    helpBox.schedule.Execute(fix);
                 }
                 UIToolkitUtils.SetHelpBox(helpBox, string.Join("\n", errors));
             }
