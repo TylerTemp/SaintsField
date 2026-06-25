@@ -10,7 +10,7 @@ namespace SaintsField
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class EnumToggleButtonsAttribute: PathedDropdownAttribute
     {
-        public readonly bool NoFold;
+        public bool NoFold;
 
         public EnumToggleButtonsAttribute(bool noFold=false)
         {

@@ -76,6 +76,11 @@
             "name": "com.esotericsoftware.spine.spine-unity",
             "expression": "",
             "define": "SAINTSFIELD_SPINE_UNITY"
+        },
+        {
+            "name": "com.unity.serialization",
+            "expression": "",
+            "define": "SAINTSFIELD_SERIALIZATION"
         }
     ],
     "noEngineReferences": false

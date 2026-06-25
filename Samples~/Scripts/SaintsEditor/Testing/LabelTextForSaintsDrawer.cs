@@ -4,7 +4,9 @@ using SaintsField.Addressable;
 #if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
 using SaintsField.AiNavigation;
 #endif
+#if SAINTSFIELD_SERIALIZATION
 using SaintsField.Events;
+#endif
 using SaintsField.SaintsSerialization;
 #if SAINTSFIELD_SPINE_CSHARP && SAINTSFIELD_SPINE_UNITY && !SAINTSFIELD_SPINE_DISABLE
 using SaintsField.Spine;
@@ -269,8 +271,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LabelText(RichLabel)]
         public SaintsInterface<Component, ILabelTextInterface> saintsInterface;
 
+#if SAINTSFIELD_SERIALIZATION
         [LabelText(RichLabel)]
         public SaintsEvent<int> saintsEvent;
+#endif
 
         [SaintsSerializedActual(nameof(serializedActualDateTime))]
         [LabelText(RichLabel)]

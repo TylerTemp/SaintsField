@@ -2762,7 +2762,7 @@ namespace SaintsField.Editor.Utils
             }
 
             string targetLower = target.ToLower();
-            return search.ToLower().Split(new [] { ' ' }, StringSplitOptions.RemoveEmptyEntries).All(searchSegment => targetLower.Contains(searchSegment));
+            return search.ToLower().Split(new [] { ' ' }, StringSplitOptions.RemoveEmptyEntries).All(targetLower.Contains);
         }
 
         private static readonly Regex EnumLabelRegex = new Regex(@"<label\s*/?>", RegexOptions.Compiled);
@@ -2994,6 +2994,11 @@ namespace SaintsField.Editor.Utils
         }
 
         private static Mesh _coneMesh;
+        private static readonly int HandleColor = Shader.PropertyToID("_HandleColor");
+        private static readonly int HandleSize = Shader.PropertyToID("_HandleSize");
+        private static readonly int ObjectToWorld = Shader.PropertyToID("_ObjectToWorld");
+        private static readonly int HandleZTest = Shader.PropertyToID("_HandleZTest");
+
         private const float ConeTipVisualScale = 0.2f;
         // Unity's HandleUtility.DistanceToCone follows the built-in Handles.coneMesh pivot convention.
         // In our exported mesh version (pivot moved to cone tip), local tip is at z=0 while legacy
@@ -3029,18 +3034,28 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static void ConeTipHandleDraw(
+            Vector3 position,
+            Quaternion rotation,
+            float size)
+        {
+            _coneMesh ??= LoadResource<Mesh>("3D/HandlesConeMesh.asset");
+            Graphics.DrawMeshNow(_coneMesh, StartCapDraw(position, rotation, size * ConeTipVisualScale));
+        }
+
         internal static Matrix4x4 StartCapDraw(Vector3 position, Quaternion rotation, float size)
         {
-            Shader.SetGlobalColor("_HandleColor", realHandleColor);
-            Shader.SetGlobalFloat("_HandleSize", size);
+            Shader.SetGlobalColor(HandleColor, RealHandleColor);
+            Shader.SetGlobalFloat(HandleSize, size);
+            // ReSharper disable once InconsistentNaming
             Matrix4x4 matrix4x4 = Handles.matrix * Matrix4x4.TRS(position, rotation, Vector3.one);
-            Shader.SetGlobalMatrix("_ObjectToWorld", matrix4x4);
-            HandleUtility.handleMaterial.SetFloat("_HandleZTest", (float) Handles.zTest);
+            Shader.SetGlobalMatrix(ObjectToWorld, matrix4x4);
+            HandleUtility.handleMaterial.SetFloat(HandleZTest, (float) Handles.zTest);
             HandleUtility.handleMaterial.SetPass(0);
             return matrix4x4;
         }
 
-        internal static Color realHandleColor => Handles.color * new Color(1f, 1f, 1f, 0.5f) + (Handles.lighting ? new Color(0.0f, 0.0f, 0.0f, 0.5f) : new Color(0.0f, 0.0f, 0.0f, 0.0f));
+        internal static Color RealHandleColor => Handles.color * new Color(1f, 1f, 1f, 0.5f) + (Handles.lighting ? new Color(0.0f, 0.0f, 0.0f, 0.5f) : new Color(0.0f, 0.0f, 0.0f, 0.0f));
 
         public static (Type drawerType, Attribute drawerAttribute) GetDrawerAndAttribute(
             SerializedProperty property,

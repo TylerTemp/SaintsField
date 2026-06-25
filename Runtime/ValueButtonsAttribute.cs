@@ -8,7 +8,7 @@ namespace SaintsField
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Parameter)]
     public class ValueButtonsAttribute: PathedDropdownAttribute
     {
-        public readonly bool NoFold;
+        public bool NoFold;
 
         public ValueButtonsAttribute(string funcName = null, EUnique unique = EUnique.None, bool noFold=false): base(funcName, unique)
         {

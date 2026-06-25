@@ -42,11 +42,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Inherent
 
         protected override bool AllowGuiColor => true;
 
-        public override void OnDestroy()
+        public override void OnSearchField(string searchString)
         {
         }
 
-        public override void OnSearchField(string searchString)
+        public override void OnDestroyIMGUI()
         {
         }
 
@@ -59,6 +59,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Inherent
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             // IMGUI renderer, if you want IMGUI you can write here
+        }
+
+        public override void OnDestroyUIToolkit()
+        {
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,

@@ -36,16 +36,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 float size = HandleUtility.GetHandleSize(worldPosEnd);
                 float distance = (worldPosStart - worldPosEnd).magnitude;
                 float useSize = Mathf.Min(size, distance);
-                Vector3 arrowPos = Vector3.Lerp(worldPosEnd, worldPosStart, useSize / distance);
-                Handles.ArrowHandleCap(
-                    0,
-                    arrowPos,
-                    // transform.rotation * Quaternion.LookRotation(Vector3.right),
+                Util.ConeTipHandleDraw(
+                    worldPosEnd,
                     Quaternion.LookRotation(worldPosEnd - worldPosStart),
-                    // (worldPosStart - worldPosEnd).magnitude,
-                    useSize,
-                    // HandleUtility.GetHandleSize(worldPosStart - worldPosEnd) * 2,
-                    EventType.Repaint
+                    useSize
                 );
 
                 if (distance > size)
