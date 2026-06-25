@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 701916b22cc34a6296b1ceffeefcbec9
+timeCreated: 1782387600
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/EnumFlagsDrawers/FlagsTreeDropdownDrawer/FlagsTreeDropdownAttributeDrawerIMGUI.cs
+  uploadId: 802314

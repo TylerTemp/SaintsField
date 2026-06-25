@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.ReferencePicker;
 #endif
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using UnityEditor;
 using UnityEngine;
 
@@ -154,7 +156,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         private static SaintsRowAttributeDrawer GetAndCacheSaintsRowDrawer(SerializedProperty property, FieldInfo fieldInfo, string label,
             bool inHorizontalLayout)
         {
-            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 1);
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
             if (IMGUIDrawerCache.CachedSaintsRowDrawers.TryGetValue(drawerKey, out SaintsRowAttributeDrawer saintsRowDrawer))
             {
                 return saintsRowDrawer;
@@ -174,7 +176,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         private static ReferencePickerAttributeDrawer GetAndCacheReferencePickerDrawer(SerializedProperty property,
             FieldInfo fieldInfo, string label, bool inHorizontalLayout)
         {
-            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 2);
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
             if (IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer))
             {
                 return (ReferencePickerAttributeDrawer)drawer;
@@ -188,6 +190,32 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             return (ReferencePickerAttributeDrawer)(IMGUIDrawerCache.CachedDrawers[drawerKey] = referencePickerDrawer);
         }
 #endif
+
+        private static SaintsPropertyDrawer GetAndCacheEnumDropdownDrawer(SerializedProperty property, Type rawType,
+            FieldInfo fieldInfo, string label, bool inHorizontalLayout)
+        {
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 3);
+            if (IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer))
+            {
+                SaintsPropertyDrawer cachedDrawer = (SaintsPropertyDrawer)drawer;
+                cachedDrawer.InHorizontalLayout = inHorizontalLayout;
+                return cachedDrawer;
+            }
+
+            bool hasFlags = rawType?.GetCustomAttributes(typeof(FlagsAttribute), true).Length > 0;
+            Attribute dropdownAttribute = hasFlags
+                ? new FlagsTreeDropdownAttribute()
+                : new DropdownAttribute();
+            Type drawerType = hasFlags
+                ? typeof(FlagsTreeDropdownAttributeDrawer)
+                : typeof(TreeDropdownAttributeDrawer);
+            SaintsPropertyDrawer enumDropdownDrawer =
+                (SaintsPropertyDrawer)SaintsPropertyDrawer.MakePropertyDrawer(
+                    drawerType, fieldInfo, dropdownAttribute, label);
+            enumDropdownDrawer.OverrideAttributes = new[] { dropdownAttribute };
+            enumDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
+            return (SaintsPropertyDrawer)(IMGUIDrawerCache.CachedDrawers[drawerKey] = enumDropdownDrawer);
+        }
 
         public static float GetPropertyHeight(
             PropertyDrawer imguiDrawer,
@@ -250,7 +278,6 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Color:
                 case SerializedPropertyType.ObjectReference:
                 case SerializedPropertyType.LayerMask:
-                case SerializedPropertyType.Enum:
                 case SerializedPropertyType.ArraySize:
                 case SerializedPropertyType.Character:
                 case SerializedPropertyType.AnimationCurve:
@@ -259,6 +286,12 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.FixedBufferSize:
                 case SerializedPropertyType.Hash128:
                     return GetSingleLineHeight(inHorizontalLayout);
+                case SerializedPropertyType.Enum:
+                {
+                    float dropdownHeight = GetAndCacheEnumDropdownDrawer(property, rawType, fieldInfo, label.text,
+                        inHorizontalLayout).GetPropertyHeight(property, label);
+                    return Mathf.Max(GetSingleLineHeight(inHorizontalLayout), dropdownHeight);
+                }
                 case SerializedPropertyType.Vector2:
                 {
                     return IMGUIVector2.GetHeight(inHorizontalLayout);
@@ -572,15 +605,12 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 }
                 case SerializedPropertyType.Enum:
                 {
-                    GUIContent[] enumContents = property.enumDisplayNames.Select(each => new GUIContent(each)).ToArray();
-                    using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
-                    int result = IMGUIEnum.DrawField(position, label, property.enumValueIndex, enumContents, inHorizontalLayout, labelGrayColor);
-                    DrawSingleLineRichText(position, label, richTextChunks, inHorizontalLayout);
-
-                    if (changed.changed)
+                    SaintsPropertyDrawer enumDropdownDrawer =
+                        GetAndCacheEnumDropdownDrawer(property, rawType, fieldInfo, label.text, inHorizontalLayout);
+                    enumDropdownDrawer.overrideRichTextChunks = richTextChunks;
+                    using (new LabelColorScoop(labelGrayColor))
                     {
-                        property.enumValueIndex = result;
-                        ApplyModifiedPropertiesAndNotify(property);
+                        enumDropdownDrawer.OnGUI(position, property, label);
                     }
 
                     return;

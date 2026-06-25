@@ -2309,10 +2309,8 @@ For each argument:
 *   `int|float min` or `string minCallback`: the minimum value of the slider, or a property/callback name.
 *   `int|float max` or `string maxCallback`: the maximum value of the slider, or a property/callback name.
 *   `int|float step=1|-1f`: the step of the slider, `<= 0` means no limit. By default, int type use `1` and float type use `-1f`
-*   `float minWidth=50f`: (IMGUI Only) the minimum width of the value label. `< 0` for auto size (not recommended)
-*   `float maxWidth=50f`: (IMGUI Only) the maximum width of the value label. `< 0` for auto size (not recommended)
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 a full-featured example:
 
@@ -5743,11 +5741,6 @@ It'll display a UI that where the event is binded
 
 ![image](https://github.com/user-attachments/assets/79be0018-387f-427c-aacb-bfd4f7b43187)
 
-Note:
-
-1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
-2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
-
 #### `OnEvent` ####
 
 > [!IMPORTANT]
@@ -5760,11 +5753,6 @@ Parameters:
 *   `string eventTarget` the target `UnityEvent`. If you have dot in it, it will first find the field (or property/function), then find the target event on the found field using the name after the dot(s) recursively.
 *   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
 *   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
-
-Note:
-
-1.  In UI Toolkit, it will only check once when you select the GameObject. In IMGUI, it'll constantly check as long as you're on this object.
-2.  It'll only check the method name. Which means, if you change the value of the callback, it'll not update the callback value.
 
 Example:
 
@@ -8098,7 +8086,6 @@ Features:
 
 Here are some features that is supported by other plugins:
 
-*   IMGUI is not supported, while `UltEvents` & `ExtEvents` does
 *   Chained call (use one callback's result as another one's input) is not supported and will not be added, while `UltEvents` does
 *   Renamed type is partly supported. If a renamed type is a `MonoBehavior`, then rename works as expected. However, `ExtEvent` will try to find a general type's rename
 *   Implicit conversions for arguments is not supported, while `ExtEvents` does

@@ -35,15 +35,18 @@ Unity: 2022.2 or higher
 ### Highlights ###
 
 1.  Works on deep nested fields!
-2.  When a target is drawn by the old IMGUI drawer, it will be rendered correctly inside UI Toolkit.
-3.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
+2.  Works with custom type drawer (either it's IMGUI or UI Toolkit implemention)
+3.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked. All decorative attributes can work with 3rd part attributes
 4.  Allow dynamic arguments in many cases
-5.  Directly serialize dictionary, interface, hashset and more
+5.  Serialize dictionary, interface, hashset and more
 6.  Easily group different fields with box
 
 SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openupm-2025-recap-6283fcd0217e/) in 2025 openupm. Hooray!
 
 ![](https://github.com/user-attachments/assets/82666e9a-268e-46f8-8413-fe57b90d854a)
+
+> [!NOTE]
+> Since 5.19.0, SaintsField's IMGUI implemention is back to support. But IMGUI support is not in a high priority
 
 ### Installation ###
 
@@ -110,12 +113,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.18.9**
+**5.19.0**
 
-1.  Add: Support for Unity 6000.5
-2.  Fix: Deprecated error on Unity 6k.5 [#409](https://github.com/TylerTemp/SaintsField/issues/409)
-3.  Fix: Compile error if `SaintsEvent` not enabled
-4.  Fix: `<field=control/>` tag where `control` is not correctly parsed
+1.  Remove "Build in Data" from Addressable group as it's a reserved group by Unity. Adding anything inside will not be accessable
+2.  [IMGUI]: IMGUI overhaul so most attributes works in custom drawers
 
 ## Usage ##
 
