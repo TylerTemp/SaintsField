@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `OnDropdownChanged` to bind `TMP_Dropdown.OnValueChanged` event to method
+2.  Add: `OnToggleChanged` to bind `Toggle.OnValueChanged` event to method
+
 ## 5.20.0 ##
 
 1.  Fix: More input can be applied by `GUIColor`

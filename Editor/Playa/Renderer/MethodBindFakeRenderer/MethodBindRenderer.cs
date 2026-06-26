@@ -7,6 +7,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using TMPro;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
@@ -88,19 +89,6 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 return ("Event not found", null);
             }
 
-//             if (methodParams.Length == 0 || foundHasValue)
-//             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
-//                 Debug.Log(methodParams.Length);
-//                 Debug.Log(foundHasValue);
-//                 Debug.Log(
-//                     foundHasValue
-//                         ? $"`{methodInfo.Name}` already added to `{foundEventBase}` on `{foundContainerObject}` with value type `{foundValueType}` and value `{foundExistingValue}`"
-//                         : $"`{methodInfo.Name}` already added to `{foundEventBase}`");
-// #endif
-//                 return ("", null);
-//             }
-
             List<Type> invokeRequiredTypes = new List<Type>();
             Type unityEventType = foundEventBase.GetType();
             if (unityEventType.IsGenericType)
@@ -166,76 +154,111 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
             Object unityEventContainerObject;
             UnityEventBase unityEventBase = null;
-            UnityEventCallState unityEventCallState = default;
-            if (methodBind == MethodBind.ButtonOnClick)
+            // UnityEventCallState unityEventCallState = default;
+            switch (methodBind)
             {
-                UnityEngine.UI.Button uiButton = eventTarget is null
-                    ? TryFindButton(target)
-                    : GetButton(eventTarget, target);
-                if (!uiButton)
+                case MethodBind.UnityEvent:
                 {
-                    return ($"{methodInfo.Name}: Button not found", false, null, null, null, default, false, null, null);
-                }
-
-                unityEventContainerObject = uiButton;
-                unityEventBase = uiButton.onClick;
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(eventTarget))
-                {
-                    return ($"{methodInfo.Name}: Event target is empty", false, null, null, null, default, false, null, null);
-                }
-
-                List<string> attrNames = new List<string>();
-                if (eventTarget.Contains("."))
-                {
-                    attrNames.AddRange(eventTarget.Split(SerializedUtils.DotSplitSeparator));
-                }
-                else
-                {
-                    attrNames.Add(eventTarget);
-                }
-
-                object accTarget = target;
-                unityEventContainerObject = serializedTarget;
-
-                while (attrNames.Count > 0)
-                {
-                    string searchAttr = attrNames[0];
-                    attrNames.RemoveAt(0);
-                    if (attrNames.Count == 0)
+                    if (string.IsNullOrEmpty(eventTarget))
                     {
-                        (string error, UnityEventBase foundUnityEvent) =
-                            Util.GetOfNoParams<UnityEventBase>(accTarget, searchAttr, null);
-                        if (error != "")
-                        {
-                            return (error, false, null, null, null, default, false, null, null);
-                        }
+                        return ($"{methodInfo.Name}: Event target is empty", false, null, null, null, default, false, null, null);
+                    }
 
-                        unityEventBase = foundUnityEvent;
+                    List<string> attrNames = new List<string>();
+                    if (eventTarget.Contains("."))
+                    {
+                        attrNames.AddRange(eventTarget.Split(SerializedUtils.DotSplitSeparator));
                     }
                     else
                     {
-                        (string error, object foundTarget) =
-                            Util.GetOfNoParams<object>(accTarget, searchAttr, null);
-                        if (error != "")
-                        {
-                            return (error, false, null, null, null, default, false, null, null);
-                        }
+                        attrNames.Add(eventTarget);
+                    }
 
-                        if (foundTarget == null)
-                        {
-                            return ($"{methodInfo.Name}: {searchAttr} is null", false, null, null, null, default, false, null, null);
-                        }
+                    object accTarget = target;
+                    unityEventContainerObject = serializedTarget;
 
-                        accTarget = foundTarget;
-                        if (foundTarget is Object foundUObject)
+                    while (attrNames.Count > 0)
+                    {
+                        string searchAttr = attrNames[0];
+                        attrNames.RemoveAt(0);
+                        if (attrNames.Count == 0)
                         {
-                            unityEventContainerObject = foundUObject;
+                            (string error, UnityEventBase foundUnityEvent) =
+                                Util.GetOfNoParams<UnityEventBase>(accTarget, searchAttr, null);
+                            if (error != "")
+                            {
+                                return (error, false, null, null, null, default, false, null, null);
+                            }
+
+                            unityEventBase = foundUnityEvent;
+                        }
+                        else
+                        {
+                            (string error, object foundTarget) =
+                                Util.GetOfNoParams<object>(accTarget, searchAttr, null);
+                            if (error != "")
+                            {
+                                return (error, false, null, null, null, default, false, null, null);
+                            }
+
+                            if (foundTarget == null)
+                            {
+                                return ($"{methodInfo.Name}: {searchAttr} is null", false, null, null, null, default, false, null, null);
+                            }
+
+                            accTarget = foundTarget;
+                            if (foundTarget is Object foundUObject)
+                            {
+                                unityEventContainerObject = foundUObject;
+                            }
                         }
                     }
                 }
+                    break;
+                case MethodBind.ButtonOnClick:
+                {
+                    UnityEngine.UI.Button targetComp = eventTarget is null
+                        ? TryFindComp<UnityEngine.UI.Button>(target)
+                        : GetComp<UnityEngine.UI.Button>(eventTarget, target);
+                    if (!targetComp)
+                    {
+                        return ($"{methodInfo.Name}: Button not found", false, null, null, null, default, false, null, null);
+                    }
+
+                    unityEventContainerObject = targetComp;
+                    unityEventBase = targetComp.onClick;
+                }
+                    break;
+                case MethodBind.ToggleOnValueChanged:
+                {
+                    UnityEngine.UI.Toggle targetComp = eventTarget is null
+                        ? TryFindComp<UnityEngine.UI.Toggle>(target)
+                        : GetComp<UnityEngine.UI.Toggle>(eventTarget, target);
+                    if (!targetComp)
+                    {
+                        return ($"{methodInfo.Name}: Toggle not found", false, null, null, null, default, false, null, null);
+                    }
+
+                    unityEventContainerObject = targetComp;
+                    unityEventBase = targetComp.onValueChanged;
+                }
+                    break;
+                case MethodBind.TMPDropdownOnValueChanged:
+                {
+                    TMP_Dropdown targetComp = eventTarget is null
+                        ? TryFindComp<TMP_Dropdown>(target)
+                        : GetComp<TMP_Dropdown>(eventTarget, target);
+                    if (!targetComp)
+                    {
+                        return ($"{methodInfo.Name}: TMP_Dropdown not found", false, null, null, null, default, false, null, null);
+                    }
+
+                    unityEventContainerObject = targetComp;
+                    unityEventBase = targetComp.onValueChanged;
+                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(methodBind), methodBind, null);
             }
 
             if (unityEventBase == null)
@@ -289,7 +312,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
             Debug.Log($"found nothing from {unityEventBase.GetPersistentEventCount()} events");
 #endif
-            return ("", false, unityEventContainerObject, unityEventBase, expectedValue, unityEventCallState, false, null, null);
+            return ("", false, unityEventContainerObject, unityEventBase, expectedValue, default, false, null, null);
         }
 
         private static (string error, bool hasValue, object value) PersistentListenerValueEquals(UnityEventBase unityEventBase, int eventIndex)
@@ -450,11 +473,11 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             };
         }
 
-        private static UnityEngine.UI.Button GetButton(string by, object target)
+        private static T GetComp<T>(string by, object target)
         {
             if (by == null)
             {
-                return TryFindButton(target);
+                return TryFindComp<T>(target);
             }
 
             (string error, MemberInfo _, object value) = Util.GetOf<object>(
@@ -466,23 +489,23 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 null);
             // Debug.Log($"find {value} path {by} on {target}");
             return error != ""
-                ? null
-                : TryFindButton(value);
+                ? default
+                : TryFindComp<T>(value);
         }
 
-        private static UnityEngine.UI.Button TryFindButton(object target)
+        private static T TryFindComp<T>(object target)
         {
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (target)
             {
-                case UnityEngine.UI.Button button:
+                case T button:
                     return button;
                 case GameObject gameObject:
-                    return gameObject.GetComponent<UnityEngine.UI.Button>();
+                    return gameObject.GetComponent<T>();
                 case Component component:
-                    return component.GetComponent<UnityEngine.UI.Button>();
+                    return component.GetComponent<T>();
                 default:
-                    return null;
+                    return default;
             }
         }
 

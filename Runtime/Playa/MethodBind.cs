@@ -2,7 +2,9 @@ namespace SaintsField.Playa
 {
     public enum MethodBind
     {
+        UnityEvent,
         ButtonOnClick,
-        CustomEvent,
+        ToggleOnValueChanged,
+        TMPDropdownOnValueChanged,
     }
 }

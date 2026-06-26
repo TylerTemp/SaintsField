@@ -18,7 +18,8 @@
         "Unity.Collections",
         "Unity.Serialization",
         "SaintsBuild.Editor",
-        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "Unity.Mathematics",
+        "Unity.TextMeshPro",
         "DOTween.Modules"
     ],
     "includePlatforms": [
@@ -107,6 +108,11 @@
             "name": "com.unity.mathematics",
             "expression": "",
             "define": "SAINTSFIELD_UNITY_MATHEMATICS"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "SAINTSFIELD_UNITY_TEXTMESHPRO"
         }
     ],
     "noEngineReferences": false
