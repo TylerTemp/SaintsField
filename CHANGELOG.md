@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.19.1 ##
+## 5.20.0 ##
 
 1.  Fix: More input can be applied by `GUIColor`
 2.  Fix: `ArrowHandleCap` could not correctly pointing at the exactly point
