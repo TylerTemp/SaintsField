@@ -1,8 +1,8 @@
 # Changelog
 
-## WIP ##
+## 5.19.1 ##
 
-1.  Fix: More attributes for `GUIColor`
+1.  Fix: More input can be applied by `GUIColor`
 2.  Fix: `ArrowHandleCap` could not correctly pointing at the exactly point
 3.  Fix: Set a bit delay for `MinValue` & `MaxValue` auto correction so when you have both but conflicted values, it now don't trigger a loop call (stack overflow)
 4.  Add: `CompInfoBox` to draw component top info boxes
