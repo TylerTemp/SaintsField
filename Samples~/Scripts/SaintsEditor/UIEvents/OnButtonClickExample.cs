@@ -1,7 +1,7 @@
 using SaintsField.Playa;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor
+namespace SaintsField.Samples.Scripts.SaintsEditor.UIEvents
 {
     public class OnButtonClickExample: SaintsMonoBehaviour
     {

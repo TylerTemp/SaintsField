@@ -4,6 +4,12 @@
 
 1.  Add: `OnDropdownChanged` to bind `TMP_Dropdown.OnValueChanged` event to method
 2.  Add: `OnToggleChanged` to bind `Toggle.OnValueChanged` event to method
+3.  Add: `OnSliderChanged` to bind `Slider.OnValueChanged` event to method
+4.  Add: `OnInputField*` to bind `TMP_InputField`'s related event to method:
+    *   `OnInputFieldChanged`
+    *   `OnInputFieldEndEdit`
+    *   `OnInputFieldSelect`
+    *   `OnInputFieldDeselect`
 
 ## 5.20.0 ##
 

@@ -5759,60 +5759,6 @@ private void OnClick()
 
 ![buttonaddonclick](https://github.com/TylerTemp/SaintsField/assets/6391063/9c827d24-677c-437a-ad50-fe953a07d6c2)
 
-#### `OnButtonClick` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-This is a method decorator, which will bind this method to the target button's click event.
-
-Parameters:
-
-*   `string buttonTarget=null` the target button. `null` to get it form the current target.
-*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
-*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[OnButtonClick]
-public void OnButtonClickVoid()
-{
-    Debug.Log("OnButtonClick Void");
-}
-
-[OnButtonClick(value: 2)]
-public void OnButtonClickInt(int value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-
-[OnButtonClick(value: true)]
-public void OnButtonClickBool(bool value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-
-[OnButtonClick(value: 0.3f)]
-public void OnButtonClickFloat(float value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-
-private GameObject ThisGo => this.gameObject;
-
-[OnButtonClick(value: nameof(ThisGo), isCallback: true)]
-public void OnButtonClickComp(UnityEngine.Object value)
-{
-    Debug.Log($"OnButtonClick ${value}");
-}
-```
-
-It'll display a UI that where the event is binded
-
-![image](https://github.com/user-attachments/assets/79be0018-387f-427c-aacb-bfd4f7b43187)
-
 #### `OnEvent` ####
 
 > [!IMPORTANT]
@@ -5868,6 +5814,254 @@ public class CustomEventExample : MonoBehaviour
 ```
 
 ![](https://github.com/user-attachments/assets/419700a4-a0cd-4cb7-8338-da651643c38a)
+
+
+#### `OnButtonClick` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target button's click event.
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[OnButtonClick]
+public void OnButtonClickVoid()
+{
+    Debug.Log("OnButtonClick Void");
+}
+
+[OnButtonClick(value: 2)]
+public void OnButtonClickInt(int value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+[OnButtonClick(value: true)]
+public void OnButtonClickBool(bool value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+[OnButtonClick(value: 0.3f)]
+public void OnButtonClickFloat(float value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+
+private GameObject ThisGo => this.gameObject;
+
+[OnButtonClick(value: nameof(ThisGo), isCallback: true)]
+public void OnButtonClickComp(UnityEngine.Object value)
+{
+    Debug.Log($"OnButtonClick ${value}");
+}
+```
+
+It'll display a UI that where the event is binded
+
+![image](https://github.com/user-attachments/assets/79be0018-387f-427c-aacb-bfd4f7b43187)
+
+#### `OnDropdownChanged` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target `TMP_Dropdown`'s `onValueChanged<int>` event.
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField;
+
+[OnDropdownChanged]  // bind a void
+public void DropdownChangedVoid()
+{
+}
+
+[OnDropdownChanged]  // bind to receive the value
+public void DropdownChangedInt(int index)
+{
+}
+
+[OnDropdownChanged(value: "My Custom String")]  // bind with a static value callback
+public void OtherMethodStr(string str)
+{
+}
+
+[GetInSiblings] public TMP_Dropdown dropdown;
+
+public TMP_Dropdown GetMyDropdown() => dropdown;
+
+[OnDropdownChanged(nameof(GetMyDropdown))] // taget is a callback (support field/property/function)
+public void BindFromOtherTarget(int dropdownIndex)
+{
+}
+```
+
+It'll display a UI that where the event is binded
+
+![image](https://github.com/user-attachments/assets/63772474-ef7f-48b6-94ed-e11b025a7fb4)
+
+#### `OnToggleChanged` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target `Toggle`'s `onValueChanged<bool>` event.
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField;
+
+[OnToggleChanged]  // bind a void
+public void ToggleChangedVoid()
+{
+}
+
+[OnToggleChanged]  // bind to receive the value
+public void ToggleChangedBool(bool isOn)
+{
+}
+
+[OnToggleChanged(value: "My Custom String")]  // bind with a static value callback
+public void OtherMethodStr(string str)
+{
+}
+
+[GetInSiblings] public Toggle toggle;
+
+public Toggle GetMyToggle() => toggle;
+
+[OnToggleChanged(nameof(GetMyToggle))] // taget is a callback (support field/property/function)
+public void BindFromOtherTarget(bool isOn)
+{
+}
+```
+
+It'll display a UI that where the event is binded
+
+![image](https://github.com/user-attachments/assets/0f7763db-f95f-45a4-bef7-51d891dfb3e5)
+
+#### `OnSliderChanged` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target `Slider`'s `onValueChanged<float>` event.
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField;
+
+[OnSliderChanged]  // bind a void
+public void SliderChangedVoid()
+{
+}
+
+[OnSliderChanged]  // bind to receive the value
+public void SliderChangedFloat(float value)
+{
+}
+
+[OnSliderChanged(value: "My Custom String")]  // bind with a static value callback
+public void OtherMethodStr(string str)
+{
+}
+
+[GetInSiblings] public Slider slider;
+
+public Slider GetMySlider() => slider;
+
+[OnSliderChanged(nameof(GetMySlider))] // taget is a callback (support field/property/function)
+public void BindFromOtherTarget(float s)
+{
+}
+```
+
+It'll display a UI that where the event is binded
+
+![image](https://github.com/user-attachments/assets/6bf490ce-ba4c-4d53-bbc5-4d857d216f5a)
+
+#### `OnInputField*` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+This is a method decorator, which will bind this method to the target `TMP_InputField`'s related event:
+
+*   `OnInputFieldChanged`
+*   `OnInputFieldEndEdit`
+*   `OnInputFieldSelect`
+*   `OnInputFieldDeselect`
+
+Parameters:
+
+*   `string buttonTarget=null` the target button. `null` to get it form the current target.
+*   `object value=null` the value passed to the method. Note unity only support `bool`, `int`, `float`, `string` and `UnityEngine.Object`. To pass a `UnityEngine.Object`, use a string name of the target, and set the `isCallback` parameter to `true`
+*   `bool isCallback=false`: when `value` is a string, set this to `true` to obtain the actual value from a method/property/field
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField;
+
+[OnInputFieldEndEdit]  // bind a void
+public void InputFieldEndEdit()
+{
+    Debug.Log("InputFieldEndEdit Void");
+}
+
+[OnInputFieldChanged]  // bind to receive the value
+public void OnInputFieldChanged(string value)
+{
+    Debug.Log($"InputFieldChanged {value}");
+}
+
+[OnInputFieldSelect(value: "My Custom String")]  // bind with a static value callback
+public void OtherMethodStr(string str)
+{
+    Debug.Log($"OtherMethod {str}");
+}
+
+[GetInSiblings] public TMP_InputField inputField;
+
+public TMP_InputField GetMyInputField() => inputField;
+
+[OnInputFieldDeselect(nameof(GetMyInputField))] // taget is a callback (support field/property/function)
+public void BindFromOtherTarget(string val)
+{
+    Debug.Log($"BindFromOtherTarget {val}");
+}
+```
+
+It'll display a UI that where the event is binded
+
+![image](https://github.com/user-attachments/assets/09573a19-5b91-46d4-8605-4c0b3b536849)
 
 #### `ColorPalette` ####
 

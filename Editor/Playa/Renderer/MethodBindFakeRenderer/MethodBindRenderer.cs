@@ -7,7 +7,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using TMPro;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
@@ -62,18 +62,18 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             // object value = playaMethodBindAttribute.Value;
 
             string eventDisplayName;
-            if (methodBind == MethodBind.ButtonOnClick)
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (methodBind == MethodBind.ComponentTypeAndName)
             {
-                eventDisplayName = $"{eventTarget ?? "Button"}.onClick";
+                eventDisplayName = $"{playaMethodBindAttribute.ComponentTypeOrNull.FullName}.{playaMethodBindAttribute.ComponentEventName}";
             }
             else  // custom event at the moment
             {
                 eventDisplayName = eventTarget;
             }
 
-            (string findExistingError, bool foundExists, Object foundContainerObject, UnityEventBase foundEventBase, object expectedValue, UnityEventCallState _, bool foundHasValue, Type foundValueType, object foundExistingValue) =
+            (string findExistingError, bool foundExists, Object foundContainerObject, UnityEventBase foundEventBase, object expectedValue, UnityEventCallState _, bool _, Type _, object _) =
                 FindAlreadyAddedCallback(playaMethodBindAttribute, methodInfo, serializedTarget, target);
-            object value = expectedValue;
             if (findExistingError != "")
             {
                 return (findExistingError, null);
@@ -89,17 +89,29 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 return ("Event not found", null);
             }
 
-            List<Type> invokeRequiredTypes = new List<Type>();
-            Type unityEventType = foundEventBase.GetType();
-            if (unityEventType.IsGenericType)
+            List<Type> invokeRequiredTypes = new List<Type>(4);
+
+            foreach (Type thisType in RectUtils.GetGenBaseTypes(foundEventBase.GetType()))
             {
-                invokeRequiredTypes.AddRange(unityEventType.GetGenericArguments());
+                if (thisType.IsGenericType)
+                {
+                    Type[] genericArguments = thisType.GetGenericArguments();
+                    // Debug.Log($"from {thisType.Name} get types: {string.Join(",", genericArguments.Select(each => each.Name))}");
+                    // Debug.Log();
+                    invokeRequiredTypes.AddRange(genericArguments);
+                }
             }
+
+            // Type unityEventType = foundEventBase.GetType();
+            // if (unityEventType.IsGenericType)
+            // {
+            //     invokeRequiredTypes.AddRange(unityEventType.GetGenericArguments());
+            // }
 
             // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), target, methodInfo);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
-            Debug.Log($"add `{methodInfo.Name}` to `{foundEventBase}` event on target {foundContainerObject}");
+            Debug.Log($"add `{methodInfo.Name}` to `{foundEventBase}` event on target {foundContainerObject}; methodParams={string.Join<ParameterInfo>(", ", methodParams)}, invokeRequiredTypes={string.Join(", ", invokeRequiredTypes)}");
 #endif
 
             // Undo.RecordObject(unityEventBase, "AddOnClick");
@@ -125,9 +137,9 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             {
                 Undo.RecordObject(foundContainerObject, "AddEventListener");
                 EditorUtility.SetDirty(foundContainerObject);
-                Util.BindEventWithValue(foundEventBase, methodInfo, invokeRequiredTypes.ToArray(), target, value);
+                Util.BindEventWithValue(foundEventBase, methodInfo, invokeRequiredTypes.ToArray(), target, expectedValue);
                 SaintsPropertyDrawer.EnqueueSceneViewNotification(
-                    $"Bind callback `{methodInfo.Name}` to `{foundContainerObject}.{eventDisplayName}`({value})");
+                    $"Bind callback `{methodInfo.Name}` to `{foundContainerObject}.{eventDisplayName}`({expectedValue})");
 #if UNITY_2021_3_OR_NEWER
                     AssetDatabase.SaveAssetIfDirty(foundContainerObject);
 #endif
@@ -215,46 +227,51 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                     }
                 }
                     break;
-                case MethodBind.ButtonOnClick:
+                case MethodBind.ComponentTypeAndName:
                 {
-                    UnityEngine.UI.Button targetComp = eventTarget is null
-                        ? TryFindComp<UnityEngine.UI.Button>(target)
-                        : GetComp<UnityEngine.UI.Button>(eventTarget, target);
+                    Object targetComp;
+                    if (eventTarget is null)
+                    {
+                        targetComp = TryFindComp(playaMethodBindAttribute.ComponentTypeOrNull, target);
+                    }
+                    else
+                    {
+                        (string error, Object findResult) = GetComp(eventTarget, playaMethodBindAttribute.ComponentTypeOrNull, target);
+                        if (error != string.Empty)
+                        {
+                            return (error, false, null, null, null, default, false, null, findResult);
+                        }
+                        targetComp = findResult;
+                    }
                     if (!targetComp)
                     {
-                        return ($"{methodInfo.Name}: Button not found", false, null, null, null, default, false, null, null);
+                        return ($"{methodInfo.Name}: {playaMethodBindAttribute.ComponentTypeOrNull} not found", false, null, null, null, default, false, null, null);
+                    }
+
+                    // Debug.Log(targetComp.GetType().Name);
+
+                    // UnityEventBase uEvent = GetEventFromTarget(targetComp, playaMethodBindAttribute.ComponentEventName);
+                    (string errorEvent, MemberInfo _, UnityEventBase uEvent) = Util.GetOf<UnityEventBase>(
+                        playaMethodBindAttribute.ComponentEventName,
+                        null,
+                        null,
+                        null,
+                        targetComp,
+                        null
+                        );
+
+                    if (errorEvent != string.Empty)
+                    {
+                        return (errorEvent, false, null, null, null, default, false, null, null);
+                    }
+                    if (uEvent == null)
+                    {
+                        return ($"{methodInfo.Name}: {playaMethodBindAttribute.ComponentEventName} not found on {playaMethodBindAttribute.ComponentTypeOrNull}({targetComp})", false, null, null, null, default, false, null, null);
                     }
 
                     unityEventContainerObject = targetComp;
-                    unityEventBase = targetComp.onClick;
-                }
-                    break;
-                case MethodBind.ToggleOnValueChanged:
-                {
-                    UnityEngine.UI.Toggle targetComp = eventTarget is null
-                        ? TryFindComp<UnityEngine.UI.Toggle>(target)
-                        : GetComp<UnityEngine.UI.Toggle>(eventTarget, target);
-                    if (!targetComp)
-                    {
-                        return ($"{methodInfo.Name}: Toggle not found", false, null, null, null, default, false, null, null);
-                    }
+                    unityEventBase = uEvent;
 
-                    unityEventContainerObject = targetComp;
-                    unityEventBase = targetComp.onValueChanged;
-                }
-                    break;
-                case MethodBind.TMPDropdownOnValueChanged:
-                {
-                    TMP_Dropdown targetComp = eventTarget is null
-                        ? TryFindComp<TMP_Dropdown>(target)
-                        : GetComp<TMP_Dropdown>(eventTarget, target);
-                    if (!targetComp)
-                    {
-                        return ($"{methodInfo.Name}: TMP_Dropdown not found", false, null, null, null, default, false, null, null);
-                    }
-
-                    unityEventContainerObject = targetComp;
-                    unityEventBase = targetComp.onValueChanged;
                 }
                     break;
                 default:
@@ -473,11 +490,11 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             };
         }
 
-        private static T GetComp<T>(string by, object target)
+        private static (string error, Object result) GetComp(string by, Type type, object target)
         {
             if (by == null)
             {
-                return TryFindComp<T>(target);
+                return ("", TryFindComp(type, target));
             }
 
             (string error, MemberInfo _, object value) = Util.GetOf<object>(
@@ -488,25 +505,73 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 target,
                 null);
             // Debug.Log($"find {value} path {by} on {target}");
-            return error != ""
-                ? default
-                : TryFindComp<T>(value);
+            if (error != "")
+            {
+                return (error, null);
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (RuntimeUtil.IsNull(value))
+            {
+                return ($"Target `{by}` is null", null);
+            }
+
+            return ("", TryFindComp(type, value));
         }
 
-        private static T TryFindComp<T>(object target)
+        private static Object TryFindComp(Type compType, object target)
         {
+            if (compType.IsAssignableFrom(target.GetType()))
+            {
+                return target as Object;
+            }
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (target)
             {
-                case T button:
-                    return button;
                 case GameObject gameObject:
-                    return gameObject.GetComponent<T>();
+                    return gameObject.GetComponent(compType);
                 case Component component:
-                    return component.GetComponent<T>();
+                    return component.GetComponent(compType);
                 default:
-                    return default;
+                    return null;
             }
+        }
+
+        // private static UnityEventBase GetEventFromTarget(Object uObject, string eventName)
+        // {
+        //     // private with [SerializedField]?
+        //     foreach (Type parentType in ReflectUtils.GetSelfAndBaseTypesFromTypeIter(uObject.GetType()))
+        //     {
+        //         // Debug.Log(parentType.Name);
+        //         UnityEventBase result = GetEventFromTargetDirectly(uObject, parentType, eventName);
+        //         if (result != null)
+        //         {
+        //             return result;
+        //         }
+        //     }
+        //
+        //     return null;
+        // }
+
+
+        private static UnityEventBase GetEventFromTargetDirectly(Object obj, Type type, string eventName)
+        {
+            const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            FieldInfo field = type.GetField(eventName, bindingFlags);
+            // Debug.Log(field);
+            if (field != null)
+            {
+                return field.GetValue(obj) as UnityEventBase;
+            }
+
+            PropertyInfo property = type.GetProperty(eventName, bindingFlags);
+            // Debug.Log(property);
+            if (property != null)
+            {
+                return property.GetValue(obj) as UnityEventBase;
+            }
+
+            return null;
         }
 
 

@@ -36,6 +36,20 @@ namespace SaintsField.Editor.Utils
             return types;
         }
 
+        // lazy loading
+        public static IEnumerable<Type> GetSelfAndBaseTypesFromTypeIter(Type thisType)
+        {
+            yield return thisType;
+
+            Type accType = thisType;
+
+            // ReSharper disable once UseIndexFromEndExpression
+            while (accType.BaseType != null)
+            {
+                yield return accType = accType.BaseType;
+            }
+        }
+
         public enum GetPropType
         {
             NotFound,

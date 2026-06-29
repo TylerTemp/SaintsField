@@ -113,13 +113,16 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.20.0**
+**WIP**
 
-1.  Fix: More input can be applied by `GUIColor`
-2.  Fix: `ArrowHandleCap` could not correctly pointing at the exactly point
-3.  Fix: Set a bit delay for `MinValue` & `MaxValue` auto correction so when you have both but conflicted values, it now don't trigger a loop call (stack overflow)
-4.  Add: `CompInfoBox` to draw component top info boxes
-5.  Add: `CompText` to draw component top text with `AboveText` behavior
+1.  Add: `OnDropdownChanged` to bind `TMP_Dropdown.OnValueChanged` event to method
+2.  Add: `OnToggleChanged` to bind `Toggle.OnValueChanged` event to method
+3.  Add: `OnSliderChanged` to bind `Slider.OnValueChanged` event to method
+4.  Add: `OnInputField*` to bind `TMP_InputField`'s related event to method:
+    *   `OnInputFieldChanged`
+    *   `OnInputFieldEndEdit`
+    *   `OnInputFieldSelect`
+    *   `OnInputFieldDeselect`
 
 ## Usage ##
 
@@ -222,8 +225,12 @@ namespace: `SaintsField`
         *   [`AboveImage`/`BelowImage`](https://saintsfield.comes.today/general-attributes/miscellaneous/aboveimagebelowimage)
         *   [`ParticlePlay`](https://saintsfield.comes.today/general-attributes/miscellaneous/particleplay)
         *   [`ButtonAddOnClick`](https://saintsfield.comes.today/general-attributes/miscellaneous/buttonaddonclick)
-        *   [`OnButtonClick`](https://saintsfield.comes.today/general-attributes/miscellaneous/onbuttonclick)
         *   [`OnEvent`](https://saintsfield.comes.today/general-attributes/miscellaneous/onevent)
+        *   [`OnButtonClick`](https://saintsfield.comes.today/general-attributes/miscellaneous/onbuttonclick)
+        *   [`OnDropdownChanged` ###](https://saintsfield.comes.today/general-attributes/miscellaneous/ondropdownchanged-)
+        *   [`OnToggleChanged`](https://saintsfield.comes.today/general-attributes/miscellaneous/ontogglechanged)
+        *   [`OnSliderChanged`](https://saintsfield.comes.today/general-attributes/miscellaneous/onsliderchanged)
+        *   [`OnInputField*`](https://saintsfield.comes.today/general-attributes/miscellaneous/oninputfield)
         *   [`ColorPalette`](https://saintsfield.comes.today/general-attributes/miscellaneous/colorpalette)
         *   [`Searchable`](https://saintsfield.comes.today/general-attributes/miscellaneous/searchable)
         *   [`DateTime`](https://saintsfield.comes.today/general-attributes/miscellaneous/datetime)

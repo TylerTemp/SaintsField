@@ -2,23 +2,21 @@ using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
+using TMPro;
 
-
-namespace SaintsField
+namespace SaintsField.Utils
 {
-    [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class OnToggleChangedAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
+    public abstract class AbsInputFieldAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
     {
         public MethodBind MethodBind => MethodBind.ComponentTypeAndName;
 
         public string EventTarget { get; }
-        public Type ComponentTypeOrNull => typeof(UnityEngine.UI.Toggle);
-        public string ComponentEventName => nameof(UnityEngine.UI.Toggle.onValueChanged);
+        public Type ComponentTypeOrNull => typeof(TMP_InputField);
+        public abstract string ComponentEventName { get; }
         public object Value { get; }
         public bool IsCallback { get; }
 
-        public OnToggleChangedAttribute(string eventTarget=null, object value=null, bool isCallback=false)
+        public AbsInputFieldAttribute(string eventTarget=null, object value=null, bool isCallback=false)
         {
             EventTarget = eventTarget;
             Value = value;
