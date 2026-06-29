@@ -1,10 +1,4 @@
 .idea
-/Samples
-/Samples.meta
-/*.html
-/*.html.meta
-/*.pdf
-/*.pdf.meta
+Samples
+Samples.meta
 .DS_Store
-
-#/Dll/*.dll

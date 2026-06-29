@@ -113,7 +113,7 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**WIP**
+**5.21.0**
 
 1.  Add: `OnDropdownChanged` to bind `TMP_Dropdown.OnValueChanged` event to method
 2.  Add: `OnToggleChanged` to bind `Toggle.OnValueChanged` event to method
@@ -123,6 +123,7 @@ namespace: `SaintsField`
     *   `OnInputFieldEndEdit`
     *   `OnInputFieldSelect`
     *   `OnInputFieldDeselect`
+5.  Fix: If the target is a pure IMGUI drawer, fix `LabelText` could not apply a proper label
 
 ## Usage ##
 
