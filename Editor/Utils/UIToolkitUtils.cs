@@ -176,7 +176,7 @@ namespace SaintsField.Editor.Utils
 
             if (chunksOrNull == null)
             {
-                label.style.display = DisplayStyle.None;
+                SetDisplayStyle(label, DisplayStyle.None);
                 return;
             }
 
@@ -186,7 +186,10 @@ namespace SaintsField.Editor.Utils
             }
 
             label.Clear();
-            label.style.flexDirection = FlexDirection.Row;
+            if (label.style.flexDirection != FlexDirection.Row)
+            {
+                label.style.flexDirection = FlexDirection.Row;
+            }
             // label.style.alignItems = Align.Center;
             // label.style.height = EditorGUIUtility.singleLineHeight;
             foreach (VisualElement richChunk in richTextDrawer.DrawChunksUIToolKit(chunksOrNull))
@@ -472,6 +475,8 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static string PropertyFieldIMGUIFallbackClass = "saintsfield-propertyfield-imgui-fallback";
+
         public static VisualElement CreateOrUpdateFieldProperty(
             SerializedProperty property,
             IReadOnlyList<Attribute> allAttributes,
@@ -565,7 +570,6 @@ namespace SaintsField.Editor.Utils
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
             // We don't need to handle decorators either
-            // Debug.Log($"PropertyField for {property.propertyPath}");
             PropertyField result = new PropertyField(property, string.IsNullOrEmpty(label) ? "": label)
             {
                 style =
@@ -575,6 +579,7 @@ namespace SaintsField.Editor.Utils
                 name = property.propertyPath,
             };
             result.Bind(property.serializedObject);
+            result.AddToClassList(PropertyFieldIMGUIFallbackClass);
             return result;
 
             // // this is the SaintsPropertyDrawer way, but some IMGUI has height issue with IMGUIContainer (e.g. Wwise.EventDrawer)

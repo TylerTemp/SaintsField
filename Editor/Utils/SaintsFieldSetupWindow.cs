@@ -286,10 +286,15 @@ namespace SaintsField.Editor.Utils
         private IEnumerator RemoveComAddressables() => DebugRemove("com.unity.addressables");
 #endif
 
+        // com.unity.transport
 #if !SAINTSFIELD_NETCODE_GAMEOBJECTS
+        [Button("Install com.unity.transport")]
+        private IEnumerator InstallTransport() => DebugInstall("com.unity.transport");
         [Button("Install com.unity.netcode.gameobjects")]
         private IEnumerator InstallComNetCode() => DebugInstall("com.unity.netcode.gameobjects");
 #else
+        [Button("Remove com.unity.transport")]
+        private IEnumerator RemoveTransport() => DebugRemove("com.unity.transport");
         [Button("Remove com.unity.netcode.gameobjects")]
         private IEnumerator RemoveComNetcode() => DebugRemove("com.unity.netcode.gameobjects");
 #endif

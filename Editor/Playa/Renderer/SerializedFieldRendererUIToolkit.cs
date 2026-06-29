@@ -13,9 +13,6 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class SerializedFieldRenderer: IMakeRenderer, IDOTweenPlayRecorder
     {
-        private PropertyField _result;
-
-        private VisualElement _fieldElement;
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             string label = null;
@@ -61,10 +58,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
                         ? DisplayStyle.Flex
                         : DisplayStyle.None;
-                    if (r.style.display != display)
-                    {
-                        r.style.display = display;
-                    }
+                    UIToolkitUtils.SetDisplayStyle(r, display);
                 }
 
                 OnSearchFieldUIToolkit.AddListener(Search);

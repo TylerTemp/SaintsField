@@ -1459,6 +1459,53 @@ MonoBehaviour:
   g23:
   - 112233
   - sfdsfds
+--- !u!1 &139880710
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 139880711}
+  - component: {fileID: 139880712}
+  m_Layer: 0
+  m_Name: IMGUIDrawerLabelTextNotWorkingFix
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &139880711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139880710}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &139880712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 139880710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae40740ebf93e464cbc88dcaa78308ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.IMGUIDrawerLabelTextNotWorkingFix
+  quaternionValue: {x: 0, y: 0, z: 0, w: 1}
+  q1: {x: 0, y: 0, z: 0, w: 1}
+  q2: {x: 0, y: 0, z: 0, w: 1}
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0
@@ -10004,7 +10051,105 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd6f0f648243edd4fa41971dc840b0c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.LabelTextForRawFallback
+  cusType:
+    text: 
+    number: 0
+  arr: []
+  text: 
+  rawStruct:
+    text: 
+    number: 0
+    go: {fileID: 0}
+  managedReference:
+    rid: 7000927644763816175
+  intValue: 0
+  byteValue: 1
+  sbyteValue: -1
+  shortValue: -5
+  ushortValue: 5
+  uintValue: 5
+  longValue: 9223372036854775807
+  ulongValue: 18446744073709551615
+  boolValue: 0
+  floatValue: 0.1234
+  doubleValue: 0.1234
+  charValue: 99
+  colorValue: {r: 1, g: 0, b: 0, a: 1}
+  objectReference: {fileID: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  enumValue: 0
+  vector2Value: {x: 1, y: 1}
+  vector3Value: {x: 1, y: 1, z: 1}
+  vector4Value: {x: 1, y: 1, z: 1, w: 1}
   quaternionValue: {x: 0, y: 0, z: 0, w: 1}
+  vector2IntValue: {x: 1, y: 1}
+  vector3IntValue: {x: 1, y: 1, z: 1}
+  rectValue:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  rectIntValue:
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  boundsValue:
+    m_Center: {x: 1, y: 1, z: 1}
+    m_Extent: {x: 0, y: 0.5, z: 0}
+  boundsIntValue:
+    m_Position: {x: 1, y: 1, z: 1}
+    m_Size: {x: 0, y: 1, z: 0}
+  animationCurveValue:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  gradientValue:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  hash128Value:
+    serializedVersion: 2
+    Hash: 01000000020000000300000004000000
+  references:
+    version: 2
+    RefIds:
+    - rid: 7000927644763816175
+      type: {class: LabelTextForRawFallbackExample/RawManagedChild, ns: SaintsField.Samples.Scripts.SaintsEditor.Testing.LabelTextForRawFallback, asm: SaintsField.Samples}
+      data:
+        baseText: 
+        childNumber: 0
 --- !u!1 &1175289510
 GameObject:
   m_ObjectHideFlags: 0
@@ -10081,6 +10226,7 @@ Transform:
   - {fileID: 320236487}
   - {fileID: 834027237}
   - {fileID: 868709667}
+  - {fileID: 139880711}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815

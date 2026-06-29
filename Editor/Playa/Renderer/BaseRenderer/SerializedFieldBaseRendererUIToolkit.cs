@@ -14,14 +14,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public partial class SerializedFieldBaseRenderer
     {
-        private PropertyField _result;
+        // private PropertyField _result;
 
         private class UserDataPayload
         {
             public string XML;
             // public Label Label;
             // public string FriendlyName;
-            public RichTextDrawer RichTextDrawer;
+            public RichTextDrawer RichTextDrawer = new RichTextDrawer();
 
             public bool TableHasSize;
         }
@@ -30,6 +30,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
         private bool _tableCondition;
+
+        private PropertyField _imguiFallbackPropertyField;
+        private Label _imGuiFallbackLabel;
 
         private class BindableWrapper: VisualElement, IBindable
         {
@@ -86,6 +89,36 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     _container = new BindableWrapper(FieldWithInfo.SerializedProperty);
                 }
                 _container.userData = userDataPayload;
+
+                if (result is PropertyField pf &&
+                    result.ClassListContains(UIToolkitUtils.PropertyFieldIMGUIFallbackClass))
+                {
+                    _imguiFallbackPropertyField = pf;
+                    _imGuiFallbackLabel = new Label
+                    {
+                        pickingMode = PickingMode.Ignore,
+                    };
+                    if (InAnyHorizontalLayout)
+                    {
+                        _imguiFallbackPropertyField.label = "";
+                        string oriName = FieldWithInfo.SerializedProperty!.displayName;
+                        UIToolkitUtils.SetLabelChildren(_imGuiFallbackLabel,
+                            new []
+                            {
+                                new RichTextDrawer.RichTextChunk(oriName, false, oriName),
+                            },
+                            userDataPayload.RichTextDrawer);
+                    }
+                    else
+                    {
+                        _imGuiFallbackLabel.style.position = Position.Absolute;
+                        _imGuiFallbackLabel.style.left = 4;
+                        _imGuiFallbackLabel.style.top = 0;
+                        _imGuiFallbackLabel.style.right = 0;
+                        _imGuiFallbackLabel.style.height = EditorGUIUtility.singleLineHeight;
+                    }
+                    _container.Add(_imGuiFallbackLabel);
+                }
                 _container.Add(result);
             }
             else
@@ -216,10 +249,33 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         userDataPayload.RichTextDrawer = new RichTextDrawer();
                     }
                     userDataPayload.XML = xml;
-                    VisualElement saintsFieldContainer =
-                        _container.Q<VisualElement>(className: SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
-                        ?? _container;
-                    UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer, RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
+
+                    // check imgui
+                    if (_imguiFallbackPropertyField is null)
+                    {
+                        VisualElement saintsFieldContainer =
+                            _container.Q<VisualElement>(className: SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
+                            ?? _container;
+                        UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer,
+                            RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
+                    }
+                    else
+                    {
+                        if(!InAnyHorizontalLayout)
+                        {
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (xml is "" or null)
+                            {
+                                _imguiFallbackPropertyField.label = "";
+                            }
+                            else
+                            {
+                                _imguiFallbackPropertyField.label = " ";
+                            }
+                        }
+
+                        UIToolkitUtils.SetLabelChildren(_imGuiFallbackLabel, RichTextDrawer.ParseRichXmlWithProvider(xml, this),  userDataPayload.RichTextDrawer);
+                    }
                 }
             }
 
