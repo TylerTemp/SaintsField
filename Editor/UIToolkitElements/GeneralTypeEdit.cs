@@ -468,7 +468,9 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 obj = Activator.CreateInstance(newType);
             }
+#pragma warning disable CS0168 // Variable is declared but never used
             catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogError(e);
