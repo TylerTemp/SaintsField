@@ -63,6 +63,13 @@ namespace SaintsField.Editor
                 return cache;
             }
 
+            if(!SaintsFieldConfigUtil.IsConfigLoaded)
+            {
+                Debug.LogWarning($"SaintsField config not loaded, unable to decide order for {systemType.FullName}. Please retry later or delete `Assets/Editor Default Resources/SaintsField/SaintsFieldConfig.asset`, use `Tools - Saints Field - Edit Config...` to re-generate it");
+                SaintsFieldConfigUtil.ReloadConfig();
+                return null;
+            }
+
             Assembly ass = systemType.GetTypeInfo().Assembly;
             // var nameSpace = systemType.Namespace;
             // SaintsField.Samples.Scripts.SaintsEditor.NewParserTest+Part1`2+TestNestedStructForParse`1[System.Int32,System.Int32,UnityEngine.GameObject]: SaintsField.Samples, SaintsField.Samples.Scripts.SaintsEditor

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
@@ -45,9 +46,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public readonly List<Waiter> Enumerators = new List<Waiter>();
             public bool WaiterHasError;
             public bool WaiterHasFinished;
+            public bool WaiterHasCancel;
 
             public readonly List<string> ResultErrors = new List<string>();
             public bool ShowReturnValue;
+            public Type ReturnType;
             public object ReturnValue;
 
             public ButtonStatusIMGUI Status;
@@ -199,7 +202,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             {
                 height += IMGUIEdit.GetPropertyHeight(
                     "[return]",
-                    userData.MethodInfo.ReturnType,
+                    userData.ReturnType,
                     userData.ReturnValue,
                     NoBeforeSetIMGUI,
                     newValue => userData.ReturnValue = newValue,
@@ -340,7 +343,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             float returnHeight = IMGUIEdit.GetPropertyHeight(
                 "[return]",
-                userData.MethodInfo.ReturnType,
+                userData.ReturnType,
                 userData.ReturnValue,
                 NoBeforeSetIMGUI,
                 newValue => userData.ReturnValue = newValue,
@@ -360,7 +363,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             IMGUIEdit.OnGUI(
                 returnRect,
                 "[return]",
-                userData.MethodInfo.ReturnType,
+                userData.ReturnType,
                 userData.ReturnValue,
                 NoBeforeSetIMGUI,
                 newValue => userData.ReturnValue = newValue,
@@ -420,10 +423,12 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         {
             userData.ResultErrors.Clear();
             userData.ShowReturnValue = false;
+            userData.ReturnType = null;
             userData.ReturnValue = null;
             userData.Enumerators.Clear();
             userData.WaiterHasError = false;
             userData.WaiterHasFinished = false;
+            userData.WaiterHasCancel = false;
             userData.Progress = -1f;
             userData.Status = ButtonStatusIMGUI.None;
             userData.StatusHideAt = -1d;
@@ -467,13 +472,22 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             if (HasReturnValueIMGUI(userData.MethodInfo))
             {
+                userData.ReturnType = userData.MethodInfo.ReturnType;
                 userData.ReturnValue = returnValues[0];
                 userData.ShowReturnValue = true;
             }
 
-            foreach (IEnumerator enumerator in returnValues.OfType<IEnumerator>())
+            foreach (object returnValue in returnValues)
             {
-                userData.Enumerators.Add(new Waiter(enumerator));
+                switch (returnValue)
+                {
+                    case IEnumerator enumerator:
+                        userData.Enumerators.Add(new Waiter(enumerator));
+                        break;
+                    case Task task:
+                        userData.Enumerators.Add(new Waiter(task));
+                        break;
+                }
             }
 
             if (userData.Enumerators.Count == 0)
@@ -503,45 +517,49 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                 if (!waiter.Done())
                 {
-                    if (waiter.Waitable != null)
+                    float curProgress = waiter.GetProgress();
+                    if (curProgress >= 0)
                     {
-                        progress = Mathf.Max(progress, waiter.Waitable.Progress);
+                        progress = Mathf.Max(progress, curProgress);
                     }
 
                     continue;
                 }
 
-                bool moveNext;
-                bool thisHasMoveError = false;
-                try
+                Waiter.MoveNextResult moveNext = waiter.MoveNext();
+                if (moveNext.Exception != null)
                 {
-                    moveNext = waiter.Enumerator.MoveNext();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e.InnerException ?? e);
-                    moveNext = false;
-                    thisHasMoveError = true;
+                    Debug.LogException(moveNext.Exception.InnerException ?? moveNext.Exception);
                     userData.WaiterHasError = true;
-                    userData.ResultErrors.Add(e.InnerException?.Message ?? e.Message);
+                    userData.ResultErrors.Add(moveNext.Exception.InnerException?.Message ?? moveNext.Exception.Message);
                 }
 
-                if (thisHasMoveError)
+                if (moveNext.Exception == null && moveNext.Status == Waiter.MoveNextStatus.Pending)
                 {
-                    waiter.Waitable = null;
-                }
-                else
-                {
-                    waiter.CheckCurrent();
+                    waiter.CheckCurrentNeedWaiter();
                 }
 
-                if (!moveNext)
+                if (!_buttonAttribute.HideReturnValue
+                    && moveNext.Status == Waiter.MoveNextStatus.Completed
+                    && moveNext.ReturnType != null
+                    && !userData.ShowReturnValue)
+                {
+                    userData.ReturnType = moveNext.ReturnType;
+                    userData.ReturnValue = moveNext.ReturnValue;
+                    userData.ShowReturnValue = true;
+                }
+
+                if (moveNext.Status != Waiter.MoveNextStatus.Pending)
                 {
                     finishedEnumerators.Add(waiter);
 
-                    if (!thisHasMoveError)
+                    if (moveNext.Status == Waiter.MoveNextStatus.Completed)
                     {
                         userData.WaiterHasFinished = true;
+                    }
+                    else if (moveNext.Status == Waiter.MoveNextStatus.Cancelled)
+                    {
+                        userData.WaiterHasCancel = true;
                     }
                 }
             }
@@ -568,6 +586,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 PlayStatusIMGUI(userData,
                     userData.WaiterHasFinished ? ButtonStatusIMGUI.Warning : ButtonStatusIMGUI.Error);
             }
+            else if (userData.WaiterHasCancel)
+            {
+                PlayStatusIMGUI(userData, ButtonStatusIMGUI.Pause);
+            }
             else
             {
                 PlayStatusIMGUI(userData, ButtonStatusIMGUI.Ok);
@@ -580,6 +602,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             userData.Enumerators.Clear();
             userData.ResultErrors.Clear();
             userData.ShowReturnValue = false;
+            userData.ReturnType = null;
             userData.ReturnValue = null;
             userData.Progress = -1f;
 
@@ -594,6 +617,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             userData.ParameterValues[index] = newValue;
             userData.ResultErrors.Clear();
             userData.ShowReturnValue = false;
+            userData.ReturnType = null;
             userData.ReturnValue = null;
         }
 
@@ -601,7 +625,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         {
             return !_buttonAttribute.HideReturnValue
                    && methodInfo.ReturnType != typeof(void)
-                   && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType);
+                   && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType)
+                   && !typeof(Task).IsAssignableFrom(methodInfo.ReturnType);
         }
 
         private static void NoBeforeSetIMGUI(object _)

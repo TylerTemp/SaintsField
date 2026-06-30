@@ -36,7 +36,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.AboveButtonDrawer
             // throw new System.NotImplementedException();
         }
 
-        protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index, MethodInfo methodInfo, object parent, object result)
+        protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index,
+            MethodInfo methodInfo, Type returnType, object parent, object result)
         {
             FancyButton fancyButton = container.Q<FancyButton>(NameButton(property, index));
             VisualElement returnValueContainer = fancyButton.ShowResult(true);
@@ -44,7 +45,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.AboveButtonDrawer
             VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                 null,
                 "<color=green>[return]</color>",
-                methodInfo.ReturnType,
+                returnType,
                 result,
                 null,
                 _ => { },

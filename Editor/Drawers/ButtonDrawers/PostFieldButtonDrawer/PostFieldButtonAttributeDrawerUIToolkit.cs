@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -64,8 +65,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
 
 
 
-        protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index, MethodInfo methodInfo,
-            object parent, object result)
+        protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index,
+            MethodInfo methodInfo, Type returnType, object parent, object result)
         {
 
             VisualElement elem = container.Q<VisualElement>(NameInvokeResult(property, index));
@@ -73,7 +74,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
             VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                 null,
                 "<color=green>[return]</color>",
-                methodInfo.ReturnType,
+                returnType,
                 result,
                 null,
                 _ => { },

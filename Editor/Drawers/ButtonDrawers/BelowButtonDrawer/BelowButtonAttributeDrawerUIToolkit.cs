@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -36,7 +37,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
             fancyButton.ShowResult(true).Add(MakeErrorBox(error));
         }
 
-        protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index, MethodInfo methodInfo, object parent, object result)
+        protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index,
+            MethodInfo methodInfo, Type returnType, object parent, object result)
         {
             FancyButton fancyButton = container.Q<FancyButton>(NameButton(property, index));
             VisualElement returnValueContainer = fancyButton.ShowResult(true);
@@ -44,7 +46,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
             VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                 null,
                 "<color=green>[return]</color>",
-                methodInfo.ReturnType,
+                returnType,
                 result,
                 null,
                 _ => { },

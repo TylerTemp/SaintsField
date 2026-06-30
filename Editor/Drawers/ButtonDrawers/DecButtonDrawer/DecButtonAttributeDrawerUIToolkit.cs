@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.UIToolkitElements;
@@ -24,7 +25,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
         protected abstract void CleanResult(VisualElement container, SerializedProperty property, int index);
         protected abstract void AppendErrorResult(VisualElement container, SerializedProperty property, int index, string error);
-        protected abstract void AppendInvokeResult(VisualElement container, SerializedProperty property, int index, MethodInfo methodInfo, object parent, object result);
+        protected abstract void AppendInvokeResult(VisualElement container, SerializedProperty property, int index,
+            MethodInfo methodInfo, Type returnType, object parent, object result);
 
         protected static VisualElement DrawUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index)
@@ -64,22 +66,22 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 buttonUserData.ButtonTask?.Pause();
                 buttonUserData.WaiterHasError = false;
                 buttonUserData.WaiterHasFinished = false;
+                buttonUserData.WaiterHasCancel = false;
+                buttonUserData.WaiterHasReturnValue = false;
 
                 // string buttonError = "";
                 // ReSharper disable once PossibleNullReferenceException
                 // ReSharper disable once AccessToModifiedClosure
                 // HashSet<IEnumerator> enumerators = (HashSet<IEnumerator>)buttonElement.userData;
                 List<string> errors = new List<string>();
-                List<object> results = new List<object>();
-                MethodInfo usedMethodInfo = null;
+                List<(MethodInfo methodInfo, object result)> results = new List<(MethodInfo methodInfo, object result)>();
                 foreach ((string eachError, MemberInfo memberInfo, object buttonResult) in CallButtonFunc(property,
                              ((DecButtonAttribute)saintsAttribute).FuncName, info, parent))
                 {
                     // Debug.Log($"{eachError}/{buttonResult}");
                     if (eachError == "")
                     {
-                        usedMethodInfo = (MethodInfo)memberInfo;
-                        results.Add(buttonResult);
+                        results.Add(((MethodInfo)memberInfo, buttonResult));
                     }
                     else
                     {
@@ -93,19 +95,30 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 }
 
                 object refreshedParent = null;
-                foreach (object result in results)
+                Dictionary<Waiter, (MethodInfo methodInfo, object parent)> waiterReturnTargets =
+                    new Dictionary<Waiter, (MethodInfo methodInfo, object parent)>();
+                foreach ((MethodInfo methodInfo, object result) in results)
                 {
                     if (result is IEnumerator ie)
                     {
                         buttonUserData.Enumerators.Add(new Waiter(ie));
                     }
+                    else if (result is Task task)
+                    {
+                        Waiter waiter = new Waiter(task);
+                        buttonUserData.Enumerators.Add(waiter);
+                        if (!decButtonAttribute.HideReturnValue)
+                        {
+                            refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                            waiterReturnTargets[waiter] = (methodInfo, refreshedParent);
+                        }
+                    }
                     else if (!decButtonAttribute.HideReturnValue)
                     {
                         if(result != null && result.GetType() != typeof(void))
                         {
-                            Debug.Assert(usedMethodInfo != null);
                             refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                            AppendInvokeResult(container, property, index, usedMethodInfo, refreshedParent, result);
+                            AppendInvokeResult(container, property, index, methodInfo, methodInfo.ReturnType, refreshedParent, result);
                         }
                     }
                 }
@@ -140,47 +153,50 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
                         if (!waiter.Done())
                         {
-                            if (waiter.Waitable != null)
+                            float curProcess = waiter.GetProgress();
+                            if (curProcess >= 0)
                             {
-                                float curProcess = waiter.Waitable.Progress;
                                 progress = Mathf.Max(progress, curProcess);
                             }
 
                             continue;
                         }
 
-                        bool moveNext;
-                        bool thisHasMoveError = false;
-                        try
+                        Waiter.MoveNextResult moveNext = waiter.MoveNext();
+                        if (moveNext.Exception != null)
                         {
-                            moveNext = waiter.Enumerator.MoveNext();
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogException(e);
-                            moveNext = false;
-                            thisHasMoveError = true;
+                            Debug.LogException(moveNext.Exception.InnerException ?? moveNext.Exception);
                             buttonUserData.WaiterHasError = true;
 
-                            AppendErrorResult(container, property, index, e.InnerException?.Message ?? e.Message);
+                            AppendErrorResult(container, property, index,
+                                moveNext.Exception.InnerException?.Message ?? moveNext.Exception.Message);
                         }
 
-                        if (thisHasMoveError)
+                        if (moveNext.Exception == null && moveNext.Status == Waiter.MoveNextStatus.Pending)
                         {
-                            waiter.Waitable = null;
+                            waiter.CheckCurrentNeedWaiter();
                         }
-                        else
+
+                        if (moveNext.Status == Waiter.MoveNextStatus.Completed
+                            && moveNext.ReturnType != null
+                            && waiterReturnTargets.TryGetValue(waiter, out (MethodInfo methodInfo, object parent) returnTarget))
                         {
-                            waiter.CheckCurrent();
+                            AppendInvokeResult(container, property, index, returnTarget.methodInfo, moveNext.ReturnType,
+                                returnTarget.parent, moveNext.ReturnValue);
+                            buttonUserData.WaiterHasReturnValue = true;
                         }
 
                         // Debug.Log(bindEnumerator.Current);
-                        if (!moveNext)
+                        if (moveNext.Status != Waiter.MoveNextStatus.Pending)
                         {
                             finishedEnumerators.Add(waiter);
-                            if (!thisHasMoveError)
+                            if (moveNext.Status == Waiter.MoveNextStatus.Completed)
                             {
                                 buttonUserData.WaiterHasFinished = true;
+                            }
+                            else if (moveNext.Status == Waiter.MoveNextStatus.Cancelled)
+                            {
+                                buttonUserData.WaiterHasCancel = true;
                             }
                         }
                     }
@@ -211,6 +227,10 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                                 {
                                     fancyButton.StatusIndicator.PlayError();
                                 }
+                            }
+                            else if (buttonUserData.WaiterHasCancel)
+                            {
+                                fancyButton.StatusIndicator.PlayPause();
                             }
                             else
                             {
