@@ -115,9 +115,10 @@ namespace: `SaintsField`
 
 **5.21.1**
 
-Add: `Button` and field buttons (`AboveButton`, `BelowButton`, `PostFieldButton`) now support:
-1.  `async Task`, `async Task<T>` functions
-2.  `async UniTask`, `async UniTask<T>` functions if you have `UniTask` installed
+1.  Add: `Button` and field buttons (`AboveButton`, `BelowButton`, `PostFieldButton`) now support:
+    *   `async Task`, `async Task<T>` functions
+    *   `async UniTask`, `async UniTask<T>` functions if you have `UniTask` installed
+2.  Improve: When first installed, avoid an error that SaintsFieldConfig is not correctly generated/loaded, and gives a warning instead 
 
 ## Usage ##
 
