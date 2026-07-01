@@ -1,11 +1,15 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
+#if SAINTSFIELD_NEWTONSOFT_JSON
+using Newtonsoft.Json;
+#endif
 
 namespace SaintsField.Editor.Utils
 {
@@ -57,34 +61,13 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        // ReSharper disable InconsistentNaming
-        // private struct ScopedRegistries
-        // {
-        //     public string name;
-        //     public string url;
-        //     public List<string> scopes;
-        // }
-        //
-        // private class ManifestBase
-        // {
-        //     public Dictionary<string, string> dependencies;
-        // }
-
-        // private class Manifest: ManifestBase
-        // {
-        //     public List<ScopedRegistries> scopedRegistries;
-        // }
-        // ReSharper enable InconsistentNaming
 
 #pragma warning disable CS0414 // Type or member is only assigned
         private bool _loadingSaintsEditor;
         private bool _loadingCodeAnalysis;
 #pragma warning restore CS0414 // Type or member is only assigned
         // private bool _loadingUnitySerialization;
-        // private const string ManifestFile = "Packages/manifest.json";
-        //
-        //
-        // private const string scopeUrl = "https://package.openupm.com";
+
         // private static readonly ICollection<string> scopeScopes = new List<string>
         // {
         //     "org.nuget.microsoft.codeanalysis.analyzers",
@@ -270,6 +253,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
 
         [LayoutStart("Debug", ELayout.FoldoutBox)]
+
 #if !SAINTSFIELD_UNITY_MATHEMATICS
         [Button("Install com.unity.mathematics")]
         private IEnumerator InstallComUnityMathematics() => DebugInstall("com.unity.mathematics");
@@ -326,6 +310,120 @@ namespace SaintsField.Editor.Utils
                 }
             }
         }
+
+        [Separator(5)]
+
+        private const string JsonPackage = "com.unity.nuget.newtonsoft-json";
+#if !SAINTSFIELD_NEWTONSOFT_JSON
+        [Button("Install " + JsonPackage)]
+        private IEnumerator InstallJson() => DebugInstall(JsonPackage);
+#else
+        [Button("Remove " + JsonPackage)]
+        private IEnumerator RemoveJson() => DebugRemove(JsonPackage);
+#endif
+
+
+#if SAINTSFIELD_NEWTONSOFT_JSON
+        // ReSharper disable InconsistentNaming
+        private struct ScopedRegistries
+        {
+            public string name;
+            public string url;
+            public List<string> scopes;
+        }
+
+        private class ManifestBase
+        {
+            // ReSharper disable once CollectionNeverQueried.Local
+            public Dictionary<string, string> dependencies;
+        }
+
+        private class Manifest: ManifestBase
+        {
+            public List<ScopedRegistries> scopedRegistries;
+        }
+
+        private const string ManifestFile = "Packages/manifest.json";
+        private const string scopeName = "package.openupm.com";
+        private const string scopeUrl = "https://package.openupm.com";
+        // ReSharper restore InconsistentNaming
+
+        private static void InstallUpmPackage(string upmName, string version)
+        {
+            Manifest manifest = JsonConvert.DeserializeObject<Manifest>(System.IO.File.ReadAllText(ManifestFile)) ?? new Manifest();
+            manifest.dependencies ??= new Dictionary<string, string>();
+            manifest.scopedRegistries ??= new List<ScopedRegistries>();
+
+            int registryIndex = manifest.scopedRegistries.FindIndex(each => each.url == scopeUrl);
+            ScopedRegistries openUpmRegistry = registryIndex == -1
+                ? new ScopedRegistries
+                {
+                    name = scopeName,
+                    url = scopeUrl,
+                    scopes = new List<string>(),
+                }
+                : manifest.scopedRegistries[registryIndex];
+
+            openUpmRegistry.scopes ??= new List<string>();
+            if (!openUpmRegistry.scopes.Contains(upmName))
+            {
+                openUpmRegistry.scopes.Add(upmName);
+            }
+
+            if (registryIndex == -1)
+            {
+                manifest.scopedRegistries.Add(openUpmRegistry);
+            }
+            else
+            {
+                manifest.scopedRegistries[registryIndex] = openUpmRegistry;
+            }
+
+            manifest.dependencies[upmName] = version;
+            System.IO.File.WriteAllText(ManifestFile, JsonConvert.SerializeObject(manifest, Formatting.Indented, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+            }));
+        }
+
+        private static void UninstallUpmPackage(string upmName)
+        {
+            Manifest manifest = JsonConvert.DeserializeObject<Manifest>(System.IO.File.ReadAllText(ManifestFile)) ?? new Manifest();
+            manifest.dependencies?.Remove(upmName);
+
+            if (manifest.scopedRegistries != null)
+            {
+                for (int index = manifest.scopedRegistries.Count - 1; index >= 0; index--)
+                {
+                    ScopedRegistries scopedRegistry = manifest.scopedRegistries[index];
+                    if (scopedRegistry.url != scopeUrl || scopedRegistry.scopes == null)
+                    {
+                        continue;
+                    }
+
+                    scopedRegistry.scopes.Remove(upmName);
+                    if (scopedRegistry.scopes.Count == 0)
+                    {
+                        manifest.scopedRegistries.RemoveAt(index);
+                    }
+                }
+            }
+
+            System.IO.File.WriteAllText(ManifestFile, JsonConvert.SerializeObject(manifest, Formatting.Indented, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+            }));
+        }
+
+        private const string UniTaskPackage = "com.cysharp.unitask";
+#if !SAINTSFIELD_UNITASK
+        [Button("Install " + UniTaskPackage)]
+        private void InstallUniTask() => InstallUpmPackage(UniTaskPackage, "2.5.11");
+#else
+        [Button("Remove " + UniTaskPackage)]
+        private void InstallUniTask() => UninstallUpmPackage(UniTaskPackage);
+#endif
+#endif
 
 #endif
 

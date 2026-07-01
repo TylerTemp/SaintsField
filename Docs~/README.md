@@ -863,7 +863,13 @@ go give a star to them!)
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments. UI Toolkit: if the method have a return value, the result will also be shown.
+Draw a button for a function. 
+*   If the method have arguments (required or optional), it'll draw inputs for these arguments. 
+*   If the method have a return value, the result will also be shown.
+*   If the method returns `IEnumerator`, it will wait that enumerator with a progress bar, and allow you to cancel in the middle
+*   If the method returns `async Task`, `async UniTask`, it will execute the task until it finishs or errors out
+*   If the method returns `async Task<T>`, `async UniTask<T>`, apon completed, the returned value will be displayed
+*   If any error happends, and Error box with info will display
 
 *   `string buttonLabel = null` the button label. If null, it'll use the function name. If it starts with `$`, use a callback or field value as the label.
     Rich text is supported.
@@ -942,6 +948,9 @@ If the yield type is `AsyncOperation`, a progress bar will display.
 
 
 ```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
 [Button]
 private void NormalFunc()
 {
@@ -996,6 +1005,56 @@ private IEnumerator AsyncOp()
 
 [![video](https://github.com/user-attachments/assets/dc39b75a-2f40-4518-a1a9-bef5a59f1455)](https://github.com/user-attachments/assets/87900181-8c17-42f5-a050-01f9a945ff94)
 
+You can use `async Task`, `async Task<T>`, `async UniTask`, `async UniTask<T>` to execute colored function.
+
+(If you installed UniTask by UnityPackage, please manually add `SAINTSFIELD_UNITASK` marco to enable this function)
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Button]
+private async Task AsyncVoid()
+{
+    Debug.Log("Async start");
+    await Task.Delay(1000);
+    Debug.Log("Async end");
+}
+
+[Button]
+private async Task<int> AsyncWithInt()
+{
+    Debug.Log("Async start");
+    await Task.Delay(1000);
+    Debug.Log("Async end");
+    return 100;
+}
+
+[ShowInInspector] private bool _uniTaskUntil;
+
+[Button]
+private async UniTask AsyncUniTaskBase()
+{
+    Debug.Log("Async start");
+    // await UniTask.Yield();
+    await UniTask.WaitUntil(() => _uniTaskUntil);
+    // throw new Exception("xx");
+    Debug.Log("Async end");
+}
+
+[Button]
+private async UniTask<string> AsyncUniTaskValue()
+{
+    Debug.Log("Async start");
+    // await UniTask.Yield();
+    await UniTask.WaitUntil(() => _uniTaskUntil);
+    // throw new Exception("xx");
+    return "fine";
+}
+```
+
+[![video](https://github.com/user-attachments/assets/52fe1e31-368f-495e-b336-6ec5822af7ca)](https://github.com/user-attachments/assets/eb4db4f5-5ffc-4254-8cde-cf16217b4790)
+
 #### `AboveButton`/`BelowButton`/`PostFieldButton` ####
 
 There are 3 general buttons:
@@ -1028,9 +1087,16 @@ All of them have the same arguments:
 
     See `GroupBy` section. Does **NOT** work on `PostFieldButton`
 
-*   AllowMultiple: Yes
+*   Allow Multiple: Yes
 
 Note: Compared to `Button` in `SaintsEditor`, these buttons can receive the value of the decorated field, and will not get parameter drawers.
+
+About the function been called:
+
+*   If the method returns `IEnumerator`, it will wait that enumerator with a progress bar, and allow you to cancel in the middle
+*   If the method returns `async Task`, `async UniTask`, it will execute the task until it finishs or errors out
+*   If the method returns `async Task<T>`, `async UniTask<T>`, apon completed, the returned value will be displayed
+*   If any error happends, and Error box with info will display
 
 ```csharp
 using SaintsField;
@@ -1084,6 +1150,50 @@ private void Toggle() => _errorOut = !_errorOut;
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
+
+Example of colored functions:
+
+```csharp
+[AboveButton(nameof(AsyncVoid))]
+[BelowButton(nameof(AsyncWithInt))]
+[PostFieldButton(nameof(AsyncUniTaskBase), "<icon=star.png/>")]
+[BelowButton(nameof(AsyncUniTaskValue))]
+public bool ok;
+
+private async Task AsyncVoid()
+{
+    Debug.Log("Async start");
+    await Task.Delay(1000);
+    Debug.Log("Async end");
+}
+
+private async Task<int> AsyncWithInt()
+{
+    Debug.Log("Async start");
+    await Task.Delay(1000);
+    Debug.Log("Async end");
+    return 100;
+}
+
+private async UniTask AsyncUniTaskBase()
+{
+    Debug.Log("Async start");
+    // await UniTask.Yield();
+    await UniTask.WaitUntil(() => ok);
+    // throw new Exception("xx");
+    Debug.Log("Async end");
+}
+private async UniTask<string> AsyncUniTaskValue()
+{
+    Debug.Log("Async start");
+    // await UniTask.Yield();
+    await UniTask.WaitUntil(() => ok);
+    // throw new Exception("xx");
+    return "fine";
+}
+```
+
+[![video](https://github.com/user-attachments/assets/c6ee0aa7-2887-45f6-82dd-62e711893215)](https://github.com/user-attachments/assets/f131b677-f07c-409e-8bd6-a5237c501441)
 
 ### Game Related ###
 

@@ -238,6 +238,31 @@ namespace SaintsField.Editor.Utils
         }
         #endregion
 
+        #region UniTask
+
+        private const string DisableUniTaskSupportPath = RuntimeUtil.MenuRoot + "Disable UniTask Support";
+        [MenuItem(DisableUniTaskSupportPath, priority = 104)]
+        public static void DisableUniTaskSupport()
+        {
+#if SAINTSFIELD_UNITASK_DISABLE
+            RemoveCompileDefine
+#else
+            AddCompileDefine
+#endif
+                ("SAINTSFIELD_UNITASK_DISABLE");
+        }
+
+        [MenuItem(DisableUniTaskSupportPath, true)]
+        public static bool DisableUniTaskSupportValidate() =>
+#if SAINTSFIELD_UNITASK
+            true
+#else
+            false
+#endif
+        ;
+
+        #endregion
+
         #region Wwise
         private const string DisableWwiseSupportPath = RuntimeUtil.MenuRoot + "Disable Wwise Support";
         [MenuItem(DisableWwiseSupportPath, priority = 104)]
@@ -540,6 +565,14 @@ namespace SaintsField.Editor.Utils
                 true
 #else
                 false
+#endif
+            );
+
+            Menu.SetChecked(DisableUniTaskSupportPath,
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                false
+#else
+                true
 #endif
             );
 

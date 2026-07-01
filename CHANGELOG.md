@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.21.1 ##
+
+1.  Add: `Button` and field buttons (`AboveButton`, `BelowButton`, `PostFieldButton`) now support:
+    *   `async Task`, `async Task<T>` functions
+    *   `async UniTask`, `async UniTask<T>` functions if you have `UniTask` installed
+2.  Improve: When first installed, avoid an error that SaintsFieldConfig is not correctly generated/loaded, and gives a warning instead 
+
 ## 5.21.0 ##
 
 1.  Add: `OnDropdownChanged` to bind `TMP_Dropdown.OnValueChanged` event to method

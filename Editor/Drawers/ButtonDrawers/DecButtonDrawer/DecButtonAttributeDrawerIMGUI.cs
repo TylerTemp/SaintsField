@@ -14,6 +14,10 @@ using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+using Cysharp.Threading.Tasks;
+#endif
+
 namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
     public partial class DecButtonAttributeDrawer
@@ -373,6 +377,9 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             object refreshedParent = null;
             foreach ((MethodInfo methodInfo, object result) in results)
             {
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                (bool returnIsUniTask, Type returnUniTaskValueType) = GetUniTaskReturnInfo(methodInfo.ReturnType);
+#endif
                 if (result is IEnumerator enumerator)
                 {
                     buttonInfo.Enumerators.Add(new Waiter(enumerator));
@@ -387,6 +394,22 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                         buttonInfo.WaiterReturnTargets[waiter] = (methodInfo, refreshedParent);
                     }
                 }
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                else if (result is UniTask uniTask)
+                {
+                    buttonInfo.Enumerators.Add(new Waiter(uniTask));
+                }
+                else if (returnIsUniTask && returnUniTaskValueType != null)
+                {
+                    Waiter waiter = Waiter.UniTaskWithValue(result, returnUniTaskValueType);
+                    buttonInfo.Enumerators.Add(waiter);
+                    if (!decButtonAttribute.HideReturnValue)
+                    {
+                        refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        buttonInfo.WaiterReturnTargets[waiter] = (methodInfo, refreshedParent);
+                    }
+                }
+#endif
                 else if (!decButtonAttribute.HideReturnValue && result != null && result.GetType() != typeof(void))
                 {
                     refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;

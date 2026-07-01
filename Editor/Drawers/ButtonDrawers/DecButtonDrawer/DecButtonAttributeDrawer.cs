@@ -1,14 +1,44 @@
 ﻿using System.Collections.Generic;
+using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+using Cysharp.Threading.Tasks;
+#endif
+
 namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
     public abstract partial class DecButtonAttributeDrawer: SaintsPropertyDrawer
     {
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+        protected static (bool returnIsUniTask, Type returnUniTaskValueType) GetUniTaskReturnInfo(Type returnType)
+        {
+            bool returnIsUniTask = false;
+            Type returnUniTaskValueType = null;
+
+            if (typeof(UniTask).IsAssignableFrom(returnType))
+            {
+                returnIsUniTask = true;
+            }
+
+            foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(returnType))
+            {
+                if (genBaseType.GetGenericTypeDefinition() == typeof(UniTask<>))
+                {
+                    returnIsUniTask = true;
+                    returnUniTaskValueType = genBaseType.GetGenericArguments()[0];
+                    break;
+                }
+            }
+
+            return (returnIsUniTask, returnUniTaskValueType);
+        }
+#endif
+
         public static IEnumerable<(string error, MemberInfo memberInfo, object result)> CallButtonFunc(SerializedProperty property, string callback, FieldInfo fieldInfo, object target)
         {
             SaintsContext.SerializedProperty = property;
@@ -32,7 +62,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             }
 
             string propPath = property.propertyPath;
-            foreach (Object t in property.serializedObject.targetObjects)
+            foreach (UnityEngine.Object t in property.serializedObject.targetObjects)
             {
                 // Debug.Log($"{t.GetType().Name}:{t}");
                 // ReSharper disable once ConvertToUsingDeclaration

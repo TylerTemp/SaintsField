@@ -1,33 +1,55 @@
 using System;
 using System.Collections;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace SaintsField.Editor.Utils.WaitableUtils
 {
     public class Waiter
     {
-        private readonly IEnumerator Enumerator;
-        private readonly Task Task;
-        private readonly Type TaskReturnType;
+        private IEnumerator _enumerator;
+        private readonly Task _task;
+        private Type _taskReturnType;
 
-        private IWaitable Waitable;
+        private IWaitable _waitable;
+        private Exception _overrideException;
+        private object _overrideReturnValue;
+
+        private Waiter()
+        {
+        }
 
         public Waiter(IEnumerator enumerator)
         {
-            Enumerator = enumerator;
+            _enumerator = enumerator;
         }
 
         public Waiter(Task task)
         {
-            Task = task;
+            _task = task;
 
             Type taskType = task.GetType();
             while (taskType != null)
             {
                 if (taskType.IsGenericType && taskType.GetGenericTypeDefinition() == typeof(Task<>))
                 {
-                    TaskReturnType = taskType.GetGenericArguments()[0];
+                    Type taskReturnType = taskType.GetGenericArguments()[0];
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                    if (taskReturnType.FullName == "System.Threading.Tasks.VoidTaskResult"
+                        && taskReturnType.Assembly.GetName().Name == "mscorlib")
+                    {
+                        _taskReturnType = null;
+                    }
+                    else
+                    {
+                        _taskReturnType = taskReturnType;
+                    }
+                    // Debug.Log($"{task.GetType().FullName}/{_taskReturnType.FullName}");
                     break;
                 }
 
@@ -35,59 +57,95 @@ namespace SaintsField.Editor.Utils.WaitableUtils
             }
         }
 
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+        public Waiter(UniTask uniTask)
+        {
+            _enumerator = uniTask.ToCoroutine(error =>
+            {
+                _overrideException = error;
+            });
+        }
+
+        // returnValue is ensured be passed in a UniTask<returnUniTaskValueType>, no need to check
+        public static Waiter UniTaskWithValue(object returnValue, Type returnUniTaskValueType)
+        {
+            MethodInfo methodInfo = typeof(Waiter).GetMethod(nameof(UniTaskWithValueTyped),
+                BindingFlags.Static | BindingFlags.NonPublic);
+            return (Waiter) methodInfo!.MakeGenericMethod(returnUniTaskValueType).Invoke(null, new[] { returnValue });
+        }
+
+        private static Waiter UniTaskWithValueTyped<T>(UniTask<T> returnValue)
+        {
+            Waiter waiter = new Waiter
+            {
+                _taskReturnType = typeof(T),
+            };
+            waiter._enumerator = returnValue.ToCoroutine(
+                result => waiter._overrideReturnValue = result,
+                error => waiter._overrideException = error
+            );
+            return waiter;
+        }
+#endif
+
         public void CheckCurrentNeedWaiter()
         {
-            if (Enumerator == null)
+            if (_enumerator == null)
             {
                 return;
             }
-            switch (Enumerator.Current)
+            switch (_enumerator.Current)
             {
                 case null:
-                    Waitable = null;
+                    _waitable = null;
                     return;
                 case WaitForSeconds ws:
-                    Waitable = new WaitableWaitForSeconds(ws);
+                    _waitable = new WaitableWaitForSeconds(ws);
                     return;
                 case WaitForSecondsRealtime ws:
-                    Waitable = new WaitableWaitForSeconds(ws);
+                    _waitable = new WaitableWaitForSeconds(ws);
                     return;
                 case WaitUntil wu:
-                    Waitable = new WaitableWaitForCallback(wu);
+                    _waitable = new WaitableWaitForCallback(wu);
                     return;
                 case WaitWhile ww:
-                    Waitable = new WaitableWaitForCallback(ww);
+                    _waitable = new WaitableWaitForCallback(ww);
                     return;
                 case AsyncOperation asyncOperation:
-                    Waitable = new WaitableWaitForAsyncOperation(asyncOperation);
+                    _waitable = new WaitableWaitForAsyncOperation(asyncOperation);
                     return;
                 default:
-                    Waitable = null;
+                    _waitable = null;
                     return;
             }
         }
 
         public void Update()
         {
-            if (!Done())
+            if (_waitable != null && !Done())
             {
-                Waitable?.Update();
+                _waitable.Update();
             }
         }
 
         public bool Done()
         {
-            if (Task != null)
+            if (_task != null)
             {
-                return Task.IsCompleted;
+                return _task.IsCompleted;
             }
 
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (Waitable is null)
+            if (_overrideException != null)
             {
                 return true;
             }
-            return Waitable.Done;
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (_waitable is null)
+            {
+                return true;
+            }
+            return _waitable.Done;
         }
 
         public enum MoveNextStatus
@@ -116,53 +174,62 @@ namespace SaintsField.Editor.Utils.WaitableUtils
 
         public MoveNextResult MoveNext()
         {
-            if (Enumerator == null)
+            if (_enumerator == null)
             {
-                if (Task.IsCompleted)
-                {
-                    if (Task.IsFaulted)
-                    {
-                        return new MoveNextResult(MoveNextStatus.Faulted, Task.Exception, taskReturnType: TaskReturnType);
-                    }
-                    else if (Task.IsCanceled)
-                    {
-                        return new MoveNextResult(MoveNextStatus.Cancelled, taskReturnType: TaskReturnType);
-                    }
-
-                    object taskReturnValue = null;
-                    if (TaskReturnType != null)
-                    {
-                        taskReturnValue = Task.GetType().GetProperty(nameof(Task<object>.Result))?.GetValue(Task);
-                    }
-
-                    return new MoveNextResult(MoveNextStatus.Completed, taskReturnType: TaskReturnType, taskReturnValue: taskReturnValue);
-                }
-                else
+                if (!_task.IsCompleted)
                 {
                     return new MoveNextResult(MoveNextStatus.Pending);
                 }
+
+                if (_task.IsFaulted)
+                {
+                    return new MoveNextResult(MoveNextStatus.Faulted, _task.Exception, taskReturnType: _taskReturnType);
+                }
+
+                if (_task.IsCanceled)
+                {
+                    return new MoveNextResult(MoveNextStatus.Cancelled, taskReturnType: _taskReturnType);
+                }
+
+                object taskReturnValue = null;
+                if (_taskReturnType != null)
+                {
+                    taskReturnValue = _task.GetType().GetProperty(nameof(Task<object>.Result))?.GetValue(_task);
+                }
+
+                return new MoveNextResult(MoveNextStatus.Completed, taskReturnType: _taskReturnType, taskReturnValue: taskReturnValue);
+
             }
-            else
+
+            if (_overrideException != null)
             {
-                try
+                return new MoveNextResult(MoveNextStatus.Faulted, _overrideException, _taskReturnType);
+            }
+
+            try
+            {
+                bool pending = _enumerator.MoveNext();
+                if (_overrideException != null)  // task -> ie can change the override exception
                 {
-                    if (Enumerator.MoveNext())
-                    {
-                        return new MoveNextResult(MoveNextStatus.Pending);
-                    }
-                    else
-                    {
-                        return new MoveNextResult(MoveNextStatus.Completed);
-                    }
+                    return new MoveNextResult(MoveNextStatus.Faulted, _overrideException, _taskReturnType);
                 }
-                catch (Exception e)
+
+                if (pending)
                 {
-                    Waitable = null;
-                    return new MoveNextResult(MoveNextStatus.Faulted, e);
+                    return new MoveNextResult(MoveNextStatus.Pending);
                 }
+
+                return new MoveNextResult(MoveNextStatus.Completed,
+                    taskReturnType: _taskReturnType,
+                    taskReturnValue: _overrideReturnValue);
+            }
+            catch (Exception e)
+            {
+                _waitable = null;
+                return new MoveNextResult(MoveNextStatus.Faulted, e);
             }
         }
 
-        public float GetProgress() => Waitable?.Progress ?? -1f;
+        public float GetProgress() => _waitable?.Progress ?? -1f;
     }
 }

@@ -1,15 +1,21 @@
 using System.Threading.Tasks;
+using UnityEngine;
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
 using Cysharp.Threading.Tasks;
 #endif
-using SaintsField.Playa;
-using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
+namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
-    public class AsyncButton : SaintsMonoBehaviour
+    public class FieldButtonAsync : MonoBehaviour
     {
-        [Button]
+        [AboveButton(nameof(AsyncVoid))]
+        [BelowButton(nameof(AsyncWithInt))]
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+        [PostFieldButton(nameof(AsyncUniTaskBase), "<icon=star.png/>")]
+        [BelowButton(nameof(AsyncUniTaskValue))]
+#endif
+        public bool ok;
+
         private async Task AsyncVoid()
         {
             Debug.Log("Async start");
@@ -17,7 +23,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Debug.Log("Async end");
         }
 
-        [Button]
         private async Task<int> AsyncWithInt()
         {
             Debug.Log("Async start");
@@ -27,24 +32,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-        [ShowInInspector] private bool _uniTaskUntil;
-
-        [Button]
         private async UniTask AsyncUniTaskBase()
         {
             Debug.Log("Async start");
             // await UniTask.Yield();
-            await UniTask.WaitUntil(() => _uniTaskUntil);
+            await UniTask.WaitUntil(() => ok);
             // throw new Exception("xx");
             Debug.Log("Async end");
         }
-
-        [Button]
         private async UniTask<string> AsyncUniTaskValue()
         {
             Debug.Log("Async start");
             // await UniTask.Yield();
-            await UniTask.WaitUntil(() => _uniTaskUntil);
+            await UniTask.WaitUntil(() => ok);
             // throw new Exception("xx");
             return "fine";
         }

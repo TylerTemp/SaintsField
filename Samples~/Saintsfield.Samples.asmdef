@@ -19,7 +19,8 @@
         "SaintsField.Runtime.TypeReference",
         "SaintsField.Runtime.Events",
         "SaintsField.Runtime.I2Loc",
-        "SaintsField.Runtime.Spine"
+        "SaintsField.Runtime.Spine",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -81,6 +82,11 @@
             "name": "com.unity.serialization",
             "expression": "",
             "define": "SAINTSFIELD_SERIALIZATION"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "SAINTSFIELD_UNITASK"
         }
     ],
     "noEngineReferences": false

@@ -18,6 +18,10 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+using Cysharp.Threading.Tasks;
+#endif
+
 namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 {
     public partial class ButtonRenderer
@@ -74,11 +78,31 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // List<VisualElement> parameterElements = new List<VisualElement>();
             object[] parameterValues = new object[parameters.Length];
             // VisualElement root = null;
+            bool returnIsUniTask = false;
+            Type returnUniTaskValueType = null;
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+            {
+                if (typeof(UniTask).IsAssignableFrom(methodInfo.ReturnType))
+                {
+                    returnIsUniTask = true;
+                }
+
+                foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(methodInfo.ReturnType))
+                {
+                    if (genBaseType.GetGenericTypeDefinition() == typeof(UniTask<>))
+                    {
+                        returnIsUniTask = true;
+                        returnUniTaskValueType = genBaseType.GetGenericArguments()[0];
+                    }
+                }
+            }
+#endif
 
             bool hasReturnValue = !_buttonAttribute.HideReturnValue
                 && methodInfo.ReturnType != typeof(void)
                 && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType)
-                && !typeof(Task).IsAssignableFrom(methodInfo.ReturnType);
+                && !typeof(Task).IsAssignableFrom(methodInfo.ReturnType)
+                && !returnIsUniTask;
 
             string buttonId = $"{FieldWithInfo.Targets[0].GetHashCode()}.{methodInfo.Name}";
 
@@ -210,6 +234,16 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         break;
                     }
 
+// #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+//                     {
+//                         Debug.Log(result?.GetType().FullName);
+//                         if (result is UniTask ut)
+//                         {
+//                             ut.ToCoroutine();
+//                             result = UniTask.ToCoroutine(() => ut);
+//                         }
+//                     }
+// #endif
                     returnValues[index] = result;
                     if (isStruct)
                     {
@@ -280,6 +314,25 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             Waiter waiter = new Waiter(task);
                             buttonUserData.Enumerators.Add(waiter);
                         }
+                            break;
+
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                        case UniTask uniTask:
+                        {
+                            Waiter waiter = new Waiter(uniTask);
+                            buttonUserData.Enumerators.Add(waiter);
+                        }
+                            break;
+#endif
+                        default:
+                            if (returnIsUniTask && returnUniTaskValueType != null)
+                            {
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                                Waiter waiter = Waiter.UniTaskWithValue(returnValue, returnUniTaskValueType);
+                                buttonUserData.Enumerators.Add(waiter);
+#endif
+                            }
+
                             break;
                     }
                 }

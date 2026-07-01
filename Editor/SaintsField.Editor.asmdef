@@ -20,7 +20,8 @@
         "SaintsBuild.Editor",
         "Unity.Mathematics",
         "Unity.TextMeshPro",
-        "DOTween.Modules"
+        "DOTween.Modules",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"
@@ -113,6 +114,11 @@
             "name": "com.unity.textmeshpro",
             "expression": "",
             "define": "SAINTSFIELD_UNITY_TEXTMESHPRO"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "SAINTSFIELD_UNITASK"
         }
     ],
     "noEngineReferences": false
