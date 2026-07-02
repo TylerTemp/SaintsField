@@ -5980,7 +5980,7 @@ It'll display a UI that where the event is binded
 
 ![image](https://github.com/user-attachments/assets/79be0018-387f-427c-aacb-bfd4f7b43187)
 
-#### `OnDropdownChanged` ###
+#### `OnDropdownChanged` ####
 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
