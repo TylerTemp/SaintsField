@@ -5,6 +5,7 @@
 1.  Fix: `Tooltip` did not work [#412](https://github.com/TylerTemp/SaintsField/issues/412)
 2.  Unity Fix: If you have SaintsEditor enabled, fix Unity `Quaternion`, `ExposedReference<Object>` not work with `Tooltip`
 3.  Fix: `SaintsArray` could not correctly rendered
+4.  Fix: an `Addressable` error
 
 ## 5.21.2 ##
 

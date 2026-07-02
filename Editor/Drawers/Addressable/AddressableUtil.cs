@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers.Addressable
             {
                 entries = entries.Where(eachName =>
                 {
-                    HashSet<string> labels = eachName.labels;
+                    ISet<string> labels = eachName.labels;
                     return labelFilters.Any(eachOr => eachOr.All(eachAnd => labels.Contains(eachAnd)));
                     // Debug.Log($"{eachName.address} {match}: {string.Join(",", labels)}");
                 });

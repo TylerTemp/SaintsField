@@ -270,6 +270,15 @@ namespace SaintsField.Editor.Utils
         private IEnumerator RemoveComAddressables() => DebugRemove("com.unity.addressables");
 #endif
 
+        private const string AINavigationPackage = "com.unity.ai.navigation";
+#if !SAINTSFIELD_AI_NAVIGATION
+        [Button("Install " + AINavigationPackage)]
+        private IEnumerator InstalAINavigation() => DebugInstall(AINavigationPackage);
+#else
+        [Button("Remove " + AINavigationPackage)]
+        private IEnumerator RemoveAINavigation() => DebugRemove(AINavigationPackage);
+#endif
+
         // com.unity.transport
 #if !SAINTSFIELD_NETCODE_GAMEOBJECTS
         [Button("Install com.unity.transport")]
