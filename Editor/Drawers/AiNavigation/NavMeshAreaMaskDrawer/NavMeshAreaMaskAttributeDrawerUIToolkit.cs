@@ -29,10 +29,15 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaMaskDrawer
             }
             NavMeshAreaIntElement element = new NavMeshAreaIntElement(true);
             element.BindProperty(property);
-            return new IntDropdownField(GetPreferredLabel(property), element)
+            IntDropdownField field = new IntDropdownField(GetPreferredLabel(property), element)
             {
                 name = NameMaskField(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
+            return field;
 
         }
 

@@ -32,6 +32,10 @@ namespace SaintsField.Editor.Drawers.TagDrawer
             TagField r = new TagField(GetPreferredLabel(property), tagElement);
             r.AddToClassList(TagField.alignedFieldUssClassName);
             r.AddToClassList(ClassAllowDisable);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

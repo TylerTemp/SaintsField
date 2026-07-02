@@ -79,6 +79,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             // objectField.BindProperty(property);
             objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
             objectField.AddToClassList(ClassAllowDisable);
+            if (!string.IsNullOrEmpty(property.tooltip) && objectField.labelElement != null)
+            {
+                objectField.labelElement.tooltip = property.tooltip;
+            }
 
             EmptyBinderField<Object> emptyBinder = new EmptyBinderField<Object>(objectField)
             {

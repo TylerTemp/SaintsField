@@ -86,6 +86,14 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 name = NameFoldout(property),
                 viewDataKey = property.propertyPath,
             };
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                Label foldoutLabel = foldout.Q<Label>();
+                if (foldoutLabel != null)
+                {
+                    foldoutLabel.tooltip = property.tooltip;
+                }
+            }
             header.Add(foldout);
             VisualElement foldoutContent = foldout.contentContainer;
             foldoutContent.style.marginLeft = 0;
@@ -627,7 +635,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                         wrapType,
                         elementProp,
                         ReflectCache.GetCustomAttributes<Attribute>(info)
-                            .Where(each => each is not InjectAttributeBase)
+                            .Where(each => each is not InjectAttributeBase && each is not SaintsArrayAttribute)
                             .Concat(injectCreatedAttributes2)
                             .ToArray(),
                         injectAttributes2,

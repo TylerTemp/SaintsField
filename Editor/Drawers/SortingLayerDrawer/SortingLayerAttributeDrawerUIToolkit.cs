@@ -38,6 +38,10 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
 
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(SortingLayerIntField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
                     return r;
                 }
                 case SerializedPropertyType.String:
@@ -50,6 +54,10 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                     SortingLayerStringField r = new SortingLayerStringField(GetPreferredLabel(property), sortingLayerStringElement);
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(SortingLayerStringField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
                     return r;
                 }
                 default:

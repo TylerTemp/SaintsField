@@ -33,6 +33,10 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = initMetaInfo.CurValues;
+            if (!string.IsNullOrEmpty(property.tooltip) && dropdownButton.labelElement != null)
+            {
+                dropdownButton.labelElement.tooltip = property.tooltip;
+            }
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 
@@ -65,6 +69,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             // var serObj = property.serializedObject;
             Object[] targetObjects = property.serializedObject.targetObjects;
             string propPath = property.propertyPath;
+
+            UIToolkitUtils.AddContextualMenuManipulator(dropdownButtonField, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
             dropdownButtonField.ButtonElement.clicked += () =>
             {

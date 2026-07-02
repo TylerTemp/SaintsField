@@ -23,7 +23,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
-                return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                return fallback;
             }
 
             SpinePathConstraintPickerElement element = new SpinePathConstraintPickerElement
@@ -33,6 +34,10 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
             SpinePathConstraintPickerField field = new SpinePathConstraintPickerField(GetPreferredLabel(property), element);
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SpinePathConstraintPickerField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
             return field;
         }
 

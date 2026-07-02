@@ -21,6 +21,10 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         {
             DateTimeField r = MakeElement(property, GetPreferredLabel(property));
             r.AddToClassList(DateTimeField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

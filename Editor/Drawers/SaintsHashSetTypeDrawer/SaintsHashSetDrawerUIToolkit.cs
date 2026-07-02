@@ -87,6 +87,14 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 value = property.isExpanded,
                 name = NameFoldout(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                Label foldoutLabel = foldout.Q<Label>();
+                if (foldoutLabel != null)
+                {
+                    foldoutLabel.tooltip = property.tooltip;
+                }
+            }
 
             VisualElement content = foldout.Q<VisualElement>(className: "unity-foldout__content");
             // Debug.Log(content);

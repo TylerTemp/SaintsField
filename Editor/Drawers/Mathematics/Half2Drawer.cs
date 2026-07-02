@@ -1,4 +1,4 @@
-#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -35,6 +35,10 @@ namespace SaintsField.Editor.Drawers.Mathematics
             };
 
             field.AddToClassList(MathematicsHalfUShortField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
             // field.BindProperty(prop);
             return field;
         }

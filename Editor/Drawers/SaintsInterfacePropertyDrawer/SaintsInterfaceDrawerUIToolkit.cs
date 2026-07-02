@@ -55,6 +55,10 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             saintsInterfaceField.AddToClassList(ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
             saintsInterfaceField.SetValueWithoutNotify(fInfo.ValueProp.objectReferenceValue);
+            if (!string.IsNullOrEmpty(property.tooltip) && saintsInterfaceField.labelElement != null)
+            {
+                saintsInterfaceField.labelElement.tooltip = property.tooltip;
+            }
 
             Debug.Assert(fInfo.ValueType != null);
             Debug.Assert(fInfo.InterfaceType != null);

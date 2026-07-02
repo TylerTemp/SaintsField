@@ -82,6 +82,10 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     MinMaxSliderFieldInt field = new MinMaxSliderFieldInt(GetPreferredLabel(property), element);
                     field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 case SerializedPropertyType.Vector2:
@@ -90,6 +94,10 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     MinMaxSliderFieldFloat field = new MinMaxSliderFieldFloat(GetPreferredLabel(property), element);
                     field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 default:

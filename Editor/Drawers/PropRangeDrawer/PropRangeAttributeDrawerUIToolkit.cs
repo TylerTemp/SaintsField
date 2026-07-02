@@ -57,6 +57,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeUIntField field = new PropRangeUIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeUIntField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
+                        if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                        {
+                            field.labelElement.tooltip = property.tooltip;
+                        }
                         return field;
                     }
                     if (rawType == typeof(long))
@@ -65,6 +69,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeLongField field = new PropRangeLongField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeLongField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
+                        if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                        {
+                            field.labelElement.tooltip = property.tooltip;
+                        }
                         return field;
                     }
                     if (rawType == typeof(ulong))
@@ -73,6 +81,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeULongField field = new PropRangeULongField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeULongField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
+                        if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                        {
+                            field.labelElement.tooltip = property.tooltip;
+                        }
                         return field;
                     }
                     else
@@ -81,6 +93,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeIntField field = new PropRangeIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
+                        if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                        {
+                            field.labelElement.tooltip = property.tooltip;
+                        }
                         return field;
                     }
                 }
@@ -90,10 +106,17 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     PropRangeDoubleField field = new PropRangeDoubleField(GetPreferredLabel(property), element);
                     field.AddToClassList(PropRangeDoubleField.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 default:
-                    return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                {
+                    PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                    return fallback;
+                }
             }
         }
 

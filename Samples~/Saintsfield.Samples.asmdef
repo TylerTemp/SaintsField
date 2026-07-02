@@ -87,6 +87,11 @@
             "name": "com.cysharp.unitask",
             "expression": "",
             "define": "SAINTSFIELD_UNITASK"
+        },
+        {
+            "name": "com.unity.mathematics",
+            "expression": "",
+            "define": "SAINTSFIELD_UNITY_MATHEMATICS"
         }
     ],
     "noEngineReferences": false

@@ -31,6 +31,10 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
 
             createFieldElement.AddToClassList(ClassAllowDisable);
             createFieldElement.AddToClassList(CustomCurveField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && createFieldElement.labelElement != null)
+            {
+                createFieldElement.labelElement.tooltip = property.tooltip;
+            }
 
             return createFieldElement;
         }

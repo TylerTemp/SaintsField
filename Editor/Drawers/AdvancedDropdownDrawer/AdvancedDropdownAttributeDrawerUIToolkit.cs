@@ -36,6 +36,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             string display = GetMetaStackDisplay(initMetaInfo);
             UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXmlWithProvider(GetMetaStackDisplay(initMetaInfo), this), _richTextDrawer);
             dropdownButton.ButtonLabelElement.userData = display;
+            if (!string.IsNullOrEmpty(property.tooltip) && dropdownButton.labelElement != null)
+            {
+                dropdownButton.labelElement.tooltip = property.tooltip;
+            }
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 

@@ -36,6 +36,10 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             dropdownButton.userData = metaInfo.SelectedIndex == -1
                 ? null
                 : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2;
+            if (!string.IsNullOrEmpty(property.tooltip) && dropdownButton.labelElement != null)
+            {
+                dropdownButton.labelElement.tooltip = property.tooltip;
+            }
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 

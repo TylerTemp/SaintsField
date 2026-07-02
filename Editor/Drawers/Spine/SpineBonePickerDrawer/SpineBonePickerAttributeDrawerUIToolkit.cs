@@ -24,7 +24,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
-                return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                return fallback;
             }
 
             SpineBonePickerElement element = new SpineBonePickerElement
@@ -34,6 +35,10 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
             SpineBonePickerField field = new SpineBonePickerField(GetPreferredLabel(property), element);
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SpineBonePickerField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
             return field;
         }
 

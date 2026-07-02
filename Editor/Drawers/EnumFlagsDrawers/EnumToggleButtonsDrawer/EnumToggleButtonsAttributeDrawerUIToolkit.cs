@@ -103,6 +103,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             };
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
 
         }

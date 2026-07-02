@@ -15,13 +15,18 @@ namespace SaintsField.Editor.Drawers.PlaceholderDrawerOfType
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            return new VisualElement()
+            VisualElement field = new VisualElement()
             {
                 style =
                 {
                     display = DisplayStyle.None,
                 },
             };
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                field.tooltip = property.tooltip;
+            }
+            return field;
         }
     }
 }

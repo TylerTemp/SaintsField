@@ -35,6 +35,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         public const string SaintsRowClass = "saints-field--saintsrow";
+        public const string SaintsRowFoldoutClass = "saints-field--saintsrow-foldout";
         // private static string NameActualContainer(SerializedProperty property) => $"{property.propertyPath}__saints_row";
 
 
@@ -85,6 +86,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     // name = NameActualContainer(property),
                     viewDataKey = property.propertyPath,
                 };
+                foldout.AddToClassList(SaintsRowFoldoutClass);
                 foldout.RegisterValueChangedCallback(evt =>
                 {
                     property.isExpanded = evt.newValue;
@@ -197,6 +199,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             SaintsRowAttribute saintsRowAttribute = saintsAttribute as SaintsRowAttribute;
 
             VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this, parent, this);
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                ele.tooltip = property.tooltip;
+            }
             //
             // if (InHorizentalLayout)
             // {

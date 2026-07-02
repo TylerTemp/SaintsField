@@ -26,6 +26,10 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
             SceneReferenceField field = new SceneReferenceField(GetPreferredLabel(property), sceneReferenceElement);
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SceneReferenceField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
             return field;
         }
 

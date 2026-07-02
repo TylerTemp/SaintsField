@@ -32,6 +32,10 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
             InputAxisField r = new InputAxisField(GetPreferredLabel(property), inputAxisElement);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(InputAxisField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

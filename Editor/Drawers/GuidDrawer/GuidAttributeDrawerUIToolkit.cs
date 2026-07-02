@@ -20,6 +20,11 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
         {
             VisualElement field = MakeElement(property, GetPreferredLabel(property));
             field.AddToClassList(GuidStringField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field is GuidStringField guidStringField &&
+                guidStringField.labelElement != null)
+            {
+                guidStringField.labelElement.tooltip = property.tooltip;
+            }
             return field;
         }
 

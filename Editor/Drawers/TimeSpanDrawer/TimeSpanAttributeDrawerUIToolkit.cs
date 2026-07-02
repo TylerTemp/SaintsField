@@ -21,6 +21,10 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
         {
             TimeSpanField r = MakeElement(property, GetPreferredLabel(property), allAttributes.Any(each => each is FieldDefaultExpandAttribute));
             r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

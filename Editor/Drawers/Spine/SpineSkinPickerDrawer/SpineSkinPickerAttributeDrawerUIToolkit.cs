@@ -33,10 +33,15 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             }
             SpineSkinElement element = new SpineSkinElement();
             element.BindProperty(property);
-            return new StringDropdownField(GetPreferredLabel(property), element)
+            StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), element)
             {
                 name = NameDropdownField(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
+            return field;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,

@@ -87,6 +87,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 name = NameFoldout(property),
                 viewDataKey = property.propertyPath,
             };
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                Label foldoutLabel = foldout.Q<Label>();
+                if (foldoutLabel != null)
+                {
+                    foldoutLabel.tooltip = property.tooltip;
+                }
+            }
 
             VisualElement content = foldout.Q<VisualElement>(className: "unity-foldout__content");
             // Debug.Log(content);
@@ -1229,7 +1237,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 GUIContent label = imguiLabelHelper.NoLabel
                     ? GUIContent.none
-                    : new GUIContent(imguiLabelHelper.RichLabel);
+                    : new GUIContent(imguiLabelHelper.RichLabel, property.tooltip);
 
                 property.serializedObject.Update();
 
@@ -1271,6 +1279,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 userData = imguiLabelHelper,
             };
             imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                imGuiContainer.tooltip = property.tooltip;
+            }
 
             return imGuiContainer;
         }

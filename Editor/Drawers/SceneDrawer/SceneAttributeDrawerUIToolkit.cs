@@ -39,6 +39,10 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                     ScenePickerIntField r = new ScenePickerIntField(GetPreferredLabel(property), e);
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(ScenePickerIntField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
                     return r;
                 }
                 case SerializedPropertyType.String:
@@ -50,6 +54,10 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                         });
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(ScenePickerStringField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
                     return r;
                 }
                 default:

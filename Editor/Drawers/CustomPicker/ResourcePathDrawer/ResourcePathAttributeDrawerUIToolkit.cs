@@ -47,6 +47,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
             };
 
             objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && objectField.labelElement != null)
+            {
+                objectField.labelElement.tooltip = property.tooltip;
+            }
 
             objectField.Bind(property.serializedObject);
 

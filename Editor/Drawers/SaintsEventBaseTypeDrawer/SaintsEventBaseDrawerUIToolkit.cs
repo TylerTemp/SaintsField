@@ -74,10 +74,16 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             string useLabel = GetEventLabel(property, GetPreferredLabel(property));
-            return new SaintsEventView(useLabel)
+            SaintsEventView field = new SaintsEventView(useLabel)
             {
                 name = NameSaintsEventView(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                field.tooltip = property.tooltip;
+                field.Label.tooltip = property.tooltip;
+            }
+            return field;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,

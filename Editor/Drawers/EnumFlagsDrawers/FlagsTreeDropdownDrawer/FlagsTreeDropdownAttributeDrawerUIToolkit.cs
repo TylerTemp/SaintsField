@@ -38,10 +38,15 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
             _enumMeta = EnumFlagsUtil.GetMetaInfo(property, info);
             FlagsDropdownElement intDropdownElement = new FlagsDropdownElement(_enumMeta);
             intDropdownElement.BindProperty(property);
-            return new IntDropdownField(GetPreferredLabel(property), intDropdownElement)
+            IntDropdownField field = new IntDropdownField(GetPreferredLabel(property), intDropdownElement)
             {
                 name = NameButton(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
+            return field;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,

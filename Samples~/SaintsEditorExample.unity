@@ -5447,6 +5447,444 @@ MonoBehaviour:
   - 2
   - 3
   - 4
+--- !u!1 &717313588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 717313589}
+  - component: {fileID: 717313592}
+  - component: {fileID: 717313593}
+  - component: {fileID: 717313590}
+  m_Layer: 0
+  m_Name: Issue412TooltipRawDraw
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &717313589
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717313588}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 785898368}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &717313590
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717313588}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 891dfeda31f941d4cae65b39a9339bc3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &717313592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717313588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69b40dd9e7ba627418f82733e128a3f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue412TooltipFallDraw
+  arr: 
+  serRef:
+    rid: -2
+  myInter:
+    <name>k__BackingField: 
+  myLong: 0
+  myULong: 0
+  myInt: 0
+  myUint: 0
+  mySbyte: 0
+  myByte: 0
+  shortTest: 0
+  ushortTest: 0
+  booleanTest: 0
+  doubleTest: 0
+  floatTest: 0
+  stringTest: 
+  myColor: {r: 0, g: 0, b: 0, a: 0}
+  myObjectReference: {fileID: 0}
+  myLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  myEnum: 0
+  myFlags: 0
+  myVector2: {x: 0, y: 0}
+  myVector2Int: {x: 0, y: 0}
+  myVector3: {x: 0, y: 0, z: 0}
+  myVector3Int: {x: 0, y: 0, z: 0}
+  myVector4: {x: 0, y: 0, z: 0, w: 0}
+  myRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  myRectInt:
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  myCharacter: 0
+  myAnimationCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  myBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  myBoundsInt:
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Size: {x: 0, y: 0, z: 0}
+  myGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  myQuaternion: {x: 0, y: 0, z: 0, w: 0}
+  myHash128:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  exposedRef:
+    exposedName: 
+    defaultValue: {fileID: 2100000, guid: 4f1ef37ae953c484bbc5d5e4049147e5, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &717313593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717313588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3360ec1ce41a48d4a8da06fc239514cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue412TooltipRawDraw
+  animator: {fileID: 717313590}
+  material: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  _mode: 0
+  _advancedDropdown: 0
+  _menuDropdown: 0
+  _treeDropdown: 0
+  _valueButtons: 0
+  _flagsDropdown: 0
+  _flagsTreeDropdown: 0
+  _enumToggleButtons: 0
+  _enumToggleButtonsFlags: 0
+  _navMeshArea: 0
+  _navMeshAreaMask: 0
+  _addressableAddress: 
+  _addressableLabel: 
+  _addressableScene: 
+  _animatorParam: 
+  _animatorState: 
+  _inputAxis: 
+  _layerInt: 0
+  _layerString: 
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _leftToggle: 0
+  _rate: 0
+  _sortingLayerString: 
+  _sortingLayerInt: 0
+  _sceneString: 
+  _sceneIndex: 0
+  _sceneReference:
+    guid: 
+    index: 0
+    path: 
+  _shaderKeyword: 
+  _shaderParamString: 
+  _shaderParamInt: 0
+  _spineAttachment: 
+  _spineSkin: 
+  _spineSlot: 
+  _spineBone: 
+  _spineEvent: 
+  _spinePathConstraint: 
+  _spineIkConstraint: 
+  _spineTransformConstraint: 
+  _typeReference:
+    _typeNameAndAssembly: 
+    _monoScriptGuid: 
+  _dateTimeTicks: 638000000000000000
+  _timeSpanTicks: 36000000000
+  _guid: 00000000-0000-0000-0000-000000000000
+  _curveRange:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _fieldType: {fileID: 0}
+  _resourcePath: 
+  _minMaxSlider: {x: 0.25, y: 0.75}
+  _minMaxSliderInt: {x: 2, y: 8}
+  _propRangeInt: 0
+  _propRangeFloat: 0
+  _progressBarInt: 5
+  _progressBarFloat: 0.5
+  _resizableTextArea: 
+  _tagName: 
+  _referencePicker:
+    rid: 773219509000732908
+  _saintsDecimal:
+    flags: 65536
+    hi: 0
+    lo: 125
+    mid: 0
+  _saintsRow:
+    intValue: 0
+    stringValue: 
+  _saintsArray:
+    _saintsList:
+    - value: 1
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 3
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  _saintsHashSet:
+    _saintsList:
+    - value: 1
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 3
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  _saintsDictionary:
+    _saintsKeys:
+    - value: one
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value: 1
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+    _keys: []
+    _values: 
+  _saintsInterface:
+    <V>k__BackingField: {fileID: 0}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
+  _half:
+    value: 0
+  _half2:
+    x:
+      value: 0
+    y:
+      value: 0
+  _half3:
+    x:
+      value: 0
+    y:
+      value: 0
+    z:
+      value: 0
+  _half4:
+    x:
+      value: 0
+    y:
+      value: 0
+    z:
+      value: 0
+    w:
+      value: 0
+  _saintsEvent:
+    _persistentCalls: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 773219509000732908
+      type: {class: Issue412TooltipRawDraw/ReferenceChild, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
+      data:
+        value: 0
+        childValue: 
 --- !u!1 &721769816
 GameObject:
   m_ObjectHideFlags: 0
@@ -6062,6 +6500,7 @@ Transform:
   - {fileID: 839517288}
   - {fileID: 1500470750}
   - {fileID: 1312160703}
+  - {fileID: 717313589}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &786619284

@@ -83,6 +83,10 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     AnimatorStateFieldString field = new AnimatorStateFieldString(GetPreferredLabel(property), element);
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorStateFieldString.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 case SerializedPropertyType.Generic:
@@ -94,6 +98,10 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     AnimatorStateFieldStruct field = new AnimatorStateFieldStruct(GetPreferredLabel(property), element);
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorStateFieldString.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 default:

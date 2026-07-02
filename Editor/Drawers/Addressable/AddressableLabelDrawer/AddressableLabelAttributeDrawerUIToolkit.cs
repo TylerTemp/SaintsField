@@ -33,10 +33,15 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
 
             AddressableLabelElement element = new AddressableLabelElement();
             element.BindProperty(property);
-            return new StringDropdownField(GetPreferredLabel(property), element)
+            StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), element)
             {
                 name = NameDropdownField(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
+            {
+                stringDropdownField.labelElement.tooltip = property.tooltip;
+            }
+            return stringDropdownField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,

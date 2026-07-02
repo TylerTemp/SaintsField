@@ -43,6 +43,10 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             r.name = NameResizable(property);
 
             UIToolkitUtils.AddContextualMenuManipulator(r.labelElement, property, () => Util.PropertyChangedCallback(property, info, null));
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
 
             return r;
         }

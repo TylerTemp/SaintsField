@@ -25,11 +25,21 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 
             VisualElement root = new VisualElement();
             // Debug.Log($"allAttributes={string.Join(",", allAttributes)}");
-            root.Add(CreateElement(property, saintsAttribute, allAttributes, container, info, parent));
+            VisualElement element = CreateElement(property, saintsAttribute, allAttributes, container, info, parent);
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                root.tooltip = property.tooltip;
+                element.tooltip = property.tooltip;
+            }
+            root.Add(element);
             root.TrackPropertyValue(property.FindPropertyRelative("wrapType"), _ =>
             {
                 root.Clear();
                 VisualElement nc = CreateElement(property, saintsAttribute, allAttributes, container, info, parent);
+                if (!string.IsNullOrEmpty(property.tooltip))
+                {
+                    nc.tooltip = property.tooltip;
+                }
                 root.Add(nc);
             });
             return root;
@@ -137,7 +147,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     SerializedProperty valueProp = property.FindPropertyRelative("value");
                     // info.FieldType=list<SaintsWrap<T>>
                     // here we want to obtain T for valueType, not SaintsWrap<T>
-                    Debug.Log($"info.FieldType={info.FieldType}");
+                    // Debug.Log($"info.FieldType={info.FieldType}");
                     Type saintsWrapType = info.FieldType.GetGenericArguments()[0];  // SaintsWrap<T>
                     Type valueType = saintsWrapType.GetGenericArguments()[0];
                     Debug.Log(valueProp.propertyPath);

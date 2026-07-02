@@ -31,10 +31,14 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     {
                         bindingPath = property.propertyPath
                     };
-                    IntDropdownField field = new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
-                    field.AddToClassList(IntDropdownField.alignedFieldUssClassName);
-                    field.AddToClassList(ClassAllowDisable);
-                    return field;
+                    IntDropdownField intDropdownField = new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
+                    intDropdownField.AddToClassList(IntDropdownField.alignedFieldUssClassName);
+                    intDropdownField.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && intDropdownField.labelElement != null)
+                    {
+                        intDropdownField.labelElement.tooltip = property.tooltip;
+                    }
+                    return intDropdownField;
                 }
                 case SerializedPropertyType.String:
                 {
@@ -42,10 +46,14 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     {
                         bindingPath = property.propertyPath
                     };
-                    StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
-                    field.AddToClassList(IntDropdownField.alignedFieldUssClassName);
-                    field.AddToClassList(ClassAllowDisable);
-                    return field;
+                    StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
+                    stringDropdownField.AddToClassList(IntDropdownField.alignedFieldUssClassName);
+                    stringDropdownField.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
+                    {
+                        stringDropdownField.labelElement.tooltip = property.tooltip;
+                    }
+                    return stringDropdownField;
                 }
                 case SerializedPropertyType.LayerMask:
                 {
@@ -53,16 +61,20 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                         {
                             bindingPath = property.propertyPath
                         };
-                    LayerMaskDropdownField field =
+                    LayerMaskDropdownField layerMaskDropdownField =
                         new LayerMaskDropdownField(GetPreferredLabel(property), layerMaskDropdownElement)
                         {
                             bindingPath = property.propertyPath
                         };
-                    field.AddToClassList(LayerMaskDropdownField.alignedFieldUssClassName);
-                    field.AddToClassList(ClassAllowDisable);
+                    layerMaskDropdownField.AddToClassList(LayerMaskDropdownField.alignedFieldUssClassName);
+                    layerMaskDropdownField.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && layerMaskDropdownField.labelElement != null)
+                    {
+                        layerMaskDropdownField.labelElement.tooltip = property.tooltip;
+                    }
                     // layerMaskDropdownElement.BindProperty(property);
                     // Debug.Log($"return {layerMaskDropdownElement}");
-                    return field;
+                    return layerMaskDropdownField;
                 }
                 default:
                     return new VisualElement();

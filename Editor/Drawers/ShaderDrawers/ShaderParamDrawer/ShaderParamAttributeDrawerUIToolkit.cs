@@ -36,6 +36,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     ShaderParamIntField r = new ShaderParamIntField(GetPreferredLabel(property), intDropdownElement);
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(ShaderParamIntField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
                     return r;
                 }
                 case SerializedPropertyType.String:
@@ -48,6 +52,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                         new ShaderParamStringField(GetPreferredLabel(property), shaderParamStringElement);
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(ShaderParamStringField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
                     return r;
                 }
                 default:

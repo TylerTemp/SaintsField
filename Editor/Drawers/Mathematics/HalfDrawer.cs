@@ -31,6 +31,10 @@ namespace SaintsField.Editor.Drawers.Mathematics
             };
 
             field.AddToClassList(MathematicsHalfUShortField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
             // field.BindProperty(prop);
             return field;
         }

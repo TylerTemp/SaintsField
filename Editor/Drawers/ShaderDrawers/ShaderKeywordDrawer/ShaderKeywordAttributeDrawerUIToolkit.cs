@@ -37,6 +37,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             ShaderKeywordField r = new ShaderKeywordField(GetPreferredLabel(property), shaderKeywordElement);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(ShaderKeywordField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

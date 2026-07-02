@@ -16,6 +16,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.UIToolkitElements.QuaternionType;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEngine;
@@ -491,7 +492,16 @@ namespace SaintsField.Editor.Utils
             bool mergeDec,
             object parent)
         {
-            (Type useDrawerType, Attribute useAttribute) = Util.GetDrawerAndAttribute(property, allAttributes, fieldInfo);
+            Type useDrawerType = null;
+            Attribute useAttribute = null;
+            if (property.propertyType == SerializedPropertyType.Quaternion)
+            {
+                // always treat this as no drawer so it can go raw fallback
+            }
+            else
+            {
+                (useDrawerType, useAttribute) = Util.GetDrawerAndAttribute(property, allAttributes, fieldInfo);
+            }
 
             if (useDrawerType == null)
             {
@@ -530,7 +540,7 @@ namespace SaintsField.Editor.Utils
             // };
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
-            // Debug.Log($"use {useDrawerType} for {property.propertyPath}, label={label}");
+            // Debug.Log($"use {useDrawerType.FullName}({useDrawerType.Assembly.GetName().Name}) for {property.propertyPath}, label={label}");
             PropertyDrawer propertyDrawer = SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, fieldInfo, useAttribute, label);
             // Debug.Log(saintsPropertyDrawer);
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
@@ -563,6 +573,32 @@ namespace SaintsField.Editor.Utils
                         r.RemoveFromClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
                     }
                     r.Bind(property.serializedObject);
+
+                    if (property.propertyType == SerializedPropertyType.ExposedReference &&
+                        // useDrawerType.FullName == "ExposedReferencePropertyDrawer" &&
+                        // useDrawerType.Assembly.GetName().Name == "UnityEditor.CoreModule" &&
+                        r is ObjectField expObj)
+                    {
+                        TooltipAttribute toolTip = allAttributes.OfType<TooltipAttribute>().FirstOrDefault();
+
+                        // ReSharper disable once InvertIf
+                        if(toolTip != null)
+                        {
+                            Label expLabel =
+                                expObj.Q<Label>(className: BaseField<UnityEngine.Object>.labelUssClassName);
+                            if (expLabel != null)
+                            {
+                                expLabel.tooltip = toolTip.tooltip;
+                            }
+                            else
+                            {
+                                expObj.tooltip = toolTip.tooltip;
+                            }
+                        }
+                        // Debug.Log(r);
+                        // Debug.Log(r.GetType().FullName);
+                    }
+
                     // PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
                     return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes.OfType<PropertyAttribute>().ToArray()): r;
                 }
@@ -849,6 +885,7 @@ namespace SaintsField.Editor.Utils
                                     // Debug.Log(element);
                                     // Debug.Log(i);
                                 },
+                                tooltip = property.tooltip,
                             };
                             Toggle listViewToggle = listView.Q<Toggle>();
                             if (listViewToggle != null && listViewToggle.style.marginLeft != -12)
@@ -971,8 +1008,24 @@ namespace SaintsField.Editor.Utils
 
                     // Debug.Log(fieldInfo.Name);
 
-                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
+                    VisualElement genResult = SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
                         null, makeRenderer, doTweenPlayRecorder, parent, new RichTextDrawer.EmptyRichTextTagProvider());
+
+                    Foldout genFoldout = genResult?.Q<Foldout>(className: SaintsRowAttributeDrawer.SaintsRowFoldoutClass);
+                    if (genFoldout != null)
+                    {
+                        Label genFoldoutLabel = genFoldout.Q<Label>();
+                        if (genFoldoutLabel != null)
+                        {
+                            genFoldoutLabel.tooltip = property.tooltip;
+                        }
+                        else
+                        {
+                            genFoldout.tooltip = property.tooltip;
+                        }
+                    }
+
+                    return genResult;
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:
@@ -1834,6 +1887,48 @@ namespace SaintsField.Editor.Utils
                     return gradientField;
                 }
                 case SerializedPropertyType.Quaternion:
+                {
+                    if (originalField is QuaternionField quaternionField)
+                    {
+                        quaternionField.SetValueWithoutNotify(property.quaternionValue);
+                        return null;
+                    }
+
+                    quaternionField = new QuaternionField(label)
+                    {
+                        value = property.quaternionValue,
+                        style =
+                        {
+                            flexGrow = 1,
+                            flexShrink = 1,
+                        },
+                    };
+                    quaternionField.BindProperty(property);
+                    quaternionField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
+                    quaternionField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                    quaternionField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
+                    if (inHorizontalLayout)
+                    {
+                        quaternionField.style.flexDirection = FlexDirection.Column;
+                        quaternionField.style.flexWrap = Wrap.Wrap;
+                        Label elementLabel = quaternionField.Q<Label>();
+                        if (elementLabel != null)
+                        {
+                            elementLabel.style.minWidth = 0;
+                            elementLabel.style.borderRightWidth = 1;
+                            elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                        }
+                    }
+                    else
+                    {
+                        quaternionField.AddToClassList(BoundsField.alignedFieldUssClassName);
+                    }
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(quaternionField, property, fieldInfo, parent);
+                    }
+                    return quaternionField;
+                }
                 case SerializedPropertyType.ExposedReference:
                     return null;
                 case SerializedPropertyType.FixedBufferSize:

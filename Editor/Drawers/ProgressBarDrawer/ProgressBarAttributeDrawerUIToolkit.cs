@@ -39,6 +39,10 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                     ProgressBarFieldInt field = new ProgressBarFieldInt(GetPreferredLabel(property), element);
                     field.AddToClassList(ProgressBarFieldInt.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 case SerializedPropertyType.Float:
@@ -47,10 +51,17 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                     ProgressBarFieldDouble field = new ProgressBarFieldDouble(GetPreferredLabel(property), element);
                     field.AddToClassList(ProgressBarFieldDouble.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 default:
-                    return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                {
+                    PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                    return fallback;
+                }
             }
         }
 

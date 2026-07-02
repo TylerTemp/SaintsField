@@ -23,7 +23,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
-                return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                return fallback;
             }
 
             SpineEventPickerElement element = new SpineEventPickerElement
@@ -33,6 +34,10 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
             SpineEventPickerField field = new SpineEventPickerField(GetPreferredLabel(property), element);
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SpineEventPickerField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
             return field;
         }
 

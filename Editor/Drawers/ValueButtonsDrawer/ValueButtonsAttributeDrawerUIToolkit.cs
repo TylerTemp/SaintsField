@@ -28,8 +28,15 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent) =>
-            UtilCreateFieldUIToolKit(GetPreferredLabel(property), property);
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+        {
+            VisualElement field = UtilCreateFieldUIToolKit(GetPreferredLabel(property), property);
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                field.tooltip = property.tooltip;
+            }
+            return field;
+        }
 
         public static  VisualElement UtilCreateFieldUIToolKit(string label, SerializedProperty property)
         {
@@ -86,6 +93,10 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             // r.BindProperty(property);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

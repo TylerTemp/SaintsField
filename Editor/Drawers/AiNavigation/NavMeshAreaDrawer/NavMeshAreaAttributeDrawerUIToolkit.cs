@@ -32,19 +32,29 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                     NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute)saintsAttribute;
                     NavMeshAreaIntElement element = new NavMeshAreaIntElement(navMeshAreaAttribute.IsMask);
                     element.BindProperty(property);
-                    return new IntDropdownField(GetPreferredLabel(property), element)
+                    IntDropdownField intDropdownField = new IntDropdownField(GetPreferredLabel(property), element)
                     {
                         name = NameButtonField(property),
                     };
+                    if (!string.IsNullOrEmpty(property.tooltip) && intDropdownField.labelElement != null)
+                    {
+                        intDropdownField.labelElement.tooltip = property.tooltip;
+                    }
+                    return intDropdownField;
                 }
                 case SerializedPropertyType.String:
                 {
                     NavMeshAreaStringElement element = new NavMeshAreaStringElement();
                     element.BindProperty(property);
-                    return new StringDropdownField(GetPreferredLabel(property), element)
+                    StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), element)
                     {
                         name = NameButtonField(property),
                     };
+                    if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
+                    {
+                        stringDropdownField.labelElement.tooltip = property.tooltip;
+                    }
+                    return stringDropdownField;
                 }
                 default:
                     return new VisualElement();

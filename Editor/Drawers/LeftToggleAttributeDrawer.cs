@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Interfaces;
@@ -99,6 +99,10 @@ namespace SaintsField.Editor.Drawers
 
             toggle.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/LeftToggle.uss"));
             toggle.AddToClassList(ClassAllowDisable);
+            if (!string.IsNullOrEmpty(property.tooltip) && toggle.labelElement != null)
+            {
+                toggle.labelElement.tooltip = property.tooltip;
+            }
 
             return toggle;
         }

@@ -24,6 +24,10 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             RateField r = new RateField(GetPreferredLabel(property), rateElement);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(RateField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+            {
+                r.labelElement.tooltip = property.tooltip;
+            }
             return r;
         }
 

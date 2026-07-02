@@ -27,6 +27,10 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         {
             SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property));
             field.DecimalTextField.AddToClassList(DecimalTextField.alignedFieldUssClassName);
+            if (!string.IsNullOrEmpty(property.tooltip) && field.DecimalTextField.labelElement != null)
+            {
+                field.DecimalTextField.labelElement.tooltip = property.tooltip;
+            }
             EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
             emptyPrefabOverrideElement.Add(field);
             return emptyPrefabOverrideElement;

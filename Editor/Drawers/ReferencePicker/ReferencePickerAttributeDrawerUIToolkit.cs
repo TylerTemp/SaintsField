@@ -35,6 +35,14 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 viewDataKey = property.propertyPath,
                 value = allAttributes.Any(each => each is FieldDefaultExpandAttribute) || property.isExpanded,
             };
+            if (!string.IsNullOrEmpty(property.tooltip))
+            {
+                UIToolkitUtils.DropdownButtonField dropdownButton = foldout.Q<UIToolkitUtils.DropdownButtonField>();
+                if (dropdownButton != null && dropdownButton.labelElement != null)
+                {
+                    dropdownButton.labelElement.tooltip = property.tooltip;
+                }
+            }
             foldout.Add(
                 SaintsRowAttributeDrawer.CreateElement(
                     property,

@@ -30,10 +30,15 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         {
             AddressableSceneElement element = new AddressableSceneElement((AddressableSceneAttribute) saintsAttribute);
             element.BindProperty(property);
-            return new AddressableSceneField(GetPreferredLabel(property), element)
+            AddressableSceneField field = new AddressableSceneField(GetPreferredLabel(property), element)
             {
                 name = NameAddressableSceneField(property),
             };
+            if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+            {
+                field.labelElement.tooltip = property.tooltip;
+            }
+            return field;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,

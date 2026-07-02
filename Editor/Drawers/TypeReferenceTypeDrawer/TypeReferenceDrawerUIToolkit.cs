@@ -27,6 +27,10 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             UIToolkitUtils.DropdownButtonField dropdown =
                 UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
             dropdown.name = NameTypeReferenceField(property);
+            if (!string.IsNullOrEmpty(property.tooltip) && dropdown.labelElement != null)
+            {
+                dropdown.labelElement.tooltip = property.tooltip;
+            }
 
             dropdown.AddToClassList(ClassAllowDisable);
 

@@ -41,6 +41,10 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     AnimatorParamStringField field = new AnimatorParamStringField(GetPreferredLabel(property), bindableElement);
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorParamStringField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 case SerializedPropertyType.Integer:
@@ -58,6 +62,10 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     };
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorParamIntField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    {
+                        field.labelElement.tooltip = property.tooltip;
+                    }
                     return field;
                 }
                 default:
