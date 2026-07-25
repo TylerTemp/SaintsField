@@ -190,7 +190,6 @@ namespace SaintsField.Editor.Core
                 if (GetType() == typeof(SaintsRowAttributeDrawer))
                 {
                     needAboveProcessor = false;
-                    Debug.Log(needAboveProcessor);
                 }
                 else if (SaintsPropertyDrawers.Any(each => each.Drawer is LeftToggleAttributeDrawer))  // Left Toggle do not need above dec; it displays label by itself
                 {
