@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers.LeftToggleDrawer
     {
 #if !UNITY_6000_0_OR_NEWER
         public new class UxmlTraits : VisualElement.UxmlTraits { }
-        public new class UxmlFactory : UxmlFactory<LeftToggleElement, UxmlTraits> { }
+        public new class UxmlFactory : UxmlFactory<LeftToggleField, UxmlTraits> { }
 #endif
         public LeftToggleField()
             : this(null)
