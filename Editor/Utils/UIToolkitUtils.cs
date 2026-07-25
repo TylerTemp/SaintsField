@@ -1600,7 +1600,10 @@ namespace SaintsField.Editor.Utils
 
                     DropdownAttribute treeDropdownAttribute = new DropdownAttribute();
                     TreeDropdownAttributeDrawer treeDropdownDrawer = (TreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
-                    treeDropdownDrawer.OverrideAttributes = new[] { treeDropdownAttribute };
+                    treeDropdownDrawer.OverrideAttributes = allAttributes
+                        .Where(each => each is PropertyAttribute or InjectAttributeBase)
+                        .Prepend(treeDropdownAttribute)
+                        .ToArray();
                     treeDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
                     return treeDropdownDrawer.CreatePropertyGUI(property);
                 }

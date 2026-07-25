@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.RendererGroup.TabGroup;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
@@ -13,6 +14,70 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.RendererGroup
 {
+    // public class MockInputElement : VisualElement
+    // {
+    //
+    // }
+
+    public class MockBaseField : BaseField<Object>
+    {
+        // public override VisualElement contentContainer { get; }
+
+        public readonly VisualElement Body;
+
+        private MockBaseField(string label, VisualElement visualInput) : base(label, visualInput)
+        {
+            Body = visualInput;
+            // contentContainer = visualInput;
+            AddToClassList(alignedFieldUssClassName);
+            // labelElement.style.flexDirection = FlexDirection.Column;
+        }
+
+        public MockBaseField() : this(" ", new VisualElement
+        {
+            style =
+            {
+                marginLeft = -3,
+                paddingRight = 2,
+            },
+        })
+        {
+        }
+
+        private bool _addAlready;
+
+        // public new void Add(VisualElement child)
+        // {
+        //     if (!_ready)
+        //     {
+        //         base.Add(child);
+        //         return;
+        //     }
+        //
+        //     VisualElement target = _addAlready ? _body : this.labelElement;
+        //     target.Add(child);
+        //     _addAlready = true;
+        // }
+
+        // private bool _initReady;
+        // public void SetReady() => _initReady = true;
+
+        public void BulkAdd(VisualElement rawBody)
+        {
+            foreach ((VisualElement visualElement, int index) in rawBody.Children().ToArray().WithIndex())
+            {
+                VisualElement target = index == 0 ? labelElement: Body;
+                target.Add(visualElement);
+                visualElement.style.flexGrow = 0;
+            }
+        }
+
+        // public MockBaseField(VisualElement labelElement, VisualElement bodyElement) : this(" ", bodyElement)
+        // {
+        //     this.labelElement.hierarchy.Add(labelElement);
+        // }
+    }
+
     public partial class SaintsRendererGroup
     {
         private HelpBox _helpBox;
@@ -37,82 +102,65 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             _fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
 
-            VisualElement root = new VisualElement
+            bool hasFoldout = _eLayout.HasFlagFast(ELayout.Foldout) || _eLayout.HasFlagFast(ELayout.Collapse);
+            bool hasTitle = _eLayout.HasFlagFast(ELayout.Title) || _eLayout.HasFlagFast(ELayout.TitleOut);
+            bool hasTab = _eLayout.HasFlagFast(ELayout.Tab);
+
+            bool foldoutTitle = hasFoldout && (
+                (hasTitle && hasTab)
+                || hasTitle
+                || !hasTab);
+            bool titleOut = _eLayout.HasFlagFast(ELayout.TitleOut);
+            bool background = _eLayout.HasFlagFast(ELayout.Background);
+            bool isLabelField = _eLayout.HasFlagFast(ELayout.LabelField);
+            bool fancy = titleOut && background;
+            VisualElement root;
+            if (foldoutTitle && !fancy)
             {
-                style =
+                root = new Foldout
                 {
-                    flexGrow = 1,
-                    borderTopLeftRadius = radius,
-                    borderTopRightRadius = radius,
-                    borderBottomLeftRadius = radius,
-                    borderBottomRightRadius = radius,
-                    width = new StyleLength(Length.Percent(100)),
-                },
-            };
+                    text = " ",
+                    // text = _groupPath.Split('/').Last(),
+                    // text = _groupPath.Last(),
+                    value = _foldout,
+                    style =
+                    {
+                        width = new StyleLength(Length.Percent(100)),
+                    },
+                };
+            }
+            else if (isLabelField)
+            {
+                // MockBaseField mockBaseField = new MockBaseField();
+                // mockBaseField.SetReady();
+                root = new MockBaseField();
+            }
+            else
+            {
+                root = new VisualElement
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        borderTopLeftRadius = radius,
+                        borderTopRightRadius = radius,
+                        borderBottomLeftRadius = radius,
+                        borderBottomRightRadius = radius,
+                        width = new StyleLength(Length.Percent(100)),
+                    },
+                };
+            }
+            root.name = $"saints-field-group--{_groupPath}";
 
             VisualElement titleRow = new VisualElement
             {
                 style =
                 {
                     flexGrow =  InAnyHorizontalLayout? 0: 1,
+                    display = DisplayStyle.None,
                 },
                 name = $"saints-field-group--title--{_groupPath}",
             };
-
-            bool hasFoldout = _eLayout.HasFlagFast(ELayout.Foldout) || _eLayout.HasFlagFast(ELayout.Collapse);
-            bool hasTitle = _eLayout.HasFlagFast(ELayout.Title) || _eLayout.HasFlagFast(ELayout.TitleOut);
-            bool hasTab = _eLayout.HasFlagFast(ELayout.Tab);
-
-            // Toolbar toolbar = new Toolbar
-            // {
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //         marginLeft = 1,
-            //         marginRight = 0,
-            //     },
-            // };
-
-            // List<Action<string>> switchTabActions = new List<Action<string>>
-            // {
-            //     tab =>
-            //     {
-            //         foreach (ToolbarToggle toolbarToggle in toolbarToggles)
-            //         {
-            //             toolbarToggle.SetValueWithoutNotify(toolbarToggle.text == tab);
-            //         }
-            //
-            //         foreach((string groupPath, List<VisualElement> visualElements) in fieldToVisualElement)
-            //         {
-            //             bool display = tab == null || groupPath == tab;
-            //             visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
-            //         }
-            //     },
-            // };
-
-            // ReSharper disable once ConvertToLocalFunction
-            // Action<string> switchTab = tab =>
-            // {
-            //     foreach (Action<string> switchTabAction in switchTabActions)
-            //     {
-            //         switchTabAction.Invoke(tab);
-            //     }
-            // };
-
-            // foreach (ToolbarToggle toolbarToggle in toolbarToggles)
-            // {
-            //     toolbarToggle.RegisterValueChangedCallback(evt =>
-            //     {
-            //         if (evt.newValue)
-            //         {
-            //             switchTab(curTab = toolbarToggle.text);
-            //         }
-            //         else
-            //         {
-            //             toolbarToggle.SetValueWithoutNotify(true);
-            //         }
-            //     });
-            // }
 
             bool inHorizontal = _eLayout.HasFlagFast(ELayout.Horizontal);
             float paddingLeft = _config.PaddingLeft;
@@ -136,30 +184,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 body.style.paddingTop = 1;
                 body.style.paddingBottom = 3;
             }
-
-            // // ReSharper disable once ConvertToLocalFunction
-            // Action<bool> foldoutAction = show =>
-            // {
-            //     if (show)
-            //     {
-            //         if (hasTitle)
-            //         {
-            //             toolbar.style.display = DisplayStyle.Flex;
-            //         }
-            //         switchTab(curTab);
-            //     }
-            //     else
-            //     {
-            //         if (hasTitle)
-            //         {
-            //             toolbar.style.display = DisplayStyle.None;
-            //         }
-            //         foreach (List<VisualElement> visualElements in fieldToVisualElement.Values)
-            //         {
-            //             visualElements.ForEach(visualElement => visualElement.style.display = DisplayStyle.None);
-            //         }
-            //     }
-            // };
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
@@ -199,17 +223,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     title.style.borderBottomWidth = 1f;
                 }
                 titleRow.Add(title);
+                titleRow.style.display = DisplayStyle.Flex;
             }
 
             // foldout-title:
-            if (hasFoldout && (
-                    (hasTitle && hasTab)
-                    || hasTitle
-                    || !hasTab))
+            if (foldoutTitle)
             {
-                bool titleOut = _eLayout.HasFlagFast(ELayout.TitleOut);
-                bool background = _eLayout.HasFlagFast(ELayout.Background);
-                bool fancy = titleOut && background;
                 if (fancy)  // title clickable foldout
                 {
                     const float imageSize = 16;
@@ -246,6 +265,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         },
                     };
                     titleRow.Add(title);
+                    titleRow.style.display = DisplayStyle.Flex;
 
                     Image foldoutImage = new Image
                     {
@@ -276,13 +296,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
                 else
                 {
-                    Foldout foldout = new Foldout
-                    {
-                        text = " ",
-                        // text = _groupPath.Split('/').Last(),
-                        // text = _groupPath.Last(),
-                        value = _foldout,
-                    };
+                    Foldout foldout = (Foldout)root;
                     Label foldoutLabel = foldout.Q<Toggle>().Q<Label>();
                     UIToolkitUtils.SetLabel(foldoutLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
                     if (_eLayout.HasFlagFast(ELayout.TitleOut))
@@ -324,19 +338,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 else
                 {
                     titleRow.Add(SetupTabToolbar(true));
+                    titleRow.style.display = DisplayStyle.Flex;
                 }
             }
-            // if (hasFoldout && !hasTitle && hasTab)
-            // {
-            //     titleRow.Add(SetupTabToolbar(true));
-            // }
-            //
-            // // tabs
-            // // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            // if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
-            // {
-            //     titleRow.Add(SetupTabToolbar(!hasFoldout));
-            // }
 
             foreach ((string groupPath, ISaintsRenderer renderer) in _renderers)
             {
@@ -348,8 +352,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #endif
 
                 // bool inHorizontal = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
-                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || inHorizontal;
-                renderer.InDirectHorizontalLayout = inHorizontal;
+                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || inHorizontal || _eLayout.HasFlagFast(ELayout.LabelField);
+                renderer.InDirectHorizontalLayout = inHorizontal || _eLayout.HasFlagFast(ELayout.LabelField);
 
                 VisualElement fieldElement = renderer.CreateVisualElement(inspectorRoot);
                 // ReSharper disable once InvertIf
@@ -387,41 +391,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 // root.style.paddingRight = 2;
             }
 
-            root.Add(titleRow);
-            root.Add(body);
-
-
-            // UIToolkitUtils.WaitUntilThenDo(body, () =>
-            // {
-            //     var l = body.Query<Label>().ToList();
-            //     if (l.Count <= 1)
-            //     {
-            //         Debug.Log($"not found");
-            //         return (false, null);
-            //     }
-            //
-            //     return (true, l);
-            // }, labels =>
-            // {
-            //     Debug.Log($"fix labels {labels.Count}");
-            //     labels.ForEach(UIToolkitUtils.FixLabelWidthUIToolkit);
-            // }, 200);
-
-            // if (_eLayout.HasFlagFast(ELayout.Tab))
-            // {
-            //     // ReSharper disable once ConvertToLocalFunction
-            //     EventCallback<AttachToPanelEvent> switchOnAttach = null;
-            //     switchOnAttach = _ =>
-            //     {
-            //         root.UnregisterCallback(switchOnAttach);
-            //         toolbarToggles[0].value = true;
-            //         if (foldoutToggle != null)
-            //         {
-            //             foldoutToggle.value = _foldout;
-            //         }
-            //     };
-            //     root.RegisterCallback(switchOnAttach);
-            // }
+            if (isLabelField)
+            {
+                ((MockBaseField)root).BulkAdd(body);
+            }
+            else
+            {
+                root.Add(titleRow);
+                root.Add(body);
+            }
 
             float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
             float marginBottom = _config.MarginBottom >= 0 ? _config.MarginBottom : 0;
@@ -450,18 +428,34 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             if(_toggleCheckInfos.Count > 0)
             {
-                root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, root, body)).Every(150);
+                VisualElement checkBodyContainer;
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                if (isLabelField)
+                {
+                    checkBodyContainer = ((MockBaseField)root).Body;
+                }
+                else
+                {
+                    checkBodyContainer = body;
+                }
+                root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, root, checkBodyContainer)).Every(150);
             }
 
-            root.name = $"saints-field-group--{_groupPath}";
-
-            root.Add(_helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = _helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
                     display = DisplayStyle.None,
                 },
-            });
+            };
+            if (isLabelField)
+            {
+                ((MockBaseField)root).Body.Add(helpBox);
+            }
+            else
+            {
+                root.Add(helpBox);
+            }
 
             return root;
 
@@ -514,7 +508,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             bool currentVisible = root.style.display != DisplayStyle.None;
             if (currentVisible != show)
             {
-                root.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+                UIToolkitUtils.SetDisplayStyle(root, show ? DisplayStyle.Flex : DisplayStyle.None);
             }
         }
 

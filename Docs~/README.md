@@ -6785,6 +6785,7 @@ It supports `./SubGroup` to create a nested subgroup:
 
 *   `Vertical`
 *   `Horizontal`
+*   `LabelField` use Unity's label-input style layout. The first element will be used as `label`, and the rest as `input`
 *   `Background` draw a background color for the whole group
 *   `Title` show the title
 *   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw a separator between title and the rest of the content.
@@ -7108,6 +7109,50 @@ public string afterGroupLast;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
+
+`LabelField` allows you to make a standard Unity field-like combo input.
+
+Example of changing label:
+
+```csharp
+[LayoutStart("LabelFieldSimple", ELayout.LabelField)]
+[InfoBox("BOX!", EMessageType.None)]
+[NoLabel] public int myI;
+```
+
+![](https://github.com/user-attachments/assets/906ce314-ab28-4248-bdf8-1ed3c3edb439)
+
+Example of enable/disable field. (See also `PrefixToggle`)
+
+```csharp
+[LayoutStart("LabelFieldToggle", ELayout.LabelField)]
+[LeftToggle] public bool enableMe;
+[NoLabel, EnableIf(nameof(enableMe))] public int enableInt;
+```
+
+![](https://github.com/user-attachments/assets/9de66089-c7a2-4b8c-9d13-548d178bf19c)
+
+Example of combo input field
+
+```csharp
+[LayoutStart("LabelSkill", ELayout.LabelField)]
+[LayoutStart("./MyLabels")]  // we create a new sub layout to make multiple fields as "label"
+public bool hasSkill;
+[ShowIf(nameof(hasSkill)), NoLabel] public SkillName skill;
+
+[LayoutStart("..")]  // close the "label" layout here
+[ProgressBar(0, 100), NoLabel, EnableIf(nameof(hasSkill))] public int skillMp;
+[PropRange(0, 100), EnableIf(nameof(hasSkill))] public float skillDamage;
+
+// We can create more layout
+[LayoutShowIf(nameof(skill), SkillName.Skill2)]
+[LayoutStart("./My Other Fields", ELayout.Horizontal)]
+[OptionsDropdown("A", "B", "C")]
+public string level;
+public string desc;
+```
+
+[![video](https://github.com/user-attachments/assets/246513ed-3a1b-44c8-8a47-0062e3f63e77)](https://github.com/user-attachments/assets/49fe5432-6b51-41da-a78a-811321975b8d)
 
 ### `LayoutCloseHere` / `LayoutTerminateHere` ###
 

@@ -8,9 +8,10 @@ namespace SaintsField.Samples.Scripts.Issue420
     {
         [OnValueChanged(nameof(RevertFinalToBaseValue))]
         [EndText(nameof(GetFinalValueText), isCallback: true)]
+        [NoLabel]
         public float baseValue;
 
-        public string GetFinalValueText() => $"Final Value: {finalValue}";
+        public string GetFinalValueText() => $"<color=gray>Final Value: {finalValue}";
 
         [HideInInspector] public float finalValue;
 

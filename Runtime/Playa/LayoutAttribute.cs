@@ -21,6 +21,10 @@ namespace SaintsField.Playa
         {
             LayoutBy = layoutBy.Trim('/');
             Layout = layout;
+            // if (Layout.HasFlagFast(ELayout.LabelField))
+            // {
+            //     Layout |= ELayout.Horizontal;
+            // }
             KeepGrouping = keepGrouping;
 
             MarginTop = marginTop;

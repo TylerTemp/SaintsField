@@ -103,57 +103,6 @@ namespace SaintsField.Editor
             return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer,  null, null, -1, targets);
         }
 
-        // public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
-        // {
-        //     // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
-        //     foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
-        //     {
-        //         switch (playaClassAttribute)
-        //         {
-        //
-        //             case InfoBoxAttribute infoBox:
-        //             {
-        //                 yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
-        //                 {
-        //                     PlayaAttributes = new[] { infoBox },
-        //                     Targets = targets,
-        //                     RenderType = SaintsRenderType.ClassStruct,
-        //                     ClassStructType = objectType,
-        //                     SerializedProperty = null,
-        //                     FieldInfo = null,
-        //                     PropertyInfo = null,
-        //                     MethodInfo = null,
-        //                     InherentDepth = -1,
-        //                     Order = int.MinValue,
-        //                     MemberId = $"{objectType.Name}-{infoBox}-{index}",
-        //                 }, infoBox);
-        //             }
-        //                 break;
-        //             case AboveTextAttribute playaAboveRichLabelAttribute:
-        //             {
-        //                 yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
-        //                 {
-        //                     PlayaAttributes = new[] { playaAboveRichLabelAttribute },
-        //                     Targets = targets,
-        //                     RenderType = SaintsRenderType.ClassStruct,
-        //                     ClassStructType = objectType,
-        //                     SerializedProperty = null,
-        //                     FieldInfo = null,
-        //                     PropertyInfo = null,
-        //                     MethodInfo = null,
-        //                     InherentDepth = -1,
-        //                     Order = int.MinValue,
-        //                     MemberId = $"{objectType.Name}-{playaAboveRichLabelAttribute}-{index}",
-        //                 }, playaAboveRichLabelAttribute);
-        //             }
-        //                 break;
-        //         }
-        //     }
-        //
-        //     // return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
-        // }
-
-
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
             SerializedObject serializedObject,
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
@@ -248,30 +197,6 @@ namespace SaintsField.Editor
                         .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                     BindingFlags.Public | BindingFlags.DeclaredOnly);
 
-//                     List<MemberInfo> memberLis =
-// #if SAINTSFIELD_CODE_ANALYSIS
-//                         (memberOrderComparer == null
-//                             ? members.OrderBy(memberInfo => memberInfo.MetadataToken)
-//                             : members.OrderBy(memberInfo => memberInfo, memberOrderComparer))
-// #else
-//                         // this is still not the correct order, but... a bit better
-//                         members.OrderBy(memberInfo => memberInfo.MetadataToken)
-// #endif
-//                         .ToList();
-
-                    // List<MemberInfo> memberLis;
-                    // if (members.Length > 100) // Parallelize on large types
-                    // {
-                    //     // 100 elements might sound too small for just 100 elements, but each comparison is so heavy that makes it worthwhile
-                    //     memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
-                    // }
-                    // else
-                    // {
-                    //     memberLis = members.ToList();
-                    //     memberLis.Sort(memberOrderComparer); // In-place no-alloc sort instead of using linq
-                    // }
-
-                    // List.Sort is unstable sort. So use linq's version anyway.
                     OrderedParallelQuery<MemberInfo> memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer);
 
 // #if SAINTSFIELD_CODE_ANALYSIS

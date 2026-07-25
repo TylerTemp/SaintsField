@@ -222,12 +222,8 @@ namespace SaintsField.Editor.Core
                                                                string.IsNullOrEmpty(rl.RichTextXml))))
                 {
                     needAboveProcessor = false;
-                    Debug.Log(needAboveProcessor);
                 }
             }
-
-            Debug.Log(needAboveProcessor);
-            Debug.Log(SaintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field));
 
             // Debug.Log($"needAboveProcessor={needAboveProcessor}; prop={property.propertyPath}; attrs={string.Join<PropertyAttribute>(",", allAttributes)}");
 
@@ -1547,7 +1543,6 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
             Debug.Log($"OnLabelStateChangedUIToolkit: {saintsLabelFieldDrawerData}");
 #endif
-            Debug.Log($"OnLabelStateChangedUIToolkit: {saintsLabelFieldDrawerData}");
 
             // if (string.IsNullOrEmpty(nowXml))
             // {

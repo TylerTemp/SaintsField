@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SaintsField.Editor.ColorPalette
 {
-#if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MENU_ITEM
     [CreateAssetMenu(fileName = "ColorPalette", menuName = "Saints/Color Palette NEW")]
 #endif
     public class ColorPaletteArray: ScriptableObject, IReadOnlyList<ColorPaletteArray.ColorInfo>

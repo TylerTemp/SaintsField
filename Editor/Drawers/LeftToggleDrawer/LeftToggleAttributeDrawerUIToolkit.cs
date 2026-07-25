@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.LeftToggleDrawer
             VisualElement container, FieldInfo info, object parent)
         {
             string label = GetPreferredLabel(property);
-            Debug.Log(label);
+            // Debug.Log(label);
             LeftToggleField toggle = new LeftToggleField(GetPreferredLabel(property))
             {
                 name = NameLeftToggle(property),

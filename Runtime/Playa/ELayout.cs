@@ -14,6 +14,8 @@ namespace SaintsField.Playa
         Tab = 1 << 5,  // tab page
         Title = 1 << 6,  // title
 
+        LabelField = 1 << 7,
+
         TitleBox = Background | Title | TitleOut,
         FoldoutBox = Background | Title | TitleOut | Foldout,
         CollapseBox = Background | Title | TitleOut | Collapse,

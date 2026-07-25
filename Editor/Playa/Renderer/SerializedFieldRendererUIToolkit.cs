@@ -36,7 +36,11 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             VisualElement r = UIToolkitUtils.CreateOrUpdateFieldProperty(
                 FieldWithInfo.SerializedProperty,
-                ReflectCache.GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo),
+                ReflectCache
+                    .GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo)
+                    // .Where(each => each is not ISaintsLayout)
+                    // .ToArray()
+                ,
                 FieldWithInfo.FieldInfo.FieldType,
                 label,
                 FieldWithInfo.FieldInfo,
