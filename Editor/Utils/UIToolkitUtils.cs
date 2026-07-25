@@ -200,7 +200,7 @@ namespace SaintsField.Editor.Utils
             {
                 label.Add(richChunk);
             }
-            label.style.display = DisplayStyle.Flex;
+            SetDisplayStyle(label, DisplayStyle.Flex);
         }
 
         public static void OnAttachToPanelOnce(VisualElement rootElement, EventCallback<AttachToPanelEvent> callback)
@@ -1354,7 +1354,7 @@ namespace SaintsField.Editor.Utils
                     // Debug.Log(inHorizontalLayout);
                     if (inHorizontalLayout)
                     {
-                        // Debug.Log($"inHorizontalLayout{property.propertyPath}");
+                        // Debug.Log($"inHorizontalLayout{property.propertyPath}/label={label}");
                         if(!string.IsNullOrEmpty(label))
                         {
                             toggle.style.flexDirection = FlexDirection.RowReverse;

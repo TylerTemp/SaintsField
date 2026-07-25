@@ -1,13 +1,13 @@
 ﻿using SaintsField.Editor.Core;
 using UnityEditor;
 
-namespace SaintsField.Editor.Drawers.RichLabelDrawer
+namespace SaintsField.Editor.Drawers.FieldLabelTextDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(FieldLabelTextAttribute), true)]
-    public partial class RichLabelAttributeDrawer: SaintsPropertyDrawer
+    public partial class FieldLabelTextAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 

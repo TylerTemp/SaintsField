@@ -11,9 +11,9 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.RichLabelDrawer
+namespace SaintsField.Editor.Drawers.FieldLabelTextDrawer
 {
-    public partial class RichLabelAttributeDrawer
+    public partial class FieldLabelTextAttributeDrawer
     {
         private static string NameRichLabelContainer(SerializedProperty property) =>
             $"{property.propertyPath}__RichLabelContainer";
@@ -24,13 +24,13 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
         private class PayloadUIToolkit
         {
             // ReSharper disable once InconsistentNaming
-            public readonly PropertyField TargetField;
+            public readonly PropertyField FallbackPropertyField;
             public string XmlContent;
             public string Error = "";
 
-            public PayloadUIToolkit(PropertyField targetField)
+            public PayloadUIToolkit(PropertyField fallbackPropertyField)
             {
-                TargetField = targetField;
+                FallbackPropertyField = fallbackPropertyField;
             }
         }
 
@@ -143,11 +143,11 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
                     ? null
                     : RichTextDrawer.ParseRichXmlWithProvider(nowXml, this).ToArray();
 
-                bool tryProcess = payload.TargetField != null;
+                bool tryProcess = payload.FallbackPropertyField != null;
 
                 if (tryProcess)
                 {
-                    UIToolkitUtils.ChangeLabelLoop(payload.TargetField,
+                    UIToolkitUtils.ChangeLabelLoop(payload.FallbackPropertyField,
                         richTextChunks,
                         _richTextDrawer);
                 }
@@ -155,7 +155,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
                 Debug.Log($"call label change to {nowXml}");
 #endif
-                OnLabelStateChangedUIToolkit(property, container, nowXml, richTextChunks, tryProcess, _richTextDrawer);
+                OnLabelStateChangedUIToolkit(property, container, nowXml, richTextChunks, tryProcess, _richTextDrawer, InHorizontalLayout);
             }
 
             // ReSharper disable once InvertIf

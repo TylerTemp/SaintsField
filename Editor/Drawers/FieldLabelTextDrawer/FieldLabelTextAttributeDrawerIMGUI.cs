@@ -4,13 +4,12 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.RichLabelDrawer
+namespace SaintsField.Editor.Drawers.FieldLabelTextDrawer
 {
-    public partial class RichLabelAttributeDrawer
+    public partial class FieldLabelTextAttributeDrawer
     {
 
         private string _error = "";

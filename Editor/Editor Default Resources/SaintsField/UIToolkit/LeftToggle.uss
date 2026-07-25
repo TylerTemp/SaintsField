@@ -1,5 +1,6 @@
-﻿Toggle {
-    flex-direction: column-reverse;
+﻿LeftToggleField {
+    /*flex-direction: column-reverse;*/
+    flex-direction: row-reverse;
     justify-content: flex-end;
 }
 

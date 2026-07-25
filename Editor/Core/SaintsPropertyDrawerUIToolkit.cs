@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers;
+using SaintsField.Editor.Drawers.FieldLabelTextDrawer;
 using SaintsField.Editor.Drawers.FullWidthRichLabelDrawer;
-using SaintsField.Editor.Drawers.RichLabelDrawer;
+using SaintsField.Editor.Drawers.LeftToggleDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
@@ -154,7 +156,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer eachDrawer = SaintsPropertyDrawers[richLabelIndex].Drawer;
                     // ReSharper disable once InvertIf
-                    if (eachDrawer is RichLabelAttributeDrawer)
+                    if (eachDrawer is FieldLabelTextAttributeDrawer)
                     {
                         found = true;
                         SaintsPropertyDrawers[richLabelIndex] = new SaintsPropertyInfo
@@ -178,7 +180,7 @@ namespace SaintsField.Editor.Core
                 }
             }
 
-            // if in horizental layout, and not SaintsRow
+            // if in horizontal layout, and not SaintsRow
             // 1. we need to swap RichLabel to AboveRichLabel, if it has content
             // 2. otherwise (NoLabel), we no longer added a `NoLabel` to it
 
@@ -188,16 +190,17 @@ namespace SaintsField.Editor.Core
                 if (GetType() == typeof(SaintsRowAttributeDrawer))
                 {
                     needAboveProcessor = false;
+                    Debug.Log(needAboveProcessor);
                 }
-                else if (SaintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
-                                                           || each.Attribute is NoLabelAttribute
-                                                           || (each.Attribute is FieldLabelTextAttribute rl &&
-                                                               string.IsNullOrEmpty(rl.RichTextXml))))
+                else if (SaintsPropertyDrawers.Any(each => each.Drawer is LeftToggleAttributeDrawer))  // Left Toggle do not need above dec; it displays label by itself
                 {
                     needAboveProcessor = false;
                 }
-                else if (property.propertyType == SerializedPropertyType.Boolean && SaintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field) && SaintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))
+                else if (property.propertyType == SerializedPropertyType.Boolean  // bool
+                         && SaintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field)  // no one response for drawing the field
+                         && SaintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))  // no left toggle
                 {
+                    // for horizontal bool with no drawer, we inject & ask LeftToggle to draw it
                     needAboveProcessor = false;
                     LeftToggleAttribute leftToggleAttribute =
                         new LeftToggleAttribute();
@@ -213,7 +216,18 @@ namespace SaintsField.Editor.Core
                         Index = SaintsPropertyDrawers.Count,
                     });
                 }
+                else if (SaintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
+                                                           || each.Attribute is NoLabelAttribute
+                                                           || (each.Attribute is FieldLabelTextAttribute rl &&
+                                                               string.IsNullOrEmpty(rl.RichTextXml))))
+                {
+                    needAboveProcessor = false;
+                    Debug.Log(needAboveProcessor);
+                }
             }
+
+            Debug.Log(needAboveProcessor);
+            Debug.Log(SaintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field));
 
             // Debug.Log($"needAboveProcessor={needAboveProcessor}; prop={property.propertyPath}; attrs={string.Join<PropertyAttribute>(",", allAttributes)}");
 
@@ -1503,7 +1517,7 @@ namespace SaintsField.Editor.Core
 
         protected static void OnLabelStateChangedUIToolkit(SerializedProperty property, VisualElement container,
             string toLabel, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried,
-            RichTextDrawer richTextDrawer)
+            RichTextDrawer richTextDrawer, bool inHorizontalLayout)
         {
             VisualElement saintsLabelField = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
 
@@ -1533,6 +1547,20 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
             Debug.Log($"OnLabelStateChangedUIToolkit: {saintsLabelFieldDrawerData}");
 #endif
+            Debug.Log($"OnLabelStateChangedUIToolkit: {saintsLabelFieldDrawerData}");
+
+            // if (string.IsNullOrEmpty(nowXml))
+            // {
+            //     VisualElement labelFieldElement =
+            //         container.Q<VisualElement>(className: ClassFieldUIToolkit(property));
+            //
+            //     // Debug.Log(labelFieldElement);
+            //
+            //     if (labelFieldElement is Toggle toggle && toggle.style.flexDirection != FlexDirection.Row)
+            //     {
+            //         toggle.style.flexDirection = FlexDirection.Row;
+            //     }
+            // }
 
             if (saintsLabelFieldDrawerData != null)
             {
@@ -1552,10 +1580,44 @@ namespace SaintsField.Editor.Core
 #endif
                 // TODO: allow disabling this function, as it might break some custom drawer
                 VisualElement actualFieldCanHasLabel = saintsLabelField.Q<VisualElement>(className: ClassFieldUIToolkit(property));
+                // Debug.Log($"actualFieldCanHasLabel={actualFieldCanHasLabel}/{actualFieldCanHasLabel != null}");
 
                 if (actualFieldCanHasLabel != null)
                 {
-                    UIToolkitUtils.ChangeLabelLoop(actualFieldCanHasLabel, richTextChunks, richTextDrawer);
+                    if (actualFieldCanHasLabel is Toggle toggle and not LeftToggleField)
+                    {
+                        Label toggleLabel = toggle.labelElement;
+                        if (toggleLabel != null)
+                        {
+                            // toggleLabel.text = " ";
+                            UIToolkitUtils.SetLabelChildren(toggleLabel, richTextChunks, richTextDrawer);
+
+                            // the default behavior of SetLabelChildren hide the label if no label for it
+                            // but in horizontal, we need to keep that label because toggle uses reverse for it
+                            if(inHorizontalLayout)
+                            {
+                                UIToolkitUtils.SetDisplayStyle(toggleLabel, DisplayStyle.Flex);
+                            }
+
+                            // Debug.Log($"toLabel={toLabel}/{string.IsNullOrEmpty(toLabel)}; xml={richTextChunks}");
+                            // if (string.IsNullOrEmpty(toLabel))
+                            // {
+                            //     toggleLabel.text = "";
+                            //     toggleLabel.Clear();
+                            // }
+                            // else
+                            // {
+                            //     UIToolkitUtils.ChangeLabelLoop(toggleLabel, richTextChunks, richTextDrawer);
+                            //     // toggleLabel.text = toLabel;
+                            // }
+                        }
+
+                    }
+                    else
+                    {
+                        // Debug.Log($"default change for {actualFieldCanHasLabel}");
+                        UIToolkitUtils.ChangeLabelLoop(actualFieldCanHasLabel, richTextChunks, richTextDrawer);
+                    }
                 }
             }
             // Debug.Log(mainDrawer._saintsFieldFallback);
