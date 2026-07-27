@@ -1,0 +1,312 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using SaintsField.DropdownBase;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
+using UnityEditor;
+using UnityEngine;
+
+namespace SaintsField.Editor.Drawers.MenuDropdownDrawer
+{
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
+#endif
+    [CustomPropertyDrawer(typeof(MenuDropdownAttribute), true)]
+    public partial class MenuDropdownAttributeDrawer: SaintsPropertyDrawer
+    {
+        private static readonly HashSet<string> DeprecatedDropdownWarningKeys = new HashSet<string>();
+
+        private static void ShowGenericMenu(MetaInfo metaInfo, string curDisplay, Rect fieldRect, Action<string, object> onSelect, bool hackSlashNoSub)
+        {
+            // create the menu and add items to it
+            GenericMenu menu = new GenericMenu();
+
+            Debug.Assert(metaInfo.DropdownListValue != null);
+            foreach ((string curName, object curItem, bool disabled, bool curIsSeparator) in metaInfo.DropdownListValue)
+            {
+                string replacedCurName = curName.Replace('/', '\u2215');
+                if (curIsSeparator)
+                {
+                    menu.AddSeparator(hackSlashNoSub? "": curName);
+                }
+                else if (disabled)
+                {
+                    // Debug.Log($"disabled: {curName}");
+                    menu.AddDisabledItem(new GUIContent(hackSlashNoSub? replacedCurName: curName), curName == curDisplay);
+                }
+                else
+                {
+                    menu.AddItem(new GUIContent(hackSlashNoSub? replacedCurName: curName), curName == curDisplay, () => onSelect(curName, curItem));
+                }
+            }
+
+            // display the menu
+            // menu.ShowAsContext();
+            menu.DropDown(fieldRect);
+        }
+
+
+        private struct MetaInfo
+        {
+            // ReSharper disable InconsistentNaming
+            public string Error;
+            public IReadOnlyList<ValueTuple<string, object, bool, bool>> DropdownListValue;
+            public int SelectedIndex;
+            // ReSharper enable InconsistentNaming
+
+            public override string ToString() =>
+                $"MetaInfo(index={SelectedIndex}, items={string.Join(",", DropdownListValue.Select(each => each.Item1))}";
+        }
+
+        private static MetaInfo GetMetaInfo(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            FieldInfo field,
+            object parentObj)
+        {
+            Debug.Assert(field != null);
+            MenuDropdownAttribute dropdownAttribute = (MenuDropdownAttribute) saintsAttribute;
+
+
+            string error;
+            IMenuDropdown dropdownListValue = null;
+            if (dropdownAttribute.FuncName == null)
+            {
+                Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
+                if(enumType.IsEnum)
+                {
+                    Array enumValues = Enum.GetValues(enumType);
+                    MenuDropdown<object> enumDropdown = new MenuDropdown<object>();
+                    foreach (object enumValue in enumValues)
+                    {
+                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(enumType, enumValue).value, enumValue);
+                    }
+
+                    error = "";
+                    dropdownListValue = enumDropdown;
+                }
+                else
+                {
+                    error = $"{property.displayName}({enumType}) is not a enum";
+                }
+            }
+            else
+            {
+                (string getOfError, MemberInfo _, object getOfDropdownListValue) =
+                    Util.GetOf<object>(dropdownAttribute.FuncName, null, property, field, parentObj, null);
+                error = getOfError;
+                if (getOfError == "")
+                {
+                    switch (getOfDropdownListValue)
+                    {
+                        case IDropdown defaultDropdown:
+                        {
+                            dropdownListValue = ConvertDeprecatedDropdown(defaultDropdown);
+                            string warningKey = SerializedUtils.GetUniqueId(property);
+                            if (DeprecatedDropdownWarningKeys.Add(warningKey))
+                            {
+                                Debug.LogWarning(
+                                    $"{nameof(IDropdown)} returned from `{dropdownAttribute.FuncName}` on `{field.Name}` is deprecated. Please use MenuDropdown<T> instead.");
+                            }
+                        }
+                            break;
+                        case IMenuDropdown dl:
+                            dropdownListValue = dl;
+                            break;
+                        case IEnumerable e:
+                            dropdownListValue = new MenuDropdown<object>(e.Cast<object>().Select(each => (each?.ToString() ?? "", each)));
+                            break;
+                        default:
+                            error = $"Value {getOfDropdownListValue} is not acceptable type";
+                            break;
+                    }
+                }
+                // dropdownListValue = getOfDropdownListValue;
+            }
+            if(dropdownListValue == null || error != "")
+            {
+                return new MetaInfo
+                {
+                    Error = error == ""? $"dropdownList is null from `{dropdownAttribute.FuncName}` on target `{parentObj}`": error,
+                    SelectedIndex = -1,
+                    DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+                };
+            }
+
+            Debug.Assert(field != null, $"{property.name}/{parentObj}");
+            (string curError, int _, object curValue) = Util.GetValue(property, field, parentObj);
+            if (curError != "")
+            {
+                return new MetaInfo
+                {
+                    Error = curError,
+                    SelectedIndex = -1,
+                    DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+                };
+            }
+
+            if (curValue is IWrapProp wrapProp)
+            {
+                curValue = Util.GetWrapValue(wrapProp);
+            }
+            // Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+            // string curDisplay = "";
+            Debug.Assert(dropdownListValue != null);
+
+            (string uniqueError, IMenuDropdown dropdownListValueUnique) = GetUniqueList(dropdownListValue, dropdownAttribute.EUnique, curValue, property, field, parentObj);
+
+            if (uniqueError != "")
+            {
+                return new MetaInfo
+                {
+                    Error = curError,
+                    SelectedIndex = -1,
+                    DropdownListValue = Array.Empty<ValueTuple<string, object, bool, bool>>(),
+                };
+            }
+
+            int selectedIndex = -1;
+
+            IReadOnlyList<(string, object, bool, bool)> dropdownActualList = dropdownListValueUnique.ToArray();
+
+            for (var dropdownIndex = 0; dropdownIndex < dropdownActualList.Count; dropdownIndex++)
+            {
+                (string _, object itemValue, bool _, bool isSeparator) = dropdownActualList[dropdownIndex];
+                if (isSeparator)
+                {
+                    continue;
+                }
+
+                if (Util.GetIsEqual(curValue, itemValue))
+                {
+                    selectedIndex = dropdownIndex;
+                    break;
+                }
+            }
+
+            return new MetaInfo
+            {
+                Error = "",
+                DropdownListValue = dropdownActualList,
+                SelectedIndex = selectedIndex,
+            };
+        }
+
+        private static (string uniqueError, IMenuDropdown dropdownListValueUnique) GetUniqueList(IMenuDropdown dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, FieldInfo info, object parent)
+        {
+            if(eUnique == EUnique.None)
+            {
+                return ("", dropdownListValue);
+            }
+
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (arrayIndex == -1)
+            {
+                return ("", dropdownListValue);
+            }
+
+            (SerializedProperty arrProp, int _, string error) = Util.GetArrayProperty(property, info, parent);
+            if (error != "")
+            {
+                return (error, null);
+            }
+
+            List<object> existsValues = new List<object>();
+
+            foreach (SerializedProperty element in Enumerable.Range(0, arrProp.arraySize).Where(index => index != arrayIndex).Select(arrProp.GetArrayElementAtIndex))
+            {
+                (string otherError, int _, object otherValue) = Util.GetValue(element, info, parent);
+                if (otherError != "")
+                {
+                    return (otherError, null);
+                }
+
+                if (otherValue is IWrapProp wrapProp)
+                {
+                    otherValue = Util.GetWrapValue(wrapProp);
+                }
+
+                existsValues.Add(otherValue);
+            }
+
+            MenuDropdown<object> newResult = new MenuDropdown<object>();
+            foreach ((string name, object value, bool disabled, bool separator) eachValue in dropdownListValue)
+            {
+                bool exists = existsValues.Any(each => Util.GetIsEqual(each, eachValue.value));
+                if (!exists)
+                {
+                    newResult.Add(eachValue);
+                }
+                else if (eUnique == EUnique.Disable)
+                {
+                    newResult.Add((eachValue.name, eachValue.value, true, eachValue.separator));
+                }
+                else if (eUnique == EUnique.Remove)
+                {
+                    // if it's the value from other element, then just disable it rather than remove it
+                    if(Util.GetIsEqual(curValue, eachValue.value))
+                    {
+                        newResult.Add((eachValue.name, eachValue.value, true, eachValue.separator));
+                    }
+                }
+            }
+
+            return ("", newResult);
+        }
+
+        private static IMenuDropdown ConvertDeprecatedDropdown(IDropdown dropdown)
+        {
+            MenuDropdown<object> result = new MenuDropdown<object>();
+            AddDeprecatedDropdownChildren(result, dropdown, "");
+            return result;
+        }
+
+        private static void AddDeprecatedDropdownChildren(MenuDropdown<object> result, IDropdown parent, string parentPath)
+        {
+            foreach (IDropdown child in parent.children)
+            {
+                string displayName = EscapeSlashInsideTags(child.displayName ?? "");
+                string itemPath = string.IsNullOrEmpty(parentPath) ? displayName : $"{parentPath}/{displayName}";
+
+                if (child.isSeparator)
+                {
+                    result.AddSeparator(parentPath);
+                    continue;
+                }
+
+                if (child.children.Count > 0)
+                {
+                    AddDeprecatedDropdownChildren(result, child, itemPath);
+                    continue;
+                }
+
+                result.Add(itemPath, child.value, child.disabled);
+            }
+        }
+
+        private static string EscapeSlashInsideTags(string value)
+        {
+            bool inTag = false;
+            char[] chars = value.ToCharArray();
+            for (int index = 0; index < chars.Length; index++)
+            {
+                switch (chars[index])
+                {
+                    case '<':
+                        inTag = true;
+                        break;
+                    case '>':
+                        inTag = false;
+                        break;
+                    case '/' when inTag:
+                        chars[index] = '\u2215';
+                        break;
+                }
+            }
+
+            return new string(chars);
+        }
+    }
+}

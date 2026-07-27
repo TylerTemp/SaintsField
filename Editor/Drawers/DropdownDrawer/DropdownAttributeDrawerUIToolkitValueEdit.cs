@@ -8,9 +8,9 @@ using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
+namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
-    public partial class TreeDropdownAttributeDrawer
+    public partial class DropdownAttributeDrawer
     {
         public class Wrap: VisualElement
         {

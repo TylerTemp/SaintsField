@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
+using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
         protected override bool UseCreateFieldIMGUI => true;
 
         private EnumToggleButtonsAttributeDrawer _enumToggleButtonsAttributeDrawer;
-        private TreeDropdownAttributeDrawer _treeDropdownAttributeDrawer;
+        private DropdownAttributeDrawer _dropdownAttributeDrawer;
         private SaintsInterfaceDrawer _saintsInterfaceDrawer;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width,
@@ -247,10 +247,10 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                     enumToggleButtonsAttribute, label);
         }
 
-        private TreeDropdownAttributeDrawer GetTreeDropdownDrawer(FieldInfo info, Attribute attribute, string label)
+        private DropdownAttributeDrawer GetTreeDropdownDrawer(FieldInfo info, Attribute attribute, string label)
         {
-            return _treeDropdownAttributeDrawer ??=
-                (TreeDropdownAttributeDrawer)MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), info, attribute,
+            return _dropdownAttributeDrawer ??=
+                (DropdownAttributeDrawer)MakePropertyDrawer(typeof(DropdownAttributeDrawer), info, attribute,
                     label);
         }
 

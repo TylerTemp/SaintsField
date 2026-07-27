@@ -40,8 +40,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public IReadOnlyList<Attribute>[] ParameterAttributes = Array.Empty<IReadOnlyList<Attribute>>();
             public IReadOnlyList<Attribute> ReturnAttributes = Array.Empty<Attribute>();
             public string ButtonId;
-            public bool ReturnIsUniTask;
-            public Type ReturnUniTaskValueType;
+            public AsyncReturnType ReturnAsync;
+            public Type ReturnAsyncValueType;
 
             public string Xml;
             public string Callback;
@@ -108,10 +108,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 Callback = _buttonAttribute.IsCallback ? _buttonAttribute.Label : "",
             };
 
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-            (_buttonUserDataIMGUI.ReturnIsUniTask, _buttonUserDataIMGUI.ReturnUniTaskValueType) =
-                GetUniTaskReturnInfo(methodInfo.ReturnType);
-#endif
+            (_buttonUserDataIMGUI.ReturnAsync, _buttonUserDataIMGUI.ReturnAsyncValueType) =
+                GetAsyncReturnInfo(methodInfo.ReturnType);
 
             return _buttonUserDataIMGUI;
         }
@@ -144,8 +142,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             #region Tick Enumerators
 
-            if (Event.current != null && Event.current.type == EventType.Repaint && userData.Enumerators.Count > 0)
+            if (userData.Enumerators.Count > 0)
             {
+                EditorApplication.QueuePlayerLoopUpdate();
+
                 List<Waiter> finishedEnumerators = new List<Waiter>();
                 int oldCounter = userData.Enumerators.Count;
                 float progress = -1f;
@@ -154,7 +154,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 {
                     waiter.Update();
 
-                    if (!waiter.SubWaiterDone())
+                    bool subWaiterDone = waiter.SubWaiterDone();
+                    if (!subWaiterDone)
                     {
                         float curProgress = waiter.GetProgress();
                         if (curProgress >= 0)
@@ -358,9 +359,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             && userData.MethodInfo.ReturnType != typeof(void)
                             && !typeof(IEnumerator).IsAssignableFrom(userData.MethodInfo.ReturnType)
                             && !typeof(Task).IsAssignableFrom(userData.MethodInfo.ReturnType)
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-                            && !GetUniTaskReturnInfo(userData.MethodInfo.ReturnType).returnIsUniTask
-#endif
+                            && userData.ReturnAsync == AsyncReturnType.None
                            )
                         {
                             userData.ReturnType = userData.MethodInfo.ReturnType;
@@ -372,6 +371,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         {
                             switch (returnValue)
                             {
+#if UNITY_6000_0_OR_NEWER
+                                case Awaitable awaitable:
+                                    userData.Enumerators.Add(new Waiter(awaitable));
+                                    break;
+#endif
                                 case IEnumerator enumerator:
                                     userData.Enumerators.Add(new Waiter(enumerator));
                                     break;
@@ -384,13 +388,26 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                     break;
 #endif
                                 default:
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-                                    if (userData.ReturnIsUniTask && userData.ReturnUniTaskValueType != null)
+                                    switch (userData.ReturnAsync)
                                     {
-                                        userData.Enumerators.Add(Waiter.UniTaskWithValue(returnValue,
-                                            userData.ReturnUniTaskValueType));
-                                    }
+                                        case AsyncReturnType.None:
+                                            break;
+#if UNITY_6000_0_OR_NEWER
+                                        case AsyncReturnType.Awaitable:
+                                            userData.Enumerators.Add(Waiter.AwaitableT(returnValue,
+                                                userData.ReturnAsyncValueType));
+                                            break;
 #endif
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                                        case AsyncReturnType.UniTask:
+                                            userData.Enumerators.Add(Waiter.UniTaskWithValue(returnValue,
+                                                userData.ReturnAsyncValueType));
+                                            break;
+#endif
+                                        default:
+                                            throw new ArgumentOutOfRangeException(nameof(userData.ReturnAsync),
+                                                userData.ReturnAsync, null);
+                                    }
                                     break;
                             }
                         }
@@ -632,6 +649,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                 #endregion
             }
+
         }
 
         private float GetParametersHeightIMGUI(ButtonUserDataIMGUI userData, float width)
@@ -711,31 +729,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             userData.ReturnType = null;
             userData.ReturnValue = null;
         }
-
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-        private static (bool returnIsUniTask, Type returnUniTaskValueType) GetUniTaskReturnInfo(Type returnType)
-        {
-            bool returnIsUniTask = false;
-            Type returnUniTaskValueType = null;
-
-            if (typeof(UniTask).IsAssignableFrom(returnType))
-            {
-                returnIsUniTask = true;
-            }
-
-            foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(returnType))
-            {
-                if (genBaseType.GetGenericTypeDefinition() == typeof(UniTask<>))
-                {
-                    returnIsUniTask = true;
-                    returnUniTaskValueType = genBaseType.GetGenericArguments()[0];
-                    break;
-                }
-            }
-
-            return (returnIsUniTask, returnUniTaskValueType);
-        }
-#endif
 
         private static void NoBeforeSetIMGUI(object _)
         {

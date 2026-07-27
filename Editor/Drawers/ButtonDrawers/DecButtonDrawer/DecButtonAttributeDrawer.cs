@@ -17,30 +17,47 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
     public abstract partial class DecButtonAttributeDrawer: SaintsPropertyDrawer
     {
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-        private static (bool returnIsUniTask, Type returnUniTaskValueType) GetUniTaskReturnInfo(Type returnType)
+        private enum AsyncReturnType
         {
-            bool returnIsUniTask = false;
-            Type returnUniTaskValueType = null;
+            None,
+            Awaitable,
+            UniTask,
+        }
 
+        private static (AsyncReturnType returnAsync, Type returnAsyncValueType) GetAsyncReturnInfo(Type returnType)
+        {
+#if UNITY_6000_0_OR_NEWER
+            if (typeof(Awaitable).IsAssignableFrom(returnType))
+            {
+                return (AsyncReturnType.Awaitable, null);
+            }
+
+            foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(returnType))
+            {
+                if (genBaseType.GetGenericTypeDefinition() == typeof(Awaitable<>))
+                {
+                    return (AsyncReturnType.Awaitable, genBaseType.GetGenericArguments()[0]);
+                }
+            }
+#endif
+
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
             if (typeof(UniTask).IsAssignableFrom(returnType))
             {
-                returnIsUniTask = true;
+                return (AsyncReturnType.UniTask, null);
             }
 
             foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(returnType))
             {
                 if (genBaseType.GetGenericTypeDefinition() == typeof(UniTask<>))
                 {
-                    returnIsUniTask = true;
-                    returnUniTaskValueType = genBaseType.GetGenericArguments()[0];
-                    break;
+                    return (AsyncReturnType.UniTask, genBaseType.GetGenericArguments()[0]);
                 }
             }
-
-            return (returnIsUniTask, returnUniTaskValueType);
-        }
 #endif
+
+            return (AsyncReturnType.None, null);
+        }
 
         public static IEnumerable<(string error, MemberInfo memberInfo, object result)> CallButtonFunc(SerializedProperty property, string callback, FieldInfo fieldInfo, object target)
         {

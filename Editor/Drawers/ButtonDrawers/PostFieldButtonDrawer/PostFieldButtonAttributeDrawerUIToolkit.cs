@@ -17,6 +17,16 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
         private static string NameResultPanel(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__Buttonresult";
         private static string NameInvokeResult(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ButtonInvoke";
 
+        private static VisualElement MakeInvokeResult(SerializedProperty property, int index) =>
+            new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+                name = NameInvokeResult(property, index),
+            };
+
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
@@ -39,21 +49,16 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
                 },
                 name = NameResultPanel(property, index),
             };
-            r.Add(new VisualElement
-            {
-                style =
-                {
-                    flexGrow = 1,
-                },
-                name = NameInvokeResult(property, index),
-            });
+            r.Add(MakeInvokeResult(property, index));
             return r;
         }
 
 
         protected override void CleanResult(VisualElement container, SerializedProperty property, int index)
         {
-            container.Q<VisualElement>(NameResultPanel(property, index)).Clear();
+            VisualElement resultPanel = container.Q<VisualElement>(NameResultPanel(property, index));
+            resultPanel.Clear();
+            resultPanel.Add(MakeInvokeResult(property, index));
         }
 
         protected override void AppendErrorResult(VisualElement container, SerializedProperty property, int index, string error)

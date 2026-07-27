@@ -42,6 +42,55 @@ namespace SaintsField.Editor.Utils.WaitableUtils
             _taskReturnType = taskReturnType;
         }
 
+#if UNITY_6000_0_OR_NEWER
+        private Awaitable _awaitable;
+        public Waiter(Awaitable awaitable)
+        {
+            _awaitable = awaitable;
+        }
+
+        private object _awaitableWithReturn;
+        private object _awaitableWithReturnAwaiter;
+        private PropertyInfo _awaitableWithReturnIsCompleted;
+        private Delegate _awaitableWithReturnGetResultDelegate;
+
+        // object awaitable must be Awaitable<T>, Type awaitableReturn is typeof(T)
+        public static Waiter AwaitableT(object awaitable, Type awaitableReturn)
+        {
+            Type awaitableType = awaitable.GetType();
+            // Type awaitableReturn = awaitableType.GetGenericArguments()[0];
+
+            MethodInfo getAwaiter = awaitableType.GetMethod(
+                "GetAwaiter",
+                BindingFlags.Instance | BindingFlags.Public
+            )!;
+
+            object awaiter = getAwaiter.Invoke(awaitable, null)!;
+            Type awaiterType = awaiter.GetType();
+            PropertyInfo awaitableIsCompleted = awaiterType.GetProperty(
+                "IsCompleted",
+                BindingFlags.Instance | BindingFlags.Public
+            )!;
+            MethodInfo awaitableGetResult = awaiterType.GetMethod(
+                "GetResult",
+                BindingFlags.Instance | BindingFlags.Public
+            )!;
+            Delegate getResultDelegate = awaitableGetResult.CreateDelegate(
+                typeof(Func<>).MakeGenericType(awaitableReturn),
+                awaiter);
+
+            return new Waiter
+            {
+                _awaitableWithReturn = awaitable,
+                _taskReturnType = awaitableReturn,
+
+                _awaitableWithReturnAwaiter = awaiter,
+                _awaitableWithReturnIsCompleted = awaitableIsCompleted,
+                _awaitableWithReturnGetResultDelegate = getResultDelegate,
+            };
+        }
+#endif
+
         public static Type GetTaskReturnType(Type type)
         {
             Type taskType = type;
@@ -146,6 +195,17 @@ namespace SaintsField.Editor.Utils.WaitableUtils
                 return _task.IsCompleted;
             }
 
+#if UNITY_6000_0_OR_NEWER
+            if (_awaitable != null)
+            {
+                return _awaitable.IsCompleted;
+            }
+            if (_awaitableWithReturn != null)
+            {
+                return (bool)_awaitableWithReturnIsCompleted.GetValue(_awaitableWithReturnAwaiter);
+            }
+#endif
+
             if (_overrideException != null)
             {
                 return true;
@@ -187,6 +247,76 @@ namespace SaintsField.Editor.Utils.WaitableUtils
         {
             if (_enumerator == null)
             {
+#if UNITY_6000_0_OR_NEWER
+                if (_awaitable != null)
+                {
+                    if (!_awaitable.IsCompleted)
+                    {
+                        return new MoveNextResult(MoveNextStatus.Pending);
+                    }
+
+                    try
+                    {
+                        _awaitable.GetAwaiter().GetResult();
+
+                        _awaitable = null;
+                        return new MoveNextResult(
+                            MoveNextStatus.Completed,
+                            taskReturnType: _taskReturnType);
+                    }
+                    catch (OperationCanceledException e)
+                    {
+                        _awaitable = null;
+                        return new MoveNextResult(
+                            MoveNextStatus.Cancelled,
+                            exception: e,
+                            taskReturnType: _taskReturnType);
+                    }
+                    catch (Exception e)
+                    {
+                        _awaitable = null;
+                        return new MoveNextResult(
+                            MoveNextStatus.Faulted,
+                            exception: e,
+                            taskReturnType: _taskReturnType);
+                    }
+                }
+                if (_awaitableWithReturn != null)
+                {
+                    bool completed = (bool)_awaitableWithReturnIsCompleted.GetValue(_awaitableWithReturnAwaiter);
+                    if (!completed)
+                    {
+                        return new MoveNextResult(MoveNextStatus.Pending);
+                    }
+
+                    try
+                    {
+                        object result = _awaitableWithReturnGetResultDelegate.DynamicInvoke();
+                        _awaitableWithReturn = null;
+                        return new MoveNextResult(
+                            MoveNextStatus.Completed,
+                            taskReturnType: _taskReturnType,
+                            taskReturnValue: result);
+                    }
+                    catch (OperationCanceledException e)
+                    {
+                        _awaitableWithReturn = null;
+                        return new MoveNextResult(
+                            MoveNextStatus.Cancelled,
+                            exception: e,
+                            taskReturnType: _taskReturnType);
+                    }
+                    catch (Exception e)
+                    {
+                        _awaitableWithReturn = null;
+                        return new MoveNextResult(
+                            MoveNextStatus.Faulted,
+                            exception: e,
+                            taskReturnType: _taskReturnType);
+                    }
+                }
+#endif
+
                 if (!_task.IsCompleted)
                 {
                     return new MoveNextResult(MoveNextStatus.Pending);

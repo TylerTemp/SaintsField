@@ -1,6 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.SaintsCell;
 using SaintsField.Interfaces;
@@ -12,6 +11,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
@@ -1599,13 +1599,13 @@ namespace SaintsField.Editor.Utils
                     }
 
                     DropdownAttribute treeDropdownAttribute = new DropdownAttribute();
-                    TreeDropdownAttributeDrawer treeDropdownDrawer = (TreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
-                    treeDropdownDrawer.OverrideAttributes = allAttributes
+                    DropdownAttributeDrawer dropdownDrawer = (DropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(DropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
+                    dropdownDrawer.OverrideAttributes = allAttributes
                         .Where(each => each is PropertyAttribute or InjectAttributeBase)
                         .Prepend(treeDropdownAttribute)
                         .ToArray();
-                    treeDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
-                    return treeDropdownDrawer.CreatePropertyGUI(property);
+                    dropdownDrawer.InHorizontalLayout = inHorizontalLayout;
+                    return dropdownDrawer.CreatePropertyGUI(property);
                 }
                 case SerializedPropertyType.Vector2:
                 {

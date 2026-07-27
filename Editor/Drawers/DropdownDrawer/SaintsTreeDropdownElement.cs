@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
+namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
     public class SaintsTreeDropdownElement: VisualElement
     {

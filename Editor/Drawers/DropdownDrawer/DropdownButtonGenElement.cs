@@ -9,7 +9,7 @@ using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
+namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
     public class DropdownButtonGenElement<T>: BindableElement, INotifyValueChanged<T>
     {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.ReferencePicker;
 #endif
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using UnityEditor;
 using UnityEngine;
 
@@ -214,7 +214,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 : new DropdownAttribute();
             Type drawerType = hasFlags
                 ? typeof(FlagsDropdownAttributeDrawer)
-                : typeof(TreeDropdownAttributeDrawer);
+                : typeof(DropdownAttributeDrawer);
             SaintsPropertyDrawer enumDropdownDrawer =
                 (SaintsPropertyDrawer)SaintsPropertyDrawer.MakePropertyDrawer(
                     drawerType, fieldInfo, dropdownAttribute, label);

@@ -344,6 +344,92 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 return;
             }
 
+#if UNITY_6000_0_OR_NEWER
+            {
+                if (obj is Awaitable)
+                {
+                    callback.Invoke(new AdvancedDropdownMetaInfo
+                    {
+                        Error = $"Awaitable is not supported, please use Awaitable<Dropdown<T>>",
+                        CurDisplay = "[Error]",
+                        CurValues = Array.Empty<object>(),
+                        DropdownListValue = null,
+                        SelectStacks = Array.Empty<SelectStack>(),
+                    });
+                    return;
+                }
+
+                bool returnIsAwaitable = false;
+                Type returnAwaitableValueType = null;
+
+                foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(obj.GetType()))
+                {
+                    if (genBaseType.GetGenericTypeDefinition() == typeof(Awaitable<>))
+                    {
+                        returnIsAwaitable = true;
+                        returnAwaitableValueType = genBaseType.GetGenericArguments()[0];
+                    }
+                }
+
+                if (returnIsAwaitable)
+                {
+                    if (!typeof(IDropdown).IsAssignableFrom(returnAwaitableValueType))
+                    {
+                        callback.Invoke(new AdvancedDropdownMetaInfo
+                        {
+                            Error = $"Awaitable<{returnAwaitableValueType.FullName}> is not supported, please use UniTask<Dropdown<T>>",
+                            CurDisplay = "[Error]",
+                            CurValues = Array.Empty<object>(),
+                            DropdownListValue = null,
+                            SelectStacks = Array.Empty<SelectStack>(),
+                        });
+                        return;
+                    }
+
+                    Debug.Assert(ticker != null);
+                    Waiter waiter = Waiter.AwaitableT(obj, returnAwaitableValueType);
+                    ticker.StartTrack(waiter, taskResult =>
+                    {
+                        if (taskResult is IDropdown dropdown)
+                        {
+                            SerializedObject serObj = null;
+                            if (!SerializedUtils.IsOk(property))
+                            {
+                                // https://github.com/TylerTemp/SaintsField/issues/367
+                                // Also happens in async...
+                                UnityEngine.Object[] inspecting = targetObjects
+                                    .Where(each => each != null).ToArray();
+                                if (inspecting.Length == 0)
+                                {
+#if SAINTSFIELD_DEBUG
+                                    Debug.Log("No inspecting");
+#endif
+                                    return;
+                                }
+
+                                serObj = new SerializedObject(inspecting);
+                                property = serObj.FindProperty(propPath);
+                            }
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, advancedDropdownAttribute, field, parentObj));
+                            serObj?.Dispose();
+                        }
+                        else
+                        {
+                            callback.Invoke(new AdvancedDropdownMetaInfo
+                            {
+                                Error = $"Return value {taskResult} is not a Dropdown<T> type",
+                                CurDisplay = "[Error]",
+                                CurValues = Array.Empty<object>(),
+                                DropdownListValue = null,
+                                SelectStacks = Array.Empty<SelectStack>(),
+                            });
+                        }
+                    });
+                    return;
+                }
+            }
+#endif
+
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
             {
                 bool returnIsUniTask = false;

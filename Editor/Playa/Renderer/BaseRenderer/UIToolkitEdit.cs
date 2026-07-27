@@ -9,6 +9,7 @@ using SaintsField.Editor.Drawers.AnimatorParamDrawer;
 using SaintsField.Editor.Drawers.AnimatorStateDrawer;
 using SaintsField.Editor.Drawers.CurveRangeDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
+using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.InputAxisDrawer;
@@ -26,7 +27,6 @@ using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Drawers.SortingLayerDrawer;
 using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.UIToolkitElements;
@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                     case DropdownAttribute treeDropdownAttribute:
                     {
-                        return (TreeDropdownAttributeDrawer.UIToolkitValueEdit(
+                        return (DropdownAttributeDrawer.UIToolkitValueEdit(
                             oldElement,
                             treeDropdownAttribute,
                             label,
@@ -1832,7 +1832,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                 }
 
-                return (TreeDropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, valueType, value, beforeSet,
+                return (DropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, valueType, value, beforeSet,
                     setterOrNull,
                     labelGrayColor, inHorizontalLayout), false);
             }

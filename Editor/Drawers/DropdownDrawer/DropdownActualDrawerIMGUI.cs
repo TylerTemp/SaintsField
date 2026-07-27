@@ -5,16 +5,14 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
-using SaintsField.Editor.Utils.WaitableUtils;
-using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
+namespace SaintsField.Editor.Drawers.DropdownDrawer
 {
-    public partial class TreeDropdownAttributeDrawer
+    public partial class DropdownAttributeDrawer
     {
         internal float GetSerializedActualFieldHeight(SaintsSerializedActualAttribute saintsSerializedActual,
             SerializedProperty property, GUIContent label, float width, object parent)

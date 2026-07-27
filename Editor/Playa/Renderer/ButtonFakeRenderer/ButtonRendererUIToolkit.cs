@@ -78,31 +78,14 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // List<VisualElement> parameterElements = new List<VisualElement>();
             object[] parameterValues = new object[parameters.Length];
             // VisualElement root = null;
-            bool returnIsUniTask = false;
-            Type returnUniTaskValueType = null;
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-            {
-                if (typeof(UniTask).IsAssignableFrom(methodInfo.ReturnType))
-                {
-                    returnIsUniTask = true;
-                }
-
-                foreach (Type genBaseType in ReflectUtils.GetGenBaseTypes(methodInfo.ReturnType))
-                {
-                    if (genBaseType.GetGenericTypeDefinition() == typeof(UniTask<>))
-                    {
-                        returnIsUniTask = true;
-                        returnUniTaskValueType = genBaseType.GetGenericArguments()[0];
-                    }
-                }
-            }
-#endif
+            (AsyncReturnType returnAsync, Type returnAsyncValueType) =
+                GetAsyncReturnInfo(methodInfo.ReturnType);
 
             bool hasReturnValue = !_buttonAttribute.HideReturnValue
                 && methodInfo.ReturnType != typeof(void)
                 && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType)
                 && !typeof(Task).IsAssignableFrom(methodInfo.ReturnType)
-                && !returnIsUniTask;
+                && (returnAsync == AsyncReturnType.None);
 
             string buttonId = $"{FieldWithInfo.Targets[0].GetHashCode()}.{methodInfo.Name}";
 
@@ -303,6 +286,14 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 {
                     switch (returnValue)
                     {
+#if UNITY_6000_0_OR_NEWER
+                        case Awaitable awaitable:
+                        {
+                            Waiter waiter = new Waiter(awaitable);
+                            buttonUserData.Enumerators.Add(waiter);
+                        }
+                            break;
+#endif
                         case IEnumerator enumerator:
                         {
                             Waiter waiter = new Waiter(enumerator);
@@ -325,22 +316,32 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             break;
 #endif
                         default:
-                            if (returnIsUniTask && returnUniTaskValueType != null)
+                            switch (returnAsync)
                             {
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-                                Waiter waiter = Waiter.UniTaskWithValue(returnValue, returnUniTaskValueType);
-                                buttonUserData.Enumerators.Add(waiter);
+                                case AsyncReturnType.None:
+                                    break;
+#if UNITY_6000_0_OR_NEWER
+                                case AsyncReturnType.Awaitable:
+                                {
+                                    Waiter waiter = Waiter.AwaitableT(returnValue, returnAsyncValueType);
+                                    buttonUserData.Enumerators.Add(waiter);
+                                }
+                                    break;
 #endif
+#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
+                                case AsyncReturnType.UniTask:
+                                {
+                                    Waiter waiter = Waiter.UniTaskWithValue(returnValue, returnAsyncValueType);
+                                    buttonUserData.Enumerators.Add(waiter);
+                                }
+                                    break;
+#endif
+                                default:
+                                    throw new ArgumentOutOfRangeException(nameof(returnAsync), returnAsync, null);
                             }
-
                             break;
                     }
                 }
-                // foreach (IEnumerator enumerator in returnValues.OfType<IEnumerator>())
-                // {
-                //     Waiter waiter = new Waiter(enumerator);
-                //     buttonUserData.Enumerators.Add(waiter);
-                // }
 
                 if (buttonUserData.Enumerators.Count == 0)
                 {

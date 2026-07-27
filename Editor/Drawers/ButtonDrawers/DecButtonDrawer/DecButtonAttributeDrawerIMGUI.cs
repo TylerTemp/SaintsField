@@ -411,9 +411,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             object refreshedParent = null;
             foreach ((MethodInfo methodInfo, object result) in results)
             {
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-                (bool returnIsUniTask, Type returnUniTaskValueType) = GetUniTaskReturnInfo(methodInfo.ReturnType);
-#endif
+                (AsyncReturnType returnAsync, Type returnAsyncValueType) =
+                    GetAsyncReturnInfo(methodInfo.ReturnType);
                 if (result is IEnumerator enumerator)
                 {
                     buttonInfo.Enumerators.Add(new Waiter(enumerator));
@@ -428,14 +427,30 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                         buttonInfo.WaiterReturnTargets[waiter] = (methodInfo, refreshedParent);
                     }
                 }
+#if UNITY_6000_0_OR_NEWER
+                else if (result is Awaitable awaitable)
+                {
+                    buttonInfo.Enumerators.Add(new Waiter(awaitable));
+                }
+                else if (returnAsync == AsyncReturnType.Awaitable && returnAsyncValueType != null)
+                {
+                    Waiter waiter = Waiter.AwaitableT(result, returnAsyncValueType);
+                    buttonInfo.Enumerators.Add(waiter);
+                    if (!decButtonAttribute.HideReturnValue)
+                    {
+                        refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        buttonInfo.WaiterReturnTargets[waiter] = (methodInfo, refreshedParent);
+                    }
+                }
+#endif
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
                 else if (result is UniTask uniTask)
                 {
                     buttonInfo.Enumerators.Add(new Waiter(uniTask));
                 }
-                else if (returnIsUniTask && returnUniTaskValueType != null)
+                else if (returnAsync == AsyncReturnType.UniTask && returnAsyncValueType != null)
                 {
-                    Waiter waiter = Waiter.UniTaskWithValue(result, returnUniTaskValueType);
+                    Waiter waiter = Waiter.UniTaskWithValue(result, returnAsyncValueType);
                     buttonInfo.Enumerators.Add(waiter);
                     if (!decButtonAttribute.HideReturnValue)
                     {
@@ -490,10 +505,12 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
         private static void TickEnumeratorsIMGUI(ButtonInfoIMGUI buttonInfo)
         {
-            if (Event.current == null || Event.current.type != EventType.Repaint || buttonInfo.Enumerators.Count == 0)
+            if (buttonInfo.Enumerators.Count == 0)
             {
                 return;
             }
+
+            EditorApplication.QueuePlayerLoopUpdate();
 
             List<Waiter> finishedEnumerators = new List<Waiter>();
             int oldCounter = buttonInfo.Enumerators.Count;

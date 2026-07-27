@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
@@ -16,6 +17,18 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 #endif
         public bool ok;
 
+        [AboveButton(nameof(IeWait), "IEnumerator Above")]
+        [BelowButton(nameof(IeWait), "IEnumerator Below")]
+        [PostFieldButton(nameof(IeWait), "IE")]
+        public bool okIe;
+
+#if UNITY_6000_0_OR_NEWER
+        [AboveButton(nameof(AsyncAwaitableBase), "Awaitable Above")]
+        [BelowButton(nameof(AsyncAwaitableValue), "Awaitable<T> Below")]
+        [PostFieldButton(nameof(AsyncAwaitableBase), "A")]
+        public bool okAwaitable;
+#endif
+
         private async Task AsyncVoid()
         {
             Debug.Log("Async start");
@@ -30,6 +43,30 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Debug.Log("Async end");
             return 100;
         }
+
+        private IEnumerator IeWait()
+        {
+            Debug.Log("IEnumerator start");
+            yield return new WaitUntil(() => okIe);
+            Debug.Log("IEnumerator end");
+        }
+
+#if UNITY_6000_0_OR_NEWER
+        private async Awaitable AsyncAwaitableBase()
+        {
+            Debug.Log("Awaitable start");
+            await Awaitable.WaitForSecondsAsync(1);
+            Debug.Log("Awaitable end");
+        }
+
+        private async Awaitable<string> AsyncAwaitableValue()
+        {
+            Debug.Log("Awaitable<T> start");
+            await Awaitable.WaitForSecondsAsync(1);
+            Debug.Log("Awaitable<T> end");
+            return "fine";
+        }
+#endif
 
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
         private async UniTask AsyncUniTaskBase()

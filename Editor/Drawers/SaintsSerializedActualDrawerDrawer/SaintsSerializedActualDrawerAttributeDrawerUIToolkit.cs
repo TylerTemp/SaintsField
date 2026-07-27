@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
+using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
@@ -117,13 +117,13 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                         return (element, element == null ? null : enumToggleButtonsAttributeDrawer);
                     }
 
-                    TreeDropdownAttributeDrawer treeDropdownAttributeDrawer =
-                        (TreeDropdownAttributeDrawer)MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), serInfo,
+                    DropdownAttributeDrawer dropdownAttributeDrawer =
+                        (DropdownAttributeDrawer)MakePropertyDrawer(typeof(DropdownAttributeDrawer), serInfo,
                             (Attribute)flagsDropdownAttribute ?? advancedFlagsDropdownAttribute, label);
-                    VisualElement treeElement = treeDropdownAttributeDrawer.RenderSerializedActual(
+                    VisualElement treeElement = dropdownAttributeDrawer.RenderSerializedActual(
                         saintsSerializedActual, (ISaintsAttribute)flagsDropdownAttribute ?? advancedFlagsDropdownAttribute,
                         label, property, parent);
-                    return (treeElement, treeElement == null ? null : treeDropdownAttributeDrawer);
+                    return (treeElement, treeElement == null ? null : dropdownAttributeDrawer);
                 }
                 case SaintsPropertyType.Interface:
                     return (SaintsInterfaceDrawer.RenderSerializedActual(saintsSerializedActual,
