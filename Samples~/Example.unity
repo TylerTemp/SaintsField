@@ -2209,12 +2209,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.FieldTextExample
   lis:
-  - first
-  - second
-  - third
-  - forth
-  - fifth
-  singleField: My <color=BlueViolet>Content!
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  singleField: I'll follow you into the <color=gray>dark
+  infoLis:
+  - displayName: something here
+  dirInfo:
+    displayName: some there
 --- !u!4 &208005633
 Transform:
   m_ObjectHideFlags: 0
@@ -31971,22 +31976,9 @@ MonoBehaviour:
   myInt1:
     baseValue: 356
     finalValue: 356
-  myInt2:
-    baseValue: 0
-    finalValue: 0
-  myInt3:
-    baseValue: 0
-    finalValue: 0
-  myFloat1:
-    baseValue: 0
-    finalValue: 0
-  myFloat2:
-    baseValue: 0
-    finalValue: 0
   myFloat3:
     baseValue: 0
     finalValue: 0
-  theName: My Label!
 --- !u!1 &1660183015
 GameObject:
   m_ObjectHideFlags: 0

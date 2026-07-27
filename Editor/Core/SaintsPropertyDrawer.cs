@@ -6,6 +6,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -844,19 +845,61 @@ namespace SaintsField.Editor.Core
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(_thisProperty);
             if (RuntimeUtil.IsNull(parent))
             {
-                return "";
+                return rawContent;
             }
 
             (string error, int _, object value) = Util.GetValue(_thisProperty, fieldInfo, parent);
+
             if (error != "")
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogWarning(error);
 #endif
-                return "";
+                return rawContent;
             }
 
-            return RichTextDrawer.TagStringFormatter(value, tagValue);
+            if (value is SaintsSerializedProperty ssp)
+            {
+                (string error, object value) subResult = SaintsSerializedEditorUtil.GetValue(ssp);
+                if (subResult.error != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(error);
+#endif
+                    return rawContent;
+                }
+
+                value = subResult.value;
+                // result = (r.error, result.index, r.value);
+            }
+
+            object finalValue;
+
+            if (tagName == "field")
+            {
+                finalValue = value;
+            }
+            else
+            {
+                string revName = tagName["field.".Length..];
+
+                (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName,
+                    null,
+                    _thisProperty,
+                    fieldInfo, value, null);
+
+                if (getOfValue.error != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(getOfValue.error);
+#endif
+                    return rawContent;
+                }
+
+                finalValue = getOfValue.result;
+            }
+
+            return RichTextDrawer.TagStringFormatter(finalValue, tagValue);
         }
         #endregion
     }

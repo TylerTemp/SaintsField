@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -17,5 +18,17 @@ namespace SaintsField.Samples.Scripts
         [FieldAboveText("Can also be used on single fields: <label/>(raw value)=<field/>")]
         [FieldBelowText("$" + nameof(singleField))]  // callback, as parsed value
         public string singleField;
+
+        [Serializable]
+        public class Info
+        {
+            public string displayName;
+        }
+
+        [FieldLabelText("<field.displayName/>")]
+        public Info[] infoLis;
+
+        [FieldLabelText("<field.displayName/>")]
+        public Info dirInfo;
     }
 }

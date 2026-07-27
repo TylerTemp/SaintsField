@@ -113,10 +113,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.0**
+**5.25.1**
 
-1.  Add: `Layout` now support `ELayout.LabelField` [#420](https://github.com/TylerTemp/SaintsField/issues/420)
-2.  Fix: `Toggle` in horizontal layout not get current label position
+Fix: `FieldLabelText` property walk broken
 
 ## Usage ##
 

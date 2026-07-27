@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.25.1 ##
+
+Fix: `FieldLabelText` property walk broken
+
 ## 5.25.0 ##
 
 1.  Add: `Layout` now support `ELayout.LabelField` [#420](https://github.com/TylerTemp/SaintsField/issues/420)
