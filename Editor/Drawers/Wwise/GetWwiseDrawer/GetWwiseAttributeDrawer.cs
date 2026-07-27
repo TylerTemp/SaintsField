@@ -6,14 +6,11 @@ using System.Reflection;
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
-using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.SaintsXPathParser;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
 using SaintsField.Wwise;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
 {
@@ -25,6 +22,64 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
     public partial class GetWwiseAttributeDrawer: GetByXPathAttributeDrawer
     {
         private const string PropNameWwiseObjectReference = "WwiseObjectReference";
+
+        private static (bool isReadable, string error, SerializedProperty wwiseProperty)
+            GetWwiseObjectReferenceProperty(SerializedProperty property, FieldInfo info)
+        {
+            SerializedProperty wwiseProperty;
+            try
+            {
+                wwiseProperty = property.FindPropertyRelative(PropNameWwiseObjectReference);
+            }
+#pragma warning disable CS0168 // Variable is declared but never used
+            catch (InvalidOperationException e)
+#pragma warning restore CS0168 // Variable is declared but never used
+            {
+#if SAINTSFIELD_DEBUG
+                UnityEngine.Debug.LogWarning(e);
+#endif
+                return (false, "", null);
+            }
+
+            if (wwiseProperty == null)
+            {
+                Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) == -1
+                    ? info.FieldType
+                    : ReflectUtils.GetElementType(info.FieldType);
+
+                string wrapPropName = ReflectUtils.GetIWrapPropName(rawType);
+                if (string.IsNullOrEmpty(wrapPropName))
+                {
+                    return (true, $"Expect Wwise object, get {info.FieldType}", null);
+                }
+
+                Type wrapType = ReflectUtils.GetIWrapPropType(rawType);
+                if (wrapType == null || !typeof(AK.Wwise.BaseType).IsAssignableFrom(wrapType))
+                {
+                    return (true, $"Expect Wwise object, get {info.FieldType}", null);
+                }
+
+                SerializedProperty wrapProperty = property.FindPropertyRelative(wrapPropName) ??
+                                                  SerializedUtils.FindPropertyByAutoPropertyName(property,
+                                                      wrapPropName);
+                if (wrapProperty == null)
+                {
+                    return (true, $"Expect Wwise object, get {wrapType}", null);
+                }
+
+                wwiseProperty = wrapProperty.FindPropertyRelative(PropNameWwiseObjectReference) ??
+                                SerializedUtils.FindPropertyByAutoPropertyName(wrapProperty,
+                                    PropNameWwiseObjectReference);
+                if (wwiseProperty == null)
+                {
+                    return (true, $"Expect Wwise object, get {wrapType}", null);
+                }
+            }
+
+            return wwiseProperty.propertyType == SerializedPropertyType.ObjectReference
+                ? (true, "", wwiseProperty)
+                : (true, $"Expect Wwise object, get {info.FieldType}({wwiseProperty.propertyType})", null);
+        }
 
         protected override void ActualSignPropertyCache(PropertyCache propertyCache)
         {

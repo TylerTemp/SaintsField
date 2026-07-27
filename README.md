@@ -113,9 +113,13 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.1**
+**5.25.2**
 
-Fix: `FieldLabelText` property walk broken
+Add `Awaitable`(`Awaitable<T>`) async functions for:
+*   `Button`
+*   Above/Below/PostField-Button
+*   `Dropdown`
+*   `ValueButtons`
 
 ## Usage ##
 

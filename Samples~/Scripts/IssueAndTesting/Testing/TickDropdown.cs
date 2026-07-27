@@ -55,6 +55,22 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             };
         }
 
+#if UNITY_6000_0_OR_NEWER
+        [Dropdown(nameof(AwaitableDrop))] public Color awaitableDrop;
+
+        private async Awaitable<Dropdown<Color>> AwaitableDrop()
+        {
+            await Awaitable.WaitForSecondsAsync(1);
+
+            return new Dropdown<Color>
+            {
+                { "<color=red>Red", Color.red },
+                { "<color=green>Green", Color.green },
+                { "<color=blue>Blue", Color.blue },
+            };
+        }
+#endif
+
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
         [Dropdown(nameof(QuickDrop))] public float percent;
 
@@ -93,5 +109,22 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
             return list;
         }
+
+#if UNITY_6000_0_OR_NEWER
+        [ValueButtons(nameof(GetAwaitableBtn), noFold: true)] public int awaitableBtn;
+
+        private async Awaitable<Dropdown<int>> GetAwaitableBtn()
+        {
+            await Awaitable.WaitForSecondsAsync(2);
+
+            Dropdown<int> list = new Dropdown<int>();
+            for (int number = 0; number < 10; number++)
+            {
+                list.Add($"{number}", number);
+            }
+
+            return list;
+        }
+#endif
     }
 }

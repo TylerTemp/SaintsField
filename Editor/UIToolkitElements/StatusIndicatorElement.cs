@@ -49,10 +49,9 @@ namespace SaintsField.Editor.UIToolkitElements
 
             hierarchy.Add(root);
 
-            UIToolkitUtils.HelpKeepRotate(_loading);
-
-            RegisterCallback<AttachToPanelEvent>(_ =>
+            UIToolkitUtils.OnAttachToPanelOnce(this, _ =>
             {
+                UIToolkitUtils.HelpKeepRotate(_loading);
                 schedule.Execute(() => UIToolkitUtils.TriggerRotate(_loading)).StartingIn(200);
             });
         }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.25.2 ##
+
+Add `Awaitable`(`Awaitable<T>`) async functions for:
+*   `Button`
+*   Above/Below/PostField-Button
+*   `Dropdown`
+*   `ValueButtons`
+
 ## 5.25.1 ##
 
 Fix: `FieldLabelText` property walk broken

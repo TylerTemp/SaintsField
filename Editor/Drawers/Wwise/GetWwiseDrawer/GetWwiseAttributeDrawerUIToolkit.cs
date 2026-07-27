@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -34,68 +33,17 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            SerializedProperty prop;
-            try
+            (bool isReadable, string error, SerializedProperty _) =
+                GetWwiseObjectReferenceProperty(property, info);
+            if (!isReadable)
             {
-                prop = property.FindPropertyRelative(PropNameWwiseObjectReference);
-            }
-#pragma warning disable CS0168 // Variable is declared but never used
-            catch (InvalidOperationException e)
-#pragma warning restore CS0168 // Variable is declared but never used
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning(e);
-#endif
                 return;
             }
 
-            HelpBox helpBox = GetHelpBox(container, property, index);
-            if (prop == null)
+            if (error != "")
             {
-                Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) == -1
-                    ? info.FieldType
-                    : ReflectUtils.GetElementType(info.FieldType);
-
-                string wrapPropName = ReflectUtils.GetIWrapPropName(rawType);
-                if (string.IsNullOrEmpty(wrapPropName))
-                {
-                    helpBox.text = $"Expect Wwise object, get {info.FieldType}";
-                    helpBox.style.display = DisplayStyle.Flex;
-                    return;
-                }
-                Type wrapType = ReflectUtils.GetIWrapPropType(rawType);
-                // Debug.Log(wrapType);
-                // Debug.Log(typeof(AK.Wwise.BaseType).IsAssignableFrom(wrapType));
-                if (wrapType == null || !typeof(AK.Wwise.BaseType).IsAssignableFrom(wrapType))
-                {
-                    helpBox.text = $"Expect Wwise object, get {info.FieldType}";
-                    helpBox.style.display = DisplayStyle.Flex;
-                    return;
-                }
-
-                SerializedProperty wrapProp = property.FindPropertyRelative(wrapPropName) ??
-                                              SerializedUtils.FindPropertyByAutoPropertyName(property, wrapPropName);
-                if (wrapProp == null)
-                {
-                    helpBox.text = $"Expect Wwise object, get {wrapType}";
-                    helpBox.style.display = DisplayStyle.Flex;
-                    return;
-                }
-
-                prop = wrapProp.FindPropertyRelative(PropNameWwiseObjectReference) ??
-                       SerializedUtils.FindPropertyByAutoPropertyName(wrapProp, PropNameWwiseObjectReference);
-
-                if (prop == null)
-                {
-                    helpBox.text = $"Expect Wwise object, get {wrapType}";
-                    helpBox.style.display = DisplayStyle.Flex;
-                    return;
-                }
-            }
-
-            if (prop.propertyType != SerializedPropertyType.ObjectReference)
-            {
-                helpBox.text = $"Expect Wwise object, get {info.FieldType}({prop.propertyType})";
+                HelpBox helpBox = GetHelpBox(container, property, index);
+                helpBox.text = error;
                 helpBox.style.display = DisplayStyle.Flex;
                 return;
             }
@@ -111,8 +59,9 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
                 string path = "";
                 string type = "";
                 // ReSharper disable once InvertIf
-                if (GuidToPath.TryGetValue(wwiseObjectReference.Guid, out WwiseBasicInfo value))
+                if (GuidToPath.ContainsKey(wwiseObjectReference.Guid))
                 {
+                    WwiseBasicInfo value = GuidToPath[wwiseObjectReference.Guid];
                     path = string.Join("/", value.BasicPathSegments);
                     type = value.WwiseObjectType.ToString();
                 }
