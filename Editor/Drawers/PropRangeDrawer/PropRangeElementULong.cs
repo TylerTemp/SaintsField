@@ -310,6 +310,17 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             PropRangeElementULong = visualInput;
         }
+
+        public override void SetValueWithoutNotify(ulong newValue)
+        {
+            PropRangeElementULong.SetValueWithoutNotify(newValue);
+        }
+
+        public override ulong value
+        {
+            get => PropRangeElementULong.value;
+            set => PropRangeElementULong.value = value;
+        }
     }
 }
 #endif

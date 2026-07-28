@@ -21,6 +21,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             _slider = new Slider("")
             {
                 showInputField = false,
+                lowValue = -10000,
+                highValue = 10000,
                 style =
                 {
                     flexGrow = 1,
@@ -47,11 +49,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 // ReSharper disable once InvertIf
                 if (_init)
                 {
-                    // Debug.Log(evt.newValue);
-                    uint newValue = RemapValue((uint)evt.newValue);
+                    float rangeValue = evt.newValue;
+                    uint actualValue = GetActualValue(rangeValue);
+                    uint newValue = RemapValue(actualValue);
                     if (newValue == value)
                     {
-                        _slider.SetValueWithoutNotify(newValue);
+                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
                         SetUnsignedIntegerFieldValueWithoutNotify(newValue);
                     }
                     else
@@ -77,7 +80,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 uint newValue = RemapValue(actualValue);
                 if (newValue == value)
                 {
-                    _slider.SetValueWithoutNotify(newValue);
+                    _slider.SetValueWithoutNotify(GetSliderValue(newValue));
                     SetUnsignedIntegerFieldValueWithoutNotify(newValue);
                 }
                 else
@@ -85,6 +88,24 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     value = newValue;
                 }
             });
+        }
+
+        private float GetSliderValue(uint newValue)
+        {
+            if (_maxValue == _minValue)
+            {
+                return 0.5f;
+            }
+
+            decimal percent = (decimal)(newValue - _minValue) / (_maxValue - _minValue);
+            return (float)((decimal)_slider.lowValue +
+                           (decimal)(_slider.highValue - _slider.lowValue) * percent);
+        }
+
+        private uint GetActualValue(float rangeValue)
+        {
+            float percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
+            return (uint)(_minValue + (_maxValue - _minValue) * percent);
         }
 
         private void SetUnsignedIntegerFieldValueWithoutNotify(uint newValue)
@@ -120,12 +141,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             if(!_init || _minValue != minResult)
             {
                 changed = true;
-                _slider.lowValue = _minValue = minResult;
+                _minValue = minResult;
             }
             if(!_init || _maxValue != maxResult)
             {
                 changed = true;
-                _slider.highValue = _maxValue = maxResult;
+                _maxValue = maxResult;
             }
 
             if(!_init || _step != step)
@@ -217,9 +238,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
             else
             {
-                // _slider.value = newValue;
-                // Debug.Log($"update no notify to {newValue}");
-                _slider.SetValueWithoutNotify(newValue);
+                _slider.SetValueWithoutNotify(GetSliderValue(newValue));
                 SetUnsignedIntegerFieldValueWithoutNotify(newValue);
                 SetHelpBox("");
             }

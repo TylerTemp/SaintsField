@@ -27,6 +27,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             _slider = new Slider("")
             {
                 showInputField = false,
+                lowValue = -10000,
+                highValue = 10000,
                 style =
                 {
                     flexGrow = 1,
@@ -51,12 +53,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 // ReSharper disable once InvertIf
                 if (_init)
                 {
-                    int newValue = RemapValue((int)evt.newValue);
-                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
+                    float rangeValue = evt.newValue;
+                    int actualValue = GetActualValue(rangeValue);
+                    int newValue = RemapValue(actualValue);
                     if (newValue == value)
                     {
-                        _slider.SetValueWithoutNotify(newValue);
-                        // _intField.SetValueWithoutNotify(newValue);
+                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
                         SetIntFieldWithoutNotify(newValue);
                     }
                     else
@@ -79,17 +81,34 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     return;
                 }
                 int newValue = RemapValue(actualValue);
-                // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
                 if (newValue == value)
                 {
-                    _slider.SetValueWithoutNotify(newValue);
-                    _intField.SetValueWithoutNotify(newValue);
+                    _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                    SetIntFieldWithoutNotify(newValue);
                 }
                 else
                 {
                     value = newValue;
                 }
             });
+        }
+
+        private float GetSliderValue(int newValue)
+        {
+            if (_maxValue == _minValue)
+            {
+                return 0.5f;
+            }
+
+            decimal percent = ((decimal)newValue - _minValue) / ((decimal)_maxValue - _minValue);
+            return (float)((decimal)_slider.lowValue +
+                           (decimal)(_slider.highValue - _slider.lowValue) * percent);
+        }
+
+        private int GetActualValue(float rangeValue)
+        {
+            float percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
+            return (int)(_minValue + ((double)_maxValue - _minValue) * percent);
         }
 
         private void SetIntFieldWithoutNotify(int newValue)
@@ -126,25 +145,23 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             int useMin = Mathf.Max(minResult, minCap);
             if(!_init || useMin != _minValue)
             {
-                _slider.lowValue = _minValue = useMin;
                 changed = true;
+                _minValue = useMin;
             }
             int useMax = Mathf.Min(maxResult, maxCap);
             if(!_init || _maxValue != useMax)
             {
-                _slider.highValue = _maxValue = useMax;
                 changed = true;
+                _maxValue = useMax;
             }
 
-            if(_step != step)
+            if(!_init || _step != step)
             {
-                _step = step;
                 changed = true;
+                _step = step;
             }
 
             _init = true;
-
-            // Debug.Log("Config OK");
 
             if(changed)
             {
@@ -225,16 +242,13 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             int originValue = value;
             int newValue = RemapValue(value);
 
-            // Debug.Log($"refresh display from {originValue} to {newValue} with {_slider.lowValue}~{_slider.highValue}");
-
             if (originValue != newValue)
             {
                 value = newValue;
             }
             else
             {
-                // _slider.value = newValue;
-                _slider.SetValueWithoutNotify(newValue);
+                _slider.SetValueWithoutNotify(GetSliderValue(newValue));
                 SetIntFieldWithoutNotify(newValue);
                 SetHelpBox("");
             }
@@ -254,7 +268,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             _cachedValue = newValue;
 
-            // Debug.Log($"set value without notification {_cachedValue}");
             RefreshDisplay();
         }
 

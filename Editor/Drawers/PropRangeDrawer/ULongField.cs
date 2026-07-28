@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using UnityEngine;
-using UnityEngine.Internal;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer

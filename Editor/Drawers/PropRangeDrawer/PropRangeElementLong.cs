@@ -302,6 +302,17 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             PropRangeElementLong = visualInput;
         }
+
+        public override void SetValueWithoutNotify(long newValue)
+        {
+            PropRangeElementLong.SetValueWithoutNotify(newValue);
+        }
+
+        public override long value
+        {
+            get => PropRangeElementLong.value;
+            set => PropRangeElementLong.value = value;
+        }
     }
 }
 #endif

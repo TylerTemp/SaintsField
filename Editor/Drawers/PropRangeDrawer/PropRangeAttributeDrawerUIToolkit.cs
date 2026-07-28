@@ -102,15 +102,31 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 }
                 case SerializedPropertyType.Float:
                 {
-                    PropRangeElementDouble element = new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
-                    PropRangeDoubleField field = new PropRangeDoubleField(GetPreferredLabel(property), element);
-                    field.AddToClassList(PropRangeDoubleField.alignedFieldUssClassName);
-                    field.AddToClassList(ClassAllowDisable);
-                    if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                    if (rawType == typeof(float))
                     {
-                        field.labelElement.tooltip = property.tooltip;
+                        PropRangeElementFloat element =
+                            new PropRangeElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeFloatField field = new PropRangeFloatField(GetPreferredLabel(property), element);
+                        field.AddToClassList(PropRangeFloatField.alignedFieldUssClassName);
+                        field.AddToClassList(ClassAllowDisable);
+                        if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
+                        {
+                            field.labelElement.tooltip = property.tooltip;
+                        }
+                        return field;
                     }
-                    return field;
+
+                    PropRangeElementDouble doubleElement =
+                        new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                    PropRangeDoubleField doubleField =
+                        new PropRangeDoubleField(GetPreferredLabel(property), doubleElement);
+                    doubleField.AddToClassList(PropRangeDoubleField.alignedFieldUssClassName);
+                    doubleField.AddToClassList(ClassAllowDisable);
+                    if (!string.IsNullOrEmpty(property.tooltip) && doubleField.labelElement != null)
+                    {
+                        doubleField.labelElement.tooltip = property.tooltip;
+                    }
+                    return doubleField;
                 }
                 default:
                 {
@@ -474,6 +490,48 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     break;
                 case SerializedPropertyType.Float:
                 {
+                    if (rawType == typeof(float))
+                    {
+                        PropRangeFloatField floatField = container.Q<PropRangeFloatField>();
+                        UIToolkitUtils.AddContextualMenuManipulator(floatField.labelElement, property,
+                            () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+                        floatField.PropRangeElementFloat.BindHelpBox(helpBox);
+
+                        // ReSharper disable once PossibleNullReferenceException
+                        float floatMaxCap = Convert.ToSingle(maxValueProp.GetValue(null));
+                        // ReSharper disable once PossibleNullReferenceException
+                        float floatMinCap = Convert.ToSingle(minValueProp.GetValue(null));
+
+                        UpdateFloatMinMax();
+                        SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateFloatMinMax);
+                        container.RegisterCallback<DetachFromPanelEvent>(_ =>
+                            SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateFloatMinMax));
+                        floatField.TrackSerializedObjectValue(property.serializedObject, _ => UpdateFloatMinMax());
+                        floatField.PropRangeElementFloat.BindProperty(property);
+                        floatField.TrackPropertyValue(property, p => onValueChangedCallback(p.floatValue));
+                        break;
+
+                        void UpdateFloatMinMax()
+                        {
+                            (object minValue, string minError, object maxValue, string maxError) =
+                                GetMinMax(property, propRangeAttribute, info, parent);
+                            if (minError != "")
+                            {
+                                UIToolkitUtils.SetHelpBox(helpBox, minError);
+                                return;
+                            }
+
+                            if (maxError != "")
+                            {
+                                UIToolkitUtils.SetHelpBox(helpBox, maxError);
+                                return;
+                            }
+
+                            floatField.PropRangeElementFloat.SetConfig(minValue, floatMinCap, maxValue, floatMaxCap,
+                                (float)step);
+                        }
+                    }
+
                     PropRangeDoubleField field = container.Q<PropRangeDoubleField>();
                     UIToolkitUtils.AddContextualMenuManipulator(field.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
                     field.PropRangeElementDouble.BindHelpBox(helpBox);
@@ -511,14 +569,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                     field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
                     field.PropRangeElementDouble.BindProperty(property);
-                    if(rawType == typeof(float))
-                    {
-                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.floatValue));
-                    }
-                    else
-                    {
-                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.doubleValue));
-                    }
+                    field.TrackPropertyValue(property, p => onValueChangedCallback(p.doubleValue));
                 }
                     break;
             }
@@ -894,23 +945,26 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             (object minValue, string minError, object maxValue, string maxError) =
                 GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
 
-            if (oldElement is PropRangeDoubleField oldF)
+            if (oldElement is PropRangeFloatField oldF)
             {
                 if (minError == "" && maxError == "")
                 {
-                    oldF.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, propRangeAttribute.Step);
+                    oldF.PropRangeElementFloat.SetConfig(minValue, min, maxValue, max,
+                        (float)propRangeAttribute.Step);
                 }
 
                 oldF.SetValueWithoutNotify(value);
                 return null;
             }
 
-            PropRangeElementDouble element = new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
-            PropRangeDoubleField field =
-                new PropRangeDoubleField(label, element);
+            PropRangeElementFloat element =
+                new PropRangeElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeFloatField field =
+                new PropRangeFloatField(label, element);
             if (minError == "" && maxError == "")
             {
-                field.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+                field.PropRangeElementFloat.SetConfig(minValue, min, maxValue, max,
+                    (float)propRangeAttribute.Step);
             }
 
             field.value = value;
@@ -923,7 +977,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
-                    setterOrNull((float)evt.newValue);
+                    setterOrNull(evt.newValue);
                 });
             }
             return field;
