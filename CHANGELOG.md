@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.25.3 ##
+
+1.  Fix: `PropRange` reset value for `int`, `uint` type
+2.  Fix: `PropRange` can not correctly precision for float when manually input the value in box. E.g. input "4.1" became "4.099999"
+
 ## 5.25.2 ##
 
 Add `Awaitable`(`Awaitable<T>`) async functions for:
