@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
             (VisualElement labelContainer, bool needUpdate) = CreateRichLabelContainer(FieldWithInfo, _playaBelowRichLabelAttribute);
             labelContainer.name = FieldWithInfo.MemberId;
-            return (labelContainer, needUpdate);
+            return (labelContainer, needUpdate || HasVisibilityOrEnableCondition());
         }
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {

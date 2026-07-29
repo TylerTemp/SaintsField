@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.25.4 ##
+
+Fix: `ShowIf` not co-op with `AboveText`/`BelowText`
+
+Note: the idea about how the attributes of show-hide/enable-disable control is confusing in some cases. I still need to adjust these related logic (maybe separate them with their stand-alone control, instead of upside down applying chain?)
+
 ## 5.25.3 ##
 
 1.  Fix: `PropRange` reset value for `int`, `uint` type

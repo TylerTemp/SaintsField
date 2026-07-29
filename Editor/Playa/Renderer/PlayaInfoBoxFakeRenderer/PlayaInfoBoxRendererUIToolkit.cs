@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         {
             (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute, this);
             helpBox.name = FieldWithInfo.MemberId;
-            return (helpBox, needUpdate);
+            return (helpBox, needUpdate || HasVisibilityOrEnableCondition());
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

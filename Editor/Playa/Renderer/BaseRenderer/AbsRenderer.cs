@@ -72,6 +72,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return _guiColorAttribute != null;
         }
 
+        protected bool HasVisibilityOrEnableCondition()
+        {
+            // EnableIfAttribute inherits DisableIfAttribute.
+            return FieldWithInfo.PlayaAttributes?.Any(each =>
+                each is IVisibilityAttribute || each is DisableIfAttribute) == true;
+        }
+
 
 
         protected static MemberInfo GetMemberInfo(SaintsFieldWithInfo info)

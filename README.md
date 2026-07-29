@@ -113,10 +113,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.3**
+**5.25.4**
 
-1.  Fix: `PropRange` reset value for `int`, `uint` type
-2.  Fix: `PropRange` can not correctly precision for float when manually input the value in box. E.g. input "4.1" became "4.099999"
+Fix: `ShowIf` not co-op with `AboveText`/`BelowText`
+
+Note: the idea about how the attributes of show-hide/enable-disable control is confusing in some cases. I still need to adjust these related logic (maybe separate them with their stand-alone control, instead of upside down applying chain?)
 
 ## Usage ##
 
