@@ -50,14 +50,16 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
 
 ### Installation ###
 
-*   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)
+*   Using git upm (Unity UI):
 
-*   Using [OpenUPM](https://openupm.com/packages/today.comes.saintsfield/)
+    1. `Window` - `Package Manager`
+    2. Click `+` button, `Add package from git URL`
+    3. Enter the following URL:
 
-    ```bash
-    openupm add today.comes.saintsfield
     ```
-
+    https://github.com/TylerTemp/SaintsField.git
+    ```
+    
 *   Using git upm:
 
     add to `Packages/manifest.json` in your project
@@ -71,26 +73,26 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
     }
     ```
 
-*   Using git upm (Unity UI):
+*   Using [OpenUPM](https://openupm.com/packages/today.comes.saintsfield/)
 
-    1. `Window` - `Package Manager`
-    2. Click `+` button, `Add package from git URL`
-    3. Enter the following URL:
-
+    ```bash
+    openupm add today.comes.saintsfield
     ```
-    https://github.com/TylerTemp/SaintsField.git
-    ```
-
-
-*   Using a `unitypackage`:
-
-    Go to the [Release Page](https://github.com/TylerTemp/SaintsField/releases) to download a desired version of `unitypackage` and import it to your project
 
 *   Using a git submodule:
 
     ```bash
     git submodule add https://github.com/TylerTemp/SaintsField.git Packages/today.comes.saintsfield
     ```
+    
+    Note: submodule will not auto upgrade. please read [Git Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to know how to upgrade
+
+*   Using a `unitypackage` (NOT RECOMMENDED):
+
+    Go to the [Release Page](https://github.com/TylerTemp/SaintsField/releases) to download a desired version of `unitypackage` and import it to your project
+
+
+*   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)  (NOT RECOMMENDED)
 
 If you have DOTween installed
 *   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
@@ -113,11 +115,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.4**
+**5.25.5**
 
-Fix: `ShowIf` not co-op with `AboveText`/`BelowText`
-
-Note: the idea about how the attributes of show-hide/enable-disable control is confusing in some cases. I still need to adjust these related logic (maybe separate them with their stand-alone control, instead of upside down applying chain?)
+Fix: Remove UI Toolkit support for Animator and make it a [plugin package](https://github.com/TylerTemp/SaintsFieldAnimatorEditorHijack) instead. fix [#423](https://github.com/TylerTemp/SaintsField/issues/423)
 
 ## Usage ##
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.25.5 ##
+
+Fix: Remove UI Toolkit support for Animator and make it a [plugin package](https://github.com/TylerTemp/SaintsFieldAnimatorEditorHijack) instead. fix [#423](https://github.com/TylerTemp/SaintsField/issues/423)
+
 ## 5.25.4 ##
 
 Fix: `ShowIf` not co-op with `AboveText`/`BelowText`

@@ -9630,10 +9630,10 @@ public class IntegerateSaintsEditor: MyEditor
 
 Animator State & Animator SubStateMachine uses IMGUI to render. Even if you enabled SaintsEditor, the `StateMachineBehaviour` will display incorrectly for some SaintsField attribute (because IMGUI still have some problem in rendering).
 
-You can use `Tools` - `SaintsField` - `Enable UI Toolkit To Animator` to hijack Unity's default drawer to UI Toolkit's implement.
+Please read [SaintsFieldAnimatorEditorHijack](https://github.com/TylerTemp/SaintsFieldAnimatorEditorHijack) to hijack Unity's default drawer to UI Toolkit's implement.
 
 > [!WARNING] 
-> This feature uses a lot of undocumented/internal API from Unity which may not work at all in feature version of Unity. Remove `SAINTSFIELD_ANIMATOR_EDITOR_HIJACK` marco if you face any issue and report it
+> This feature uses a lot of undocumented/internal API from Unity which may not work at all in feature version of Unity.
 
 Before:
 
