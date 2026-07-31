@@ -65,28 +65,14 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
-        // ReSharper disable once InconsistentNaming
-        public const string SAINTSFIELD_ANIMATOR_EDITOR_HIJACK = "SAINTSFIELD_ANIMATOR_EDITOR_HIJACK";
+#if !SAINTSFIELD_ANIMATOR_EDITOR_HIJACK
         private const string AnimatorEditorHijackPath = RuntimeUtil.MenuRoot + "Enable UI Toolkit in Animator";
         [MenuItem(AnimatorEditorHijackPath, priority = 3)]
         public static void AnimatorEditorHijackApply()
         {
-#if SAINTSFIELD_ANIMATOR_EDITOR_HIJACK
-            RemoveCompileDefine(
-#else
-            AddCompileDefine(
-#endif
-                SAINTSFIELD_ANIMATOR_EDITOR_HIJACK);
+            Application.OpenURL("https://github.com/TylerTemp/SaintsFieldAnimatorEditorHijack");
         }
-
-        [MenuItem(AnimatorEditorHijackPath, true)]
-        public static bool AnimatorEditorHijackValidate() =>
-#if SAINTSFIELD_UI_TOOLKIT_DISABLE
-            false
-#else
-            true
 #endif
-        ;
 
 // #endif
 
@@ -352,31 +338,7 @@ namespace SaintsField.Editor.Utils
         ;
         #endregion
 
-        #region Inject Animator
-
-        public const int EnableSaintsEditorToAnimatorPathPriority = 200;
-        // ReSharper disable once InconsistentNaming
-        private const string SAINTSFIELD_SAINTS_EDITOR_ANIMATOR_STATE_APPLY = "SAINTSFIELD_SAINTS_EDITOR_ANIMATOR_STATE_APPLY";
-        private const string EnableSaintsEditorToAnimatorPath = RuntimeUtil.MenuRoot + "Enable SaintsEditor To Animator";
-        [MenuItem(EnableSaintsEditorToAnimatorPath, priority = EnableSaintsEditorToAnimatorPathPriority)]
-        public static void EnableSaintsEditorToAnimator()
-        {
-#if SAINTSFIELD_NETCODE_GAMEOBJECTS_DISABLED
-            RemoveCompileDefine
-#else
-            AddCompileDefine
-#endif
-                (SAINTSFIELD_SAINTS_EDITOR_ANIMATOR_STATE_APPLY);
-        }
-        [MenuItem(EnableSaintsEditorToAnimatorPath, true)]
-        public static bool EnableSaintsEditorToAnimatorValidate() =>
-#if SAINTSFIELD_ANIMATOR_EDITOR_HIJACK
-            true
-#else
-            false
-#endif
-        ;
-        #endregion
+        public const int EnableSaintsEditorToTargetPriority = 200;
 
         #region Header GUI
 
@@ -585,15 +547,6 @@ namespace SaintsField.Editor.Utils
 #endif
             );
 
-            Menu.SetChecked(AnimatorEditorHijackPath,
-#if SAINTSFIELD_ANIMATOR_EDITOR_HIJACK
-                 true
-#else
-                false
-#endif
-                );
-
-
             Menu.SetChecked(EnableDOTweenPath,
 #if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
                 true
@@ -665,16 +618,6 @@ namespace SaintsField.Editor.Utils
                 false
 #endif
             );
-
-            Menu.SetChecked(EnableSaintsEditorToAnimatorPath,
-#if SAINTSFIELD_SAINTS_EDITOR_ANIMATOR_STATE_APPLY
-                true
-#else
-                false
-#endif
-                );
-
-
         }
     }
 }

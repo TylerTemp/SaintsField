@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Playa.NetCode
         // ReSharper disable once InconsistentNaming
         private const string SAINTSFIELD_SAINTS_EDITOR_NETWORK_BEHAVIOR_APPLY = "SAINTSFIELD_SAINTS_EDITOR_NETWORK_BEHAVIOR_APPLY";
         private const string EnableSaintsEditorToNetworkBehaviorPath = RuntimeUtil.MenuRoot + "Enable SaintsEditor To NetworkBehavior";
-        [MenuItem(EnableSaintsEditorToNetworkBehaviorPath, priority = SaintsMenu.EnableSaintsEditorToAnimatorPathPriority + 2)]
+        [MenuItem(EnableSaintsEditorToNetworkBehaviorPath, priority = SaintsMenu.EnableSaintsEditorToTargetPriority + 1)]
         public static void EnableSaintsEditorToNetworkBehavior()
         {
             SaintsMenu.

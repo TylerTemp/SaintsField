@@ -66,11 +66,6 @@
             "define": "SAINTSFIELD_SAINTSDRAW"
         },
         {
-            "name": "com.unity.netcode.gameobjects",
-            "expression": "",
-            "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
-        },
-        {
             "name": "com.unity.nuget.newtonsoft-json",
             "expression": "",
             "define": "SAINTSFIELD_NEWTONSOFT_JSON"
@@ -119,6 +114,11 @@
             "name": "com.cysharp.unitask",
             "expression": "",
             "define": "SAINTSFIELD_UNITASK"
+        },
+        {
+            "name": "today.comes.saintsfield.animatoreditorhijack",
+            "expression": "",
+            "define": "SAINTSFIELD_ANIMATOR_EDITOR_HIJACK"
         }
     ],
     "noEngineReferences": false

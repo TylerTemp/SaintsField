@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         // ReSharper disable once InconsistentNaming
         private const string SAINTSFIELD_SAINTS_EDITOR_SCRIPTABLE_RENDERER_APPLY = "SAINTSFIELD_SAINTS_EDITOR_SCRIPTABLE_RENDERER_APPLY";
         private const string EnableSaintsEditorToScriptableRendererPath = RuntimeUtil.MenuRoot + "Enable SaintsEditor To Scriptable Rendererer";
-        [MenuItem(EnableSaintsEditorToScriptableRendererPath, priority = SaintsMenu.EnableSaintsEditorToAnimatorPathPriority + 1)]
+        [MenuItem(EnableSaintsEditorToScriptableRendererPath, priority = SaintsMenu.EnableSaintsEditorToTargetPriority)]
         public static void EnableSaintsEditorToScriptableRenderer()
         {
             SaintsMenu.
