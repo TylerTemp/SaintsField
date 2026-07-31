@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -168,7 +169,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             {
                 if (!toFill.ContainsKey(assembly))
                 {
-                    toFill[assembly] = assembly.GetTypes();
+                    toFill[assembly] = Util.GetAssemblyTypesSafe(assembly);
                 }
             }
         }

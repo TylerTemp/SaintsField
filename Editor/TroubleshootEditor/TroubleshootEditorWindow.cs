@@ -73,7 +73,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
             foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
             {
-                Type[] allTypes = asb.GetTypes();
+                Type[] allTypes = Util.GetAssemblyTypesSafe(asb);
                 List<Type> allEditors = allTypes
                     .Where(type => type.IsSubclassOf(typeof(UnityEditor.Editor)))
                     .ToList();

@@ -1240,11 +1240,20 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static Type[] GetAssemblyTypesSafe(Assembly assembly)
+        {
+            try {
+                return assembly.GetTypes();
+            } catch (ReflectionTypeLoadException e) {
+                return e.Types.Where(each => each != null).ToArray();
+            }
+        }
+
         private static Type FindTypeInAssembly(Assembly assembly, IReadOnlyList<string> split)
         {
             return split.Count > 1
                 ? assembly.GetType(string.Join(".", split), false)
-                : assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
+                : GetAssemblyTypesSafe(assembly).FirstOrDefault(t => t.Name == split[0]);
         }
 
         private static (string error, MemberInfo memberInfo, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)

@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Core
                 }
 #endif
 
-                Type[] allTypes = asb.GetTypes();
+                Type[] allTypes = Util.GetAssemblyTypesSafe(asb);
 
                 // foreach (Type editorType in allTypes.Where(type => type.IsSubclassOf(typeof(UnityEditor.Editor))))
                 // {

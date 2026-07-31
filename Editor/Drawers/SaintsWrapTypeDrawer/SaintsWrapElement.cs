@@ -222,7 +222,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
         private IReadOnlyList<Type> GetTypesImplementingInterface(Type interfaceType)
         {
             return _cachedTypesImplementingInterface ??= AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
+                .SelectMany(Util.GetAssemblyTypesSafe)
                 .Where(type => !type.IsAbstract
                                &&!typeof(Object).IsAssignableFrom(type)
                                && interfaceType.IsAssignableFrom(type))

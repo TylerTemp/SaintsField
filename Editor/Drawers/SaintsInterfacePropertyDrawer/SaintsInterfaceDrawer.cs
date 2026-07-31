@@ -190,15 +190,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             List<Type> results = new List<Type>();
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                IEnumerable<Type> assemblyTypes;
-                try
-                {
-                    assemblyTypes = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException e)
-                {
-                    assemblyTypes = e.Types.Where(each => each != null);
-                }
+                IEnumerable<Type> assemblyTypes = Util.GetAssemblyTypesSafe(assembly);
 
                 results.AddRange(assemblyTypes.Where(type =>
                     type != null
