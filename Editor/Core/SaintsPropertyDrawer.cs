@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Core
             Dictionary<Type, HashSet<Type>> attrToDecoratorDrawers =
                 new Dictionary<Type, HashSet<Type>>();
 
-            foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly asb in Util.GetAssemblies())
             {
 #if UNITY_2022_1_OR_NEWER
                 if (asb.GetName().Name == "UnityEditor")

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -62,7 +63,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_allAssemblies == null)
             {
-                _allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+                _allAssemblies = Util.GetAssemblies();
             }
 
             foreach (Assembly assembly in _allAssemblies)
@@ -129,7 +130,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                 if (_allAssemblies == null)
                 {
-                    _allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    _allAssemblies = Util.GetAssemblies();
                 }
 
                 foreach (Assembly assembly in _allAssemblies)

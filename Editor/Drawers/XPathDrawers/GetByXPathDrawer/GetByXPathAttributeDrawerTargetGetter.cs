@@ -1347,7 +1347,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 ? shortOrQualifiedName.Split('.').Last()
                 : shortOrQualifiedName;
 
-            _cachedAssemblyTypes ??= AppDomain.CurrentDomain.GetAssemblies()
+            _cachedAssemblyTypes ??= Util.GetAssemblies()
                 .ToDictionary(assembly => assembly, assembly =>
                 {
                     try

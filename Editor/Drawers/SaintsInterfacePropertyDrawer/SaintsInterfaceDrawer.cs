@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
 
             List<Type> results = new List<Type>();
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in Util.GetAssemblies())
             {
                 IEnumerable<Type> assemblyTypes;
                 try

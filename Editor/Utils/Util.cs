@@ -1240,6 +1240,16 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static IReadOnlyList<Assembly> GetAssemblies() 
+        {
+#if UNITY_6000_4_OR_NEWER
+            // https://docs.unity3d.com/6000.4/Documentation/ScriptReference/Assemblies.CurrentAssemblies.GetLoadedAssemblies
+            return UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+            return AppDomain.CurrentDomain.GetAssemblies();
+#endif
+        }
+
         private static Type FindTypeInAssembly(Assembly assembly, IReadOnlyList<string> split)
         {
             return split.Count > 1
@@ -1274,7 +1284,7 @@ namespace SaintsField.Editor.Utils
             }
             if (type == null && fullSearch)
             {
-                foreach (Assembly searchAssembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (Assembly searchAssembly in GetAssemblies())
                 {
                     type = FindTypeInAssembly(searchAssembly, split);
                     if (type != null)
