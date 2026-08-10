@@ -71,7 +71,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
             _propertyTypeToDrawers.Clear();
 
-            foreach (Assembly asb in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly asb in Util.GetAssemblies())
             {
                 Type[] allTypes = asb.GetTypes();
                 List<Type> allEditors = allTypes
