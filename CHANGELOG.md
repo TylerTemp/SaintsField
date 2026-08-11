@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.25.6 ##
+
+1.  Fix: Use CurrentAssemblies for getting assemblies in Unity 6000.4+ by [@Insprill](https://github.com/Insprill) on [PR#426](https://github.com/TylerTemp/SaintsField/pull/426)
+2.  Improve: Source Parser no longer write to files to reduce file IO on huge project
+3.  Improve: Source Generator/Parser optimized [#401](https://github.com/TylerTemp/SaintsField/issues/401)
+
 ## 5.25.5 ##
 
 Fix: Remove UI Toolkit support for Animator and make it a [plugin package](https://github.com/TylerTemp/SaintsFieldAnimatorEditorHijack) instead. fix [#423](https://github.com/TylerTemp/SaintsField/issues/423)
