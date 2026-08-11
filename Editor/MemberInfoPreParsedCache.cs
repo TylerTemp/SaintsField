@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -11,10 +10,10 @@ namespace SaintsField.Editor
         [Serializable]
         public enum MemberType
         {
-            Field,
-            Property,
-            Method,
-            Event,
+            Field = 0,
+            Property = 1,
+            Method = 2,
+            Event = 3,
         }
 
         [Serializable]
@@ -33,29 +32,14 @@ namespace SaintsField.Editor
                 returnType = null;
             }
 
-            public MemberContainer(string name, IEnumerable<string> arguments, string returnType)
+            public MemberContainer(string name, string[] arguments, string returnType)
             {
                 type = MemberType.Method;
                 this.name = name;
-                this.arguments = arguments.ToArray();
+                this.arguments = arguments;
                 this.returnType = returnType;
             }
         }
-
-        [Serializable]
-        public struct FileInfo
-        {
-            public long lastWriteTime;
-            public MemberContainer[] memberContainers;
-
-            public FileInfo(long lastWriteTime, MemberContainer[] memberContainers)
-            {
-                this.lastWriteTime = lastWriteTime;
-                this.memberContainers = memberContainers;
-            }
-        }
-
-        public SaintsDictionary<string, FileInfo> nameToFileInfo = new SaintsDictionary<string, FileInfo>();
 
         public static string GetMemberInfoEssentialId(MemberInfo memberInfo)
         {

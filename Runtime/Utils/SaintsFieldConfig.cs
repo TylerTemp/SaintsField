@@ -1,8 +1,4 @@
 #if UNITY_EDITOR
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEditor;
@@ -16,9 +12,6 @@ namespace SaintsField.Utils
 #endif
     public class SaintsFieldConfig : ScriptableObject
     {
-        public const int PreParserVersion = 1;
-        public static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
-
         public const int UpdateLoopDefaultMs = 100;
 
         [LayoutStart("Component Header", ELayout.FoldoutBox)]
@@ -137,85 +130,6 @@ namespace SaintsField.Utils
 
         [LayoutStart("Hidden Configs", ELayout.Collapse)]
         public bool setupWindowPopOnce;
-
-        [LayoutStart("./Code Parser", ELayout.TitleBox)]
-        [AboveText("Custom Code Parser Save Path, variables:\n"
-                   + "- {TEMP}: Temp Folder Path\n"
-                   + "- {PROJECT}: Project Root Path\n"
-                   + "- {PROJECT_DIR_NAME}: Project Directory Name\n"
-                   + "- {PRODUCT_NAME}: Application.productName"
-        )]
-
-        [InfoBox("Parser result will be saved in: <field />", show: nameof(_codeParserFolderResult))]
-        private string _codeParserFolderResult;
-
-        [LayoutStart("./Configs", ELayout.Horizontal)]
-        [FieldLabelText("Override Save")] public bool overrideCodeParserFolder;
-        [ShowIf(nameof(overrideCodeParserFolder)), NoLabel, ResizableTextArea, Required, FieldInfoBox("$" + nameof(GetCustomSavePath), EMessageType.None), BelowButton(nameof(UpdateRoslyn))]
-        public string codeParserFolder = "";
-
-        [ShowInInspector, HideIf(nameof(overrideCodeParserFolder)), LabelText(null), ResizableTextArea]
-        public static string CodeParserDefaultFolder
-        {
-            get
-            {
-                string projectRootPath = Directory.GetCurrentDirectory();
-                return $"{projectRootPath.Replace("\\", "/")}/{PreParserRelativeFolder}";
-            }
-        }
-
-        private void UpdateRoslyn()
-        {
-            (string error, string result) = RoslynUtil.CheckChange(this);
-
-            if (string.IsNullOrEmpty(error))
-            {
-                Debug.Log($"Set parsed folder to {result}");
-                _codeParserFolderResult = result;
-            }
-            else
-            {
-                _codeParserFolderResult = null;
-                Debug.LogError(error);
-                throw new Exception(error);
-            }
-        }
-
-        public static string GetCustomSavePath(string parserFolder)
-        {
-            string projectRootPath = Directory.GetCurrentDirectory();
-            string tempPath = Path.GetTempPath().Replace("\\", "/").TrimEnd('/');
-            string projectDirName = Path.GetFileName(projectRootPath);
-            // Debug.Log(parserFolder);
-            return StringFormatByName(parserFolder,
-                new Dictionary<string, string>
-                {
-                    { "TEMP", tempPath},
-                    { "PROJECT", projectRootPath },
-                    { "PROJECT_DIR_NAME", projectDirName },
-                    { "PRODUCT_NAME", Application.productName },
-                }).Replace("\\", "/").Trim();
-        }
-
-        public string GetParserSavePath()
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (overrideCodeParserFolder)
-            {
-                return GetCustomSavePath(codeParserFolder);
-            }
-
-            return CodeParserDefaultFolder;
-        }
-
-        private static string StringFormatByName(string template, Dictionary<string, string> values)
-        {
-            // Dictionary<string, string> values = new Dictionary<string, string> { { "Name", "Alice" }, { "Age", "30" } };
-            // string template = "Hello {Name}, you are {Age}.";
-
-            return values.Aggregate(template, (current, value) =>
-                current.Replace("{" + value.Key + "}", value.Value));
-        }
 
         // ReSharper disable once MemberCanBeMadeStatic.Global
         public bool GetSetupWindowPopOnce()

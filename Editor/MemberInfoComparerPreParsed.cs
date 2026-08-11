@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using System.Text;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEngine;
@@ -15,40 +13,17 @@ namespace SaintsField.Editor
 {
     public class MemberInfoComparerPreParsed : IComparer<MemberInfo>, IComparer
     {
+        private const string GeneratedProviderTypeName =
+            "SaintsFieldSourceParser.Generated.__SaintsFieldMemberOrderProvider_v1";
+        private const string GeneratedProviderMethodName = "GetMembers";
+
+        private delegate (int MemberType, string Name, string ReturnType, string[] ArgumentTypes)[]
+            GetGeneratedMembers(string typeName);
+
         private static readonly Dictionary<Type, MemberInfoComparerPreParsed> TypeToPreParsedComparer =
             new Dictionary<Type, MemberInfoComparerPreParsed>();
-
-        // private enum MemberType
-        // {
-        //     Field,
-        //     Property,
-        //     Method,
-        //     Event,
-        // }
-        //
-        // private readonly struct MemberContainer
-        // {
-        //     public readonly MemberType Type;
-        //     public readonly string Name;
-        //     public readonly IReadOnlyList<string> Arguments;
-        //     public readonly string ReturnType;
-        //
-        //     public MemberContainer(MemberType type, string name)
-        //     {
-        //         Type = type;
-        //         Name = name;
-        //         Arguments = null;
-        //         ReturnType = null;
-        //     }
-        //
-        //     public MemberContainer(string name, IEnumerable<string> arguments, string returnType)
-        //     {
-        //         Type = MemberType.Method;
-        //         Name = name;
-        //         Arguments = arguments.ToArray();
-        //         ReturnType = returnType;
-        //     }
-        // }
+        private static readonly Dictionary<Assembly, GetGeneratedMembers> AssemblyToProvider =
+            new Dictionary<Assembly, GetGeneratedMembers>();
 
         public static MemberInfoComparerPreParsed GetComparer(Type systemType)
         {
@@ -57,143 +32,113 @@ namespace SaintsField.Editor
 #endif
             if (TypeToPreParsedComparer.TryGetValue(systemType, out MemberInfoComparerPreParsed cache))
             {
-// #if SAINTSFIELD_DEBUG
-//                 Debug.Log($"return cache for {systemType}: {cache}");
-// #endif
                 return cache;
             }
 
-            if(!SaintsFieldConfigUtil.IsConfigLoaded)
+            Assembly assembly = systemType.GetTypeInfo().Assembly;
+            GetGeneratedMembers provider = GetProvider(assembly);
+            if (provider == null)
             {
-                Debug.LogWarning($"SaintsField config not loaded, unable to decide order for {systemType.FullName}. Please retry later or delete `Assets/Editor Default Resources/SaintsField/SaintsFieldConfig.asset`, use `Tools - Saints Field - Edit Config...` to re-generate it");
-                SaintsFieldConfigUtil.ReloadConfig();
-                return null;
+                return TypeToPreParsedComparer[systemType] = null;
             }
 
-            Assembly ass = systemType.GetTypeInfo().Assembly;
-            // var nameSpace = systemType.Namespace;
-            // SaintsField.Samples.Scripts.SaintsEditor.NewParserTest+Part1`2+TestNestedStructForParse`1[System.Int32,System.Int32,UnityEngine.GameObject]: SaintsField.Samples, SaintsField.Samples.Scripts.SaintsEditor
-            // SaintsField.Samples.Scripts.SaintsEditor.NewParserTest+Part1`2+TestNestedStructForParse[System.Int32,System.Int32]: SaintsField.Samples, SaintsField.Samples.Scripts.SaintsEditor
-
-            // Debug.Log($"{systemType}: {ass.GetName().Name}, {nameSpace}");
-            string baseFolder = $"{SaintsFieldConfigUtil.Config.GetParserSavePath()}/{ass.GetName().Name}";
-            if (!Directory.Exists(baseFolder))
+            string typeName = GetTypeMetadataName(systemType);
+            (int MemberType, string Name, string ReturnType, string[] ArgumentTypes)[] generatedMembers =
+                provider(typeName);
+            (bool found, MemberInfoPreParsedCache.MemberContainer[] memberContainers) =
+                TryCreateMemberContainers(generatedMembers);
+            if (!found)
             {
-// #if SAINTSFIELD_DEBUG
-//                 Debug.LogWarning($"folder not found {baseFolder}");
-// #endif
-                return null;
+                return TypeToPreParsedComparer[systemType] = null;
             }
 
-            // Get actual file name of parse result.
-            List<string> nameParts = new List<string>();
-            foreach (string segTypeName in systemType.ToString().Split('+'))
-            {
-                string resultName = segTypeName;
-                int leftBracket = resultName.IndexOf('[');
-                if (leftBracket > 0)
-                {
-                    resultName = segTypeName[..leftBracket];
-                }
-
-                nameParts.Add(resultName);
-            }
-
-            string nameBase = string.Join(".", nameParts);
-
-            string parsedFile = $"{baseFolder}/{nameBase}.rc";
-            if (!File.Exists(parsedFile))
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"not found {parsedFile}");
-#endif
-                return null;
-            }
-
-            long lastWriteTime = File.GetLastWriteTime(parsedFile).Ticks;
-            if (MemberInfoPreParsedCache.instance.nameToFileInfo.TryGetValue(nameBase,
-                    out MemberInfoPreParsedCache.FileInfo cachedFileInfo) && cachedFileInfo.lastWriteTime == lastWriteTime)
-            {
-// #if SAINTSFIELD_DEBUG
-//                 Debug.Log($"Use cached preParse for {nameBase}");
-// #endif
-                return TypeToPreParsedComparer[systemType] = new MemberInfoComparerPreParsed(nameBase, cachedFileInfo.memberContainers);
-            }
-
-            // Debug.Log($"{nameBase}.rc={File.ReadAllText(parsedFile)}");
-            using FileStream fs = new FileStream(
-                parsedFile,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.ReadWrite);
-            using StreamReader reader = new StreamReader(fs, Encoding.UTF8);
-            // string versionLine = reader.ReadLine();
-            // if (versionLine != $"{SaintsFieldConfig.PreParserVersion}")
-            // {
-            //     return TypeToPreParsedComparer[systemType] = null;
-            // }
-            // skip the checksum line
-            reader.ReadLine();
-
-            const string fieldPrefix = "Field ";
-            const string propertyPrefix = "Property ";
-            const string eventPrefix = "Event ";
-            const string methodPrefix = "Method ";
-
-            List<MemberInfoPreParsedCache.MemberContainer> memberContainers = new List<MemberInfoPreParsedCache.MemberContainer>();
-
-            // ReSharper disable once MoveVariableDeclarationInsideLoopCondition
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (line.StartsWith(fieldPrefix))
-                {
-                    string fieldName = line[fieldPrefix.Length..].Split('|')[1].Trim();
-                    memberContainers.Add(new MemberInfoPreParsedCache.MemberContainer(MemberInfoPreParsedCache.MemberType.Field, fieldName));
-                }
-                else if (line.StartsWith(propertyPrefix))
-                {
-                    string propertyName = line[propertyPrefix.Length..].Split('|')[1].Trim();
-                    memberContainers.Add(new MemberInfoPreParsedCache.MemberContainer(MemberInfoPreParsedCache.MemberType.Property, propertyName));
-                }
-                else if (line.StartsWith(eventPrefix))
-                {
-                    string eventName = line[eventPrefix.Length..].Split('|')[1].Trim();
-                    memberContainers.Add(new MemberInfoPreParsedCache.MemberContainer(MemberInfoPreParsedCache.MemberType.Event, eventName));
-                }
-                else if (line.StartsWith(methodPrefix))
-                {
-                    string[] methodRaw = line[methodPrefix.Length..].Split('|');
-                    string methodReturnType = methodRaw[0].Trim();
-                    string methodName = methodRaw[1].Trim();
-
-                    string[] methodArgumentsSplit = methodRaw[2].Split(';');
-                    string[] methodArguments = new string[methodArgumentsSplit.Length];
-                    for (int index = 0; index < methodArgumentsSplit.Length; index++)
-                    {
-                        methodArguments[index] = methodArgumentsSplit[index].Trim();
-                    }
-
-                    memberContainers.Add(new MemberInfoPreParsedCache.MemberContainer(methodName, methodArguments, methodReturnType));
-                }
-            }
-            MemberInfoPreParsedCache.instance.nameToFileInfo[nameBase] = new MemberInfoPreParsedCache.FileInfo(lastWriteTime, memberContainers.ToArray());
-            MemberInfoPreParsedCache.instance.nameToMemberIdToOrder.Remove(nameBase);
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MEMBER_ORDER
-            Debug.Log($"Use new preParse for {nameBase}");
-#endif
-            return TypeToPreParsedComparer[systemType] = new MemberInfoComparerPreParsed(nameBase, memberContainers);
+            string cacheKey = $"{assembly.FullName}|{typeName}";
+            MemberInfoPreParsedCache.instance.nameToMemberIdToOrder.Remove(cacheKey);
+            return TypeToPreParsedComparer[systemType] =
+                new MemberInfoComparerPreParsed(cacheKey, memberContainers);
         }
 
-        private readonly string _nameBase;
+        private static GetGeneratedMembers GetProvider(Assembly assembly)
+        {
+            if (AssemblyToProvider.TryGetValue(assembly, out GetGeneratedMembers cachedProvider))
+            {
+                return cachedProvider;
+            }
+
+            Type providerType = assembly.GetType(GeneratedProviderTypeName, false);
+            MethodInfo providerMethod = providerType?.GetMethod(
+                GeneratedProviderMethodName,
+                BindingFlags.Public | BindingFlags.Static,
+                null,
+                new[] { typeof(string) },
+                null);
+
+            GetGeneratedMembers provider = providerMethod == null
+                ? null
+                : (GetGeneratedMembers)Delegate.CreateDelegate(typeof(GetGeneratedMembers), providerMethod);
+            AssemblyToProvider[assembly] = provider;
+            return provider;
+        }
+
+        private static string GetTypeMetadataName(Type systemType)
+        {
+            Type typeDefinition = systemType.IsGenericType
+                ? systemType.GetGenericTypeDefinition()
+                : systemType;
+
+            Stack<string> containingTypeNames = new Stack<string>();
+            for (Type current = typeDefinition; current != null; current = current.DeclaringType)
+            {
+                containingTypeNames.Push(current.Name);
+            }
+
+            string typeName = string.Join(".", containingTypeNames);
+            return string.IsNullOrEmpty(typeDefinition.Namespace)
+                ? typeName
+                : $"{typeDefinition.Namespace}.{typeName}";
+        }
+
+        private static (bool Found, MemberInfoPreParsedCache.MemberContainer[] Result) TryCreateMemberContainers(
+            (int MemberType, string Name, string ReturnType, string[] ArgumentTypes)[] generatedMembers)
+        {
+            if (generatedMembers == null)
+            {
+                return (false, null);
+            }
+
+            MemberInfoPreParsedCache.MemberContainer[] memberContainers =
+                new MemberInfoPreParsedCache.MemberContainer[generatedMembers.Length];
+            for (int index = 0; index < generatedMembers.Length; index++)
+            {
+                (int MemberType, string Name, string ReturnType, string[] ArgumentTypes) generatedMember =
+                    generatedMembers[index];
+                MemberInfoPreParsedCache.MemberType memberType =
+                    (MemberInfoPreParsedCache.MemberType)generatedMember.MemberType;
+                if (memberType == MemberInfoPreParsedCache.MemberType.Method)
+                {
+                    memberContainers[index] = new MemberInfoPreParsedCache.MemberContainer(
+                        generatedMember.Name,
+                        generatedMember.ArgumentTypes ?? Array.Empty<string>(),
+                        generatedMember.ReturnType);
+                }
+                else
+                {
+                    memberContainers[index] =
+                        new MemberInfoPreParsedCache.MemberContainer(memberType, generatedMember.Name);
+                }
+            }
+
+            return (true, memberContainers);
+        }
+
+        private readonly string _cacheKey;
         private readonly IReadOnlyList<MemberInfoPreParsedCache.MemberContainer> _memberContainers;
         private SaintsDictionary<string, int> _memberIdToOrderCache;
 
-        private MemberInfoComparerPreParsed(string nameBase, IReadOnlyList<MemberInfoPreParsedCache.MemberContainer> memberContainers)
+        private MemberInfoComparerPreParsed(string cacheKey, IReadOnlyList<MemberInfoPreParsedCache.MemberContainer> memberContainers)
         {
-            _nameBase = nameBase;
-            if (MemberInfoPreParsedCache.instance.nameToMemberIdToOrder.TryGetValue(nameBase,
+            _cacheKey = cacheKey;
+            if (MemberInfoPreParsedCache.instance.nameToMemberIdToOrder.TryGetValue(cacheKey,
                     out SaintsDictionary<string, int> memberIdToOrder))
             {
                 _memberIdToOrderCache = memberIdToOrder;
@@ -259,7 +204,7 @@ namespace SaintsField.Editor
             {
                 if (_memberIdToOrderCache == null)
                 {
-                    _memberIdToOrderCache = MemberInfoPreParsedCache.instance.nameToMemberIdToOrder[_nameBase] =
+                    _memberIdToOrderCache = MemberInfoPreParsedCache.instance.nameToMemberIdToOrder[_cacheKey] =
                         new SaintsDictionary<string, int>
                         {
                             { aId, aIndex },
