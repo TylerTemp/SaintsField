@@ -115,11 +115,12 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.6**
+**5.25.7**
 
-1.  Fix: Use CurrentAssemblies for getting assemblies in Unity 6000.4+ by [@Insprill](https://github.com/Insprill) on [PR#426](https://github.com/TylerTemp/SaintsField/pull/426)
-2.  Improve: Source Parser no longer write to files to reduce file IO on huge project
-3.  Improve: Source Generator/Parser optimized [#401](https://github.com/TylerTemp/SaintsField/issues/401)
+1.  Add: SaintsDictionary (and `[ShowInInspector] Dictionary<>`) now has a menu button to toggle paging, searching, and scriptable object searching. Fix [#428](https://github.com/TylerTemp/SaintsField/issues/428)
+2.  Fix: `[ShowInInspector] Dictionary<>` constantly repaint on value changed
+3.  Fix: `AssetPreview` shown an empty space if the target has no preview of any kind
+4.  Change: `AssetPreview` default width & height to 128. This makes interactive preview do not shows too big by default  
 
 ## Usage ##
 

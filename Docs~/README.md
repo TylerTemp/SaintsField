@@ -8513,7 +8513,9 @@ public SaintsDictionary<int, SpriteRenderer> valueInject;
 
 ![](https://github.com/user-attachments/assets/8c8ae6ce-f402-48f1-b280-9bb65293eca5)
 
-Add `SaintsDictionary` attribute to control:
+You can use config menu to control the behavior of SaintsDictionary. 
+
+However, adding `SaintsDictionary` attribute can change it's default behavior and more controls:
 
 1.  Change keys' label & values' label
 2.  Disable the search, if you want
@@ -8525,6 +8527,7 @@ Add `SaintsDictionary` attribute to control:
 *   `string valueLabel = "Values"`
 *   `bool searchable = true`: false to disable the search ability
 *   `int numberOfItemsPerPage = 0`: items per page. 0 for no paging
+*   `bool objectSearch = true`: should it search inside a `ScriptableObject` target? Useful if you have a gaint `ScriptableObject` (like `Timeline`) but you only want to search the name
 *   `string keyWidth = null`: key column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
 *   `string valueWidth = null`: value column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
 
