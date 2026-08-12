@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/CollectionFoldout/CollectionFoldoutStyle.uss?fileID=7433441132597879392&amp;guid=44e6922bfcc609d4dbb4f01fdef72ddd&amp;type=3#CollectionFoldoutStyle"/>
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:Foldout/>
+        <ui:VisualElement name="topRightContainer" class="topRightContainer">
+            <ui:Button name="menuButton" class="menuButton"/>
+            <ui:IntegerField is-delayed="true" name="arraySizeField" class="arraySizeField"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -78,64 +78,68 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             SerializedProperty arrayProp = FieldWithInfo.SerializedProperty;
             TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().First();
 
-            Foldout foldout = new Foldout
+            // Foldout foldout = new Foldout
+            // {
+            //     text = arrayProp.displayName,
+            //     viewDataKey = NameTableContainer(arrayProp),
+            //     style =
+            //     {
+            //
+            //         // marginRight = 54,
+            //     },
+            // };
+            CollectionFoldout foldout = new CollectionFoldout(arrayProp.displayName)
             {
-                text = arrayProp.displayName,
                 viewDataKey = NameTableContainer(arrayProp),
-                style =
-                {
-
-                    // marginRight = 54,
-                },
             };
 
             UIToolkitUtils.AddContextualMenuManipulator(foldout, arrayProp, () => {});
             root.Add(foldout);
 
-            VisualElement topRightContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    // width = 50,
-                    position = Position.Absolute,
-                    top = 0,
-                    right = 0,
-                    height = EditorGUIUtility.singleLineHeight + 2,
-                    // marginLeft = 0,
-                    // alignSelf = Align.FlexEnd,
-                    // marginTop = -18,
-                },
-            };
-            root.Add(topRightContainer);
+            // VisualElement topRightContainer = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //         // width = 50,
+            //         position = Position.Absolute,
+            //         top = 0,
+            //         right = 0,
+            //         height = EditorGUIUtility.singleLineHeight + 2,
+            //         // marginLeft = 0,
+            //         // alignSelf = Align.FlexEnd,
+            //         // marginTop = -18,
+            //     },
+            // };
+            // root.Add(topRightContainer);
 
-            Button menuButton = new Button
-            {
-                style =
-                {
-                    backgroundImage = Util.LoadResource<Texture2D>("d__Menu"),
-                },
-            };
-            topRightContainer.Add(menuButton);
+            // Button menuButton = new Button
+            // {
+            //     style =
+            //     {
+            //         backgroundImage = Util.LoadResource<Texture2D>("d__Menu"),
+            //     },
+            // };
+            // topRightContainer.Add(menuButton);
 
-            IntegerField arraySizeField = new IntegerField
-            {
-                isDelayed = true,
-                value = arrayProp.arraySize,
-                style =
-                {
-                    width = 50,
-                    // position = Position.Absolute,
-                    // top = 0,
-                    // right = 0,
-                    // marginLeft = 0,
-                    // alignSelf = Align.FlexEnd,
-                    // marginTop = -18,
-                },
-            };
-            topRightContainer.Add(arraySizeField);
+            // IntegerField arraySizeField = new IntegerField
+            // {
+            //     isDelayed = true,
+            //     value = arrayProp.arraySize,
+            //     style =
+            //     {
+            //         width = 50,
+            //         // position = Position.Absolute,
+            //         // top = 0,
+            //         // right = 0,
+            //         // marginLeft = 0,
+            //         // alignSelf = Align.FlexEnd,
+            //         // marginTop = -18,
+            //     },
+            // };
+            // topRightContainer.Add(arraySizeField);
             // root.Add(arraySizeField);
-
+            foldout.ArraySizeField.value = arrayProp.arraySize;
 
             VisualElement foldoutContent = foldout.contentContainer;
             foldoutContent.style.marginLeft = 0;
@@ -160,7 +164,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             TableContentElement tableContentElement = new TableContentElement(FieldWithInfo);
             foldout.Add(tableContentElement);
 
-            menuButton.clicked += () =>
+            foldout.MenuButton.clicked += () =>
             {
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
                 if(tableContentElement.HasListView())
@@ -174,11 +178,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     genericDropdownMenu.AddDisabledItem("Expand All", false);
                 }
 
-                Rect menuBound = menuButton.worldBound;
+                Rect menuBound = foldout.MenuButton.worldBound;
 #if !UNITY_6000_3_OR_NEWER
                 menuBound.xMin = menuBound.xMax - Mathf.Max(menuBound.width, 120f);
 #endif
-                genericDropdownMenu.DropDown(menuBound, menuButton,
+                genericDropdownMenu.DropDown(menuBound, foldout.MenuButton,
 #if UNITY_6000_3_OR_NEWER
                     DropdownMenuSizeMode.Auto
 #else
@@ -202,7 +206,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             }
             // tableContentElement.AddToClassList("unity-collection-view--with-border");
 
-            arraySizeField.RegisterValueChangedCallback(evt =>
+            foldout.ArraySizeField.RegisterValueChangedCallback(evt =>
             {
                 int newValue = evt.newValue;
                 int oldValue = arrayProp.arraySize;
@@ -217,7 +221,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             // controls.Add(arraySizeField);
 
-            ListViewFooterElement listViewFooter = new ListViewFooterElement
+            ListViewFooterButtonsElement listViewFooterButtons = new ListViewFooterButtonsElement
             {
                 AddButton =
                 {
@@ -228,7 +232,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     name = NameRemoveButton(arrayProp),
                 },
             };
-            listViewFooter.AddButton.clicked += () =>
+            listViewFooterButtons.AddButton.clicked += () =>
             {
                 int oldValue = arrayProp.arraySize;
                 ChangeArraySize(oldValue + 1, arrayProp);
@@ -247,11 +251,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             if (tableAttribute.HideAddButton)
             {
                 // addButton.style.display = DisplayStyle.None;
-                listViewFooter.AddButton.style.display = DisplayStyle.None;
+                listViewFooterButtons.AddButton.style.display = DisplayStyle.None;
             }
             // toolbar.Add(addButton);
 
-            listViewFooter.RemoveButton.clicked += () =>
+            listViewFooterButtons.RemoveButton.clicked += () =>
             {
                 DeleteArrayElement(arrayProp, tableContentElement.SelectedIndices());
             };
@@ -267,15 +271,15 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             if (tableAttribute.HideRemoveButton)
             {
                 // removeButton.style.display = DisplayStyle.None;
-                listViewFooter.RemoveButton.style.display = DisplayStyle.None;
+                listViewFooterButtons.RemoveButton.style.display = DisplayStyle.None;
             }
             // toolbar.Add(removeButton);
 
             if (tableAttribute.HideAddButton && tableAttribute.HideRemoveButton)
             {
-                arraySizeField.SetEnabled(false);
+                foldout.ArraySizeField.SetEnabled(false);
                 // listViewFooter.style.display = DisplayStyle.None;
-                listViewFooter.ButtonsContainer.style.display = DisplayStyle.None;
+                listViewFooterButtons.ButtonsContainer.style.display = DisplayStyle.None;
             }
 
             // controls.Add(toolbar);
@@ -291,7 +295,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 if (_preArraySize != arrayProp.arraySize)
                 {
                     _preArraySize = arrayProp.arraySize;
-                    arraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
+                    foldout.ArraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
                 }
             });
 
@@ -301,7 +305,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
 // #endif
 
-            foldout.Add(listViewFooter);
+            foldout.Add(listViewFooterButtons);
         }
 
         public override void OnDestroyUIToolkit()

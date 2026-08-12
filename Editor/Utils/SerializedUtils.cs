@@ -503,7 +503,7 @@ namespace SaintsField.Editor.Utils
         }
 
         // Note: This WILL contain -1 for the sake of async searching...
-        public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string searchFull)
+        public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string searchFull, bool objectNestSearch)
         {
             IReadOnlyList<ListSearchToken> searchTokens = ParseSearch(searchFull).ToArray();
             for (int arrayElementIndex = 0; arrayElementIndex < property.arraySize; arrayElementIndex++)
@@ -520,7 +520,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
                     Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
 #endif
-                    if (!SearchProp(childProperty, search.Token, searchedObjects))
+                    if (!SearchProp(childProperty, search.Token, objectNestSearch, searchedObjects))
                     {
                         all = false;
                         break;
@@ -541,7 +541,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static bool SearchProp(SerializedProperty property, string rawToken, HashSet<object> searchedObjects)
+        public static bool SearchProp(SerializedProperty property, string rawToken, bool objectNestSearch, HashSet<object> searchedObjects)
         {
             SerializedPropertyType propertyType;
             try
@@ -581,16 +581,8 @@ namespace SaintsField.Editor.Utils
                     }
 
                     // ReSharper disable once Unity.NoNullPropagation
-                    if (property.objectReferenceValue is ScriptableObject so)
+                    if (objectNestSearch && property.objectReferenceValue is ScriptableObject so)
                     {
-//                         if (!searchedObjects.Add(so))
-//                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
-//                             Debug.Log($"#Search# Already searched {so.name} ({so.GetType()}) for {token}, skip");
-// #endif
-//                             return false;
-//                         }
-
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
                         Debug.Log($"#Search# nested search {so.name} with searchedObjects={string.Join(",", searchedObjects)}");
 #endif
@@ -657,7 +649,7 @@ namespace SaintsField.Editor.Utils
 
                     foreach ((string _, SerializedProperty subProp)  in SaintsRowAttributeDrawer.GetSerializableFieldInfo(property))
                     {
-                        if (SearchProp(subProp, token, searchedObjects))
+                        if (SearchProp(subProp, token, objectNestSearch, searchedObjects))
                         {
                             return true;
                         }
@@ -674,7 +666,7 @@ namespace SaintsField.Editor.Utils
 #endif
                         for (int i = 0; i < property.arraySize; i++)
                         {
-                            if (SearchProp(property.GetArrayElementAtIndex(i), token, searchedObjects))
+                            if (SearchProp(property.GetArrayElementAtIndex(i), token, objectNestSearch, searchedObjects))
                             {
                                 return true;
                             }
@@ -685,7 +677,7 @@ namespace SaintsField.Editor.Utils
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (SerializedProperty child in GetPropertyChildren(property))
                     {
-                        if(SearchProp(child, token, searchedObjects))
+                        if(SearchProp(child, token, objectNestSearch, searchedObjects))
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"found child: {child.propertyPath}");
@@ -705,7 +697,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static bool SearchUnityObjectProp(UnityEngine.Object uObject, string search, HashSet<object> searchedObjects)
+        public static bool SearchUnityObjectProp(Object uObject, string search, HashSet<object> searchedObjects)
         {
             if (!searchedObjects.Add(uObject))
             {
@@ -721,7 +713,7 @@ namespace SaintsField.Editor.Utils
                 SerializedProperty iterator = serializedObject.GetIterator();
                 while (iterator.NextVisible(true))
                 {
-                    if (SearchProp(iterator, search, searchedObjects))
+                    if (SearchProp(iterator, search, true, searchedObjects))
                     {
                         return true;
                     }

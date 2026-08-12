@@ -2862,6 +2862,12 @@ namespace SaintsField.Editor.Utils
 
         public static bool SearchObject(object childObject, string rawToken, HashSet<object> searchedObjects)
         {
+            return SearchObject(childObject, rawToken, searchedObjects, true);
+        }
+
+        public static bool SearchObject(object childObject, string rawToken, HashSet<object> searchedObjects,
+            bool objectNestedSearch)
+        {
             if (RuntimeUtil.IsNull(childObject))
             {
                 return false;
@@ -2888,12 +2894,16 @@ namespace SaintsField.Editor.Utils
                 {
                     return go.name.ToLower().Contains(token);
                 }
+                if (!objectNestedSearch)
+                {
+                    return uObject.name.ToLower().Contains(token);
+                }
                 return SerializedUtils.SearchUnityObjectProp(uObject, rawToken, searchedObjects);
             }
 
             if (childObject is IEnumerable ie)
             {
-                return ie.Cast<object>().Any(each => SearchObject(each, rawToken, searchedObjects));
+                return ie.Cast<object>().Any(each => SearchObject(each, rawToken, searchedObjects, objectNestedSearch));
             }
 
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
@@ -2920,7 +2930,7 @@ namespace SaintsField.Editor.Utils
                     continue;
                 }
 
-                if (SearchObject(fieldValue, rawToken, searchedObjects))
+                if (SearchObject(fieldValue, rawToken, searchedObjects, objectNestedSearch))
                 {
                     return true;
                 }
@@ -2948,7 +2958,7 @@ namespace SaintsField.Editor.Utils
                     continue;
                 }
 
-                if (SearchObject(propertyValue, rawToken, searchedObjects))
+                if (SearchObject(propertyValue, rawToken, searchedObjects, objectNestedSearch))
                 {
                     return true;
                 }
@@ -2959,6 +2969,12 @@ namespace SaintsField.Editor.Utils
 
         // Note: This WILL contain -1 for the sake of async searching...
         public static IEnumerable<int> SearchArrayObjects(IReadOnlyList<object> payloadRawValues, string searchFull)
+        {
+            return SearchArrayObjects(payloadRawValues, searchFull, true);
+        }
+
+        public static IEnumerable<int> SearchArrayObjects(IReadOnlyList<object> payloadRawValues, string searchFull,
+            bool objectNestedSearch)
         {
             IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(searchFull).ToArray();
             for (int arrayElementIndex = 0; arrayElementIndex < payloadRawValues.Count; arrayElementIndex++)
@@ -2975,7 +2991,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
                     Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
 #endif
-                    if (!SearchObject(childObject, search.Token, searchedObjects))
+                    if (!SearchObject(childObject, search.Token, searchedObjects, objectNestedSearch))
                     {
                         all = false;
                         break;
@@ -2998,11 +3014,17 @@ namespace SaintsField.Editor.Utils
 
         public static bool SearchObjectWithTokens(object value, IReadOnlyList<ListSearchToken> searchTokens)
         {
+            return SearchObjectWithTokens(value, searchTokens, true);
+        }
+
+        public static bool SearchObjectWithTokens(object value, IReadOnlyList<ListSearchToken> searchTokens,
+            bool objectNestedSearch)
+        {
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (ListSearchToken search in searchTokens)
             {
                 // ReSharper disable once InvertIf
-                if (!SearchObject(value, search.Token, new HashSet<object>()))
+                if (!SearchObject(value, search.Token, new HashSet<object>(), objectNestedSearch))
                 {
                     // Debug.Log($"search failed {value} for {search.Token}");
                     return false;

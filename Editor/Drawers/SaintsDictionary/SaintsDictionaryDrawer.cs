@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
@@ -91,13 +90,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 _valuesPropName = ReflectUtils.GetIWrapPropName(rawType, "EditorPropValues");
             }
 
-            Debug.Assert(_keysPropName != null, $"Failed to find keys property name for {rawType}. Do you froget to define a `static string EditorPropKeys` (nameof(YourPropKeyList))?");
-            Debug.Assert(_valuesPropName != null, $"Failed to find values property name for {rawType}. Do you froget to define a `static string EditorPropValues` (nameof(YourPropValueList))?");
+            Debug.Assert(_keysPropName != null, $"Failed to find keys property name for {rawType}. Do you forget to define a `static string EditorPropKeys` (nameof(YourPropKeyList))?");
+            Debug.Assert(_valuesPropName != null, $"Failed to find values property name for {rawType}. Do you forget to define a `static string EditorPropValues` (nameof(YourPropValueList))?");
 
             return (_keysPropName, _valuesPropName);
         }
 
-        private static IEnumerable<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch)
+        private static IEnumerable<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch, bool objectSearch)
         {
             int size = keysProp.arraySize;
 
@@ -116,7 +115,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             if (keySearchEmpty)
             {
-                foreach (int index in SerializedUtils.SearchArrayProperty(valuesProp, valueSearch))
+                foreach (int index in SerializedUtils.SearchArrayProperty(valuesProp, valueSearch, objectSearch))
                 {
                     yield return index;
                 }
@@ -124,10 +123,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 yield break;
             }
 
-
-
             IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
-            foreach (int index in SerializedUtils.SearchArrayProperty(keysProp, keySearch))
+            foreach (int index in SerializedUtils.SearchArrayProperty(keysProp, keySearch, objectSearch))
             {
                 if (index == -1)
                 {
@@ -145,7 +142,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         ListSearchToken search = searchTokens[tokenIndex];
                         HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
                         // ReSharper disable once InvertIf
-                        if (!SerializedUtils.SearchProp(valueProp, search.Token, searchedObjects))
+                        if (!SerializedUtils.SearchProp(valueProp, search.Token, objectSearch, searchedObjects))
                         {
                             all = false;
                             break;
@@ -162,23 +159,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                 }
             }
-            //
-            // IEnumerable<int> results = string.IsNullOrEmpty(keySearch)
-            //     ? Enumerable.Range(0, size)
-            //     : SerializedUtils.SearchArrayProperty(keysProp, keySearch);
-            // // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
-            // if (string.IsNullOrEmpty(valueSearch))
-            // {
-            //     return results;
-            // }
-            //
-            // Debug.Log("Search value");
-            //
-            // IEnumerable<int> valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch);
-            //
-            // Debug.Log("Filter value");
-            //
-            // return results.Where(each => each != -1 && valueResults.Contains(each));
         }
 
         private static string GetKeyLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null
@@ -188,43 +168,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private static string GetValueLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null
             ? "Values"
             : saintsDictionaryAttribute.ValueLabel;
-
-        private static bool GetNeedFlatten(SerializedProperty elementProp, Type baseType)
-        {
-            if (elementProp.propertyType != SerializedPropertyType.Generic)
-            {
-                return false;
-            }
-
-            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
-            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
-            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
-            SaintsRowAttribute saintsRowAttribute =
-                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
-
-            if (saintsRowAttribute is null)
-            {
-                // check if it has a 3rd party drawer
-                bool drawer = valuesAttributes.Any(eachAttr =>
-                    PropertyAttributeToPropertyDrawers.TryGetValue(eachAttr.GetType(), out IReadOnlyList<PropertyDrawerInfo> d) &&
-                    d.Any(each => !each.IsSaints));
-
-                if (drawer)
-                {
-                    return false;
-                }
-
-                // check if it has a type drawer
-                Type typeDrawer = FindTypeDrawerAny(baseType);
-                // Debug.Log($"{baseType}:{typeDrawer}");
-                if (typeDrawer != null)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
 
         private static SerializedProperty FindPropertyCompact(SerializedProperty property, string propValuesNameCompact)
         {
@@ -243,33 +186,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             return accProp;
-        }
-
-        private static object GetIndexAt(IEnumerable keysResult, int index)
-        {
-            if (keysResult is Array array)
-            {
-                return array.GetValue(index);
-            }
-
-            if (keysResult is IList iList)
-            {
-                return iList[index];
-            }
-
-
-            int curIndex = 0;
-            foreach (object item in keysResult)
-            {
-                if (curIndex == index)
-                {
-                    return item;
-                }
-
-                curIndex++;
-            }
-
-            throw new IndexOutOfRangeException($"Failed to get index {index} from {keysResult}");
         }
     }
 }

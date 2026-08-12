@@ -10,6 +10,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -29,6 +30,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             public VisualElement KeyLoadingImage;
             public VisualElement ValueLoadingImage;
+            public VisualElement KeySearchRoot;
+            public VisualElement ValueSearchRoot;
+            public ToolbarSearchField KeySearchField;
+            public ToolbarSearchField ValueSearchField;
+            public bool ObjectNestedSearch;
             public List<object> itemIndexToKeys;
 
             public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
@@ -222,109 +228,51 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         private class SaintsDictionaryWrapper : VisualElement
         {
-            public readonly Foldout Foldout;
+            public readonly CollectionFoldout Foldout;
             public readonly IntegerField ArraySizeField;
-            public readonly Button NullButton;
             public readonly MultiColumnListView ListView;
-            public readonly ListViewPagerFooterStruct FooterStruct;
+            public readonly ListViewPagerElement Pager;
+            public readonly ListViewFooterButtonsElement FooterButtons;
             public readonly PairPanel PairPanel;
 
-            public SaintsDictionaryWrapper(string label, bool nullable, MultiColumnListView listView, Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider, string foldoutViewKey)
+            public SaintsDictionaryWrapper(string label, MultiColumnListView listView, Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider, string foldoutViewKey)
             {
-                VisualElement header = new VisualElement();
-                Add(header);
-
                 // Debug.Log(label);
 
-                header.Add(Foldout = new Foldout
+                Add(Foldout = new CollectionFoldout(label)
                 {
-                    text = label,
+                    viewDataKey = foldoutViewKey,
                 });
-                VisualElement foldoutContent = Foldout.contentContainer;
-                foldoutContent.style.marginLeft = 0;
+                ArraySizeField = Foldout.ArraySizeField;
 
-                VisualElement rightAlign = new VisualElement
+                // body
+                Foldout.Add(ListView = listView);
+
+                // footer
+                VisualElement footer = new VisualElement
                 {
                     style =
                     {
                         flexDirection = FlexDirection.Row,
-                        alignSelf = Align.FlexEnd,
-                        marginTop = -16,
+                        justifyContent = Justify.FlexEnd,
                     },
                 };
-                header.Add(rightAlign);
-
-                rightAlign.Add(NullButton = new Button
-                {
-                    tooltip = "Set to Null",
-                    // text = "x",
-                    style =
-                    {
-                        display = nullable? DisplayStyle.Flex: DisplayStyle.None,
-                        width = EditorGUIUtility.singleLineHeight,
-                        // height = EditorGUIUtility.singleLineHeight,
-                        borderBottomRightRadius = 0,
-                        borderTopRightRadius = 0,
-                        borderRightWidth = 0,
-                        marginRight = 0,
-
-                        backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-#if UNITY_2022_2_OR_NEWER
-                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                        backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                    },
-                });
-                rightAlign.Add(ArraySizeField = new IntegerField
-                {
-                    isDelayed = true,
-                    style =
-                    {
-                        width = 50,
-                        marginLeft = 0,
-                    },
-                });
-
-                VisualElement textInputElement = ArraySizeField.Q<VisualElement>(name: "unity-text-input");
-                if (textInputElement != null)
-                {
-                    textInputElement.style.borderTopLeftRadius = textInputElement.style.borderTopRightRadius = 0;
-                    textInputElement.style.marginLeft = 0;
-                }
-
-                // body
-                Add(ListView = listView);
-
-                // footer
-                FooterStruct = new ListViewPagerFooterStruct(true);
-                Add(FooterStruct.Root);
+                footer.Add(Pager = new ListViewPagerElement());
+                footer.Add(FooterButtons = new ListViewFooterButtonsElement());
+                Foldout.Add(footer);
 
                 // panel for adding
-                Add(PairPanel = new PairPanel(dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider, $"{foldoutViewKey}.[add.panel]"));
+                Foldout.Add(PairPanel = new PairPanel(dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider, $"{foldoutViewKey}.[add.panel]"));
 
-                FooterStruct.AddButton.clicked += () =>
+                FooterButtons.AddButton.clicked += () =>
                 {
                     PairPanel.style.display = DisplayStyle.Flex;
-                    FooterStruct.AddButton.SetEnabled(false);
+                    FooterButtons.AddButton.SetEnabled(false);
                 };
                 PairPanel.OnFinished.AddListener((_, _, _) =>
                 {
-                    FooterStruct.AddButton.SetEnabled(true);
+                    FooterButtons.AddButton.SetEnabled(true);
                 });
-
-                RefreshToggleDisplay();
-                Foldout.RegisterValueChangedCallback(_ => RefreshToggleDisplay());
-            }
-
-            private void RefreshToggleDisplay()
-            {
-                DisplayStyle display = Foldout.value ? DisplayStyle.Flex : DisplayStyle.None;
-                ListView.style.display = display;
-                FooterStruct.Root.style.display = display;
             }
 
         }
@@ -342,7 +290,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 oldPayload.RawDictValue = rawDictValue;
                 int totalCount = oldPayload.GetKeys().Count();
                 dictField.ArraySizeField.SetValueWithoutNotify(totalCount);
-                dictField.FooterStruct.NumberOfItemsTotalField.SetValueWithoutNotify(totalCount);
+                dictField.Pager.NumberOfItemsTotalField.SetValueWithoutNotify(totalCount);
 
                 RefreshFieldWithPayload(dictField, (DictionaryViewPayload)dictField.ListView.userData);
 
@@ -387,9 +335,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod, containsKeyMethod, asyncSearchItems)
             {
                 itemIndexToKeys = initKeys,
+                ObjectNestedSearch = saintsDictionaryAttribute.ObjectSearch,
             };
 
-            dictField = new SaintsDictionaryWrapper(label, setterOrNull != null, new MultiColumnListView
+            dictField = new SaintsDictionaryWrapper(label, new MultiColumnListView
             {
                 selectionType = SelectionType.Multiple,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
@@ -417,11 +366,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             if (isReadOnly)
             {
                 dictField.ArraySizeField.SetEnabled(false);
-                dictField.FooterStruct.NumberOfItemsTotalField.SetEnabled(false);
-                dictField.FooterStruct.FooterButtons.SetEnabled(false);
+                dictField.Pager.NumberOfItemsTotalField.SetEnabled(false);
+                dictField.FooterButtons.SetEnabled(false);
             }
             dictField.ArraySizeField.SetValueWithoutNotify(initCount);
-            dictField.FooterStruct.NumberOfItemsTotalField.SetValueWithoutNotify(initCount);
+            dictField.Pager.NumberOfItemsTotalField.SetValueWithoutNotify(initCount);
 
             void ChangeSize(ChangeEvent<int> evt)
             {
@@ -436,10 +385,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     case > 0:
                     {
                         dictField.PairPanel.style.display = DisplayStyle.Flex;
-                        dictField.FooterStruct.AddButton.SetEnabled(false);
+                        dictField.FooterButtons.AddButton.SetEnabled(false);
 
                         dictField.ArraySizeField.SetValueWithoutNotify(curCount);
-                        dictField.FooterStruct.NumberOfItemsTotalField.SetValueWithoutNotify(curCount);
+                        dictField.Pager.NumberOfItemsTotalField.SetValueWithoutNotify(curCount);
                     }
                         break;
                     case < 0:
@@ -454,7 +403,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             dictField.ArraySizeField.RegisterValueChangedCallback(ChangeSize);
-            dictField.FooterStruct.NumberOfItemsTotalField.RegisterValueChangedCallback(ChangeSize);
+            dictField.Pager.NumberOfItemsTotalField.RegisterValueChangedCallback(ChangeSize);
 
             #region Key/Value
             ResponsiveLength keyWidth = saintsDictionaryAttribute.KeyWidth;
@@ -475,6 +424,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         },
                     });
                     SearchContainerStruct searchContainerStruct = SearchContainerStruct.Load();
+                    payload.KeySearchRoot = searchContainerStruct.Root;
+                    payload.KeySearchField = searchContainerStruct.ToolbarSearchField;
                     if (!saintsDictionaryAttribute.Searchable)
                     {
                         searchContainerStruct.Root.style.display = DisplayStyle.None;
@@ -601,6 +552,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         },
                     });
                     SearchContainerStruct searchContainerStruct = SearchContainerStruct.Load();
+                    payload.ValueSearchRoot = searchContainerStruct.Root;
+                    payload.ValueSearchField = searchContainerStruct.ToolbarSearchField;
                     header.Add(searchContainerStruct.Root);
 #if UNITY_6000_0_OR_NEWER
                     searchContainerStruct.ToolbarSearchField.placeholderText = "";
@@ -677,15 +630,15 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
 
                 payload.SetKeyValue(key, value);
-                dictField.ListView.itemsSource = payload.GetKeys().ToList();
+                RefreshFieldWithPayload(dictField, payload);
             });
 
             if (saintsDictionaryAttribute.NumberOfItemsPerPage <= 0)
             {
-                dictField.FooterStruct.PagingContainer.style.display = DisplayStyle.None;
+                dictField.Pager.style.display = DisplayStyle.None;
             }
 
-            dictField.FooterStruct.RemoveButton.clicked += () =>
+            dictField.FooterButtons.RemoveButton.clicked += () =>
             {
                 int[] toRemoveIndices = dictField.ListView.selectedIndices.ToArray();
                 List<object> removeKeys = new List<object>();
@@ -716,26 +669,120 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             #region Logic
 
-            dictField.FooterStruct.NumberOfItemsPerPageField.RegisterValueChangedCallback(evt =>
+            dictField.Pager.NumberOfItemsPerPageField.RegisterValueChangedCallback(evt =>
             {
                 payload.AsyncSearchItems.NumberOfItemsPerPage = evt.newValue;
                 RefreshFieldWithPayload(dictField, payload);
             });
-            dictField.FooterStruct.NumberOfItemsPerPageField.SetValueWithoutNotify(saintsDictionaryAttribute.NumberOfItemsPerPage);
-            dictField.FooterStruct.PagePreButton.clicked += () =>
+            dictField.Pager.NumberOfItemsPerPageField.SetValueWithoutNotify(saintsDictionaryAttribute.NumberOfItemsPerPage);
+            dictField.Pager.PagePreButton.clicked += () =>
             {
                 payload.AsyncSearchItems.PageIndex = Mathf.Max(0, payload.AsyncSearchItems.PageIndex - 1);
                 RefreshFieldWithPayload(dictField, payload);
             };
-            dictField.FooterStruct.PageField.RegisterValueChangedCallback(evt =>
+            dictField.Pager.PageField.RegisterValueChangedCallback(evt =>
             {
                 payload.AsyncSearchItems.PageIndex = Mathf.Clamp(evt.newValue - 1, 0, payload.AsyncSearchItems.TotalPage - 1);
                 RefreshFieldWithPayload(dictField, payload);
             });
-            dictField.FooterStruct.PageNextButton.clicked += () =>
+            dictField.Pager.PageNextButton.clicked += () =>
             {
                 payload.AsyncSearchItems.PageIndex = Mathf.Min(payload.AsyncSearchItems.PageIndex + 1, payload.AsyncSearchItems.TotalPage - 1);
                 RefreshFieldWithPayload(dictField, payload);
+            };
+
+            #endregion
+
+            #region Menu
+
+            dictField.Foldout.MenuButton.clicked += () =>
+            {
+                GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+                if (setterOrNull == null)
+                {
+                    genericDropdownMenu.AddDisabledItem("Set To Null", false);
+                }
+                else
+                {
+                    genericDropdownMenu.AddItem("Set To Null", false, () =>
+                    {
+                        beforeSet?.Invoke(payload.RawDictValue);
+                        setterOrNull(null);
+                    });
+                }
+
+                bool curPaging = dictField.Pager.style.display != DisplayStyle.None;
+                genericDropdownMenu.AddItem("Paging", curPaging, () =>
+                {
+                    if (curPaging)
+                    {
+                        dictField.Pager.style.display = DisplayStyle.None;
+                        dictField.Pager.NumberOfItemsPerPageField.value = -1;
+                    }
+                    else
+                    {
+                        int configuredItemsPerPage = saintsDictionaryAttribute.NumberOfItemsPerPage;
+                        int itemsPerPage = configuredItemsPerPage > 0
+                            ? configuredItemsPerPage
+                            : Mathf.Max(5, payload.GetKeys().Count() / 2);
+                        dictField.Pager.style.display = DisplayStyle.Flex;
+                        dictField.Pager.NumberOfItemsPerPageField.value = itemsPerPage;
+                    }
+                });
+
+                if (payload.KeySearchField != null && payload.ValueSearchField != null)
+                {
+                    bool curSearch = payload.KeySearchRoot.style.display != DisplayStyle.None;
+                    genericDropdownMenu.AddItem("Search", curSearch, () =>
+                    {
+                        DisplayStyle toDisplay = curSearch ? DisplayStyle.None : DisplayStyle.Flex;
+                        payload.KeySearchRoot.style.display = payload.ValueSearchRoot.style.display = toDisplay;
+                        if (curSearch)
+                        {
+                            payload.KeySearchField.value = "";
+                            payload.ValueSearchField.value = "";
+                        }
+                    });
+
+                    if (curSearch)
+                    {
+                        genericDropdownMenu.AddItem("Object Search", payload.ObjectNestedSearch, () =>
+                        {
+                            payload.ObjectNestedSearch = !payload.ObjectNestedSearch;
+                            if (!string.IsNullOrEmpty(payload.AsyncSearchItems.KeySearchText) ||
+                                !string.IsNullOrEmpty(payload.AsyncSearchItems.ValueSearchText))
+                            {
+                                payload.AsyncSearchItems.DebounceSearchTime = 0;
+                                payload.AsyncSearchItems.Started = false;
+                                payload.AsyncSearchItems.Finished = false;
+                                payload.AsyncSearchItems.HitTargetIndexes.Clear();
+                                payload.AsyncSearchItems.SourceGenerator?.Dispose();
+                                payload.AsyncSearchItems.SourceGenerator = SearchPayload(payload);
+                                RefreshFieldWithPayload(dictField, payload);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Object Search", payload.ObjectNestedSearch);
+                    }
+                }
+                else
+                {
+                    genericDropdownMenu.AddDisabledItem("Search", false);
+                }
+
+                Rect menuBound = dictField.Foldout.MenuButton.worldBound;
+#if !UNITY_6000_3_OR_NEWER
+                menuBound.xMin = menuBound.xMax - Mathf.Max(menuBound.width, 120f);
+#endif
+                genericDropdownMenu.DropDown(menuBound, dictField.Foldout.MenuButton,
+#if UNITY_6000_3_OR_NEWER
+                    DropdownMenuSizeMode.Auto
+#else
+                    true
+#endif
+                );
             };
 
             #endregion
@@ -960,10 +1007,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 // Debug.Log("rebuild list view");
                 dictField.ListView.itemsSource = payload.itemIndexToKeys.ToList();
                 dictField.ListView.Rebuild();
-                dictField.FooterStruct.PagePreButton.SetEnabled(payload.AsyncSearchItems.PageIndex > 0);
-                dictField.FooterStruct.PageField.SetValueWithoutNotify(payload.AsyncSearchItems.PageIndex + 1);
-                dictField.FooterStruct.PageLabel.text = $"/ {payload.AsyncSearchItems.TotalPage}";
-                dictField.FooterStruct.PageNextButton.SetEnabled(payload.AsyncSearchItems.PageIndex + 1 < payload.AsyncSearchItems.TotalPage);
+                dictField.Pager.PagePreButton.SetEnabled(payload.AsyncSearchItems.PageIndex > 0);
+                dictField.Pager.PageField.SetValueWithoutNotify(payload.AsyncSearchItems.PageIndex + 1);
+                dictField.Pager.PageLabel.text = $"/ {payload.AsyncSearchItems.TotalPage}";
+                dictField.Pager.PageNextButton.SetEnabled(payload.AsyncSearchItems.PageIndex + 1 < payload.AsyncSearchItems.TotalPage);
             }
         }
 
@@ -992,7 +1039,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 foreach (object key in keys)
                 {
                     object value = payload.GetValue(key);
-                    if (Util.SearchObjectWithTokens(value, valueSearchTokens))
+                    if (Util.SearchObjectWithTokens(value, valueSearchTokens, payload.ObjectNestedSearch))
                     {
                         yield return key;
                     }
@@ -1006,7 +1053,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
 
-            foreach (int index in Util.SearchArrayObjects(keys, keySearch))
+            foreach (int index in Util.SearchArrayObjects(keys, keySearch, payload.ObjectNestedSearch))
             {
                 if (index == -1)
                 {
@@ -1016,7 +1063,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 {
                     object key = keys[index];
                     object valueProp = payload.GetValue(key);
-                    if (Util.SearchObjectWithTokens(valueProp, valueSearchTokens))
+                    if (Util.SearchObjectWithTokens(valueProp, valueSearchTokens, payload.ObjectNestedSearch))
                     {
                         yield return key;
                     }

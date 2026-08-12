@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-    public class ListViewFooterElement: VisualElement
+    public class ListViewFooterButtonsElement: VisualElement
     {
         private static VisualTreeAsset _containerTree;
 
@@ -15,7 +15,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public override VisualElement contentContainer { get; }
 
-        public ListViewFooterElement()
+        public ListViewFooterButtonsElement()
         {
             if (_containerTree == null)
             {

@@ -29,27 +29,32 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         private static string NameFoldout(SerializedProperty property) =>
             $"{property.propertyPath}__SaintsDictionary_Foldout";
-        private static string NameTotalCount(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_TotalCount";
+        // private static string NameTotalCount(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_TotalCount";
 
         private static string NameListView(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_ListView";
-        private static string NameTotalCountBottom(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_TotalCountBottom";
+        // private static string NameTotalCountBottom(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_TotalCountBottom";
 
-        private static string NamePagePreButton(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictinoary_PagePreButton";
+        // private static string NamePagePreButton(SerializedProperty property) =>
+        //     $"{property.propertyPath}__SaintsDictionary_PagePreButton";
+        //
+        // private static string NamePage(SerializedProperty property) =>
+        //     $"{property.propertyPath}__SaintsDictionary_Page";
+        //
+        // private static string NamePageLabel(SerializedProperty property) =>
+        //     $"{property.propertyPath}__SaintsDictionary_PageLabel";
+        // private static string NamePageNextButton(SerializedProperty property) =>
+        //     $"{property.propertyPath}__SaintsDictionary_PageNextButton";
 
-        private static string NamePage(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictionary_Page";
+        // private static string NameAddButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_AddButton";
+        // private static string NameRemoveButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_RemoveButton";
 
-        private static string NamePageLabel(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictionary_PageLabel";
-        private static string NamePageNextButton(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictionary_PageNextButton";
+        // private static string NameNumberOfItemsPerPage(SerializedProperty property) =>
+        //     $"{property.propertyPath}__SaintsDictionary_NameNumberOfItemsPerPage";
 
-        private static string NameAddButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_AddButton";
-        private static string NameRemoveButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_RemoveButton";
-
-        private static string NameNumberOfItemsPerPage(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictionary_NameNumberOfItemsPerPage";
+        private static string NamePager(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsDictionary_Pager";
+        private static string NameFooterButtons(SerializedProperty property) =>
+            $"{property.propertyPath}__SaintsDictionary_FooterButtons";
 
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -80,13 +85,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 pickingMode = PickingMode.Ignore,
             });
 
-            VisualElement foldout = new Foldout
+            CollectionFoldout foldout = new CollectionFoldout(GetPreferredLabel(property))
             {
-                text = GetPreferredLabel(property),
                 value = property.isExpanded,
                 name = NameFoldout(property),
                 viewDataKey = property.propertyPath,
             };
+            // foldout.MenuButton.style.display = DisplayStyle.None;
             if (!string.IsNullOrEmpty(property.tooltip))
             {
                 Label foldoutLabel = foldout.Q<Label>();
@@ -96,13 +101,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
             }
 
-            VisualElement content = foldout.Q<VisualElement>(className: "unity-foldout__content");
-            // Debug.Log(content);
-            if (content != null)
-            {
-                content.style.marginLeft = 0;
-            }
-
             root.Add(foldout);
 
             // (string propKeysName, string propValuesName) = GetKeysValuesPropName(info.FieldType);
@@ -110,21 +108,21 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // SerializedProperty keysProp = property.FindPropertyRelative(propKeysName);
             // SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName);
 
-            IntegerField totalCount = new IntegerField
-            {
-                // value = keysProp.arraySize,
-                label = "",
-                // isDelayed = true,
-                style =
-                {
-                    minWidth = 50,
-                    position = Position.Absolute,
-                    top = 1,
-                    right = 1,
-                },
-                name = NameTotalCount(property),
-            };
-            root.Add(totalCount);
+            // IntegerField totalCount = new IntegerField
+            // {
+            //     // value = keysProp.arraySize,
+            //     label = "",
+            //     // isDelayed = true,
+            //     style =
+            //     {
+            //         minWidth = 50,
+            //         position = Position.Absolute,
+            //         top = 1,
+            //         right = 1,
+            //     },
+            //     name = NameTotalCount(property),
+            // };
+            // root.Add(totalCount);
 
             MultiColumnListView multiColumnListView = new MultiColumnListView
             {
@@ -147,8 +145,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             foldout.Add(multiColumnListView);
 
-            // footer: add/remove
-            VisualElement footerButtons = new VisualElement
+            VisualElement footer = new VisualElement
             {
                 style =
                 {
@@ -159,136 +156,24 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             int numberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
 
-            IntegerField numberOfItemsPerPageField = new IntegerField
-            {
-                value = numberOfItemsPerPage,
-                isDelayed = true,
-                style =
-                {
-                    minWidth = 30,
-                },
-                name = NameNumberOfItemsPerPage(property),
-            };
-            if(numberOfItemsPerPage > 0)
-            {
-                TextElement numberOfItemsPerPageFieldTextElement = numberOfItemsPerPageField.Q<TextElement>();
-                if (numberOfItemsPerPageFieldTextElement != null)
-                {
-                    numberOfItemsPerPageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
-                }
-            }
-            else
-            {
-                numberOfItemsPerPageField.style.display = DisplayStyle.None;
-            }
-
-            footerButtons.Add(numberOfItemsPerPageField);
-
-            Label numberOfItemsSep = new Label("/")
+            ListViewPagerElement pager = new ListViewPagerElement
             {
                 style =
                 {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
+                    display = numberOfItemsPerPage > 0 ? DisplayStyle.Flex : DisplayStyle.None,
                 },
+                name = NamePager(property),
             };
-            footerButtons.Add(numberOfItemsSep);
-            IntegerField totalCountBottomField = new IntegerField
+            footer.Add(pager);
+
+            ListViewFooterButtonsElement footerButtonsAddRemove = new ListViewFooterButtonsElement
             {
-                isDelayed = true,
-                style =
-                {
-                    minWidth = 30,
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
-                },
-                name = NameTotalCountBottom(property),
-                // value = property.arraySize,
+                name = NameFooterButtons(property),
             };
-            footerButtons.Add(totalCountBottomField);
 
-            Label numberOfItemsDesc = new Label("Items")
-            {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
-                },
-            };
-            footerButtons.Add(numberOfItemsDesc);
+            footer.Add(footerButtonsAddRemove);
 
-            Button pagePreButton = new Button
-            {
-                style =
-                {
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
-                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-left.png"),
-#if UNITY_2022_2_OR_NEWER
-                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                },
-                name = NamePagePreButton(property),
-            };
-            footerButtons.Add(pagePreButton);
-
-            IntegerField pageField = new IntegerField
-            {
-                isDelayed = true,
-                value = 1,
-                style =
-                {
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
-                    minWidth = 30,
-                },
-                name = NamePage(property),
-            };
-            TextElement pageFieldTextElement = pageField.Q<TextElement>();
-            if(pageFieldTextElement != null)
-            {
-                pageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
-            }
-            footerButtons.Add(pageField);
-            Label pageLabel = new Label(" / 1")
-            {
-                style =
-                {
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                },
-                name = NamePageLabel(property),
-            };
-            footerButtons.Add(pageLabel);
-            Button pageNextButton = new Button
-            {
-                style =
-                {
-                    display = numberOfItemsPerPage > 0? DisplayStyle.Flex: DisplayStyle.None,
-                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-right.png"),
-#if UNITY_2022_2_OR_NEWER
-                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                },
-                name = NamePageNextButton(property),
-            };
-            footerButtons.Add(pageNextButton);
-
-            ListViewFooterElement footerAddRemove = new ListViewFooterElement();
-
-            footerButtons.Add(footerAddRemove);
-
-            footerAddRemove.AddButton.name = NameAddButton(property);
-            footerAddRemove.RemoveButton.name = NameRemoveButton(property);
-
-            foldout.Add(footerButtons);
+            foldout.Add(footer);
 
             // root.Add(multiColumnListView);
             return root;
@@ -363,11 +248,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private AsyncSearchItems<int> _asyncSearchItems;
 
         private const float DebounceTime = 0.6f;
+        private bool _objectNestedSearch = true;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            Foldout foldout = container.Q<Foldout>(name: NameFoldout(property));
+            CollectionFoldout foldout = container.Q<CollectionFoldout>(name: NameFoldout(property));
+            ListViewPagerElement pager = container.Q<ListViewPagerElement>(name: NamePager(property));
+
             UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             foldout.RegisterValueChangedCallback(newValue => property.isExpanded = newValue.newValue);
 
@@ -460,9 +348,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, valueHasSerializeReference);
             // Debug.Log($"decide valueWrapType={valueWrapType} for {valuesField.Name}/{valueType}");
 
-            IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
+            IntegerField totalCountFieldTop = foldout.ArraySizeField;
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
-            IntegerField totalCountBottomField = container.Q<IntegerField>(name: NameTotalCountBottom(property));
+
+            IntegerField totalCountBottomField = pager.NumberOfItemsTotalField;
             totalCountBottomField.SetValueWithoutNotify(keysProp.arraySize);
 
             void ManuallySetSize(int size)
@@ -499,10 +388,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             });
             totalCountBottomField.RegisterValueChangedCallback(evt => ManuallySetSize(evt.newValue));
 
-            Label pageLabel = container.Q<Label>(name: NamePageLabel(property));
-            Button pagePreButton = container.Q<Button>(name: NamePagePreButton(property));
-            IntegerField pageField = container.Q<IntegerField>(name: NamePage(property));
-            Button pageNextButton = container.Q<Button>(name: NamePageNextButton(property));
+            Label pageLabel = pager.PageLabel;
+            Button pagePreButton = pager.PagePreButton;
+            IntegerField pageField = pager.PageField;
+            Button pageNextButton = pager.PageNextButton;
 
             List<int> itemIndexToPropertyIndex = Enumerable.Range(0, keysProp.arraySize).ToList();
 
@@ -511,6 +400,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             #region Paging & Search
 
             SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
+            if (saintsDictionaryAttribute != null)
+            {
+                _objectNestedSearch = saintsDictionaryAttribute.ObjectSearch;
+            }
 
             int initNumberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
             List<int> initTargets = new List<int>(Enumerable.Range(0, keysProp.arraySize));
@@ -557,7 +450,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     _asyncSearchItems.HitTargetIndexes.Clear();
                     _asyncSearchItems.SourceGenerator?.Dispose();
                     _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp,
-                        _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+                        _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText, _objectNestedSearch).GetEnumerator();
 
                     // Debug.Log("size changed, tail call refresh list");
                     // ReSharper disable once TailRecursiveCall
@@ -634,7 +527,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             #endregion
 
-            IntegerField numberOfItemsPerPage = container.Q<IntegerField>(name: NameNumberOfItemsPerPage(property));
+            IntegerField numberOfItemsPerPage = pager.NumberOfItemsPerPageField;
+            numberOfItemsPerPage.SetValueWithoutNotify(initNumberOfItemsPerPage);
             numberOfItemsPerPage.RegisterValueChangedCallback(evt =>
             {
                 _asyncSearchItems.NumberOfItemsPerPage = evt.newValue;
@@ -677,6 +571,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             keyWidth = GetSessionColumnWidth(property, true, keyWidth);
             VisualElement keyHeader = null;
 #endif
+            ToolbarSearchField keySearchField = null;
             Column keyColumn = new Column
             {
                 name = "Keys",
@@ -700,7 +595,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             },
                         });
                     }
-                    ToolbarSearchField keySearch = new ToolbarSearchField
+                    ToolbarSearchField keySearch = keySearchField = new ToolbarSearchField
                     {
                         style =
                         {
@@ -727,7 +622,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         _asyncSearchItems.Started = false;
                         _asyncSearchItems.Finished = false;
                         _asyncSearchItems.HitTargetIndexes.Clear();
-                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText, _objectNestedSearch).GetEnumerator();
                         _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
                         RefreshList();
                     });
@@ -819,6 +714,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             valueWidth = GetSessionColumnWidth(property, false, valueWidth);
             VisualElement valueHeader = null;
 #endif
+            ToolbarSearchField valueSearchField = null;
             Column valueColumn = new Column
             {
                 name = "Values",
@@ -846,7 +742,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
 
                     // header.Add(new Label("Values"));
-                    ToolbarSearchField valueSearch = new ToolbarSearchField
+                    ToolbarSearchField valueSearch = valueSearchField = new ToolbarSearchField
                     {
                         style =
                         {
@@ -874,7 +770,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         _asyncSearchItems.Started = false;
                         _asyncSearchItems.Finished = false;
                         _asyncSearchItems.HitTargetIndexes.Clear();
-                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText, _objectNestedSearch).GetEnumerator();
                         _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
                         RefreshList();
                     });
@@ -909,40 +805,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, valueInjectCreatedAttributes, valueInjectAttributes, valueHasSerializeReference, this, this, this, valuesParent);
 
                     element.Add(resultElement);
-
-                    // if (!valueStructChecked)
-                    // {
-                    //     valueStructChecked = true;
-                    //     valueStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(valuesField.FieldType));
-                    // }
-                    //
-                    // VisualElement valueContainer = new VisualElement
-                    // {
-                    //     style =
-                    //     {
-                    //         marginRight = 3,
-                    //     },
-                    // };
-                    // element.Add(valueContainer);
-                    // if (valueStructNeedFlatten)
-                    // {
-                    //     foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
-                    //     {
-                    //         valueContainer.Add(new Label(childProp.displayName));
-                    //         PropertyField propertyField = new PropertyField(childProp)
-                    //         {
-                    //             label = "",
-                    //         };
-                    //         propertyField.Bind(property.serializedObject);
-                    //         valueContainer.Add(propertyField);
-                    //     }
-                    // }
-                    // else
-                    // {
-                    //     PropertyField propertyField = new PropertyField(elementProp, "");
-                    //     propertyField.Bind(property.serializedObject);
-                    //     valueContainer.Add(propertyField);
-                    // }
                 },
             };
             multiColumnListView.columns.Add(valueColumn);
@@ -990,7 +852,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 RefreshList();
             };
 
-            Button addButton = container.Q<Button>(name: NameAddButton(property));
+            ListViewFooterButtonsElement footerButtons = container.Q<ListViewFooterButtonsElement>(name: NameFooterButtons(property));
+
+            Button addButton = footerButtons.AddButton;
             addButton.clicked += () =>
             {
                 IncreaseArraySize(keysProp.arraySize + 1, keysProp, valuesProp);
@@ -1000,8 +864,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 RefreshList();
                 // multiColumnListView.Rebuild();
             };
-            Button deleteButton = container.Q<Button>(name: NameRemoveButton(property));
-            deleteButton.clicked += () =>
+            Button removeButton = footerButtons.RemoveButton;
+            removeButton.clicked += () =>
             {
                 // Debug.Log("Clicked");
                 // property.serializedObject.Update();
@@ -1064,6 +928,91 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 RefreshList();
                 // multiColumnListView.Rebuild();
             };
+
+            #region Menu
+
+            foldout.MenuButton.clicked += () =>
+            {
+                GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+                bool curPaging = pager.style.display != DisplayStyle.None;
+                genericDropdownMenu.AddItem("Paging", curPaging, () =>
+                {
+                    if (curPaging)
+                    {
+                        pager.style.display = DisplayStyle.None;
+                        numberOfItemsPerPage.value = -1;
+                    }
+                    else
+                    {
+                        int configuredItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
+                        int itemsPerPage = configuredItemsPerPage > 0
+                            ? configuredItemsPerPage
+                            : Mathf.Max(5, keysProp.arraySize / 2);
+                        pager.style.display = DisplayStyle.Flex;
+                        numberOfItemsPerPage.value = itemsPerPage;
+                    }
+                });
+
+                if(keySearchField != null && valueSearchField != null)
+                {
+                    bool curOn = keySearchField.style.display != DisplayStyle.None;
+
+                    genericDropdownMenu.AddItem("Search", curOn, () =>
+                    {
+                        DisplayStyle toDisplay = curOn ? DisplayStyle.None : DisplayStyle.Flex;
+                        keySearchField.style.display = valueSearchField.style.display = toDisplay;
+                        // ReSharper disable once InvertIf
+                        if (curOn)
+                        {
+                            keySearchField.value = "";
+                            valueSearchField.value = "";
+                        }
+                    });
+
+                    if(curOn)
+                    {
+                        genericDropdownMenu.AddItem("Object Search", _objectNestedSearch, () =>
+                        {
+                            _objectNestedSearch = !_objectNestedSearch;
+                            if (!string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) ||
+                                !string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText))
+                            {
+                                _asyncSearchItems.DebounceSearchTime = 0;
+                                _asyncSearchItems.Started = false;
+                                _asyncSearchItems.Finished = false;
+                                _asyncSearchItems.HitTargetIndexes.Clear();
+                                _asyncSearchItems.SourceGenerator?.Dispose();
+                                _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp,
+                                    _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText,
+                                    _objectNestedSearch).GetEnumerator();
+                                RefreshList();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Object Search", _objectNestedSearch);
+                    }
+                }
+                else
+                {
+                    genericDropdownMenu.AddDisabledItem("Search", false);
+                }
+
+                Rect menuBound = foldout.MenuButton.worldBound;
+#if !UNITY_6000_3_OR_NEWER
+                menuBound.xMin = menuBound.xMax - Mathf.Max(menuBound.width, 120f);
+#endif
+                genericDropdownMenu.DropDown(menuBound, foldout.MenuButton,
+#if UNITY_6000_3_OR_NEWER
+                    DropdownMenuSizeMode.Auto
+#else
+                    true
+#endif
+                );
+            };
+
+            #endregion
 
             // multiColumnListView.Rebuild();
             // _asyncSearchItems.DebounceSearchTime = 0;
@@ -1129,7 +1078,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
 
                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                foreach (Image loadingImage in _asyncSearchItems.LoadingImages)
+                foreach (VisualElement loadingImage in _asyncSearchItems.LoadingImages)
                 {
                     if(loadingImage.style.visibility != Visibility.Visible)
                     {

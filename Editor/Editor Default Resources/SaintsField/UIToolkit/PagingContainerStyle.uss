@@ -1,9 +1,5 @@
 :root {
     flex-direction: row;
-}
-
-.paging-container {
-    flex-direction: row;
     flex-shrink: 0;
     margin-left: 4px;
     justify-content: flex-end;

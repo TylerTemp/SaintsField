@@ -1090,7 +1090,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             asyncSearchItems.Started = false;
             asyncSearchItems.Finished = false;
             asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTimeIMGUI;
-            asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, safeKeySearch, safeValueSearch).GetEnumerator();
+            asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, safeKeySearch, safeValueSearch, true).GetEnumerator();
             UpdateVisibleIndexes(asyncSearchItems);
         }
 

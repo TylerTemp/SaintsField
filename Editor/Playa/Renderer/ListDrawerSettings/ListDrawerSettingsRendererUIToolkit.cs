@@ -39,6 +39,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             return (root, false);
         }
 
+        private ListView _listView;
+
         private (VisualElement root, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, ArraySizeAttribute arraySizeAttribute)
         {
 
@@ -63,7 +65,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
             }
 
-            IEnumerable<IReadOnlyList<int>> SearchCallback(SerializedProperty arrayProperty, string search)
+            IEnumerable<IReadOnlyList<int>> SearchCallbackWithCustom(SerializedProperty arrayProperty, string search)
             {
                 const int batchLimit = 10;
 
@@ -175,7 +177,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                                     ListSearchToken token = searchTokens[index];
                                     HashSet<object> searchedObject = searchedObjectsArray[index];
                                     // ReSharper disable once InvertIf
-                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObject))
+                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, true, searchedObject))
                                     {
                                         all = false;
                                         break;
@@ -240,7 +242,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                                 {
                                     ListSearchToken token = searchTokens[index];
                                     HashSet<object> searchedObjects = searchedObjectsArray[index];
-                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObjects))
+                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, true, searchedObjects))
                                     {
                                         all = false;
                                         break;
@@ -280,7 +282,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 #endif
                     List<int> batchResults = new List<int>();
                     int batchCount = 0;
-                    foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search))
+                    foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search, true))
                     {
                         if(i != -1)
                         {
@@ -347,7 +349,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             // int numberOfItemsPerPage = 0;
 
-            ListView listView = null;
+
 
             VisualElement MakeItem()
             {
@@ -373,7 +375,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     return;
                 }
 
-                MarkElementTreeRowIndex(listView, element, index);
+                MarkElementTreeRowIndex(_listView, element, index);
 
                 SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
                 VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldProperty(
@@ -435,7 +437,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
             }
 
-            listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
+            _listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
             {
                 makeItem = MakeItem,
                 bindItem = BindItem,
@@ -456,7 +458,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 viewDataKey = property.propertyPath,
                 // bindingPath = property.propertyPath,
             };
-            listView.selectedIndicesChanged += _ => ClearNestedSelectionAndFocusOutsideSelection(listView);
+            _listView.selectedIndicesChanged += _ => ClearNestedSelectionAndFocusOutsideSelection(_listView);
 
             UIToolkitUtils.AddContextualMenuManipulator(root, property, () => {});
             Toggle toggle = root.Q<Toggle>();
@@ -654,7 +656,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 // text = ">",
             };
 
-            ListViewFooterElement listViewFooter = new ListViewFooterElement
+            ListViewFooterButtonsElement listViewFooterButtons = new ListViewFooterButtonsElement
             {
                 // AddButton =
                 // {
@@ -666,9 +668,9 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 // },
             };
 
-            root.Add(listViewFooter);
+            root.Add(listViewFooterButtons);
 
-            void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
+            void LocalUpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
                 string searchText = searchField.value;
                 List<int> resultIndexes;
@@ -707,7 +709,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                         _asyncSearchItems.SourceGenerator.Dispose();
                         _asyncSearchItems.SourceGenerator = null;
                     }
-                    _asyncSearchItems.SourceGenerator = SearchCallback(property, searchText).GetEnumerator();
+                    _asyncSearchItems.SourceGenerator = SearchCallbackWithCustom(property, searchText).GetEnumerator();
 
                     resultIndexes = _asyncSearchItems.CachedFullSources;
                 }
@@ -734,10 +736,10 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"set items: {string.Join(", ", curPageItems)}, itemIndexToPropertyIndex={string.Join(",", itemIndexToPropertyIndex)}");
 #endif
-                if(!listView.itemsSource.Cast<int>().SequenceEqual(curPageItems))
+                if(!_listView.itemsSource.Cast<int>().SequenceEqual(curPageItems))
                 {
-                    listView.itemsSource = curPageItems;
-                    listView.Rebuild();
+                    _listView.itemsSource = curPageItems;
+                    _listView.Rebuild();
                 }
                 // Debug.Log("rebuild listView");
 
@@ -772,32 +774,32 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 arraySize = newSize;
                 numberOfItemsTotalField.SetValueWithoutNotify(arraySize);
                 numberOfItemsTopRightField.SetValueWithoutNotify(arraySize);
-                UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
             }
 
             // result.TrackPropertyValue(property, p =>
             // listView.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
-            listView.TrackPropertyValue(property, _ =>
+            _listView.TrackPropertyValue(property, _ =>
             {
                 CheckArraySizeChange();
             });
 
-            listView.schedule.Execute(CheckArraySizeChange).StartingIn(500);
+            _listView.schedule.Execute(CheckArraySizeChange).StartingIn(500);
 
             searchField.RegisterValueChangedCallback(_ =>
             {
-                UpdatePage(0, numberOfItemsPerPageField.value);
+                LocalUpdatePage(0, numberOfItemsPerPageField.value);
             });
 
             pagePreButton.clicked += () =>
             {
-                UpdatePage(_asyncSearchItems.CurPageIndex - 1, numberOfItemsPerPageField.value);
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex - 1, numberOfItemsPerPageField.value);
             };
             pageNextButton.clicked += () =>
             {
-                UpdatePage(_asyncSearchItems.CurPageIndex + 1, numberOfItemsPerPageField.value);
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex + 1, numberOfItemsPerPageField.value);
             };
-            pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
+            pageField.RegisterValueChangedCallback(evt => LocalUpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
 
             void NumberOfItemsTotalChangedCallback(ChangeEvent<int> e)
             {
@@ -828,7 +830,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 {
                     property.arraySize = newSize;
                     property.serializedObject.ApplyModifiedProperties();
-                    UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
+                    LocalUpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
                 }
                 else
                 {
@@ -846,25 +848,25 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"update number of items per page {newValueClamp}");
 #endif
-                UpdatePage(_asyncSearchItems.CurPageIndex, newValueClamp);
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex, newValueClamp);
             }
 
             numberOfItemsPerPageField.RegisterValueChangedCallback(evt => UpdateNumberOfItemsPerPage(evt.newValue));
 
-            listViewFooter.AddButton.clicked += () =>
+            listViewFooterButtons.AddButton.clicked += () =>
             {
                 property.arraySize += 1;
                 property.serializedObject.ApplyModifiedProperties();
                 int totalVisiblePage = Mathf.CeilToInt((float)_asyncSearchItems.ItemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value);
-                UpdatePage(totalVisiblePage - 1, numberOfItemsPerPageField.value);
+                LocalUpdatePage(totalVisiblePage - 1, numberOfItemsPerPageField.value);
                 // numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
                 numberOfItemsTopRightField.SetValueWithoutNotify(property.arraySize);
                 numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
             };
 
-            listViewFooter.RemoveButton.clicked += () =>
+            listViewFooterButtons.RemoveButton.clicked += () =>
             {
-                List<int> curRemoveObjects = listView.selectedIndices.ToList();
+                List<int> curRemoveObjects = _listView.selectedIndices.ToList();
                 if (curRemoveObjects.Count == 0)
                 {
                     return;
@@ -887,7 +889,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 Debug.Log($"removed update page to {_asyncSearchItems.CurPageIndex}");
 #endif
 
-                listView.schedule.Execute(() => UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value));
+                _listView.schedule.Execute(() => LocalUpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value));
             };
 
             if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
@@ -895,7 +897,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 // preContent.style.display = DisplayStyle.Flex;
                 // pagingContainer.style.visibility = Visibility.Visible;
 
-                listView.RegisterCallback<AttachToPanelEvent>(_ =>
+                _listView.RegisterCallback<AttachToPanelEvent>(_ =>
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"init update numberOfItemsPerPage={listDrawerSettingsAttribute.NumberOfItemsPerPage}");
@@ -927,7 +929,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             // Type elementType =
             //     ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
             //                                 FieldWithInfo.PropertyInfo.PropertyType);
-            var foldoutToggle = root.Q<Toggle>();
+            Toggle foldoutToggle = root.Q<Toggle>();
             foldoutToggle.RegisterCallback<DragEnterEvent>(_ =>
             {
                 // Debug.Log($"Drag Enter {evt}");
@@ -957,11 +959,11 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
 
                 property.serializedObject.ApplyModifiedProperties();
-                UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
             });
             #endregion
 
-            listView.itemIndexChanged += (first, second) =>
+            _listView.itemIndexChanged += (first, second) =>
             {
                 int fromPropIndex = _asyncSearchItems.ItemIndexToPropertyIndex[first];
                 int toPropIndex = _asyncSearchItems.ItemIndexToPropertyIndex[second];
@@ -973,7 +975,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 property.serializedObject.ApplyModifiedProperties();
             };
 
-            listView.RegisterCallback<KeyDownEvent>(evt =>
+            _listView.RegisterCallback<KeyDownEvent>(evt =>
             {
                 // ReSharper disable once MergeIntoLogicalPattern
                 bool ctrl = evt.modifiers == EventModifiers.Control ||
@@ -982,7 +984,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 bool copyCommand = ctrl && evt.keyCode == KeyCode.C;
                 if (copyCommand)
                 {
-                    int selectedIndex = listView.selectedItems
+                    int selectedIndex = _listView.selectedItems
                         .Cast<int>()
                         .DefaultIfEmpty(-1)
                         .First();
@@ -1008,7 +1010,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 bool pasteCommand = ctrl && evt.keyCode == KeyCode.V;
                 if (pasteCommand)
                 {
-                    int selectedIndex = listView.selectedItems
+                    int selectedIndex = _listView.selectedItems
                         .Cast<int>()
                         .DefaultIfEmpty(-1)
                         .First();
@@ -1037,7 +1039,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             // foldoutContent.Insert(0, preContent);
 
-            listView.schedule.Execute(() =>
+            _listView.schedule.Execute(() =>
             {
                 if(!_asyncSearchItems.Started && EditorApplication.timeSinceStartup > _asyncSearchItems.DebounceSearchTime)
                 {
@@ -1056,7 +1058,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     if (loadingImage.style.visibility != Visibility.Visible)
                     {
                         loadingImage.style.visibility = Visibility.Visible;
-                        UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
+                        LocalUpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
                     }
 
                     if (_asyncSearchItems.SourceGenerator.MoveNext())
@@ -1070,7 +1072,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"#Search# add search results {string.Join(", ", currentValue)}");
 #endif
-                            UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
+                            LocalUpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
                         }
                     }
                     else
@@ -1094,7 +1096,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             }).Every(1);
 
             // UpdateAddRemoveButtons();
-            listContent.Add(listView);
+            listContent.Add(_listView);
 
             // if (listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0)
             // {
@@ -1104,7 +1106,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             OnSearchFieldUIToolkit.AddListener(Search);
             root.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
 
-            return (root, listViewFooter.AddButton, listViewFooter.RemoveButton);
+            return (root, listViewFooterButtons.AddButton, listViewFooterButtons.RemoveButton);
 
             void Search(string search)
             {

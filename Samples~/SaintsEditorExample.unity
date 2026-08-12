@@ -10932,6 +10932,7 @@ Transform:
   - {fileID: 1355955361}
   - {fileID: 1519348706}
   - {fileID: 1699986815}
+  - {fileID: 1303232495}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -11710,6 +11711,519 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1303232494
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1303232495}
+  - component: {fileID: 1303232496}
+  m_Layer: 0
+  m_Name: DictionaryNewLook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1303232495
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303232494}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1303232496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303232494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 924e438ad6ba15847ad06006dee785e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.DictionaryNewLook
+  p:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 1
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 3
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 4
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 5
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 6
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 7
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+    _keys: 
+    _values: []
+  pNoConf:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 1
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 3
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 4
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 5
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 6
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 7
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+    _keys: 
+    _values: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &1312160702
 GameObject:
   m_ObjectHideFlags: 0

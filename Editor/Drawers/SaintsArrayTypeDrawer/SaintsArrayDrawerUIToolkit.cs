@@ -940,7 +940,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 yield break;
             }
 
-            foreach (int index in SerializedUtils.SearchArrayProperty(wrapProp, searchText))
+            foreach (int index in SerializedUtils.SearchArrayProperty(wrapProp, searchText, true))
             {
                 yield return index;
             }

@@ -1,0 +1,22 @@
+:root {
+}
+
+Foldout > #unity-content {
+    margin-left: 0;
+}
+
+.topRightContainer {
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 20px;
+}
+
+.menuButton {
+    background-image: resource("d__Menu");
+}
+
+.arraySizeField {
+    width: 50px;
+}

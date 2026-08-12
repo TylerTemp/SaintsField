@@ -4552,7 +4552,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 bool isReadOnly = !isNormalDictionary;
                 return (SaintsDictionaryDrawer.UIToolkitValueEdit(
-                    oldElement as Foldout, label, valueType, value, isReadOnly,
+                    oldElement, label, valueType, value, isReadOnly,
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
                     inHorizontalLayout, allAttributes, targets, richTextTagProvider, foldoutViewKey), false);
             }

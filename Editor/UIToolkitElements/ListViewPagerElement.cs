@@ -3,11 +3,19 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-    public readonly struct ListViewPagerFooterStruct
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class ListViewPagerElement: VisualElement
     {
-        private static VisualTreeAsset _treeRowTemplate;
+#if !UNITY_6000_0_OR_NEWER
+        // public new class UxmlTraits : BindableElement.UxmlTraits { }
+        public new class UxmlFactory : UxmlFactory<ListViewPagerElement, UxmlTraits> { }
+#endif
 
-        public readonly TemplateContainer Root;
+        private static VisualTreeAsset _template;
+
+        // public readonly TemplateContainer Root;
         public readonly VisualElement PagingContainer;
 
         public readonly IntegerField NumberOfItemsPerPageField;
@@ -17,17 +25,13 @@ namespace SaintsField.Editor.UIToolkitElements
         public readonly Label PageLabel;
         public readonly Button PageNextButton;
 
-        public readonly VisualElement FooterButtons;
-        public readonly Button AddButton;
-        public readonly Button RemoveButton;
-
-        // ReSharper disable once UnusedParameter.Local
-        public ListViewPagerFooterStruct(bool yeahWhateverYouCSharpWantsThisIsJustAHack)
+        public ListViewPagerElement()
         {
-            _treeRowTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/ListViewPagerFooter.uxml");
-            Root = _treeRowTemplate.CloneTree();
+            _template ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/PagingContainer.uxml");
+            TemplateContainer root = _template.CloneTree();
+            hierarchy.Add(root);
 
-            PagingContainer = Root.Q<VisualElement>(name: "PagingContainer");
+            PagingContainer = root;
 
             NumberOfItemsPerPageField = PagingContainer.Q<IntegerField>(name: "numberOfItemsPerPageField");
             NumberOfItemsTotalField = PagingContainer.Q<IntegerField>(name: "numberOfItemsTotalField");
@@ -36,10 +40,6 @@ namespace SaintsField.Editor.UIToolkitElements
             PageField = PagingContainer.Q<IntegerField>(name: "pageField");
             PageLabel = PagingContainer.Q<Label>(name: "pageLabel");
             PageNextButton = PagingContainer.Q<Button>(name: "pageNextButton");
-
-            FooterButtons = Root.Q<VisualElement>(name: "ListViewFooter");
-            AddButton = FooterButtons.Q<Button>(name: "saints-add-button");
-            RemoveButton = FooterButtons.Q<Button>(name: "saints-remove-button");
 
         }
     }

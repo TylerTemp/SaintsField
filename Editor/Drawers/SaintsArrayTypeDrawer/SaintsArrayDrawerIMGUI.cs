@@ -1000,7 +1000,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 yield break;
             }
 
-            foreach (int result in SerializedUtils.SearchArrayProperty(wrapProp, searchText))
+            foreach (int result in SerializedUtils.SearchArrayProperty(wrapProp, searchText, true))
             {
                 yield return result;
             }

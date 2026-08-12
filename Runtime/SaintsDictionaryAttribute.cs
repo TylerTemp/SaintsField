@@ -18,6 +18,8 @@ namespace SaintsField
 
         public readonly int NumberOfItemsPerPage;
         public readonly bool Searchable;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public bool ObjectSearch;
 
         public readonly ResponsiveLength KeyWidth;
         public readonly ResponsiveLength ValueWidth;
@@ -27,6 +29,7 @@ namespace SaintsField
             string valueLabel = "Values",
             bool searchable = true,
             int numberOfItemsPerPage = 0,
+            bool objectSearch = true,
             string keyWidth = null,
             string valueWidth = null)
         {
@@ -34,6 +37,7 @@ namespace SaintsField
             ValueLabel = valueLabel;
             NumberOfItemsPerPage = numberOfItemsPerPage;
             Searchable = searchable;
+            ObjectSearch = objectSearch;
 
             KeyWidth = RuntimeUtil.ParseResponsiveLength(keyWidth);
             ValueWidth = RuntimeUtil.ParseResponsiveLength(valueWidth);

@@ -197,7 +197,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                             {
                                 ListSearchToken token = searchTokens[index];
                                 HashSet<object> searchedObject = searchedObjectsArray[index];
-                                if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObject))
+                                if (!SerializedUtils.SearchProp(itemProp, token.Token, true, searchedObject))
                                 {
                                     all = false;
                                     break;
@@ -253,7 +253,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                             {
                                 ListSearchToken token = searchTokens[index];
                                 HashSet<object> searchedObjects = searchedObjectsArray[index];
-                                if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObjects))
+                                if (!SerializedUtils.SearchProp(itemProp, token.Token, true, searchedObjects))
                                 {
                                     all = false;
                                     break;
@@ -287,7 +287,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             List<int> defaultBatchResults = new List<int>();
             int defaultBatchCount = 0;
-            foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search))
+            foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search, true))
             {
                 if (i != -1)
                 {

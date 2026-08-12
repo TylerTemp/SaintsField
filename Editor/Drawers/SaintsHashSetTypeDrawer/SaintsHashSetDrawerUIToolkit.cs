@@ -280,12 +280,12 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             };
             footerButtons.Add(pageNextButton);
 
-            ListViewFooterElement footerAddRemove = new ListViewFooterElement();
+            ListViewFooterButtonsElement footerButtonsAddRemove = new ListViewFooterButtonsElement();
 
-            footerButtons.Add(footerAddRemove);
+            footerButtons.Add(footerButtonsAddRemove);
 
-            footerAddRemove.AddButton.name = NameAddButton(property);
-            footerAddRemove.RemoveButton.name = NameRemoveButton(property);
+            footerButtonsAddRemove.AddButton.name = NameAddButton(property);
+            footerButtonsAddRemove.RemoveButton.name = NameRemoveButton(property);
 
             foldout.Add(footerButtons);
 
