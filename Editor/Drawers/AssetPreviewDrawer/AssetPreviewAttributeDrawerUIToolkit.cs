@@ -155,6 +155,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
             if (hasPreviewGui)
             {
                 payload.UseEditor = true;
+                UIToolkitUtils.SetDisplayStyle(root, DisplayStyle.Flex);
                 UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.ImageElement, DisplayStyle.None);
                 if(root.AssetPreviewContainer.InteractivePreviewContainer.childCount > 0)
                 {
@@ -214,16 +215,15 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                         root,
                         assetPreviewAttribute.Width, assetPreviewAttribute.Height);
                 }
-                else if (AssetPreview.IsLoadingAssetPreview(curObject.
-#if UNITY_6000_4_OR_NEWER
-                        GetEntityId
-#else
-                        GetInstanceID
-#endif
-                                ()))
+                else
                 {
-                    // Debug.Log("still processing, will be updated later");
-                    payload.ObjectReferenceValue = null;
+                    UIToolkitUtils.SetDisplayStyle(root, DisplayStyle.None);
+                    UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.ImageElement, DisplayStyle.None);
+                    if (IsLoadingPreview(curObject))
+                    {
+                        // Debug.Log("still processing, will be updated later");
+                        payload.ObjectReferenceValue = null;
+                    }
                 }
 
             }
@@ -263,6 +263,10 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
             {
                 name = NameRoot(property, index),
                 userData = new Payload(),
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
             };
 
             assetPreviewField.AddToClassList(AssetPreviewField.alignedFieldUssClassName);

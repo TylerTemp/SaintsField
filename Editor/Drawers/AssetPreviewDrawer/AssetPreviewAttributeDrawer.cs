@@ -19,17 +19,30 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
     {
         private const int InteractiveDefaultSize = 300;
 
+        private static Object GetPreviewTarget(Object target)
+        {
+            return target is Component component ? component.gameObject : target;
+        }
+
+        private static bool IsLoadingPreview(Object target)
+        {
+            target = GetPreviewTarget(target);
+            return target && AssetPreview.IsLoadingAssetPreview(target.
+#if UNITY_6000_4_OR_NEWER
+                       GetEntityId
+#else
+                       GetInstanceID
+#endif
+                           ());
+        }
+
         private static Texture2D GetPreview(Object target)
         {
             // Debug.Log(target);
+            target = GetPreviewTarget(target);
             if (!target)
             {
                 return null;
-            }
-
-            if (target is Component c)
-            {
-                target = c.gameObject;
             }
 
             Texture2D previewTexture;
@@ -42,14 +55,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 return null;
             }
 
-            if(AssetPreview.IsLoadingAssetPreview(target.
-#if UNITY_6000_4_OR_NEWER
-                   GetEntityId
-#else
-                   GetInstanceID
-#endif
-                       ()))
-
+            if(IsLoadingPreview(target))
             {
                 return null;
             }

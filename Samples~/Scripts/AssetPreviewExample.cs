@@ -4,7 +4,8 @@ namespace SaintsField.Samples.Scripts
 {
     public class AssetPreviewExample: MonoBehaviour
     {
-        [AssetPreview(int.MaxValue, 500, align: EAlign.FieldStart)] public GameObject go;
+        [AssetPreview] public GameObject go;
+        [AssetPreview] public Dummy dummyCube;
         [AssetPreview] public GameObject fbx;
         [AssetPreview] public Material drawMaterial;
 
