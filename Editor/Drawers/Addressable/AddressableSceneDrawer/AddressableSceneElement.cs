@@ -23,6 +23,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         public string Error = "";
         public readonly Button Button;
 
+        private readonly ObjectField _objectField;
+
         public AddressableSceneElement(AddressableSceneAttribute addressableSceneAttribute)
         {
             _addressableSceneAttribute = addressableSceneAttribute;
@@ -39,6 +41,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             _sceneField = dropdownElement.Q<ObjectField>();
 
             _sceneField.RegisterValueChangedCallback(OnSceneFieldChanged);
+
+            _objectField = dropdownElement.Q<ObjectField>(name: "ObjectField");
+            Debug.Assert(_objectField != null);
 
             Add(dropdownElement);
         }
@@ -119,17 +124,59 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _objectField.showMixedValue = showMixedValue;
+        }
     }
 
     public class AddressableSceneField: BaseField<string>
     {
         // public readonly Button Button;
+        private readonly AddressableSceneElement _addressableSceneElement;
 
-        public AddressableSceneField(string label, AddressableSceneElement addressableSceneElement) : base(label, addressableSceneElement)
+        private AddressableSceneField(string label, AddressableSceneElement addressableSceneElement) : base(label, addressableSceneElement)
         {
             // Button = addressableSceneElement.Button;
             AddToClassList(alignedFieldUssClassName);
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+
+            _addressableSceneElement = addressableSceneElement;
+            addressableSceneElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public AddressableSceneField(string label, AddressableSceneAttribute addressableSceneAttribute) : this(label, new AddressableSceneElement(addressableSceneAttribute))
+        {
+        }
+
+        public override void SetValueWithoutNotify(string newValue)
+        {
+            _addressableSceneElement.SetValueWithoutNotify(newValue);
+        }
+
+        public override string value
+        {
+            get => _addressableSceneElement.value;
+            set
+            {
+                if (_addressableSceneElement.value == value)
+                {
+                    return;
+                }
+
+                string previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            _addressableSceneElement.SetShowMixedValue(showMixedValue);
         }
     }
 }

@@ -91,6 +91,11 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            FloatField.showMixedValue = showMixedValue;
+        }
     }
 }
 #endif

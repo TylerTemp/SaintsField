@@ -31,11 +31,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             {
                 return new Label(GetPreferredLabel(property));
             }
-            SpineSkinElement element = new SpineSkinElement();
-            element.BindProperty(property);
-            StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), element)
+
+            StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), new SpineSkinElement())
             {
                 name = NameDropdownField(property),
+                bindingPath = property.propertyPath,
             };
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
             {

@@ -96,26 +96,16 @@ namespace SaintsField.Editor.Drawers.TagDrawer
         }
     }
 
-    public class TagField : BaseField<string>
+    public class TagField : StringDropdownField
     {
-        private readonly TagElement _tagElement;
-
-        public TagField(string label, TagElement visualInput) : base(label, visualInput)
+        private TagField(string label, TagElement visualInput) : base(label, visualInput)
         {
-            style.flexShrink = 1;
-            _tagElement = visualInput;
             visualInput.BindBound(this);
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public TagField(string label) : this(label, new TagElement())
         {
-            _tagElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => _tagElement.value;
-            set => _tagElement.value = value;
         }
     }
 }

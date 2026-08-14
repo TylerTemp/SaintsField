@@ -247,6 +247,17 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _dayInputElement.SetShowMixedValue(showMixedValue);
+            _totalHourInputElement.SetShowMixedValue(showMixedValue);
+            _hourInputElement.SetShowMixedValue(showMixedValue);
+            _minuteInputElement.SetShowMixedValue(showMixedValue);
+            _secondFloatInputElement.SetShowMixedValue(showMixedValue);
+            _secondInputElement.SetShowMixedValue(showMixedValue);
+            _millisecondInputElement.SetShowMixedValue(showMixedValue);
+        }
     }
 }
 

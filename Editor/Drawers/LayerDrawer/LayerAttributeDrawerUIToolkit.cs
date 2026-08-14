@@ -27,11 +27,11 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    LayerIntDropdownElement intDropdownElement = new LayerIntDropdownElement
+                    IntDropdownField intDropdownField = new IntDropdownField(GetPreferredLabel(property), new LayerIntDropdownElement())
                     {
                         bindingPath = property.propertyPath
                     };
-                    IntDropdownField intDropdownField = new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
+
                     intDropdownField.AddToClassList(IntDropdownField.alignedFieldUssClassName);
                     intDropdownField.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && intDropdownField.labelElement != null)
@@ -42,11 +42,10 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 }
                 case SerializedPropertyType.String:
                 {
-                    LayerStringDropdownElement layerStringStringDropdown = new LayerStringDropdownElement
+                    StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), new LayerStringDropdownElement())
                     {
-                        bindingPath = property.propertyPath
+                        bindingPath = property.propertyPath,
                     };
-                    StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
                     stringDropdownField.AddToClassList(IntDropdownField.alignedFieldUssClassName);
                     stringDropdownField.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
@@ -57,12 +56,8 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 }
                 case SerializedPropertyType.LayerMask:
                 {
-                    LayerMaskDropdownElement layerMaskDropdownElement = new LayerMaskDropdownElement
-                        {
-                            bindingPath = property.propertyPath
-                        };
                     LayerMaskDropdownField layerMaskDropdownField =
-                        new LayerMaskDropdownField(GetPreferredLabel(property), layerMaskDropdownElement)
+                        new LayerMaskDropdownField(GetPreferredLabel(property))
                         {
                             bindingPath = property.propertyPath
                         };

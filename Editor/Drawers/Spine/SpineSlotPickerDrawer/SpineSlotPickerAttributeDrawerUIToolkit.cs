@@ -34,12 +34,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
                 return new Label(GetPreferredLabel(property));
             }
 
-            SpineSlotElement element = new SpineSlotElement();
-            element.BindProperty(property);
-            StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), element)
+            StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), new SpineSlotElement())
             {
                 name = NameDropdownField(property),
+                bindingPath = property.propertyPath,
             };
+
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
             {
                 field.labelElement.tooltip = property.tooltip;

@@ -102,25 +102,18 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
         }
     }
 
-    public class AnimatorStateFieldString: BaseField<string>
+    public class AnimatorStateFieldString: StringDropdownField
     {
         public readonly AnimatorStateElementString AnimatorStateElementString;
-        public AnimatorStateFieldString(string label, AnimatorStateElementString visualInput) : base(label, visualInput)
+        private AnimatorStateFieldString(string label, AnimatorStateElementString visualInput) : base(label, visualInput)
         {
             AnimatorStateElementString = visualInput;
             visualInput.BindBound(this);
             style.flexShrink = 1;
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public AnimatorStateFieldString(string label) : this(label, new AnimatorStateElementString())
         {
-            AnimatorStateElementString.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => AnimatorStateElementString.value;
-            set => AnimatorStateElementString.value = value;
         }
     }
 }

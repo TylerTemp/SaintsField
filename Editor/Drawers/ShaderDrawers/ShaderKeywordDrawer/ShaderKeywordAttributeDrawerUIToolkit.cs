@@ -30,11 +30,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
                 return new VisualElement();
             }
 
-            ShaderKeywordElement shaderKeywordElement = new ShaderKeywordElement
+            ShaderKeywordField r = new ShaderKeywordField(GetPreferredLabel(property))
             {
                 bindingPath = property.propertyPath,
             };
-            ShaderKeywordField r = new ShaderKeywordField(GetPreferredLabel(property), shaderKeywordElement);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(ShaderKeywordField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -187,17 +186,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
                 return null;
             }
 
-            ShaderKeywordElement visualInput = new ShaderKeywordElement()
-            {
-                value = value,
-            };
             ShaderKeywordField field =
-                new ShaderKeywordField(label, visualInput)
+                new ShaderKeywordField(label)
                 {
                     value = value,
                 };
             ShaderKeywordValueEdit element = new ShaderKeywordValueEdit(field);
-            visualInput.BindShader(shader);
+            field.ShaderKeywordElement.BindShader(shader);
             ShaderUtils.UpdateHelpBox(element.HelpBox, error);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
@@ -205,7 +200,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

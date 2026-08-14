@@ -295,14 +295,24 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             UIToolkitUtils.SetHelpBox(_helpBox, content);
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _unsignedIntegerField.showMixedValue = showMixedValue;
+        }
     }
 
     public class PropRangeUIntField : BaseField<uint>
     {
         public readonly PropRangeElementUInt PropRangeElementUInt;
-        public PropRangeUIntField(string label, PropRangeElementUInt visualInput) : base(label, visualInput)
+        private PropRangeUIntField(string label, PropRangeElementUInt visualInput) : base(label, visualInput)
         {
             PropRangeElementUInt = visualInput;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public PropRangeUIntField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementUInt(adaptAttribute))
+        {
         }
 
         public override void SetValueWithoutNotify(uint newValue)
@@ -313,7 +323,25 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         public override uint value
         {
             get => PropRangeElementUInt.value;
-            set => PropRangeElementUInt.value = value;
+            set
+            {
+                if (PropRangeElementUInt.value == value)
+                {
+                    return;
+                }
+
+                uint previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<uint> evt = ChangeEvent<uint>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            PropRangeElementUInt.SetShowMixedValue(showMixedValue);
         }
     }
 }

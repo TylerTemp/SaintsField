@@ -40,11 +40,10 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
 
         private static DateTimeField MakeElement(SerializedProperty property, string label)
         {
-            DateTimeElement dateTimeElement = new DateTimeElement();
-            dateTimeElement.BindPath(property.propertyPath);
-            dateTimeElement.Bind(property.serializedObject);
-
-            DateTimeField element = new DateTimeField(label, dateTimeElement);
+            DateTimeField element = new DateTimeField(label)
+            {
+                bindingPath = property.propertyPath,
+            };
 
             element.AddToClassList(ClassAllowDisable);
 
@@ -63,12 +62,10 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 return null;
             }
 
-            DateTimeElement dateTimeElement = new DateTimeElement
+            DateTimeField element = new DateTimeField(label)
             {
                 value = ticks,
             };
-
-            DateTimeField element = new DateTimeField(label, dateTimeElement);
 
             element.AddToClassList(ClassAllowDisable);
 

@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
-using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsDecimalType
 {
@@ -18,65 +13,6 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
     [CustomPropertyDrawer(typeof(SaintsDecimal), true)]
     public partial class SaintsDecimalDrawer: SaintsPropertyDrawer
     {
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        protected override bool UseCreateFieldUIToolKit => true;
-
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
-        {
-            SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property));
-            field.DecimalTextField.AddToClassList(DecimalTextField.alignedFieldUssClassName);
-            if (!string.IsNullOrEmpty(property.tooltip) && field.DecimalTextField.labelElement != null)
-            {
-                field.DecimalTextField.labelElement.tooltip = property.tooltip;
-            }
-            EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
-            emptyPrefabOverrideElement.Add(field);
-            return emptyPrefabOverrideElement;
-        }
-
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            SaintsDecimalField field = container.Q<SaintsDecimalField>();
-            // int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            field.ManuallyBindProperty(property, newValue =>
-            {
-                string error = UpdateCachedDecimalValue(property, info, newValue);
-                if (error != "")
-                {
-                    Debug.LogError(error);
-                }
-            });
-
-            AddContextualMenuManipulator(field, property);
-        }
-
-#endif
-
-        private static void AddContextualMenuManipulator(SaintsDecimalFieldAbs field, SerializedProperty property)
-        {
-            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
-
-            field.AddManipulator(new ContextualMenuManipulator(evt =>
-            {
-                evt.menu.AppendAction($"Copy \"{field.value}\"", _ =>
-                {
-                    EditorGUIUtility.systemCopyBuffer = $"{field.value}";
-                });
-
-                string clipboardText = EditorGUIUtility.systemCopyBuffer;
-                if (decimal.TryParse(clipboardText, out decimal value))
-                {
-                    evt.menu.AppendAction($"Paste \"{clipboardText}\"", _ =>
-                    {
-                        field.value = value;
-                    });
-                }
-            }));
-        }
-
         internal readonly struct DecimalPropertyInfo
         {
             public readonly string Error;

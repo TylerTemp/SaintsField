@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
             Dropdown<string> dropdown = new Dropdown<string>(isImGui ? "Pick Addressable Address" : "");
             string selected = null;
-            string error = "";
+            string error;
             string[] addresses = Array.Empty<string>();
 
             if (settings == null)
@@ -72,7 +72,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 
                     foreach (string address in addresses)
                     {
-                        dropdown.Add(new Dropdown<string>(address, address));
+                        // dropdown.Add(new Dropdown<string>(address, address));
+                        dropdown.Add(address, address);
                         if (property.stringValue == address)
                         {
                             selected = address;
@@ -85,6 +86,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                     }
 
                     dropdown.Add(EditAddressesLabel, null, false, "d_editicon.sml");
+
+                    dropdown.SelfCompact();
                 }
             }
 

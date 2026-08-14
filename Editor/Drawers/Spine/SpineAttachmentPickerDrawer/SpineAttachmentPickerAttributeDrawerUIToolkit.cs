@@ -32,10 +32,10 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             }
 
             SpineAttachmentElement element = new SpineAttachmentElement();
-            element.BindProperty(property);
             StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), element)
             {
                 name = NameDropdownField(property),
+                bindingPath = property.propertyPath,
             };
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
             {

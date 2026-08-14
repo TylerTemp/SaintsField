@@ -27,11 +27,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
                 return fallback;
             }
 
-            SpinePathConstraintPickerElement element = new SpinePathConstraintPickerElement
+            SpinePathConstraintPickerField field = new SpinePathConstraintPickerField(GetPreferredLabel(property))
             {
                 bindingPath = property.propertyPath,
             };
-            SpinePathConstraintPickerField field = new SpinePathConstraintPickerField(GetPreferredLabel(property), element);
+
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SpinePathConstraintPickerField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)

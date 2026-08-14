@@ -7,24 +7,27 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsDecimalType
 {
-    public abstract class SaintsDecimalFieldAbs: BindableElement, INotifyValueChanged<SaintsDecimal>
+    public abstract class SaintsDecimalFieldAbs: BaseField<SaintsDecimal>
     {
         public readonly DecimalTextField DecimalTextField;
-        public SaintsDecimalFieldAbs(string label)
+        private SaintsDecimalFieldAbs(string label, DecimalTextField visualInput): base(label, visualInput)
         {
-            DecimalTextField = new DecimalTextField(label);
-
-            hierarchy.Add(DecimalTextField);
+            DecimalTextField = visualInput;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
-        public void SetValueWithoutNotify(SaintsDecimal newValue)
+        public SaintsDecimalFieldAbs(string label): this(label, new DecimalTextField(""))
         {
-            bool valueChanged = !DecimalTextField.value.Equals(newValue);
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            DecimalTextField.showMixedValue = showMixedValue;
+        }
+
+        public override void SetValueWithoutNotify(SaintsDecimal newValue)
+        {
             DecimalTextField.SetValueWithoutNotify(newValue);
-            if (valueChanged && _propUpdated != null)
-            {
-                WriteBackValue(newValue);
-            }
         }
 
         private void WriteBackValue(decimal d)
@@ -42,8 +45,6 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                 _propUpdated(d);
             }
         }
-
-        private void WriteBackValue(SaintsDecimal d) => WriteBackValue(d.GetValue());
 
         private SerializedProperty _flagsProp;
         private SerializedProperty _hiProp;
@@ -80,6 +81,11 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
         private void WriteSerValueNoNotify()
         {
+            showMixedValue = _flagsProp.hasMultipleDifferentValues
+                             || _hiProp.hasMultipleDifferentValues
+                             || _loProp.hasMultipleDifferentValues
+                             || _midProp.hasMultipleDifferentValues;
+
             SetValueWithoutNotify(new SaintsDecimal
             {
                 hi = _hiProp.intValue,
@@ -97,7 +103,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
             tracker.RegisterCallback<DetachFromPanelEvent>(_ => UIToolkitUtils.Unbind(tracker));
         }
 
-        public SaintsDecimal value
+        public override SaintsDecimal value
         {
             get => DecimalTextField.value;
             set
@@ -109,6 +115,10 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
                 SaintsDecimal previous = this.value;
                 SetValueWithoutNotify(value);
+                if (_propUpdated != null)
+                {
+                    WriteBackValue(value.GetValue());
+                }
 
                 using ChangeEvent<SaintsDecimal> evt = ChangeEvent<SaintsDecimal>.GetPooled(previous, value);
                 evt.target = this;

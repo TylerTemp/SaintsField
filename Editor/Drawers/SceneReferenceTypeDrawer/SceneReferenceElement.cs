@@ -329,21 +329,43 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
     public class SceneReferenceField : BaseField<string>
     {
         public readonly SceneReferenceElement SceneReferenceElement;
-        public SceneReferenceField(string label, SceneReferenceElement visualInput) : base(label, visualInput)
+        private SceneReferenceField(string label, SceneReferenceElement visualInput) : base(label, visualInput)
         {
             SceneReferenceElement = visualInput;
             visualInput.DropdownRoot = this;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+        public SceneReferenceField(string label) : this(label, new SceneReferenceElement())
+        {
         }
 
         public override string value
         {
             get => SceneReferenceElement.value;
-            set => SceneReferenceElement.value = value;
+            set
+            {
+                if (SceneReferenceElement.value == value)
+                {
+                    return;
+                }
+
+                string previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
         }
 
         public override void SetValueWithoutNotify(string newValue)
         {
             SceneReferenceElement.SetValueWithoutNotify(newValue);
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            SceneReferenceElement.SetShowMixedValue(showMixedValue);
         }
     }
 }

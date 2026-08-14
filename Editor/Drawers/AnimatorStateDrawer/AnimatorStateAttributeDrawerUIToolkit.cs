@@ -76,11 +76,10 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             {
                 case SerializedPropertyType.String:
                 {
-                    AnimatorStateElementString element = new AnimatorStateElementString
+                    AnimatorStateFieldString field = new AnimatorStateFieldString(GetPreferredLabel(property))
                     {
                         bindingPath = property.propertyPath,
                     };
-                    AnimatorStateFieldString field = new AnimatorStateFieldString(GetPreferredLabel(property), element);
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorStateFieldString.alignedFieldUssClassName);
                     if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -447,27 +446,24 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 return null;
             }
 
-            AnimatorStateElementString visualInput = new AnimatorStateElementString
-            {
-                value = value,
-            };
-
-            if (metaInfo.Error == "")
-            {
-                visualInput.BindAnimatorInfo(metaInfo.AnimatorStates, metaInfo.RuntimeAnimatorController);
-            }
             AnimatorStateFieldString field =
-                new AnimatorStateFieldString(label, visualInput)
+                new AnimatorStateFieldString(label)
                 {
                     value = value,
                 };
+
+            if (metaInfo.Error == "")
+            {
+                field.AnimatorStateElementString.BindAnimatorInfo(metaInfo.AnimatorStates, metaInfo.RuntimeAnimatorController);
+            }
+
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                field.AnimatorStateElementString.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

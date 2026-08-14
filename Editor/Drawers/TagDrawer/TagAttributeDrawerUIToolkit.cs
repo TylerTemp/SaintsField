@@ -25,11 +25,10 @@ namespace SaintsField.Editor.Drawers.TagDrawer
                 return new VisualElement();
             }
 
-            TagElement tagElement = new TagElement
+            TagField r = new TagField(GetPreferredLabel(property))
             {
                 bindingPath = property.propertyPath,
             };
-            TagField r = new TagField(GetPreferredLabel(property), tagElement);
             r.AddToClassList(TagField.alignedFieldUssClassName);
             r.AddToClassList(ClassAllowDisable);
             if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -112,22 +111,16 @@ namespace SaintsField.Editor.Drawers.TagDrawer
                 return null;
             }
 
-            TagElement visualInput = new TagElement
-            {
-                value = value,
-            };
             TagField element =
-                new TagField(label, visualInput)
-                {
-                    value = value,
-                };
+                new TagField(label);
+            element.SetValueWithoutNotify(value);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

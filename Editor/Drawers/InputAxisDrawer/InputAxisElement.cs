@@ -92,26 +92,16 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
 
     }
 
-    public class InputAxisField : BaseField<string>
+    public class InputAxisField : StringDropdownField
     {
-        private readonly InputAxisElement _inputAxisElement;
-
-        public InputAxisField(string label, InputAxisElement visualInput) : base(label, visualInput)
+        private InputAxisField(string label, InputAxisElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             visualInput.BindBound(this);
-            _inputAxisElement = visualInput;
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public InputAxisField(string label) : this(label, new InputAxisElement())
         {
-            _inputAxisElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => _inputAxisElement.value;
-            set => _inputAxisElement.value = value;
         }
     }
 }

@@ -36,24 +36,16 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
         }
     }
 
-    public class SortingLayerIntField : BaseField<int>
+    public class SortingLayerIntField : IntDropdownField
     {
-        private readonly SortingLayerIntElement _sortingLayerIntElement;
-        public SortingLayerIntField(string label, SortingLayerIntElement visualInput) : base(label, visualInput)
+        private SortingLayerIntField(string label, SortingLayerIntElement visualInput) : base(label, visualInput)
         {
-            _sortingLayerIntElement = visualInput;
             visualInput.BindBound(this);
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
-        public override void SetValueWithoutNotify(int newValue)
+        public SortingLayerIntField(string label) : this(label, new SortingLayerIntElement())
         {
-            _sortingLayerIntElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override int value
-        {
-            get => _sortingLayerIntElement.value;
-            set => _sortingLayerIntElement.value = value;
         }
     }
 }

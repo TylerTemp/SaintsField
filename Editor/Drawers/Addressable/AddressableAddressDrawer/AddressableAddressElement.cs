@@ -28,5 +28,12 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             Label.text = AddressableAddressAttributeDrawer.GetAddressableAddressDisplay(CachedValue, keys, true);
         }
     }
+
+    public class AddressableAddressField : StringDropdownField
+    {
+        public AddressableAddressField(string label, AddressableAddressAttribute addressableAddressAttribute) : base(label, new AddressableAddressElement(addressableAddressAttribute))
+        {
+        }
+    }
 }
 #endif

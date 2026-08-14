@@ -95,15 +95,18 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         }
     }
 
-    public class ShaderParamStringField : BaseField<string>
+    public class ShaderParamStringField : StringDropdownField
     {
         public readonly ShaderParamStringElement ShaderParamStringElement;
 
-        public ShaderParamStringField(string label, ShaderParamStringElement visualInput) : base(label, visualInput)
+        private ShaderParamStringField(string label, ShaderParamStringElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             ShaderParamStringElement = visualInput;
             visualInput.BindBound(this);
+        }
+        public ShaderParamStringField(string label, ShaderPropertyType? filterPropertyType) : this(label, new ShaderParamStringElement(filterPropertyType))
+        {
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -127,8 +128,23 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                     false,
                     (curItem, _) =>
                     {
-                        AddressableAssetEntry entry = (AddressableAssetEntry)curItem;
-                        string newValue = entry?.address ?? "";
+                        DropdownItem dropdownItem = (DropdownItem)curItem;
+                        string newValue;
+                        switch (dropdownItem.Type)
+                        {
+                            case DropdownType.Null:
+                                newValue = "";
+                                break;
+                            case DropdownType.asset:
+                                newValue = dropdownItem.AddressableAssetEntry.address;
+                                break;
+                            case DropdownType.CommandEdit:
+                                AddressableUtil.OpenGroupEditor();
+                                return null;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+
                         cachedInfo.Error = "";
                         ApplyAddressableSceneSelection(property, info, parent, newValue,
                             changedValue => TriggerChangedIMGUI(property, changedValue));

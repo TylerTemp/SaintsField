@@ -75,6 +75,16 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             Add(root);
         }
 
+        private Color GetInactiveColor()
+        {
+            return _showMixedValue? RateUtils.WillInactiveColor : RateUtils.InactiveColor;
+        }
+
+        private Color GetActiveColor()
+        {
+            return _showMixedValue? RateUtils.WillActiveColor : RateUtils.ActiveColor;
+        }
+
         private Button MakeStarUIToolkit(int option, int minValue)
         {
             int thisUserData = Mathf.Max(option, minValue);
@@ -115,7 +125,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             {
                 image = option == 0 ? _starSlash : _star,
                 scaleMode = ScaleMode.ScaleToFit,
-                tintColor = (option <= minValue && option != 0) ? RateUtils.ActiveColor : RateUtils.InactiveColor,
+                tintColor = (option <= minValue && option != 0) ? GetActiveColor() : GetInactiveColor(),
                 style =
                 {
                     width = SaintsPropertyDrawer.SingleLineHeight,
@@ -135,15 +145,15 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                     Image eachImage = eachButton.Q<Image>();
                     if (eachValue == 0)
                     {
-                        eachImage.tintColor = RateUtils.InactiveColor;
+                        eachImage.tintColor = GetInactiveColor();
                     }
                     else if (eachValue > curValue && eachValue > hoverValue)
                     {
-                        eachImage.tintColor = RateUtils.InactiveColor;
+                        eachImage.tintColor = GetInactiveColor();
                     }
                     else if (eachValue <= curValue && eachValue <= hoverValue)
                     {
-                        eachImage.tintColor = RateUtils.ActiveColor;
+                        eachImage.tintColor = GetActiveColor();
                     }
                     else if (eachValue > curValue && eachValue <= hoverValue)
                     {
@@ -151,7 +161,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                     }
                     else if (eachValue <= curValue && eachValue > hoverValue)
                     {
-                        eachImage.tintColor = eachValue <= minValue ? RateUtils.ActiveColor : RateUtils.WillInactiveColor;
+                        eachImage.tintColor = eachValue <= minValue ? GetActiveColor() : RateUtils.WillInactiveColor;
                     }
                     else
                     {
@@ -181,7 +191,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             {
                 int buttonValue = (int)button.userData;
                 Image image = button.Q<Image>();
-                image.tintColor = buttonValue <= value && buttonValue != 0 ? RateUtils.ActiveColor : RateUtils.InactiveColor;
+                image.tintColor = buttonValue <= value && buttonValue != 0 ? GetActiveColor() : GetInactiveColor();
                 if (buttonValue == 0 && value == 0)
                 {
                     image.tintColor = Color.red;
@@ -214,26 +224,71 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                 SendEvent(evt);
             }
         }
+
+        private bool _showMixedValue;
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _showMixedValue = showMixedValue;
+            UpdateStarUIToolkit();
+
+            // if (showMixedValue)
+            // {
+            //     foreach (Button button in _starButtons)
+            //     {
+            //         // int buttonValue = (int)button.userData;
+            //         Image image = button.Q<Image>();
+            //         image.tintColor = Color.aquamarine;
+            //     }
+            // }
+            // else
+            // {
+            //     UpdateStarUIToolkit();
+            // }
+        }
     }
 
     public class RateField : BaseField<int>
     {
-        private readonly RateElement _rateElement;
+        public readonly RateElement RateElement;
 
-        public RateField(string label, RateElement visualInput) : base(label, visualInput)
+        private RateField(string label, RateElement visualInput) : base(label, visualInput)
         {
-            _rateElement = visualInput;
+            RateElement = visualInput;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public RateField(string label, RateAttribute rateAttribute) : this(label, new RateElement(rateAttribute))
+        {
         }
 
         public override void SetValueWithoutNotify(int newValue)
         {
-            _rateElement.SetValueWithoutNotify(newValue);
+            RateElement.SetValueWithoutNotify(newValue);
         }
 
         public override int value
         {
-            get => _rateElement.value;
-            set => _rateElement.value = value;
+            get => RateElement.value;
+            set
+            {
+                if (RateElement.value == value)
+                {
+                    return;
+                }
+
+                int previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<int> evt = ChangeEvent<int>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            RateElement.SetShowMixedValue(showMixedValue);
         }
     }
 }

@@ -268,18 +268,32 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            foreach (HexInputLengthElement hexInputLengthElement in _hexInputs)
+            {
+                hexInputLengthElement.showMixedValue = showMixedValue;
+            }
+        }
     }
 
     public class GuidStringField : BaseField<string>
     {
         private readonly GuidStringElement _guidStringElement;
 
-        public GuidStringField(string label, GuidStringElement visualInput) : base(label, visualInput)
+        private GuidStringField(string label, GuidStringElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
 
             _guidStringElement = visualInput;
             visualInput.BindDropdownElement(this);
+
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public GuidStringField(string label) : this(label, new GuidStringElement())
+        {
         }
 
         public override void SetValueWithoutNotify(string newValue)
@@ -290,7 +304,25 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
         public override string value
         {
             get => _guidStringElement.value;
-            set => _guidStringElement.value = value;
+            set
+            {
+                if (_guidStringElement.value == value)
+                {
+                    return;
+                }
+
+                string previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            _guidStringElement.SetShowMixedValue(showMixedValue);
         }
     }
 }

@@ -29,11 +29,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    ShaderParamIntElement intDropdownElement = new ShaderParamIntElement(shaderParamAttribute.PropertyType)
+                    ShaderParamIntField r = new ShaderParamIntField(GetPreferredLabel(property), shaderParamAttribute.PropertyType)
                     {
                         bindingPath = property.propertyPath,
                     };
-                    ShaderParamIntField r = new ShaderParamIntField(GetPreferredLabel(property), intDropdownElement);
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(ShaderParamIntField.alignedFieldUssClassName);
                     if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -44,12 +43,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
                 case SerializedPropertyType.String:
                 {
-                    ShaderParamStringElement shaderParamStringElement = new ShaderParamStringElement(shaderParamAttribute.PropertyType)
-                    {
-                        bindingPath = property.propertyPath,
-                    };
                     ShaderParamStringField r =
-                        new ShaderParamStringField(GetPreferredLabel(property), shaderParamStringElement);
+                        new ShaderParamStringField(GetPreferredLabel(property), shaderParamAttribute.PropertyType){
+                            bindingPath = property.propertyPath,
+                        };
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(ShaderParamStringField.alignedFieldUssClassName);
                     if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -262,17 +259,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return null;
             }
 
-            ShaderParamStringElement visualInput = new ShaderParamStringElement(shaderParamAttribute.PropertyType)
-            {
-                value = value,
-            };
             ShaderParamStringField field =
-                new ShaderParamStringField(label, visualInput)
+                new ShaderParamStringField(label, shaderParamAttribute.PropertyType)
                 {
                     value = value,
                 };
             ShaderParamValueEditString element = new ShaderParamValueEditString(field);
-            visualInput.BindShader(shader);
+            field.ShaderParamStringElement.BindShader(shader);
             ShaderUtils.UpdateHelpBox(element.HelpBox, error);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
@@ -280,7 +273,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);
@@ -327,17 +320,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return null;
             }
 
-            ShaderParamIntElement visualInput = new ShaderParamIntElement(shaderParamAttribute.PropertyType)
-            {
-                value = value,
-            };
             ShaderParamIntField field =
-                new ShaderParamIntField(label, visualInput)
+                new ShaderParamIntField(label, shaderParamAttribute.PropertyType)
                 {
                     value = value,
                 };
             ShaderParamValueEditInt element = new ShaderParamValueEditInt(field);
-            visualInput.BindShader(shader);
+            field.ShaderParamIntElement.BindShader(shader);
             ShaderUtils.UpdateHelpBox(element.HelpBox, error);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
@@ -345,7 +334,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

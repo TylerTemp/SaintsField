@@ -75,5 +75,13 @@ namespace SaintsField.Editor.UIToolkitElements.EditWrapper
             evt.target = this;
             SendEvent(evt);
         }
+
+        public void SetShowMixedValue(bool isMixedValue)
+        {
+            foreach (TField valueField in _valueFields)
+            {
+                valueField.showMixedValue = isMixedValue;
+            }
+        }
     }
 }

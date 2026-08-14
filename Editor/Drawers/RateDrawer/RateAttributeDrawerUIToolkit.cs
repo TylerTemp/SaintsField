@@ -16,12 +16,11 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            RateElement rateElement = new RateElement((RateAttribute)saintsAttribute)
-            {
-                bindingPath = property.propertyPath,
-            };
+            RateField r = new RateField(GetPreferredLabel(property), (RateAttribute)saintsAttribute)
+                {
+                    bindingPath = property.propertyPath,
+                };
 
-            RateField r = new RateField(GetPreferredLabel(property), rateElement);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(RateField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -46,26 +45,20 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         {
             if (oldElement is RateField rateField)
             {
-                rateField.value = value;
+                rateField.SetValueWithoutNotify(value);
                 return null;
             }
 
-            RateElement visualInput = new RateElement(rateAttribute)
-            {
-                value = value,
-            };
             RateField element =
-                new RateField(label, visualInput)
-                {
-                    value = value,
-                };
+                new RateField(label, rateAttribute);
+            element.SetValueWithoutNotify(value);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

@@ -53,6 +53,11 @@ namespace SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort
             result.labelElement.style.minWidth = 0;
             return result;
         }
+
+        protected override void UpdateMixedValueContent()
+        {
+            _rowInputsElement.SetShowMixedValue(showMixedValue);
+        }
     }
 }
 #endif

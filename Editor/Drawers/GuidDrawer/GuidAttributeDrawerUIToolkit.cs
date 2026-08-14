@@ -38,14 +38,10 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
         private static VisualElement MakeElement(SerializedProperty property, string label)
         {
-            GuidStringElement timeSpanElement = new GuidStringElement
+            GuidStringField element = new GuidStringField(label)
             {
                 bindingPath = property.propertyPath,
             };
-            timeSpanElement.BindProp(property);
-            timeSpanElement.Bind(property.serializedObject);
-
-            GuidStringField element = new GuidStringField(label, timeSpanElement);
 
             element.AddToClassList(ClassAllowDisable);
 
@@ -60,22 +56,19 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                 return null;
             }
 
-            GuidStringElement guidStringElement = new GuidStringElement
-            {
-                value = value.ToString(),
-            };
             GuidStringField element =
-                new GuidStringField(label, guidStringElement)
+                new GuidStringField(label)
                 {
                     value = value.ToString(),
                 };
+
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                guidStringElement.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     // ReSharper disable once InvertIf
                     if (Guid.TryParse(evt.newValue, out Guid guid))
@@ -96,12 +89,8 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                 return null;
             }
 
-            GuidStringElement guidStringElement = new GuidStringElement
-            {
-                value = value,
-            };
             GuidStringField element =
-                new GuidStringField(label, guidStringElement)
+                new GuidStringField(label)
                 {
                     value = value,
                 };
@@ -111,7 +100,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
             if (setterOrNull != null)
             {
-                guidStringElement.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     // ReSharper disable once InvertIf
                     if (Guid.TryParse(evt.newValue, out Guid guid))

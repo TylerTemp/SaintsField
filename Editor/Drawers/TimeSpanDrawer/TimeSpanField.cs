@@ -5,22 +5,46 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 {
     public class TimeSpanField: BaseField<long>
     {
-        private readonly TimeSpanElement _timeSpanElement;
-        public TimeSpanField(string label, TimeSpanElement timeSpanElement) : base(label, timeSpanElement)
+        public readonly TimeSpanElement TimeSpanElement;
+
+        private TimeSpanField(string label, TimeSpanElement timeSpanElement) : base(label, timeSpanElement)
         {
             style.flexShrink = 1;
-            _timeSpanElement = timeSpanElement;
+            TimeSpanElement = timeSpanElement;
+            timeSpanElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public TimeSpanField(string label, bool defaultExpand = false) : this(label, new TimeSpanElement(defaultExpand))
+        {
         }
 
         public override void SetValueWithoutNotify(long newValue)
         {
-            _timeSpanElement.SetValueWithoutNotify(newValue);
+            TimeSpanElement.SetValueWithoutNotify(newValue);
         }
 
         public override long value
         {
-            get => _timeSpanElement.value;
-            set => _timeSpanElement.value = value;
+            get => TimeSpanElement.value;
+            set
+            {
+                if (TimeSpanElement.value == value)
+                {
+                    return;
+                }
+
+                long previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<long> evt = ChangeEvent<long>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            TimeSpanElement.SetShowMixedValue(showMixedValue);
         }
     }
 }

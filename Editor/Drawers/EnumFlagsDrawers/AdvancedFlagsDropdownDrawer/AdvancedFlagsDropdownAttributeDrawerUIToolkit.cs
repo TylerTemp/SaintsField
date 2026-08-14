@@ -36,9 +36,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.AdvancedFlagsDropdownDrawe
             _enumMeta = EnumFlagsUtil.GetMetaInfo(property, info);
 
             FlagsDropdownElement intDropdownElement = new FlagsDropdownElement(_enumMeta);
-            intDropdownElement.BindProperty(property);
+            // intDropdownElement.BindProperty(property);
             IntDropdownField field = new IntDropdownField(GetPreferredLabel(property), intDropdownElement)
             {
+                bindingPath = property.propertyPath,
                 name = NameButton(property),
             };
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)

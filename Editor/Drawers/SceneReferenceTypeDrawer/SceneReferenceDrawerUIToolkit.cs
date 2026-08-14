@@ -19,11 +19,10 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            SceneReferenceElement sceneReferenceElement = new SceneReferenceElement
+            SceneReferenceField field = new SceneReferenceField(GetPreferredLabel(property))
             {
                 bindingPath = property.FindPropertyRelative(nameof(SceneReference.guid)).propertyPath,
             };
-            SceneReferenceField field = new SceneReferenceField(GetPreferredLabel(property), sceneReferenceElement);
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SceneReferenceField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)

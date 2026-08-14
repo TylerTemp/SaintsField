@@ -147,25 +147,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
         }
     }
 
-    public class SpineBonePickerField : BaseField<string>
+    public class SpineBonePickerField : StringDropdownField
     {
         public readonly SpineBonePickerElement SpineBonePickerElement;
-        public SpineBonePickerField(string label, SpineBonePickerElement visualInput) : base(label, visualInput)
+        private SpineBonePickerField(string label, SpineBonePickerElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             visualInput.BindBound(this);
             SpineBonePickerElement = visualInput;
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public SpineBonePickerField(string label) : this(label, new SpineBonePickerElement())
         {
-            SpineBonePickerElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => SpineBonePickerElement.value;
-            set => SpineBonePickerElement.value = value;
         }
     }
 }

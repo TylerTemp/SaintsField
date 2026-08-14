@@ -13,22 +13,28 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public readonly Button Button;
 
-        protected StringDropdownElement()
+        public StringDropdownElement()
         {
-            TemplateContainer dropdownElement = UIToolkitUtils.CloneDropdownButtonTree();
-            dropdownElement.style.flexGrow = 1;
+            FancyButton fancyButton = new FancyButton();
+            fancyButton.DisplayDropdown();
+            // TemplateContainer dropdownElement = UIToolkitUtils.CloneDropdownButtonTree();
+            // dropdownElement.style.flexGrow = 1;
 
-            Button = dropdownElement.Q<Button>();
+            Button = fancyButton.MainButton;
 
-            Button.style.flexGrow = 1;
+            // Button.style.flexGrow = 1;
 
-            Label = Button.Q<Label>();
+            Label = fancyButton.MainLabel;
+            Label.RegisterValueChangedCallback(evt => evt.StopPropagation());
 
-            Add(dropdownElement);
+            Add(fancyButton);
         }
 
-        // You gotta be shitting me
-        public void SetLabelString(string v) => ((INotifyValueChanged<string>)Label).SetValueWithoutNotify(v);
+        protected void SetLabelString(string v)
+        {
+            Label.text = v;
+            // ((INotifyValueChanged<string>)Label).SetValueWithoutNotify(v);
+        }
 
         public abstract void SetValueWithoutNotify(string newValue);
 
@@ -50,17 +56,57 @@ namespace SaintsField.Editor.UIToolkitElements
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            Label.text = showMixedValue ? "-" : CachedValue;
+        }
     }
 
     public class StringDropdownField: BaseField<string>
     {
         public readonly Button Button;
+        private readonly StringDropdownElement _element;
 
         public StringDropdownField(string label, StringDropdownElement stringDropdownElement) : base(label, stringDropdownElement)
         {
+            _element = stringDropdownElement;
+
             Button = stringDropdownElement.Button;
             AddToClassList(alignedFieldUssClassName);
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+            style.flexShrink = 1;
+
+            stringDropdownElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public override string value
+        {
+            get => _element.value;
+            set
+            {
+                if (_element.value == value)
+                {
+                    return;
+                }
+
+                string previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        public override void SetValueWithoutNotify(string newValue)
+        {
+            _element.SetValueWithoutNotify(newValue);
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            _element.SetShowMixedValue(showMixedValue);
         }
     }
 }

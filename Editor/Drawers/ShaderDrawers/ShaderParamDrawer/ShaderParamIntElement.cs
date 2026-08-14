@@ -83,14 +83,17 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         }
     }
 
-    public class ShaderParamIntField: BaseField<int>
+    public class ShaderParamIntField: IntDropdownField
     {
         public readonly ShaderParamIntElement ShaderParamIntElement;
-        public ShaderParamIntField(string label, ShaderParamIntElement visualInput) : base(label, visualInput)
+        private ShaderParamIntField(string label, ShaderParamIntElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             ShaderParamIntElement = visualInput;
             visualInput.BindBound(this);
+        }
+        public ShaderParamIntField(string label, ShaderPropertyType? filterPropertyType) : this(label, new ShaderParamIntElement(filterPropertyType))
+        {
         }
     }
 }

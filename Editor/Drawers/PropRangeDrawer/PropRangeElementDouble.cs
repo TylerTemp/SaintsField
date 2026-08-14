@@ -289,14 +289,53 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             UIToolkitUtils.SetHelpBox(_helpBox, content);
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _doubleField.showMixedValue = showMixedValue;
+        }
     }
 
     public class PropRangeDoubleField : BaseField<double>
     {
         public readonly PropRangeElementDouble PropRangeElementDouble;
-        public PropRangeDoubleField(string label, PropRangeElementDouble visualInput) : base(label, visualInput)
+        private PropRangeDoubleField(string label, PropRangeElementDouble visualInput) : base(label, visualInput)
         {
             PropRangeElementDouble = visualInput;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public PropRangeDoubleField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementDouble(adaptAttribute))
+        {
+        }
+
+        public override void SetValueWithoutNotify(double newValue)
+        {
+            PropRangeElementDouble.SetValueWithoutNotify(newValue);
+        }
+
+        public override double value
+        {
+            get => PropRangeElementDouble.value;
+            set
+            {
+                if (Math.Abs(PropRangeElementDouble.value - value) <= double.Epsilon)
+                {
+                    return;
+                }
+
+                double previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<double> evt = ChangeEvent<double>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            PropRangeElementDouble.SetShowMixedValue(showMixedValue);
         }
     }
 }

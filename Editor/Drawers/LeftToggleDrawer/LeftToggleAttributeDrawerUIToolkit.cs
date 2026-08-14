@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.LeftToggleDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            string label = GetPreferredLabel(property);
+            // string label = GetPreferredLabel(property);
             // Debug.Log(label);
             LeftToggleField toggle = new LeftToggleField(GetPreferredLabel(property))
             {
@@ -32,9 +32,8 @@ namespace SaintsField.Editor.Drawers.LeftToggleDrawer
                 //     flexDirection = FlexDirection.RowReverse,
                 //     justifyContent = Justify.FlexEnd,
                 // },
+                bindingPath = property.propertyPath,
             };
-
-            toggle.BindProperty(property);
 
             // toggle.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/LeftToggle.uss"));
             toggle.AddToClassList(ClassAllowDisable);

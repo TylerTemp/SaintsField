@@ -330,14 +330,23 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         {
             UIToolkitUtils.SetHelpBox(_helpBox, content);
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _intField.showMixedValue = showMixedValue;
+        }
     }
 
     public class ProgressBarFieldDouble : BaseField<double>
     {
         public readonly ProgressBarElementDouble ProgressBarElementDouble;
-        public ProgressBarFieldDouble(string label, ProgressBarElementDouble visualInput) : base(label, visualInput)
+        private ProgressBarFieldDouble(string label, ProgressBarElementDouble visualInput) : base(label, visualInput)
         {
             ProgressBarElementDouble = visualInput;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+        public ProgressBarFieldDouble(string label) : this(label, new ProgressBarElementDouble())
+        {
         }
 
         public override void SetValueWithoutNotify(double newValue)
@@ -348,7 +357,25 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         public override double value
         {
             get => ProgressBarElementDouble.value;
-            set => ProgressBarElementDouble.value = value;
+            set
+            {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (ProgressBarElementDouble.value == value)
+                {
+                    return;
+                }
+                double previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<double> evt = ChangeEvent<double>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            ProgressBarElementDouble.SetShowMixedValue(showMixedValue);
         }
     }
 }

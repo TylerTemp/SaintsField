@@ -158,6 +158,18 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            if (showMixedValue)
+            {
+                UIToolkitUtils.SetLabel(_label, new []{new RichTextDrawer.RichTextChunk("-", false, "-")}, _richTextDrawer);
+            }
+            else
+            {
+                RefreshDisplay();
+            }
+        }
     }
 
     public class AnimatorStateFieldStruct : BaseField<AnimatorState>
@@ -168,6 +180,38 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             AnimatorStateElementStruct = visualInput;
             visualInput.BindBound(this);
             style.flexShrink = 1;
+
+            AnimatorStateElementStruct.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public override void SetValueWithoutNotify(AnimatorState newValue)
+        {
+            AnimatorStateElementStruct.SetValueWithoutNotify(newValue);
+        }
+
+        public override AnimatorState value
+        {
+            get => AnimatorStateElementStruct.value;
+            set
+            {
+                if (AnimatorStateElementStruct.value == value)
+                {
+                    return;
+                }
+
+                AnimatorState previous = this.value;
+
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<AnimatorState> evt = ChangeEvent<AnimatorState>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            AnimatorStateElementStruct.SetShowMixedValue(showMixedValue);
         }
     }
 }

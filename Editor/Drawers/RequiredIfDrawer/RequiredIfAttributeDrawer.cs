@@ -9,6 +9,7 @@ using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using UnityEngine.AddressableAssets;
@@ -81,7 +82,7 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (curValue is AssetReference ar)
             {
-                return ValidateAddresable(ar);
+                return ValidateAddressable(ar);
             }
 #endif
 #if SAINTSFIELD_I2_LOC
@@ -96,11 +97,26 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
         }
 
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-        private static string ValidateAddresable(AssetReference ar)
+        private static string ValidateAddressable(AssetReference ar)
         {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
+            // ReSharper disable once InvertIf
             if (ar.editorAsset)
             {
+                AddressableAssetSettings settings =
+                    UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.Settings;
+
+                if (settings == null)
+                {
+                    return "Addressable Settings is null";
+                }
+
+                AddressableAssetEntry obj = settings.FindAssetEntry(ar.AssetGUID, true);
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if (obj == null)
+                {
+                    return $"Resource {ar.editorAsset} ({ar.AssetGUID}) is not in addressable, it may be removed from Addressable group";
+                }
+
                 return "";
 
             }

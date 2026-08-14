@@ -312,11 +312,11 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             RefreshDisplay();
         }
 
-        public void SetShowMixedValue(bool show)
+        public void SetShowMixedValue(bool showMixedValue)
         {
-            _minIntegerField.showMixedValue = show;
-            _minMaxSlider.showMixedValue = show;
-            _maxIntegerField.showMixedValue = show;
+            _minIntegerField.showMixedValue = showMixedValue;
+            _minMaxSlider.showMixedValue = showMixedValue;
+            _maxIntegerField.showMixedValue = showMixedValue;
         }
 
         public Vector2Int value

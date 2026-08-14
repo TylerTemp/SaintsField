@@ -34,11 +34,10 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             {
                 case SerializedPropertyType.String:
                 {
-                    AnimatorParamStringElement bindableElement = new AnimatorParamStringElement
+                    AnimatorParamStringField field = new AnimatorParamStringField(GetPreferredLabel(property))
                     {
                         bindingPath = property.propertyPath,
                     };
-                    AnimatorParamStringField field = new AnimatorParamStringField(GetPreferredLabel(property), bindableElement);
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorParamStringField.alignedFieldUssClassName);
                     if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -374,26 +373,27 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                 return null;
             }
 
-            AnimatorParamStringElement visualInput = new AnimatorParamStringElement()
-            {
-                value = value,
-            };
-            if (metaInfo.Error == "")
-            {
-                visualInput.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
-            }
             AnimatorParamStringField field =
-                new AnimatorParamStringField(label, visualInput)
+                new AnimatorParamStringField(label)
                 {
                     value = value,
                 };
+
+            // AnimatorParamStringElement visualInput = new AnimatorParamStringElement()
+            // {
+            //     value = value,
+            // };
+            if (metaInfo.Error == "")
+            {
+                field.AnimatorParamStringElement.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
+            }
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

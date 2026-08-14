@@ -35,8 +35,10 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 case SerializedPropertyType.Integer:
                 // case SerializedPropertyType.Character:
                 {
-                    ProgressBarElementInt element = new ProgressBarElementInt();
-                    ProgressBarFieldInt field = new ProgressBarFieldInt(GetPreferredLabel(property), element);
+                    ProgressBarFieldInt field = new ProgressBarFieldInt(GetPreferredLabel(property))
+                    {
+                        bindingPath = property.propertyPath,
+                    };
                     field.AddToClassList(ProgressBarFieldInt.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -47,8 +49,10 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 }
                 case SerializedPropertyType.Float:
                 {
-                    ProgressBarElementDouble element = new ProgressBarElementDouble();
-                    ProgressBarFieldDouble field = new ProgressBarFieldDouble(GetPreferredLabel(property), element);
+                    ProgressBarFieldDouble field = new ProgressBarFieldDouble(GetPreferredLabel(property))
+                    {
+                        bindingPath = property.propertyPath,
+                    };
                     field.AddToClassList(ProgressBarFieldDouble.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -513,8 +517,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementInt element = new ProgressBarElementInt();
-            ProgressBarFieldInt field = new ProgressBarFieldInt(label, element);
+            ProgressBarFieldInt field = new ProgressBarFieldInt(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementInt.SetConfig(info, min, max, (int)progressBarAttribute.Step);
@@ -527,9 +530,9 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
-                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    (bool ok, int result) = field.ProgressBarElementInt.GetNumber(evt.newValue);
                     if (!ok)
                     {
                         return;
@@ -560,8 +563,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementInt element = new ProgressBarElementInt();
-            ProgressBarFieldInt field = new ProgressBarFieldInt(label, element);
+            ProgressBarFieldInt field = new ProgressBarFieldInt(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementInt.SetConfig(info, min, max, (int)progressBarAttribute.Step);
@@ -574,9 +576,9 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
-                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    (bool ok, int result) = field.ProgressBarElementInt.GetNumber(evt.newValue);
                     if (!ok)
                     {
                         return;
@@ -607,8 +609,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementInt element = new ProgressBarElementInt();
-            ProgressBarFieldInt field = new ProgressBarFieldInt(label, element);
+            ProgressBarFieldInt field = new ProgressBarFieldInt(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementInt.SetConfig(info, min, max, (int)progressBarAttribute.Step);
@@ -621,9 +622,9 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
-                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    (bool ok, int result) = field.ProgressBarElementInt.GetNumber(evt.newValue);
                     if (!ok)
                     {
                         return;
@@ -654,8 +655,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementInt element = new ProgressBarElementInt();
-            ProgressBarFieldInt field = new ProgressBarFieldInt(label, element);
+            ProgressBarFieldInt field = new ProgressBarFieldInt(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementInt.SetConfig(info, min, max, (int)progressBarAttribute.Step);
@@ -668,9 +668,9 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
-                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    (bool ok, int result) = field.ProgressBarElementInt.GetNumber(evt.newValue);
                     if (!ok)
                     {
                         return;
@@ -701,8 +701,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementInt element = new ProgressBarElementInt();
-            ProgressBarFieldInt field = new ProgressBarFieldInt(label, element);
+            ProgressBarFieldInt field = new ProgressBarFieldInt(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementInt.SetConfig(info, min, max, (int)progressBarAttribute.Step);
@@ -715,7 +714,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);
@@ -744,8 +743,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementDouble element = new ProgressBarElementDouble();
-            ProgressBarFieldDouble field = new ProgressBarFieldDouble(label, element);
+            ProgressBarFieldDouble field = new ProgressBarFieldDouble(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementDouble.SetConfig(info, min, max, progressBarAttribute.Step, formatter);
@@ -758,9 +756,9 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
-                    (bool ok, double result) = element.GetNumber(evt.newValue);
+                    (bool ok, double result) = field.ProgressBarElementDouble.GetNumber(evt.newValue);
                     if (!ok)
                     {
                         return;
@@ -792,8 +790,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 return null;
             }
 
-            ProgressBarElementDouble element = new ProgressBarElementDouble();
-            ProgressBarFieldDouble field = new ProgressBarFieldDouble(label, element);
+            ProgressBarFieldDouble field = new ProgressBarFieldDouble(label);
             if (info.Error == "")
             {
                 field.ProgressBarElementDouble.SetConfig(info, min, max, progressBarAttribute.Step, formatter);
@@ -806,7 +803,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

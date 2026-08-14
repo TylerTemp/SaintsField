@@ -36,11 +36,12 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 
         private static TimeSpanField MakeElement(SerializedProperty property, string label, bool defaultExpanded)
         {
-            TimeSpanElement timeSpanElement = new TimeSpanElement(defaultExpanded);
-            timeSpanElement.BindPath(property.propertyPath);
-            timeSpanElement.Bind(property.serializedObject);
-
-            TimeSpanField element = new TimeSpanField(label, timeSpanElement);
+            TimeSpanField element = new TimeSpanField(label, defaultExpanded)
+            {
+                bindingPath = property.propertyPath,
+            };
+            element.TimeSpanElement.BindPath(property.propertyPath);
+            element.Bind(property.serializedObject);
 
             element.AddToClassList(ClassAllowDisable);
 
@@ -58,12 +59,8 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
                 return null;
             }
 
-            TimeSpanElement timeSpanElement = new TimeSpanElement
-            {
-                value = ticks,
-            };
-
-            TimeSpanField element = new TimeSpanField(label, timeSpanElement);
+            TimeSpanField element = new TimeSpanField(label);
+            element.SetValueWithoutNotify(ticks);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);

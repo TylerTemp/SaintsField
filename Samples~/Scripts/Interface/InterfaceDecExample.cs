@@ -30,16 +30,16 @@ namespace SaintsField.Samples.Scripts.Interface
         }
 
 #if UNITY_EDITOR
-        [AdvancedDropdown(nameof(AdvDropdown))]
+        [Dropdown(nameof(AdvDropdown))]
 #endif
         public Interface1 advDropdown;
 
 #if UNITY_EDITOR
-        private AdvancedDropdownList<Component> AdvDropdown()
+        private Dropdown<Component> AdvDropdown()
         {
-            GameObject g1 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface1.prefab");
-            GameObject g2 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface12.prefab");
-            return new AdvancedDropdownList<Component>("")
+            GameObject g1 = AssetDatabase.LoadAssetAtPath<GameObject>("Packages/today.comes.saintsfield/Samples/RawResources/PrefabInterface1.prefab");
+            GameObject g2 = AssetDatabase.LoadAssetAtPath<GameObject>("Packages/today.comes.saintsfield/Samples/RawResources/PrefabInterface12.prefab");
+            return new Dropdown<Component>("")
             {
                 {g1.name, g1.GetComponent<MonoInter1>()},
                 {g2.name, g2.GetComponent<MonoInter12>()},
@@ -53,11 +53,11 @@ namespace SaintsField.Samples.Scripts.Interface
         public Interface1 dropdown;
 
 #if UNITY_EDITOR
-        private DropdownList<Component> Dropdown()
+        private MenuDropdown<Component> Dropdown()
         {
-            GameObject g1 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface1.prefab");
-            GameObject g2 = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SaintsField/Samples/RawResources/PrefabInterface12.prefab");
-            return new DropdownList<Component>
+            GameObject g1 = AssetDatabase.LoadAssetAtPath<GameObject>("Packages/today.comes.saintsfield/Samples/RawResources/PrefabInterface1.prefab");
+            GameObject g2 = AssetDatabase.LoadAssetAtPath<GameObject>("Packages/today.comes.saintsfield/Samples/RawResources/PrefabInterface12.prefab");
+            return new MenuDropdown<Component>
             {
                 {g1.name, g1.GetComponent<MonoInter1>()},
                 {g2.name, g2.GetComponent<MonoInter12>()},

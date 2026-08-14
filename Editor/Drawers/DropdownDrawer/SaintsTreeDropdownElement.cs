@@ -316,7 +316,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             {
                 if (treeRowAbsElement is TreeRowSepElement)
                 {
-                    result += 2;
+                    result += 3;
                 }
                 else
                 {

@@ -34,12 +34,12 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 return new VisualElement();
             }
 
-            AddressableAddressElement element = new AddressableAddressElement((AddressableAddressAttribute) saintsAttribute);
-            element.BindProperty(property);
-            StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), element)
+            AddressableAddressField stringDropdownField = new AddressableAddressField(GetPreferredLabel(property), (AddressableAddressAttribute) saintsAttribute)
             {
                 name = NameDropdownField(property),
+                bindingPath = property.propertyPath,
             };
+
             if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
             {
                 stringDropdownField.labelElement.tooltip = property.tooltip;
@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 return;
             }
 
-            StringDropdownField field = container.Q<StringDropdownField>(NameDropdownField(property));
+            AddressableAddressField field = container.Q<AddressableAddressField>(NameDropdownField(property));
 
             UIToolkitUtils.AddContextualMenuManipulator(field, property,
                 () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
@@ -132,7 +132,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 (curItem, _) =>
                 {
                     ApplyAddressableAddressSelection(property, info, parent, dropdownInfo.Settings, (string)curItem,
-                        newValue => onValueChangedCallback.Invoke(newValue));
+                        onValueChangedCallback.Invoke);
                     return null;
                 }
             );

@@ -31,11 +31,10 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
                 return new VisualElement();
             }
 
-            AddressableLabelElement element = new AddressableLabelElement();
-            element.BindProperty(property);
-            StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), element)
+            AddressableLabelField stringDropdownField = new AddressableLabelField(GetPreferredLabel(property))
             {
                 name = NameDropdownField(property),
+                bindingPath = property.propertyPath,
             };
             if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
             {
@@ -85,7 +84,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
             {
                 return;
             }
-            StringDropdownField field = container.Q<StringDropdownField>(NameDropdownField(property));
+            AddressableLabelField field = container.Q<AddressableLabelField>(NameDropdownField(property));
 
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
@@ -124,7 +123,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
                 (curItem, _) =>
                 {
                     ApplyAddressableLabelSelection(property, info, parent, dropdownInfo.Settings, (string)curItem,
-                        newValue => onValueChangedCallback.Invoke(newValue));
+                        onValueChangedCallback.Invoke);
                     return null;
                 }
             );

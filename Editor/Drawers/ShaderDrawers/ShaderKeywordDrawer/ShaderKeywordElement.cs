@@ -126,14 +126,19 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
         }
     }
 
-    public class ShaderKeywordField : BaseField<string>
+    public class ShaderKeywordField : StringDropdownField
     {
         public readonly ShaderKeywordElement ShaderKeywordElement;
-        public ShaderKeywordField(string label, ShaderKeywordElement visualInput) : base(label, visualInput)
+
+        private ShaderKeywordField(string label, ShaderKeywordElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             visualInput.BindBound(this);
             ShaderKeywordElement = visualInput;
+        }
+
+        public ShaderKeywordField(string label) : this(label, new ShaderKeywordElement())
+        {
         }
     }
 }

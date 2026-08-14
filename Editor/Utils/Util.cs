@@ -949,7 +949,7 @@ namespace SaintsField.Editor.Utils
                 }
 
                 // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
-                var r = ConvertTo(genResult, defaultValue);
+                (string error, T result) r = ConvertTo(genResult, defaultValue);
                 return (r.error, fieldOrMethodInfo, r.result);
             }
 
@@ -1240,7 +1240,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static IReadOnlyList<Assembly> GetAssemblies() 
+        public static IReadOnlyList<Assembly> GetAssemblies()
         {
 #if UNITY_6000_4_OR_NEWER
             // https://docs.unity3d.com/6000.4/Documentation/ScriptReference/Assemblies.CurrentAssemblies.GetLoadedAssemblies
@@ -1250,11 +1250,27 @@ namespace SaintsField.Editor.Utils
 #endif
         }
 
-        private static Type FindTypeInAssembly(Assembly assembly, IReadOnlyList<string> split)
+        private static IEnumerable<Type> FindTypeInAssembly(Assembly assembly, IReadOnlyList<string> split)
         {
-            return split.Count > 1
-                ? assembly.GetType(string.Join(".", split), false)
-                : assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
+            if (split.Count > 1)
+            {
+                Type result = assembly.GetType(string.Join(".", split), false);
+                if (result != null)
+                {
+                    yield return result;
+                }
+            }
+            else
+            {
+                foreach (Type t in assembly.GetTypes())
+                {
+                    if (t.Name == split[0])
+                    {
+                        yield return t;
+                    }
+                }
+            }
+                // return assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
         }
 
         private static (string error, MemberInfo memberInfo, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
@@ -1276,24 +1292,21 @@ namespace SaintsField.Editor.Utils
 
             string fieldOrMethod = split[totalLength - 1];
             split.RemoveAt(totalLength - 1);
-            Type type = null;
+            // Type type = null;
+            List<Type> types = new List<Type>();
             if(target != null)
             {
                 Assembly assembly = target.GetType().Assembly;
-                type = FindTypeInAssembly(assembly, split);
+                types = FindTypeInAssembly(assembly, split).ToList();
             }
-            if (type == null && fullSearch)
+            if (types.Count == 0 && fullSearch)
             {
                 foreach (Assembly searchAssembly in GetAssemblies())
                 {
-                    type = FindTypeInAssembly(searchAssembly, split);
-                    if (type != null)
-                    {
-                        break;
-                    }
+                    types.AddRange(FindTypeInAssembly(searchAssembly, split));
                 }
             }
-            if (type == null)
+            if (types.Count == 0)
             {
                 return ($"type name `{string.Join(".", split)}` not found", null, defaultValue);
             }
@@ -1301,123 +1314,160 @@ namespace SaintsField.Editor.Utils
             const BindingFlags bindAttr = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public |
                                           BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            FieldInfo fieldInfo = type.GetField(fieldOrMethod, bindAttr);
-            // Debug.Log($"fieldInfo={fieldInfo}");
-            if (fieldInfo != null)
-            {
-                object genResult;
-                try
-                {
-                    genResult = fieldInfo.GetValue(null);
-                }
-                catch (Exception e)
-                {
-                    // _error = e.Message;
-#if SAINTSFIELD_DEBUG
-                    Debug.LogException(e);
-#endif
-                    return (e.Message, null, defaultValue);
-                }
-
-                (string error, T result) r = ConvertTo(genResult, defaultValue);
-                return (r.error, fieldInfo, r.result);
-            }
-
-            PropertyInfo propertyInfo = type.GetProperty(fieldOrMethod, bindAttr);
-            // Debug.Log($"propertyInfo={propertyInfo}");
-            if (propertyInfo != null)
-            {
-                object genResult;
-                try
-                {
-                    genResult = propertyInfo.GetValue(null);
-                }
-                catch (Exception e)
-                {
-#if SAINTSFIELD_DEBUG
-                    Debug.LogException(e);
-#endif
-                    return (e.Message, null, defaultValue);
-                }
-
-                (string error, T result) r = ConvertTo(genResult, defaultValue);
-                return (r.error, propertyInfo, r.result);
-            }
-
-            MethodInfo[] methodInfos = type.GetMethods(bindAttr);
-            // Debug.Log($"methodInfos={methodInfos.Length}");
-            if (methodInfos.Length == 0)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"No field, property or method found for {nameSpaceAndName}");
-#endif
-                return ($"No field, property or method found for {nameSpaceAndName}", null, defaultValue);
-            }
-
             List<string> errors = new List<string>();
-            MethodInfo foundMethodInfo = null;
-            foreach (MethodInfo methodInfo in methodInfos)
+            foreach (Type type in types)
             {
-                if(methodInfo.Name == fieldOrMethod)
+                FieldInfo fieldInfo = type.GetField(fieldOrMethod, bindAttr);
+                if (fieldInfo != null)
                 {
-                    (string error, object returnValue) =
-                        InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
-                    if (error == "")
+                    object genResult;
+                    try
                     {
-                        (string error, T result) r = ConvertTo(returnValue, defaultValue);
-                        return (r.error, methodInfo, r.result);
+                        genResult = fieldInfo.GetValue(null);
+                    }
+                    catch (Exception e)
+                    {
+                        // _error = e.Message;
+    #if SAINTSFIELD_DEBUG
+                        Debug.LogException(e);
+    #endif
+                        errors.Add(e.InnerException?.Message ?? e.Message);
+                        continue;
+                        // return (e.Message, null, defaultValue);
                     }
 
-                    foundMethodInfo = methodInfo;
-                    errors.Add(error);
+                    (string error, T result) r = ConvertTo(genResult, defaultValue);
+                    if(r.error == "")
+                    {
+                        return (r.error, fieldInfo, r.result);
+                    }
+
+                    errors.Add(r.error);
+
+                    continue;
+                }
+
+                PropertyInfo propertyInfo = type.GetProperty(fieldOrMethod, bindAttr);
+                // Debug.Log($"propertyInfo={propertyInfo}");
+                if (propertyInfo != null)
+                {
+                    object genResult;
+                    try
+                    {
+                        genResult = propertyInfo.GetValue(null);
+                    }
+                    catch (Exception e)
+                    {
+    #if SAINTSFIELD_DEBUG
+                        Debug.LogException(e);
+    #endif
+                        errors.Add(e.InnerException?.Message ?? e.Message);
+                        continue;
+                    }
+
+                    (string error, T result) r = ConvertTo(genResult, defaultValue);
+
+                    if(r.error == "")
+                    {
+                        return (r.error, propertyInfo, r.result);
+                    }
+
+                    errors.Add(r.error);
+                    continue;
+                }
+
+                MethodInfo[] methodInfos = type.GetMethods(bindAttr);
+                // Debug.Log($"methodInfos={methodInfos.Length}");
+                // if (methodInfos.Length == 0)
+                // {
+                //     continue;
+                //     // #if SAINTSFIELD_DEBUG
+                //     //                 Debug.LogWarning($"No field, property or method found for {nameSpaceAndName}");
+                //     // #endif
+                //     //                 return ($"No field, property or method found for {nameSpaceAndName}", null, defaultValue);
+                // }
+
+                // List<string> errors = new List<string>();
+                MethodInfo foundMethodInfo = null;
+                foreach (MethodInfo methodInfo in methodInfos)
+                {
+                    if(methodInfo.Name == fieldOrMethod)
+                    {
+                        foundMethodInfo = methodInfo;
+    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+                        Debug.Log($"processing {methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(each => $"{each.ParameterType} {each.Name}"))})");
+    #endif
+
+                        (string error, object returnValue) =
+                            InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
+                        if (error == "")
+                        {
+                            (string error, T result) r = ConvertTo(returnValue, defaultValue);
+                            return (r.error, methodInfo, r.result);
+                        }
+
+                        errors.Add(error);
+                    }
+                }
+
+                if (foundMethodInfo == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    if (target != null)  // search nested target inside type
+                    {
+                        Type targetType = target.GetType();
+                        Type accType = targetType;
+                        foreach (string literType in split)
+                        {
+                            accType = accType.GetNestedType(literType, BindingFlags.Public | BindingFlags.NonPublic);
+                            // Debug.Log($"accType={accType} for {literType}");
+                            if (accType == null)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (accType != null)
+                        {
+                            FieldInfo nestedFieldInfo = type.GetField(fieldOrMethod, bindAttr);
+                            if (nestedFieldInfo != null)
+                            {
+                                object genResult;
+                                try
+                                {
+                                    genResult = nestedFieldInfo.GetValue(null);
+                                }
+                                catch (Exception e)
+                                {
+                                    // _error = e.Message;
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogException(e);
+#endif
+                                    return (e.Message, null, defaultValue);
+                                }
+
+                                (string error, T result) r = ConvertTo(genResult, defaultValue);
+                                if(r.error == "")
+                                {
+                                    return (r.error, foundMethodInfo, r.result);
+                                }
+                            }
+                        }
+
+                    }
+// #if SAINTSFIELD_DEBUG
+//                     Debug.LogWarning($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}");
+// #endif
+//                     return ($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}", null, defaultValue);
                 }
             }
 
             if (errors.Count == 0)
             {
-                if (target != null)  // search nested target inside type
-                {
-                    Type targetType = target.GetType();
-                    Type accType = targetType;
-                    foreach (string literType in split)
-                    {
-                        accType = accType.GetNestedType(literType, BindingFlags.Public | BindingFlags.NonPublic);
-                        // Debug.Log($"accType={accType} for {literType}");
-                        if (accType == null)
-                        {
-                            break;
-                        }
-                    }
-
-                    if (accType != null)
-                    {
-                        FieldInfo nestedFieldInfo = type.GetField(fieldOrMethod, bindAttr);
-                        if (nestedFieldInfo != null)
-                        {
-                            object genResult;
-                            try
-                            {
-                                genResult = nestedFieldInfo.GetValue(null);
-                            }
-                            catch (Exception e)
-                            {
-                                // _error = e.Message;
-#if SAINTSFIELD_DEBUG
-                                Debug.LogException(e);
-#endif
-                                return (e.Message, null, defaultValue);
-                            }
-
-                            var r = ConvertTo(genResult, defaultValue);
-                            return (r.error, foundMethodInfo, r.result);
-                        }
-                    }
-
-                }
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}");
-#endif
-                return ($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}", null, defaultValue);
+                errors.Add($"target not found {nameSpaceAndName}");
             }
 
             string finalError = string.Join("\n", errors);

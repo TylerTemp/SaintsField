@@ -293,14 +293,24 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             UIToolkitUtils.SetHelpBox(_helpBox, content);
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _longField.showMixedValue = showMixedValue;
+        }
     }
 
     public class PropRangeLongField : BaseField<long>
     {
         public readonly PropRangeElementLong PropRangeElementLong;
-        public PropRangeLongField(string label, PropRangeElementLong visualInput) : base(label, visualInput)
+        private PropRangeLongField(string label, PropRangeElementLong visualInput) : base(label, visualInput)
         {
             PropRangeElementLong = visualInput;
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+        }
+
+        public PropRangeLongField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementLong(adaptAttribute))
+        {
         }
 
         public override void SetValueWithoutNotify(long newValue)
@@ -311,7 +321,25 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         public override long value
         {
             get => PropRangeElementLong.value;
-            set => PropRangeElementLong.value = value;
+            set
+            {
+                if (PropRangeElementLong.value == value)
+                {
+                    return;
+                }
+
+                long previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<long> evt = ChangeEvent<long>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            PropRangeElementLong.SetShowMixedValue(showMixedValue);
         }
     }
 }

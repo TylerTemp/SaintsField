@@ -85,25 +85,17 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
         }
     }
 
-    public class AnimatorParamStringField : BaseField<string>
+    public class AnimatorParamStringField : StringDropdownField
     {
         public readonly AnimatorParamStringElement AnimatorParamStringElement;
 
-        public AnimatorParamStringField(string label, AnimatorParamStringElement visualInput) : base(label, visualInput)
+        private AnimatorParamStringField(string label, AnimatorParamStringElement visualInput) : base(label, visualInput)
         {
             AnimatorParamStringElement = visualInput;
             visualInput.BindBound(this);
         }
-
-        public override void SetValueWithoutNotify(string newValue)
+        public AnimatorParamStringField(string label) : this(label, new AnimatorParamStringElement())
         {
-            AnimatorParamStringElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => AnimatorParamStringElement.value;
-            set => AnimatorParamStringElement.value = value;
         }
     }
 }

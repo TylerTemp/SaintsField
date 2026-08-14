@@ -79,15 +79,33 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             return true;
         }
 
+        private enum DropdownType
+        {
+            Null,
+            asset,
+            CommandEdit,
+        }
+
+        private readonly struct DropdownItem
+        {
+            public readonly DropdownType Type;
+            public readonly AddressableAssetEntry AddressableAssetEntry;
+
+
+            public DropdownItem(DropdownType type, AddressableAssetEntry addressableAssetEntry)
+            {
+                Type = type;
+                AddressableAssetEntry = addressableAssetEntry;
+            }
+        }
+
         private static AdvancedDropdownMetaInfo GetMetaInfo(string key, IEnumerable<AddressableAssetEntry> assetEntries, bool sepAsSub, bool isImGui)
         {
-            Dropdown<AddressableAssetEntry>
-                dropdown = new Dropdown<AddressableAssetEntry>(isImGui? "Pick A Scene": "")
+            Dropdown<DropdownItem>
+                dropdown = new Dropdown<DropdownItem>(isImGui? "Pick A Scene": "")
                 {
-                    {"[Null]", null},
+                    {"[Null]", new DropdownItem(DropdownType.Null, null)},
                 };
-
-            dropdown.AddSeparator();
 
             AddressableAssetEntry curValue = null;
 
@@ -100,13 +118,18 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
                 if (sepAsSub)
                 {
-                    dropdown.Add(assetEntry.address, assetEntry);
+                    dropdown.Add(assetEntry.address, new DropdownItem(DropdownType.asset, assetEntry));
                 }
                 else
                 {
-                    dropdown.Add(new Dropdown<AddressableAssetEntry>(assetEntry.address, assetEntry));
+                    dropdown.Add(new Dropdown<DropdownItem>(assetEntry.address,
+                        new DropdownItem(DropdownType.asset, assetEntry)));
                 }
+
             }
+
+            dropdown.AddSeparator();
+            dropdown.Add("Edit Addresses...", new DropdownItem(DropdownType.CommandEdit, null), false, "d_editicon.sml");
 
             dropdown.SelfCompact();
 

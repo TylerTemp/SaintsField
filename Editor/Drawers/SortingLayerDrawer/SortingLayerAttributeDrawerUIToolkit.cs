@@ -30,11 +30,10 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    SortingLayerIntElement sortingLayerIntElement = new SortingLayerIntElement
+                    SortingLayerIntField r = new SortingLayerIntField(GetPreferredLabel(property))
                     {
                         bindingPath = property.propertyPath,
                     };
-                    SortingLayerIntField r = new SortingLayerIntField(GetPreferredLabel(property), sortingLayerIntElement);
 
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(SortingLayerIntField.alignedFieldUssClassName);
@@ -46,12 +45,10 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                 }
                 case SerializedPropertyType.String:
                 {
-                    SortingLayerStringElement sortingLayerStringElement = new SortingLayerStringElement
+                    SortingLayerStringField r = new SortingLayerStringField(GetPreferredLabel(property))
                     {
                         bindingPath = property.propertyPath,
                     };
-
-                    SortingLayerStringField r = new SortingLayerStringField(GetPreferredLabel(property), sortingLayerStringElement);
                     r.AddToClassList(ClassAllowDisable);
                     r.AddToClassList(SortingLayerStringField.alignedFieldUssClassName);
                     if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -179,22 +176,16 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                 return null;
             }
 
-            SortingLayerStringElement visualInput = new SortingLayerStringElement
-            {
-                value = value,
-            };
             SortingLayerStringField element =
-                new SortingLayerStringField(label, visualInput)
-                {
-                    value = value,
-                };
+                new SortingLayerStringField(label);
+            element.SetValueWithoutNotify(value);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);
@@ -211,22 +202,16 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                 return null;
             }
 
-            SortingLayerIntElement visualInput = new SortingLayerIntElement
-            {
-                value = value,
-            };
             SortingLayerIntField element =
-                new SortingLayerIntField(label, visualInput)
-                {
-                    value = value,
-                };
+                new SortingLayerIntField(label);
+            element.SetValueWithoutNotify(value);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

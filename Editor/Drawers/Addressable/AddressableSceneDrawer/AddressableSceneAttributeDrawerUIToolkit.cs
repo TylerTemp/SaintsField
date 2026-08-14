@@ -28,11 +28,10 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
             FieldInfo info, object parent)
         {
-            AddressableSceneElement element = new AddressableSceneElement((AddressableSceneAttribute) saintsAttribute);
-            element.BindProperty(property);
-            AddressableSceneField field = new AddressableSceneField(GetPreferredLabel(property), element)
+            AddressableSceneField field = new AddressableSceneField(GetPreferredLabel(property), (AddressableSceneAttribute) saintsAttribute)
             {
                 name = NameAddressableSceneField(property),
+                bindingPath = property.propertyPath,
             };
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
             {
@@ -98,10 +97,25 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                     false,
                     (curItem, _) =>
                     {
-                        AddressableAssetEntry entry = (AddressableAssetEntry)curItem;
-                        string newValue = entry?.address ?? "";
+                        DropdownItem dropdownItem = (DropdownItem)curItem;
+                        string newValue;
+                        switch (dropdownItem.Type)
+                        {
+                            case DropdownType.Null:
+                                newValue = "";
+                                break;
+                            case DropdownType.asset:
+                                newValue = dropdownItem.AddressableAssetEntry.address;
+                                break;
+                            case DropdownType.CommandEdit:
+                                AddressableUtil.OpenGroupEditor();
+                                return null;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+
                         ApplyAddressableSceneSelection(property, info, parent, newValue,
-                            changedValue => onValueChangedCallback.Invoke(changedValue));
+                            onValueChangedCallback.Invoke);
                         return null;
                     }
                 ));

@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
 {
     public partial class SpineBonePickerAttributeDrawer
     {
+        private static string NameField(SerializedProperty property) => $"{property.propertyPath}__SpineBone";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SpineBone_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -28,11 +29,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
                 return fallback;
             }
 
-            SpineBonePickerElement element = new SpineBonePickerElement
+            SpineBonePickerField field = new SpineBonePickerField(GetPreferredLabel(property))
             {
                 bindingPath = property.propertyPath,
+                name = NameField(property),
             };
-            SpineBonePickerField field = new SpineBonePickerField(GetPreferredLabel(property), element);
+
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SpineBonePickerField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -78,7 +80,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
             }
 
             SpineBonePickerAttribute spineBonePickerAttribute = (SpineBonePickerAttribute)saintsAttribute;
-            SpineBonePickerField field = container.Q<SpineBonePickerField>();
+            SpineBonePickerField field = container.Q<SpineBonePickerField>(name: NameField(property));
+
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
             field.SpineBonePickerElement.BindHelpBox(helpBox);

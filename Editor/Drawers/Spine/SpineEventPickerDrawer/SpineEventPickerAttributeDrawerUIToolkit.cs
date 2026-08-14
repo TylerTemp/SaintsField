@@ -27,11 +27,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
                 return fallback;
             }
 
-            SpineEventPickerElement element = new SpineEventPickerElement
+            SpineEventPickerField field = new SpineEventPickerField(GetPreferredLabel(property))
             {
                 bindingPath = property.propertyPath,
             };
-            SpineEventPickerField field = new SpineEventPickerField(GetPreferredLabel(property), element);
+
             field.AddToClassList(ClassAllowDisable);
             field.AddToClassList(SpineEventPickerField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)

@@ -15,14 +15,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         protected IntDropdownElement()
         {
-            // TemplateContainer dropdownElement = UIToolkitUtils.CloneDropdownButtonTree();
-            FancyButton fancyButton = new FancyButton
-            {
-                style =
-                {
-                    flexGrow = 1,
-                },
-            };
+            FancyButton fancyButton = new FancyButton();
             fancyButton.DisplayDropdown();
 
             Button = fancyButton.MainButton;
@@ -54,19 +47,62 @@ namespace SaintsField.Editor.UIToolkitElements
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            if (showMixedValue)
+            {
+                Label.text = "-";
+            }
+            else
+            {
+                SetValueWithoutNotify(value);
+            }
+        }
     }
 
     public class IntDropdownField: BaseField<int>
     {
         public readonly Button Button;
+        private readonly IntDropdownElement _element;
 
         public IntDropdownField(string label, IntDropdownElement intDropdownElement) : base(label, intDropdownElement)
         {
+            _element = intDropdownElement;
             Button = intDropdownElement.Button;
             AddToClassList(alignedFieldUssClassName);
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
             style.flexShrink = 1;
+        }
+
+        public override int value
+        {
+            get => _element.value;
+            set
+            {
+                if (_element.value == value)
+                {
+                    return;
+                }
+
+                int previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<int> evt = ChangeEvent<int>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+
+        public override void SetValueWithoutNotify(int newValue)
+        {
+            _element.SetValueWithoutNotify(newValue);
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            _element.SetShowMixedValue(showMixedValue);
         }
     }
 }

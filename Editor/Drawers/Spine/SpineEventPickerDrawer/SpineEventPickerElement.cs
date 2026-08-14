@@ -138,25 +138,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
         }
     }
 
-    public class SpineEventPickerField : BaseField<string>
+    public class SpineEventPickerField : StringDropdownField
     {
         public readonly SpineEventPickerElement SpineEventPickerElement;
-        public SpineEventPickerField(string label, SpineEventPickerElement visualInput) : base(label, visualInput)
+        private SpineEventPickerField(string label, SpineEventPickerElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             visualInput.BindBound(this);
             SpineEventPickerElement = visualInput;
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public SpineEventPickerField(string label) : this(label, new SpineEventPickerElement())
         {
-            SpineEventPickerElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => SpineEventPickerElement.value;
-            set => SpineEventPickerElement.value = value;
         }
     }
 }

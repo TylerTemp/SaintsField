@@ -18,12 +18,8 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 return null;
             }
 
-            LayerMaskDropdownElement layerMaskDropdownElement = new LayerMaskDropdownElement
-            {
-                value = value.value,
-            };
             LayerMaskDropdownField element =
-                new LayerMaskDropdownField(label, layerMaskDropdownElement)
+                new LayerMaskDropdownField(label)
                 {
                     value = value.value,
                 };
@@ -33,7 +29,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
 
             if (setterOrNull != null)
             {
-                layerMaskDropdownElement.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull((LayerMask)evt.newValue);

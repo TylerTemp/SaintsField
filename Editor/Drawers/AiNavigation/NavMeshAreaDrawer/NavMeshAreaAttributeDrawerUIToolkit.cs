@@ -31,11 +31,12 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                 {
                     NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute)saintsAttribute;
                     NavMeshAreaIntElement element = new NavMeshAreaIntElement(navMeshAreaAttribute.IsMask);
-                    element.BindProperty(property);
                     IntDropdownField intDropdownField = new IntDropdownField(GetPreferredLabel(property), element)
                     {
                         name = NameButtonField(property),
+                        bindingPath = property.propertyPath,
                     };
+
                     if (!string.IsNullOrEmpty(property.tooltip) && intDropdownField.labelElement != null)
                     {
                         intDropdownField.labelElement.tooltip = property.tooltip;
@@ -45,10 +46,10 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                 case SerializedPropertyType.String:
                 {
                     NavMeshAreaStringElement element = new NavMeshAreaStringElement();
-                    element.BindProperty(property);
                     StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), element)
                     {
                         name = NameButtonField(property),
+                        bindingPath = property.propertyPath,
                     };
                     if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
                     {

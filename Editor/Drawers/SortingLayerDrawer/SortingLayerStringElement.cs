@@ -37,24 +37,16 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
         }
     }
 
-    public class SortingLayerStringField : BaseField<string>
+    public class SortingLayerStringField : StringDropdownField
     {
-        private readonly SortingLayerStringElement _sortingLayerStringElement;
-        public SortingLayerStringField(string label, SortingLayerStringElement visualInput) : base(label, visualInput)
+        private SortingLayerStringField(string label, SortingLayerStringElement visualInput) : base(label, visualInput)
         {
-            _sortingLayerStringElement = visualInput;
             visualInput.BindBound(this);
+            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public SortingLayerStringField(string label) : this(label, new SortingLayerStringElement())
         {
-            _sortingLayerStringElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => _sortingLayerStringElement.value;
-            set => _sortingLayerStringElement.value = value;
         }
     }
 }

@@ -64,6 +64,9 @@
     flex-grow: 1;
     flex-direction: row;
     justify-content: center;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .statusIndicatorElement {

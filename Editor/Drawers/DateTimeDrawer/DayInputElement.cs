@@ -67,6 +67,11 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            IntegerField.showMixedValue = showMixedValue;
+        }
     }
 }
 #endif

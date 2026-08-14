@@ -69,11 +69,15 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         }
     }
 
-    public class LayerMaskDropdownField : BaseField<int>
+    public class LayerMaskDropdownField : IntDropdownField
     {
-        public LayerMaskDropdownField(string label, LayerMaskDropdownElement visualInput) : base(label, visualInput)
+        private LayerMaskDropdownField(string label, LayerMaskDropdownElement visualInput) : base(label, visualInput)
         {
             visualInput.BindDrop(this);
+        }
+
+        public LayerMaskDropdownField(string label) : this(label, new LayerMaskDropdownElement())
+        {
         }
     }
 }

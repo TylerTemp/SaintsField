@@ -25,6 +25,15 @@ namespace SaintsField.Editor.UIToolkitElements
             set => _dropdownRoot = value;
         }
 
+        // // ReSharper disable once InconsistentNaming
+        // public bool showMixedValue
+        // {
+        //     get => _sceneField.showMixedValue;
+        //     set => _sceneField.showMixedValue = value;
+        // }
+
+        public void SetShowMixedValue(bool showMixedValue) => _sceneField.showMixedValue = showMixedValue;
+
         protected ScenePickerBaseElement()
         {
             if (_sceneElement == null)

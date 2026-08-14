@@ -24,12 +24,11 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 return new VisualElement();
             }
 
-            InputAxisElement inputAxisElement = new InputAxisElement
+            InputAxisField r = new InputAxisField(GetPreferredLabel(property))
             {
                 bindingPath = property.propertyPath,
             };
 
-            InputAxisField r = new InputAxisField(GetPreferredLabel(property), inputAxisElement);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(InputAxisField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
@@ -112,22 +111,19 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 return null;
             }
 
-            InputAxisElement visualInput = new InputAxisElement
-            {
-                value = value,
-            };
             InputAxisField element =
-                new InputAxisField(label, visualInput)
+                new InputAxisField(label)
                 {
                     value = value,
                 };
+
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                visualInput.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

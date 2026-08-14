@@ -55,6 +55,13 @@ namespace SaintsField.Editor.UIToolkitElements
             Add(TextField);
         }
 
+        // ReSharper disable once InconsistentNaming
+        public bool showMixedValue
+        {
+            get => TextField.showMixedValue;
+            set => TextField.showMixedValue = value;
+        }
+
         public void SetValueWithoutNotify(string newValue)
         {
             _cachedValue = newValue;

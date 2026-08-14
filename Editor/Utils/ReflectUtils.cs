@@ -127,6 +127,7 @@ namespace SaintsField.Editor.Utils
         private class MethodParamFiller
         {
             public string Name;
+            public Type Type;
             public bool IsOptional;
             public object DefaultValue;
 
@@ -142,12 +143,14 @@ namespace SaintsField.Editor.Utils
                     ? new MethodParamFiller
                     {
                         Name = param.Name,
+                        Type = param.ParameterType,
                         IsOptional = true,
                         DefaultValue = param.DefaultValue,
                     }
                     : new MethodParamFiller
                     {
                         Name = param.Name,
+                        Type = param.ParameterType,
                     })
                 .ToArray();
             // then we check for each params:
@@ -260,8 +263,8 @@ namespace SaintsField.Editor.Utils
                 }
                 else
                 {
-                    string message = $"No value for required parameter `{each.Name}` in method.";
-#if SAINTSFIELD_DEBUG
+                    string message = $"No value for required parameter `{each.Type} {each.Name}` in method.";
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
                     Debug.LogWarning(message);
 #endif
                     return (message, null);

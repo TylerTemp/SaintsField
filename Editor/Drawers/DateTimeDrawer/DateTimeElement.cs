@@ -308,6 +308,18 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 SendEvent(evt);
             }
         }
+
+        public void SetShowMixedValue(bool showMixedValue)
+        {
+            _yearInputElement.SetShowMixedValue(showMixedValue);
+            _monthInputElement.SetShowMixedValue(showMixedValue);
+            _dayInputElement.SetShowMixedValue(showMixedValue);
+
+            _hourInputElement.SetShowMixedValue(showMixedValue);
+            _minuteInputElement.SetShowMixedValue(showMixedValue);
+            _secondInputElement.SetShowMixedValue(showMixedValue);
+            _millisecondInputElement.SetShowMixedValue(showMixedValue);
+        }
     }
 }
 #endif

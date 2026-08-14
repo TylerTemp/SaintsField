@@ -152,25 +152,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
         }
     }
 
-    public class SpineIkConstraintPickerField : BaseField<string>
+    public class SpineIkConstraintPickerField : StringDropdownField
     {
         public readonly SpineIkConstraintPickerElement SpineIkConstraintPickerElement;
-        public SpineIkConstraintPickerField(string label, SpineIkConstraintPickerElement visualInput) : base(label, visualInput)
+        private SpineIkConstraintPickerField(string label, SpineIkConstraintPickerElement visualInput) : base(label, visualInput)
         {
             style.flexShrink = 1;
             visualInput.BindBound(this);
             SpineIkConstraintPickerElement = visualInput;
         }
-
-        public override void SetValueWithoutNotify(string newValue)
+        public SpineIkConstraintPickerField(string label) : this(label, new SpineIkConstraintPickerElement())
         {
-            SpineIkConstraintPickerElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => SpineIkConstraintPickerElement.value;
-            set => SpineIkConstraintPickerElement.value = value;
         }
     }
 }
