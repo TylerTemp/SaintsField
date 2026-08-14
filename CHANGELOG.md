@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.25.8 ##
+
+1.  Fix: Multiple targets editing works as expected for many custom field types. Fix [#431](https://github.com/TylerTemp/SaintsField/issues/431)
+2.  Fix: Unity 6k.5 code unload issue for type reference and SaintsEvent
+
 ## 5.25.7 ##
 
 1.  Add: SaintsDictionary (and `[ShowInInspector] Dictionary<>`) now has a menu button to toggle paging, searching, and scriptable object searching. Fix [#428](https://github.com/TylerTemp/SaintsField/issues/428)

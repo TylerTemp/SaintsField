@@ -1250,6 +1250,25 @@ namespace SaintsField.Editor.Utils
 #endif
         }
 
+        public static Type[] GetAssemblyTypesSafe(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.Where(each => each != null).ToArray();
+            }
+            catch (Exception e)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning($"Unable to enumerate types in {assembly.FullName}: {e.GetType().Name}: {e.Message}");
+#endif
+                return Array.Empty<Type>();
+            }
+        }
+
         private static IEnumerable<Type> FindTypeInAssembly(Assembly assembly, IReadOnlyList<string> split)
         {
             if (split.Count > 1)

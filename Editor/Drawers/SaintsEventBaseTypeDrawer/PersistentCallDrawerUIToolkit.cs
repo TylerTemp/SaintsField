@@ -103,6 +103,23 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
         private static readonly Dictionary<Assembly, Type[]> ToFill = new Dictionary<Assembly, Type[]>();
 
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.OnCodeUnloading]
+#endif
+        private static void ClearAssemblyTypeCache()
+        {
+            ToFill.Clear();
+        }
+
+#if !UNITY_6000_5_OR_NEWER
+        [InitializeOnLoadMethod]
+        private static void RegisterAssemblyTypeCacheCleanup()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload -= ClearAssemblyTypeCache;
+            AssemblyReloadEvents.beforeAssemblyReload += ClearAssemblyTypeCache;
+        }
+#endif
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {

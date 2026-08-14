@@ -22,6 +22,24 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
         private static IReadOnlyList<Assembly> _allAssemblies;
 
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.OnCodeUnloading]
+#endif
+        private static void ClearAssemblyCache()
+        {
+            _allAssemblies = null;
+            InfoCacheIMGUI.Clear();
+        }
+
+#if !UNITY_6000_5_OR_NEWER
+        [InitializeOnLoadMethod]
+        private static void RegisterAssemblyCacheCleanup()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload -= ClearAssemblyCache;
+            AssemblyReloadEvents.beforeAssemblyReload += ClearAssemblyCache;
+        }
+#endif
+
         internal readonly struct TypeReferenceContext
         {
             public readonly string Error;
@@ -169,7 +187,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             {
                 if (!toFill.ContainsKey(assembly))
                 {
-                    toFill[assembly] = assembly.GetTypes();
+                    toFill[assembly] = Util.GetAssemblyTypesSafe(assembly);
                 }
             }
         }

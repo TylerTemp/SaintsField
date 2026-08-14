@@ -115,12 +115,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.7**
+**5.25.8**
 
-1.  Add: SaintsDictionary (and `[ShowInInspector] Dictionary<>`) now has a menu button to toggle paging, searching, and scriptable object searching. Fix [#428](https://github.com/TylerTemp/SaintsField/issues/428)
-2.  Fix: `[ShowInInspector] Dictionary<>` constantly repaint on value changed
-3.  Fix: `AssetPreview` shown an empty space if the target has no preview of any kind
-4.  Change: `AssetPreview` default width & height to 128. This makes interactive preview do not shows too big by default  
+1.  Fix: Multiple targets editing works as expected for many custom field types. Fix [#431](https://github.com/TylerTemp/SaintsField/issues/431)
+2.  Fix: Unity 6k.5 code unload issue for type reference and SaintsEvent
 
 ## Usage ##
 

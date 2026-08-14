@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
@@ -107,6 +108,17 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             };
 
             UpdateLabel(container, property);
+
+            SaintsLifecycleManagement.OnCodeUnloadingEvent.RemoveListener(OnCodeUnloading);
+            SaintsLifecycleManagement.OnCodeUnloadingEvent.AddListener(OnCodeUnloading);
+            container.RegisterCallback<DetachFromPanelEvent>(_ => SaintsLifecycleManagement.OnCodeUnloadingEvent.RemoveListener(OnCodeUnloading));
+            return;
+
+            void OnCodeUnloading()
+            {
+                _cachedAssemblies = null;
+                _cachedAssembliesTypes.Clear();
+            }
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
