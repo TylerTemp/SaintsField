@@ -63,6 +63,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             public readonly AsyncSearchItemsIMGUI AsyncSearchItems = new AsyncSearchItemsIMGUI();
             public readonly IMGUILoading KeyLoading = new IMGUILoading();
             public readonly IMGUILoading ValueLoading = new IMGUILoading();
+            public bool ConfigurationInitialized;
+            public bool SearchEnabled;
+            public bool ObjectSearch;
             public SaintsDictionaryTable Table;
             public DictionaryContextIMGUI Context;
             public string KeysPropPath;
@@ -405,6 +408,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private const float PagerSepWidth = 8f;
         private const float SearchGap = 5f;
         private const float SizeWidth = 50f;
+        private const float MenuButtonWidth = 20f;
         private const float ButtonWidth = 18f;
         private const float ControlGap = 4f;
         private const float TableHeightPadding = 4f;
@@ -456,8 +460,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 return SingleLineHeight;
             }
 
-            bool searchable = context.Attribute?.Searchable ?? true;
-            return cache.Table.totalHeight + TableHeightPadding + SingleLineHeight * 2f + (searchable ? SingleLineHeight : 0f);
+            return cache.Table.totalHeight + TableHeightPadding + SingleLineHeight * 2f
+                   + (cache.SearchEnabled ? SingleLineHeight : 0f);
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
@@ -482,8 +486,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             EnsureIcons();
 
-            SaintsDictionaryAttribute saintsDictionaryAttribute = context.Attribute;
-            bool searchable = saintsDictionaryAttribute?.Searchable ?? true;
             bool hasPaging = cache.AsyncSearchItems.NumberOfItemsPerPage > 0;
 
             Rect headerRect = new Rect(position)
@@ -496,14 +498,24 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 x = headerRect.xMax - SizeWidth,
                 width = SizeWidth,
             };
+            Rect menuRect = new Rect(headerRect)
+            {
+                x = sizeRect.x - MenuButtonWidth - ControlGap,
+                width = MenuButtonWidth,
+            };
             Rect foldoutRect = new Rect(headerRect)
             {
-                width = Mathf.Max(0f, headerRect.width - SizeWidth - ControlGap),
+                width = Mathf.Max(0f, headerRect.width - SizeWidth - MenuButtonWidth - ControlGap * 2f),
             };
 
             Rect foldoutUseRect = ShrinkRect(foldoutRect);
             property.isExpanded = EditorGUI.Foldout(foldoutUseRect, property.isExpanded, context.Label, true);
             DrawOverrideRichText(foldoutUseRect, label, overrideRichTextChunks);
+
+            if (GUI.Button(ShrinkRect(menuRect), "...", EditorStyles.miniButton))
+            {
+                ShowMenu(menuRect, cache, context);
+            }
 
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
@@ -536,7 +548,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 height = Mathf.Max(0f, contentRect.height - 2f),
             };
 
-            if (searchable)
+            if (cache.SearchEnabled)
             {
                 (Rect searchRect, Rect restRect) = RectUtils.SplitHeightRect(workRect, SingleLineHeight);
                 workRect = restRect;
@@ -562,6 +574,66 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             DrawFooter(ShrinkRect(footerRect), cache, context, hasPaging);
+        }
+
+        private static void ShowMenu(Rect rect, InfoIMGUI cache, DictionaryContextIMGUI context)
+        {
+            AsyncSearchItemsIMGUI searchItems = cache.AsyncSearchItems;
+            GenericMenu menu = new GenericMenu();
+
+            bool hasPaging = searchItems.NumberOfItemsPerPage > 0;
+            menu.AddItem(new GUIContent("Paging"), hasPaging, () =>
+            {
+                int configuredItemsPerPage = context.Attribute?.NumberOfItemsPerPage ?? -1;
+                searchItems.NumberOfItemsPerPage = hasPaging
+                    ? -1
+                    : configuredItemsPerPage > 0
+                        ? configuredItemsPerPage
+                        : Mathf.Max(5, context.KeysProp.arraySize / 2);
+                searchItems.PageIndex = 0;
+                RefreshView(cache);
+            });
+
+            bool searchEnabled = cache.SearchEnabled;
+            menu.AddItem(new GUIContent("Search"), searchEnabled, () =>
+            {
+                cache.SearchEnabled = !searchEnabled;
+                if (searchEnabled)
+                {
+                    RestartSearch(cache, context.KeysProp, context.ValuesProp, "", "", true);
+                }
+                RefreshView(cache);
+            });
+
+            if (searchEnabled)
+            {
+                menu.AddItem(new GUIContent("Object Search"), cache.ObjectSearch, () =>
+                {
+                    cache.ObjectSearch = !cache.ObjectSearch;
+                    if (!string.IsNullOrEmpty(searchItems.KeySearchText)
+                        || !string.IsNullOrEmpty(searchItems.ValueSearchText))
+                    {
+                        RestartSearch(cache, context.KeysProp, context.ValuesProp,
+                            searchItems.KeySearchText, searchItems.ValueSearchText, false);
+                    }
+                    RefreshView(cache);
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Object Search"), cache.ObjectSearch);
+            }
+
+            menu.DropDown(rect);
+        }
+
+        private static void RefreshView(InfoIMGUI cache)
+        {
+            UpdateVisibleIndexes(cache.AsyncSearchItems);
+            SyncTableItems(cache);
+            cache.Table?.Reload();
+            GUI.changed = true;
+            EditorWindow.focusedWindow?.Repaint();
         }
 
         private void DrawSearchField(Rect rect, bool isKeySearch, InfoIMGUI cache, DictionaryContextIMGUI context)
@@ -1031,23 +1103,15 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SaintsDictionaryAttribute attribute)
         {
             AsyncSearchItemsIMGUI asyncSearchItems = cache.AsyncSearchItems;
-            int numberOfItemsPerPage = attribute?.NumberOfItemsPerPage ?? -1;
 
-            if (asyncSearchItems.Size == 0
-                && asyncSearchItems.HitTargetIndexes.Count == 0
-                && asyncSearchItems.CachedHitTargetIndexes.Count == 0
-                && string.IsNullOrEmpty(asyncSearchItems.KeySearchText)
-                && string.IsNullOrEmpty(asyncSearchItems.ValueSearchText))
+            if (!cache.ConfigurationInitialized)
             {
-                asyncSearchItems.NumberOfItemsPerPage = numberOfItemsPerPage;
+                cache.ConfigurationInitialized = true;
+                cache.SearchEnabled = attribute?.Searchable ?? true;
+                cache.ObjectSearch = attribute?.ObjectSearch ?? true;
+                asyncSearchItems.NumberOfItemsPerPage = attribute?.NumberOfItemsPerPage ?? -1;
                 SetFullResults(asyncSearchItems, keysProp.arraySize);
                 return;
-            }
-
-            if (asyncSearchItems.NumberOfItemsPerPage != numberOfItemsPerPage)
-            {
-                asyncSearchItems.NumberOfItemsPerPage = numberOfItemsPerPage;
-                UpdateVisibleIndexes(asyncSearchItems);
             }
 
             if (asyncSearchItems.Size != keysProp.arraySize)
@@ -1090,7 +1154,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             asyncSearchItems.Started = false;
             asyncSearchItems.Finished = false;
             asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTimeIMGUI;
-            asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, safeKeySearch, safeValueSearch, true).GetEnumerator();
+            asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, safeKeySearch, safeValueSearch,
+                cache.ObjectSearch).GetEnumerator();
             UpdateVisibleIndexes(asyncSearchItems);
         }
 

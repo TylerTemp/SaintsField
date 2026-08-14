@@ -16,7 +16,6 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         public new class UxmlTraits : VisualElement.UxmlTraits { }
         public new class UxmlFactory : UxmlFactory<MinMaxSliderElementFloat, UxmlTraits> { }
 #endif
-        private const int InputWidth = 50;
 
         private Vector2 _cachedValue;
 
@@ -310,6 +309,13 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             RefreshDisplay();
         }
 
+        public void SetShowMixedValue(bool show)
+        {
+            _minIntegerField.showMixedValue = show;
+            _minMaxSlider.showMixedValue = show;
+            _maxIntegerField.showMixedValue = show;
+        }
+
         public Vector2 value
         {
             get => _cachedValue;
@@ -341,6 +347,11 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         public override void SetValueWithoutNotify(Vector2 newValue)
         {
             MinMaxSliderElementFloat.SetValueWithoutNotify(newValue);
+        }
+
+        protected override void UpdateMixedValueContent()
+        {
+            MinMaxSliderElementFloat.SetShowMixedValue(showMixedValue);
         }
 
         public override Vector2 value

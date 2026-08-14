@@ -7033,6 +7033,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1451422003}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &598716946
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 598716947}
+  - component: {fileID: 598716948}
+  m_Layer: 0
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &598716947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598716946}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1101882547}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &598716948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598716946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dd063b9008710a49863616a10e35568, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Issue431MultipleMinMaxSer
+  _randomRotationRange: {x: -58.666687, y: 109.33331}
+  _randomRotationRangeInt: {x: 70, y: 135}
 --- !u!1 &599044141
 GameObject:
   m_ObjectHideFlags: 0
@@ -22094,6 +22140,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 787857618}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &963764183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 963764184}
+  - component: {fileID: 963764185}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &963764184
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963764183}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1101882547}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &963764185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963764183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dd063b9008710a49863616a10e35568, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Issue431MultipleMinMaxSer
+  _randomRotationRange: {x: -104.000015, y: 109.33331}
+  _randomRotationRangeInt: {x: -95, y: 29}
 --- !u!1 &964163564
 GameObject:
   m_ObjectHideFlags: 0
@@ -23874,6 +23966,39 @@ MonoBehaviour:
   _mat1: {fileID: 2100000, guid: 832112d0d8069044fa7b775831f6ef0f, type: 2}
   _mat2: {fileID: 2100000, guid: 09fa8ef13abd33f42a267980f8846ff5, type: 2}
   _matDisabled: {fileID: 0}
+--- !u!1 &1101882546
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1101882547}
+  m_Layer: 0
+  m_Name: Issue431MultipleMinMaxSer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1101882547
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101882546}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 963764184}
+  - {fileID: 598716947}
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1106711413
 GameObject:
   m_ObjectHideFlags: 0
@@ -29482,6 +29607,7 @@ Transform:
   - {fileID: 357291856}
   - {fileID: 1656727569}
   - {fileID: 516712123}
+  - {fileID: 1101882547}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1487457131
