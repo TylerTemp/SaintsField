@@ -243,23 +243,13 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 return;
             }
 
-            Vector2Int originValue = value;
             Vector2Int newValue = RemapValue(value);
 
-            // Debug.Log($"refresh display from {originValue} to {newValue} with {_minMaxSlider.lowLimit}~{_minMaxSlider.highLimit}");
-
-            if (originValue != newValue)
-            {
-                value = newValue;
-            }
-            else
-            {
-                // _slider.value = newValue;
-                _minMaxSlider.SetValueWithoutNotify(newValue);
-                SetIntFieldWithoutNotify(_minIntegerField, newValue.x);
-                SetIntFieldWithoutNotify(_maxIntegerField, newValue.y);
-                SetHelpBox("");
-            }
+            _cachedValue = newValue;
+            _minMaxSlider.SetValueWithoutNotify(newValue);
+            SetIntFieldWithoutNotify(_minIntegerField, newValue.x);
+            SetIntFieldWithoutNotify(_maxIntegerField, newValue.y);
+            SetHelpBox("");
         }
 
         private Vector2Int RemapValue(Vector2Int newValue)

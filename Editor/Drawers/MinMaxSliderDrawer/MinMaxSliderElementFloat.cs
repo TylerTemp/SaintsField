@@ -153,19 +153,19 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             bool changed = false;
 
-            if(!_init || Math.Abs(minResult - _minValue) < float.Epsilon)
+            if(!_init || Math.Abs(minResult - _minValue) > float.Epsilon)
             {
                 _minMaxSlider.lowLimit = _minValue = minResult;
                 changed = true;
             }
 
-            if(!_init || Math.Abs(_maxValue - maxResult) < float.Epsilon)
+            if(!_init || Math.Abs(_maxValue - maxResult) > float.Epsilon)
             {
                 _minMaxSlider.highLimit = _maxValue = maxResult;
                 changed = true;
             }
 
-            if(!_init || Math.Abs(_step - step) < float.Epsilon)
+            if(!_init || Math.Abs(_step - step) > float.Epsilon)
             {
                 _step = step;
                 changed = true;
@@ -240,23 +240,13 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 return;
             }
 
-            Vector2 originValue = value;
             Vector2 newValue = RemapValue(value);
 
-            // Debug.Log($"refresh display from {originValue} to {newValue} with {_minMaxSlider.lowLimit}~{_minMaxSlider.highLimit}");
-
-            if (!VectorClose(originValue, newValue))
-            {
-                value = newValue;
-            }
-            else
-            {
-                // _slider.value = newValue;
-                _minMaxSlider.SetValueWithoutNotify(newValue);
-                SetFloatFieldWithoutNotify(_minIntegerField, newValue.x);
-                SetFloatFieldWithoutNotify(_maxIntegerField, newValue.y);
-                SetHelpBox("");
-            }
+            _cachedValue = newValue;
+            _minMaxSlider.SetValueWithoutNotify(newValue);
+            SetFloatFieldWithoutNotify(_minIntegerField, newValue.x);
+            SetFloatFieldWithoutNotify(_maxIntegerField, newValue.y);
+            SetHelpBox("");
         }
 
         private Vector2 RemapValue(Vector2 newValue)

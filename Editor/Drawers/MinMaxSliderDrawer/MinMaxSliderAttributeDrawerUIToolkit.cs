@@ -333,15 +333,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     // field.MinMaxSliderElementInt.bindingPath = property.propertyPath;
                     field.bindingPath = property.propertyPath;  // just let prefab blue bar works
                     field.BindProperty(property);  // just let prefab blue bar works
-                    field.value = property.vector2IntValue;
-                    field.RegisterValueChangedCallback(evt =>
-                    {
-                        // Debug.Log(evt.newValue);
-                        Vector2Int newValue = evt.newValue;
-                        property.vector2IntValue = newValue;
-                        property.serializedObject.ApplyModifiedProperties();
-                        // onValueChangedCallback(newValue);
-                    });
+                    field.SetValueWithoutNotify(property.vector2IntValue);
                     field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.vector2IntValue));
                 }
                     break;
@@ -380,15 +372,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     // field.MinMaxSliderElementInt.bindingPath = property.propertyPath;
                     field.bindingPath = property.propertyPath;  // just let prefab blue bar works
                     field.BindProperty(property);  // just let prefab blue bar works
-                    field.value = property.vector2Value;
-                    field.RegisterValueChangedCallback(evt =>
-                    {
-                        // Debug.Log(evt.newValue);
-                        Vector2 newValue = evt.newValue;
-                        property.vector2Value = newValue;
-                        property.serializedObject.ApplyModifiedProperties();
-                        // onValueChangedCallback(newValue);
-                    });
+                    field.SetValueWithoutNotify(property.vector2Value);
 
                     field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.vector2Value));
                 }
