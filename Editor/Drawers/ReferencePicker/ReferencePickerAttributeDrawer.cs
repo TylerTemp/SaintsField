@@ -41,7 +41,8 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 .Prepend(realType)
                 .Where(each => !each.IsAbstract) // abstract classes
                 .Where(each => !each.ContainsGenericParameters) // generic classes
-                .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null);
+                .Where(each => !each.IsClass || each.GetConstructor(Type.EmptyTypes) != null)
+                .OrderBy(each => each.Name);
         }
 
         public static object CopyObj(object oldObj, object newObj)
@@ -150,32 +151,32 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             return (fieldTargets, propertyTargets);
         }
 
-        private static void UpdateForType(Type type, object source, object destination)
-        {
-            FieldInfo[] myObjectFields = type.GetFields(
-                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-
-            foreach (FieldInfo fi in myObjectFields)
-            {
-                // Debug.Log($"copy {fi.Name}");
-                try
-                {
-                    object originalValue = fi.GetValue(source);
-                    fi.SetValue(destination, originalValue);
-                    // Debug.Log($"set {fi.Name}={originalValue}");
-                }
-#pragma warning disable CS0168 // Variable is declared but never used
-                catch (Exception e)
-#pragma warning restore CS0168 // Variable is declared but never used
-                {
-#if SAINTSFIELD_DEBUG
-                    Debug.LogError(e);
-#endif
-                    // do nothing
-                    // Debug.LogException(e);
-                }
-            }
-        }
+//         private static void UpdateForType(Type type, object source, object destination)
+//         {
+//             FieldInfo[] myObjectFields = type.GetFields(
+//                 BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+//
+//             foreach (FieldInfo fi in myObjectFields)
+//             {
+//                 // Debug.Log($"copy {fi.Name}");
+//                 try
+//                 {
+//                     object originalValue = fi.GetValue(source);
+//                     fi.SetValue(destination, originalValue);
+//                     // Debug.Log($"set {fi.Name}={originalValue}");
+//                 }
+// #pragma warning disable CS0168 // Variable is declared but never used
+//                 catch (Exception e)
+// #pragma warning restore CS0168 // Variable is declared but never used
+//                 {
+// #if SAINTSFIELD_DEBUG
+//                     Debug.LogError(e);
+// #endif
+//                     // do nothing
+//                     // Debug.LogException(e);
+//                 }
+//             }
+//         }
     }
 }
 #endif
