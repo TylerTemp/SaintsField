@@ -1,7 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
-using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -40,29 +39,23 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
 
         public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
         {
-            if (oldElement is IntDropdownField intDropdownField)
+            if (oldElement is LayerIntDropdownField intDropdownField)
             {
-                LayerIntDropdownElement layerIntDropdownElement = intDropdownField.Q<LayerIntDropdownElement>();
-                if(layerIntDropdownElement != null)
-                {
-                    layerIntDropdownElement.SetValueWithoutNotify(value);
-                    return null;
-                }
+                intDropdownField.SetValueWithoutNotify(value);
+                return null;
             }
 
-            LayerIntDropdownElement intDropdownElement = new LayerIntDropdownElement
+            LayerIntDropdownField element = new LayerIntDropdownField(label)
             {
                 value = value,
             };
-            IntDropdownField element = new IntDropdownField(label, intDropdownElement);
-            intDropdownElement.BindDrop(element);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                intDropdownElement.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);
@@ -73,31 +66,23 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
 
         public static VisualElement UIToolkitValueEditString(VisualElement oldElement, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
         {
-            if (oldElement is StringDropdownField stringDropdownField)
+            if (oldElement is LayerStringDropdownField stringDropdownField)
             {
-                LayerStringDropdownElement layerStringDropdownElement =
-                    stringDropdownField.Q<LayerStringDropdownElement>();
-                if(layerStringDropdownElement != null)
-                {
-                    // Debug.Log($"renderer update string {value}");
-                    layerStringDropdownElement.SetValueWithoutNotify(value);
-                    return null;
-                }
+                stringDropdownField.SetValueWithoutNotify(value);
+                return null;
             }
 
-            LayerStringDropdownElement stringDropdownElement = new LayerStringDropdownElement
+            LayerStringDropdownField element = new LayerStringDropdownField(label)
             {
                 value = value,
             };
-            StringDropdownField element = new StringDropdownField(label, stringDropdownElement);
-            stringDropdownElement.BindDrop(element);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
             {
-                stringDropdownElement.RegisterValueChangedCallback(evt =>
+                element.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     // Debug.Log($"renderer set string {evt.newValue}");

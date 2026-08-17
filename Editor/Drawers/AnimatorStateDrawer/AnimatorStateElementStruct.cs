@@ -181,32 +181,17 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             visualInput.BindBound(this);
             style.flexShrink = 1;
 
-            AnimatorStateElementStruct.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            AnimatorStateElementStruct.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public override void SetValueWithoutNotify(AnimatorState newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             AnimatorStateElementStruct.SetValueWithoutNotify(newValue);
-        }
-
-        public override AnimatorState value
-        {
-            get => AnimatorStateElementStruct.value;
-            set
-            {
-                if (AnimatorStateElementStruct.value == value)
-                {
-                    return;
-                }
-
-                AnimatorState previous = this.value;
-
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<AnimatorState> evt = ChangeEvent<AnimatorState>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

@@ -289,7 +289,11 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             _guidStringElement = visualInput;
             visualInput.BindDropdownElement(this);
 
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public GuidStringField(string label) : this(label, new GuidStringElement())
@@ -298,26 +302,8 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
         public override void SetValueWithoutNotify(string newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             _guidStringElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => _guidStringElement.value;
-            set
-            {
-                if (_guidStringElement.value == value)
-                {
-                    return;
-                }
-
-                string previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

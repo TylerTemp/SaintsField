@@ -329,13 +329,22 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
     public class MinMaxSliderFieldFloat : BaseField<Vector2>
     {
         public readonly MinMaxSliderElementFloat MinMaxSliderElementFloat;
-        public MinMaxSliderFieldFloat(string label, MinMaxSliderElementFloat visualInput): base(label, visualInput)
+        private MinMaxSliderFieldFloat(string label, MinMaxSliderElementFloat visualInput): base(label, visualInput)
         {
             MinMaxSliderElementFloat = visualInput;
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
+        }
+        public MinMaxSliderFieldFloat(string label, AdaptAttribute adaptAttribute): this(label, new MinMaxSliderElementFloat(adaptAttribute))
+        {
         }
 
         public override void SetValueWithoutNotify(Vector2 newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             MinMaxSliderElementFloat.SetValueWithoutNotify(newValue);
         }
 
@@ -344,11 +353,6 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             MinMaxSliderElementFloat.SetShowMixedValue(showMixedValue);
         }
 
-        public override Vector2 value
-        {
-            get => MinMaxSliderElementFloat.value;
-            set => MinMaxSliderElementFloat.value = value;
-        }
     }
 }
 #endif

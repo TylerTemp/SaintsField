@@ -56,5 +56,17 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         }
 
     }
+
+    public class LayerStringDropdownField: StringDropdownField
+    {
+        private LayerStringDropdownField(string label, LayerStringDropdownElement visualInput) : base(label, visualInput)
+        {
+            visualInput.BindDrop(this);
+        }
+
+        public LayerStringDropdownField(string label) : this(label, new LayerStringDropdownElement())
+        {
+        }
+    }
 }
 #endif

@@ -13,12 +13,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         {
             Button.clicked += () =>
             {
-                if (CachedValue == null)
-                {
-                    return;
-                }
-
-                LayerUtils.MakeDropdown(false, (int)CachedValue, root, newValue => value = newValue.Mask);
+                LayerUtils.MakeDropdown(false, CachedValue, root, newValue => value = newValue.Mask);
             };
         }
 

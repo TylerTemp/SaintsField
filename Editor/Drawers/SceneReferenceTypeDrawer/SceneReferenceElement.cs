@@ -333,33 +333,19 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         {
             SceneReferenceElement = visualInput;
             visualInput.DropdownRoot = this;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
         public SceneReferenceField(string label) : this(label, new SceneReferenceElement())
         {
         }
 
-        public override string value
-        {
-            get => SceneReferenceElement.value;
-            set
-            {
-                if (SceneReferenceElement.value == value)
-                {
-                    return;
-                }
-
-                string previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
-        }
-
         public override void SetValueWithoutNotify(string newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             SceneReferenceElement.SetValueWithoutNotify(newValue);
         }
 

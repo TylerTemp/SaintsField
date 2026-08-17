@@ -17,6 +17,9 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField, MinMaxSlider(nameof(_minValue), nameof(_maxValue)), FieldAboveText(nameof(intRange), true)]
         public Vector2Int intRange { get; private set; }
 
+        [MinMaxSlider(-2f, 180f)]
+        public Vector2 serializedRange;
+
         // test broken
         public int wrongMin;
         public int wrongMax;

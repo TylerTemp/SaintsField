@@ -78,8 +78,11 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             {
                 case SerializedPropertyType.Vector2Int:
                 {
-                    MinMaxSliderElementInt element = new MinMaxSliderElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
-                    MinMaxSliderFieldInt field = new MinMaxSliderFieldInt(GetPreferredLabel(property), element);
+                    // MinMaxSliderElementInt element = new MinMaxSliderElementInt();
+                    MinMaxSliderFieldInt field = new MinMaxSliderFieldInt(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault())
+                    {
+                        bindingPath = property.propertyPath,
+                    };
                     field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -90,8 +93,10 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 }
                 case SerializedPropertyType.Vector2:
                 {
-                    MinMaxSliderElementFloat element = new MinMaxSliderElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
-                    MinMaxSliderFieldFloat field = new MinMaxSliderFieldFloat(GetPreferredLabel(property), element);
+                    MinMaxSliderFieldFloat field = new MinMaxSliderFieldFloat(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault())
+                    {
+                        bindingPath = property.propertyPath,
+                    };
                     field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                     field.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -331,8 +336,8 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
                     // Well, this does not work, tf Unity
                     // field.MinMaxSliderElementInt.bindingPath = property.propertyPath;
-                    field.bindingPath = property.propertyPath;  // just let prefab blue bar works
-                    field.BindProperty(property);  // just let prefab blue bar works
+                    // field.bindingPath = property.propertyPath;  // just let prefab blue bar works
+                    // field.BindProperty(property);  // just let prefab blue bar works
                     field.SetValueWithoutNotify(property.vector2IntValue);
                     field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.vector2IntValue));
                 }
@@ -370,8 +375,8 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
                     // Well, this does not work, tf Unity
                     // field.MinMaxSliderElementInt.bindingPath = property.propertyPath;
-                    field.bindingPath = property.propertyPath;  // just let prefab blue bar works
-                    field.BindProperty(property);  // just let prefab blue bar works
+                    // field.bindingPath = property.propertyPath;  // just let prefab blue bar works
+                    // field.BindProperty(property);  // just let prefab blue bar works
                     field.SetValueWithoutNotify(property.vector2Value);
 
                     field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.vector2Value));
@@ -398,9 +403,9 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 return null;
             }
 
-            MinMaxSliderElementFloat element = new MinMaxSliderElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            // MinMaxSliderElementFloat element = new MinMaxSliderElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
             MinMaxSliderFieldFloat field =
-                new MinMaxSliderFieldFloat(label, element);
+                new MinMaxSliderFieldFloat(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.MinMaxSliderElementFloat.SetConfig(minValue, maxValue, minMaxSliderAttribute.Step);
@@ -413,7 +418,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);
@@ -438,9 +443,9 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 return null;
             }
 
-            MinMaxSliderElementInt element = new MinMaxSliderElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            // MinMaxSliderElementInt element = new MinMaxSliderElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
             MinMaxSliderFieldInt field =
-                new MinMaxSliderFieldInt(label, element);
+                new MinMaxSliderFieldInt(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.MinMaxSliderElementInt.SetConfig(minValue, maxValue, (int)minMaxSliderAttribute.Step);
@@ -453,7 +458,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             if (setterOrNull != null)
             {
-                element.RegisterValueChangedCallback(evt =>
+                field.RegisterValueChangedCallback(evt =>
                 {
                     beforeSet?.Invoke(value);
                     setterOrNull(evt.newValue);

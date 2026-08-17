@@ -11,7 +11,11 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
         {
             style.flexShrink = 1;
             TimeSpanElement = timeSpanElement;
-            timeSpanElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            timeSpanElement.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public TimeSpanField(string label, bool defaultExpand = false) : this(label, new TimeSpanElement(defaultExpand))
@@ -20,26 +24,8 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 
         public override void SetValueWithoutNotify(long newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             TimeSpanElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override long value
-        {
-            get => TimeSpanElement.value;
-            set
-            {
-                if (TimeSpanElement.value == value)
-                {
-                    return;
-                }
-
-                long previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<long> evt = ChangeEvent<long>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

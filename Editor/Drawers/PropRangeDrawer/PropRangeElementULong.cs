@@ -309,7 +309,11 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         private PropRangeULongField(string label, PropRangeElementULong visualInput) : base(label, visualInput)
         {
             PropRangeElementULong = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
         public PropRangeULongField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementULong(adaptAttribute))
         {
@@ -317,26 +321,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         public override void SetValueWithoutNotify(ulong newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             PropRangeElementULong.SetValueWithoutNotify(newValue);
-        }
-
-        public override ulong value
-        {
-            get => PropRangeElementULong.value;
-            set
-            {
-                if (PropRangeElementULong.value == value)
-                {
-                    return;
-                }
-
-                ulong previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<ulong> evt = ChangeEvent<ulong>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
     }
 }

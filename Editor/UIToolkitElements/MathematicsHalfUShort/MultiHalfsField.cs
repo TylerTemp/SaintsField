@@ -13,21 +13,22 @@ namespace SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort
         public MultiHalfsField(string label, RowInputsElement<MathematicsHalfUShortField, int> visualInput) : base(label, visualInput)
         {
             _rowInputsElement = visualInput;
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = (int[])evt.newValue.Clone();
+            });
         }
 
         public MultiHalfsField(string label, int count) : this(label, new RowInputsElement<MathematicsHalfUShortField, int>(count, Creator))
         {
         }
 
-        public override int[] value
-        {
-            get => _rowInputsElement.value;
-            set => _rowInputsElement.value = value;
-        }
-
         public override void SetValueWithoutNotify(int[] newValue)
         {
-            _rowInputsElement.SetValueWithoutNotify(newValue);
+            int[] fieldValue = (int[])newValue.Clone();
+            base.SetValueWithoutNotify(fieldValue);
+            _rowInputsElement.SetValueWithoutNotify((int[])fieldValue.Clone());
         }
 
         private static MathematicsHalfUShortField Creator(int index)

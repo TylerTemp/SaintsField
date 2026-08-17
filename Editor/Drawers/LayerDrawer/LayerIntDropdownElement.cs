@@ -11,14 +11,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         public void BindDrop(VisualElement root)
         {
             Button.clicked += () =>
-            {
-                if (CachedValue == null)
-                {
-                    return;
-                }
-
-                LayerUtils.MakeDropdown(false, 1 << (int)CachedValue, root, newValue => value = newValue.Value);
-            };
+                LayerUtils.MakeDropdown(false, 1 << CachedValue, root, newValue => value = newValue.Value);
         }
 
         public override void SetValueWithoutNotify(int newValue)
@@ -39,6 +32,18 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             Label.text =
                 LayerUtils.LayerInfoLabelUIToolkit(new LayerUtils.LayerInfo("<color=red>?</color>", newValue));
             Button.tooltip = "Invalid layer";
+        }
+    }
+
+    public class LayerIntDropdownField: IntDropdownField
+    {
+        private LayerIntDropdownField(string label, LayerIntDropdownElement visualInput) : base(label, visualInput)
+        {
+            visualInput.BindDrop(this);
+        }
+
+        public LayerIntDropdownField(string label) : this(label, new LayerIntDropdownElement())
+        {
         }
     }
 }

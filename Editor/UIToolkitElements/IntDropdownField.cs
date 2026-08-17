@@ -9,7 +9,7 @@ namespace SaintsField.Editor.UIToolkitElements
     {
         protected readonly Label Label;
 
-        protected int? CachedValue = null;
+        protected int CachedValue;
 
         public readonly Button Button;
 
@@ -31,7 +31,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public int value
         {
-            get => CachedValue ?? 0;
+            get => CachedValue;
             set
             {
                 if (CachedValue == value)
@@ -70,33 +70,21 @@ namespace SaintsField.Editor.UIToolkitElements
         {
             _element = intDropdownElement;
             Button = intDropdownElement.Button;
+            intDropdownElement.SetValueWithoutNotify(base.value);
             AddToClassList(alignedFieldUssClassName);
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
             style.flexShrink = 1;
-        }
-
-        public override int value
-        {
-            get => _element.value;
-            set
+            intDropdownElement.RegisterValueChangedCallback(evt =>
             {
-                if (_element.value == value)
-                {
-                    return;
-                }
-
-                int previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<int> evt = ChangeEvent<int>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public override void SetValueWithoutNotify(int newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             _element.SetValueWithoutNotify(newValue);
         }
 

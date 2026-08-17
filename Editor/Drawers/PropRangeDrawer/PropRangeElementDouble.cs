@@ -302,7 +302,11 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         private PropRangeDoubleField(string label, PropRangeElementDouble visualInput) : base(label, visualInput)
         {
             PropRangeElementDouble = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public PropRangeDoubleField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementDouble(adaptAttribute))
@@ -311,26 +315,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         public override void SetValueWithoutNotify(double newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             PropRangeElementDouble.SetValueWithoutNotify(newValue);
-        }
-
-        public override double value
-        {
-            get => PropRangeElementDouble.value;
-            set
-            {
-                if (Math.Abs(PropRangeElementDouble.value - value) <= double.Epsilon)
-                {
-                    return;
-                }
-
-                double previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<double> evt = ChangeEvent<double>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

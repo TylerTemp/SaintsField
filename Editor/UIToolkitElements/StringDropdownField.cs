@@ -77,30 +77,16 @@ namespace SaintsField.Editor.UIToolkitElements
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
             style.flexShrink = 1;
 
-            stringDropdownElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
-        }
-
-        public override string value
-        {
-            get => _element.value;
-            set
+            stringDropdownElement.RegisterValueChangedCallback(evt =>
             {
-                if (_element.value == value)
-                {
-                    return;
-                }
-
-                string previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public override void SetValueWithoutNotify(string newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             _element.SetValueWithoutNotify(newValue);
         }
 

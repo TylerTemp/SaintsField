@@ -327,7 +327,11 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         private ProgressBarFieldInt(string label, ProgressBarElementInt visualInput) : base(label, visualInput)
         {
             ProgressBarElementInt = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
         public ProgressBarFieldInt(string label) : this(label, new ProgressBarElementInt())
         {
@@ -335,26 +339,8 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
         public override void SetValueWithoutNotify(int newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             ProgressBarElementInt.SetValueWithoutNotify(newValue);
-        }
-
-        public override int value
-        {
-            get => ProgressBarElementInt.value;
-            set
-            {
-                if (ProgressBarElementInt.value == value)
-                {
-                    return;
-                }
-
-                int previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<int> evt = ChangeEvent<int>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
     }
 }

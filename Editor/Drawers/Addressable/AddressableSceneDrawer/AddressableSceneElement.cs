@@ -143,7 +143,11 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
             _addressableSceneElement = addressableSceneElement;
-            addressableSceneElement.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            addressableSceneElement.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public AddressableSceneField(string label, AddressableSceneAttribute addressableSceneAttribute) : this(label, new AddressableSceneElement(addressableSceneAttribute))
@@ -152,26 +156,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         public override void SetValueWithoutNotify(string newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             _addressableSceneElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override string value
-        {
-            get => _addressableSceneElement.value;
-            set
-            {
-                if (_addressableSceneElement.value == value)
-                {
-                    return;
-                }
-
-                string previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

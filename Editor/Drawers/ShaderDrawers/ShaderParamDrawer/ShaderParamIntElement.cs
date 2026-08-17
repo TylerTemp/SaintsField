@@ -73,12 +73,12 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
             }
 
-            string wrongLabel = $"<color=red>?</color> {(CachedValue == null? "": $"({CachedValue})")}";
+            string wrongLabel = $"<color=red>?</color> ({CachedValue})";
             UIToolkitUtils.SetLabel(Label, new[]{new RichTextDrawer.RichTextChunk(wrongLabel, false, wrongLabel)}, _richTextDrawer);
 
             if(_helpBox != null)
             {
-                ShaderUtils.UpdateHelpBox(_helpBox, CachedValue == null? "": $"Shader Param {CachedValue} not found in {_shader}");
+                ShaderUtils.UpdateHelpBox(_helpBox, $"Shader Param {CachedValue} not found in {_shader}");
             }
         }
     }

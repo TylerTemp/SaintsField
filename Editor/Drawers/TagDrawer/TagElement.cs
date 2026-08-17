@@ -101,7 +101,6 @@ namespace SaintsField.Editor.Drawers.TagDrawer
         private TagField(string label, TagElement visualInput) : base(label, visualInput)
         {
             visualInput.BindBound(this);
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
         public TagField(string label) : this(label, new TagElement())

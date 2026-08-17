@@ -301,7 +301,11 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         private PropRangeFloatField(string label, PropRangeElementFloat visualInput) : base(label, visualInput)
         {
             PropRangeElementFloat = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public PropRangeFloatField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementFloat(adaptAttribute))
@@ -310,26 +314,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         public override void SetValueWithoutNotify(float newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             PropRangeElementFloat.SetValueWithoutNotify(newValue);
-        }
-
-        public override float value
-        {
-            get => PropRangeElementFloat.value;
-            set
-            {
-                if (Math.Abs(PropRangeElementFloat.value - value) <= float.Epsilon)
-                {
-                    return;
-                }
-
-                float previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<float> evt = ChangeEvent<float>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

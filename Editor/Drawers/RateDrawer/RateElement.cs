@@ -255,7 +255,11 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         private RateField(string label, RateElement visualInput) : base(label, visualInput)
         {
             RateElement = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
         public RateField(string label, RateAttribute rateAttribute) : this(label, new RateElement(rateAttribute))
@@ -264,26 +268,8 @@ namespace SaintsField.Editor.Drawers.RateDrawer
 
         public override void SetValueWithoutNotify(int newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             RateElement.SetValueWithoutNotify(newValue);
-        }
-
-        public override int value
-        {
-            get => RateElement.value;
-            set
-            {
-                if (RateElement.value == value)
-                {
-                    return;
-                }
-
-                int previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<int> evt = ChangeEvent<int>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

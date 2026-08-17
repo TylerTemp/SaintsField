@@ -41,7 +41,6 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
         private SortingLayerIntField(string label, SortingLayerIntElement visualInput) : base(label, visualInput)
         {
             visualInput.BindBound(this);
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
         }
 
         public SortingLayerIntField(string label) : this(label, new SortingLayerIntElement())

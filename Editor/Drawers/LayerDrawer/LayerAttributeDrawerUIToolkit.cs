@@ -27,9 +27,9 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    IntDropdownField intDropdownField = new IntDropdownField(GetPreferredLabel(property), new LayerIntDropdownElement())
+                    LayerIntDropdownField intDropdownField = new LayerIntDropdownField(GetPreferredLabel(property))
                     {
-                        bindingPath = property.propertyPath
+                        bindingPath = property.propertyPath,
                     };
 
                     intDropdownField.AddToClassList(IntDropdownField.alignedFieldUssClassName);
@@ -42,11 +42,11 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 }
                 case SerializedPropertyType.String:
                 {
-                    StringDropdownField stringDropdownField = new StringDropdownField(GetPreferredLabel(property), new LayerStringDropdownElement())
+                    LayerStringDropdownField stringDropdownField = new LayerStringDropdownField(GetPreferredLabel(property))
                     {
                         bindingPath = property.propertyPath,
                     };
-                    stringDropdownField.AddToClassList(IntDropdownField.alignedFieldUssClassName);
+                    stringDropdownField.AddToClassList(StringDropdownField.alignedFieldUssClassName);
                     stringDropdownField.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && stringDropdownField.labelElement != null)
                     {
@@ -116,11 +116,8 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    IntDropdownField intDropdownField = container.Q<IntDropdownField>();
+                    LayerIntDropdownField intDropdownField = container.Q<LayerIntDropdownField>();
                     AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
-                    LayerIntDropdownElement layerIntDropdownElement = intDropdownField.Q<LayerIntDropdownElement>();
-                    layerIntDropdownElement.BindDrop(intDropdownField);
-                    // layerIntDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
                     intDropdownField.TrackPropertyValue(property, v => onValueChangedCallback(v.intValue));
 
                     // intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
@@ -128,12 +125,8 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     break;
                 case SerializedPropertyType.String:
                 {
-                    StringDropdownField layerStringField = container.Q<StringDropdownField>();
+                    LayerStringDropdownField layerStringField = container.Q<LayerStringDropdownField>();
                     AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
-                    LayerStringDropdownElement layerStringDropdownElement = layerStringField.Q<LayerStringDropdownElement>();
-                    layerStringDropdownElement.BindDrop(layerStringField);
-                    // layerStringDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
-
                     layerStringField.TrackPropertyValue(property, v => onValueChangedCallback(v.stringValue));
                     // layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
                 }

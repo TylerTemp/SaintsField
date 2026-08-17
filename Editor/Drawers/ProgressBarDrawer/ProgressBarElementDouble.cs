@@ -343,7 +343,11 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         private ProgressBarFieldDouble(string label, ProgressBarElementDouble visualInput) : base(label, visualInput)
         {
             ProgressBarElementDouble = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
         public ProgressBarFieldDouble(string label) : this(label, new ProgressBarElementDouble())
         {
@@ -351,26 +355,8 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
         public override void SetValueWithoutNotify(double newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             ProgressBarElementDouble.SetValueWithoutNotify(newValue);
-        }
-
-        public override double value
-        {
-            get => ProgressBarElementDouble.value;
-            set
-            {
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (ProgressBarElementDouble.value == value)
-                {
-                    return;
-                }
-                double previous = this.value;
-                SetValueWithoutNotify(value);
-
-                using ChangeEvent<double> evt = ChangeEvent<double>.GetPooled(previous, value);
-                evt.target = this;
-                SendEvent(evt);
-            }
         }
 
         protected override void UpdateMixedValueContent()

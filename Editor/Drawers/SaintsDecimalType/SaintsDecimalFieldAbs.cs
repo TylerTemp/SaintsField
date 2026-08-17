@@ -13,10 +13,14 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         private SaintsDecimalFieldAbs(string label, DecimalTextField visualInput): base(label, visualInput)
         {
             DecimalTextField = visualInput;
-            visualInput.RegisterValueChangedCallback(evt => evt.StopPropagation());
+            visualInput.RegisterValueChangedCallback(evt =>
+            {
+                evt.StopPropagation();
+                value = evt.newValue;
+            });
         }
 
-        public SaintsDecimalFieldAbs(string label): this(label, new DecimalTextField(""))
+        protected SaintsDecimalFieldAbs(string label): this(label, new DecimalTextField(""))
         {
         }
 
@@ -27,6 +31,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
         public override void SetValueWithoutNotify(SaintsDecimal newValue)
         {
+            base.SetValueWithoutNotify(newValue);
             DecimalTextField.SetValueWithoutNotify(newValue);
         }
 
@@ -62,11 +67,6 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
             WriteSerValueNoNotify();
 
             _propUpdated = propUpdated;
-
-            DecimalTextField.RegisterValueChangedCallback(v =>
-            {
-                WriteBackValue(v.newValue);
-            });
 
             AddPropertyTracker(_flagsProp);
             AddPropertyTracker(_hiProp);
@@ -105,10 +105,10 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
         public override SaintsDecimal value
         {
-            get => DecimalTextField.value;
+            get => base.value;
             set
             {
-                if (DecimalTextField.value.Equals(value))
+                if (base.value.Equals(value))
                 {
                     return;
                 }
