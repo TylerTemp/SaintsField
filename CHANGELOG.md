@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.25.9 ##
+
+Fix: Serialized Binding due to last version refactory. [#431](https://github.com/TylerTemp/SaintsField/issues/431#event-29491255868), [#434](https://github.com/TylerTemp/SaintsField/issues/434)
+
 ## 5.25.8 ##
 
 1.  Fix: Multiple targets editing works as expected for many custom field types. Fix [#431](https://github.com/TylerTemp/SaintsField/issues/431)

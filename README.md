@@ -115,11 +115,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.8**
+**5.25.9**
 
-1.  Fix: Multiple targets editing works as expected for many custom field types. Fix [#431](https://github.com/TylerTemp/SaintsField/issues/431)
-2.  Fix: Unity 6k.5 code unload issue for type reference and SaintsEvent
-3.  Fix: If the resource was in addressable and get deleted later, `RequiredIf` now can properly give error box.
+Fix: Serialized Binding due to last version refactory. [#431](https://github.com/TylerTemp/SaintsField/issues/431#event-29491255868), [#434](https://github.com/TylerTemp/SaintsField/issues/434)
 
 ## Usage ##
 
