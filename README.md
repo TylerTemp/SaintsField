@@ -115,9 +115,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.9**
+**5.25.10**
 
-Fix: Serialized Binding due to last version refactory. [#431](https://github.com/TylerTemp/SaintsField/issues/431#event-29491255868), [#434](https://github.com/TylerTemp/SaintsField/issues/434)
+1.  Fix: Type Reference now sort the types by its name
+2.  Fix: Package didn't work if `Addressable` package is not installed
 
 ## Usage ##
 
