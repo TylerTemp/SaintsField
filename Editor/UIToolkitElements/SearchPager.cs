@@ -42,7 +42,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 schedule.Execute(() => UIToolkitUtils.TriggerRotate(LoadingImage));
             });
 
-            PagingContainer = root.Q<VisualElement>(name: "pagingContainer");
+            PagingContainer = root.Q<VisualElement>(name: "PagingContainer");
             // PagingContainer.style.justifyContent = Justify.FlexEnd;
 
             NumberOfItemsPerPageField = PagingContainer.Q<IntegerField>(name: "numberOfItemsPerPageField");

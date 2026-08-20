@@ -115,10 +115,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.10**
+**5.25.11**
 
-1.  Fix: Type Reference now sort the types by its name
-2.  Fix: Package didn't work if `Addressable` package is not installed
+Fix: `ListDrawerSettings` broken due to 5.25.7 change
 
 ## Usage ##
 

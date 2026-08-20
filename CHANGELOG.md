@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.25.11 ##
+
+Fix: `ListDrawerSettings` broken due to 5.25.7 change
+
 ## 5.25.10 ##
 
 1.  Fix: Type Reference now sort the types by its name
