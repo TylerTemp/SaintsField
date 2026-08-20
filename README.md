@@ -115,7 +115,7 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.11**
+**5.25.12**
 
 Fix: `ListDrawerSettings` broken due to 5.25.7 change
 
