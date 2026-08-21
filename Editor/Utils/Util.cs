@@ -1281,7 +1281,7 @@ namespace SaintsField.Editor.Utils
             }
             else
             {
-                foreach (Type t in assembly.GetTypes())
+                foreach (Type t in GetAssemblyTypesSafe(assembly))
                 {
                     if (t.Name == split[0])
                     {
@@ -1289,7 +1289,7 @@ namespace SaintsField.Editor.Utils
                     }
                 }
             }
-                // return assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
+                // return GetAssemblyTypesSafe(assembly).FirstOrDefault(t => t.Name == split[0]);
         }
 
         private static (string error, MemberInfo memberInfo, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
