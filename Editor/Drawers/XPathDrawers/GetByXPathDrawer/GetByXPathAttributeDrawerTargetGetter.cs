@@ -1348,17 +1348,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 : shortOrQualifiedName;
 
             _cachedAssemblyTypes ??= Util.GetAssemblies()
-                .ToDictionary(assembly => assembly, assembly =>
-                {
-                    try
-                    {
-                        return assembly.GetTypes();
-                    }
-                    catch
-                    {
-                        return Array.Empty<Type>();
-                    }
-                });
+                .ToDictionary(assembly => assembly, Util.GetAssemblyTypesSafe);
 
             List<Type> exactlyFullMatchedTypes = new List<Type>();
             List<Type> unityEngineTypes = new List<Type>();
