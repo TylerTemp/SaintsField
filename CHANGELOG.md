@@ -1,5 +1,12 @@
 # Changelog
 
+## WIP ##
+
+1.  Improve: `ListDrawerSettings` now use menu button to toggle paging, searching etc.
+2.  Changes: `ListDrawerSettings` now can use menu button to control how you want it to be searched. `string overrideSearch` is now deprecated and has no effect at all as this is now merged into menu button
+3.  Improve: If you have `SaintsEditor` enabled, the default list/array will be rendered like it has `[ListDrawerSettings(searchable: false)]`, and you can still toggle the search in menu button.
+4.  Fix: Safely enumerate assembly types everywhere for Unity 6000.4. [PR#436](https://github.com/TylerTemp/SaintsField/pull/436) by [@Insprill](https://github.com/Insprill)
+
 ## 5.25.12 ##
 
 Fix: `ListDrawerSettings` broken due to 5.25.7 change

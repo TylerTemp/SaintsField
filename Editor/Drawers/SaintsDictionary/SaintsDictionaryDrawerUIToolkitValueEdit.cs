@@ -710,6 +710,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         setterOrNull(null);
                     });
                 }
+                genericDropdownMenu.AddSeparator("");
 
                 bool curPaging = dictField.Pager.style.display != DisplayStyle.None;
                 genericDropdownMenu.AddItem("Paging", curPaging, () =>

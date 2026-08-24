@@ -26,8 +26,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
-            ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault();
-            Debug.Assert(listDrawerSettingsAttribute != null, $"{FieldWithInfo.SerializedProperty.propertyPath}");
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute = GetListDrawerSettingsAttribute();
             // ArraySizeAttribute arraySizeAttribute =
             //     FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
 

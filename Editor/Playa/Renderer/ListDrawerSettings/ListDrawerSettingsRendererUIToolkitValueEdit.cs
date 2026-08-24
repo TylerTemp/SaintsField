@@ -30,45 +30,18 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         {
             public readonly CollectionFoldout Foldout;
             public readonly IntegerField ArraySizeField;
-            public readonly Button NullButton;
             public readonly ListView ListView;
             public readonly ToolbarSearchField SearchField;
             public readonly VisualElement LoadingImage;
             public readonly ListViewPagerElement Pager;
             public readonly ListViewFooterButtonsElement FooterButtons;
 
-            public ListViewWrapper(string label, bool nullable, ListView listView)
+            public ListViewWrapper(string label, ListView listView)
             {
                 Add(Foldout = new CollectionFoldout(label));
                 VisualElement foldoutContent = Foldout.contentContainer;
                 foldoutContent.style.marginLeft = 0;
 
-                VisualElement topRightContainer = Foldout.MenuButton.parent;
-                NullButton = new Button
-                {
-                    tooltip = "Set to Null",
-                    style =
-                    {
-                        display = nullable? DisplayStyle.Flex: DisplayStyle.None,
-                        width = EditorGUIUtility.singleLineHeight,
-                        // height = EditorGUIUtility.singleLineHeight,
-                        borderBottomRightRadius = 0,
-                        borderTopRightRadius = 0,
-                        borderRightWidth = 0,
-                        marginRight = 0,
-
-                        backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-#if UNITY_2022_2_OR_NEWER
-                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                        backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                    },
-                };
-                topRightContainer.Insert(0, NullButton);
                 ArraySizeField = Foldout.ArraySizeField;
 
                 SearchField = new ToolbarSearchField
@@ -436,7 +409,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             #endregion
 
-            listViewWrapper = new ListViewWrapper(label, setterOrNull != null, new ListView
+            listViewWrapper = new ListViewWrapper(label, new ListView
             {
                 selectionType = SelectionType.Multiple,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
@@ -460,18 +433,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             if (labelGrayColor)
             {
                 listViewWrapper.Foldout.style.color = EColor.EditorSeparator.GetColor();
-            }
-
-            // null button
-            if (setterOrNull != null)
-            {
-                // nullable
-                listViewWrapper.NullButton.style.display = DisplayStyle.Flex;
-                listViewWrapper.NullButton.clicked += () =>
-                {
-                    beforeSet?.Invoke(rawListValue);
-                    setterOrNull(null);
-                };
             }
 
             // Size & Page Items Total
@@ -616,6 +577,20 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             listViewWrapper.Foldout.MenuButton.clicked += () =>
             {
                 GenericDropdownMenu menu = new GenericDropdownMenu();
+
+                if (setterOrNull == null)
+                {
+                    menu.AddDisabledItem("Set To Null", false);
+                }
+                else
+                {
+                    menu.AddItem("Set To Null", false, () =>
+                    {
+                        beforeSet?.Invoke(payload.RawListValue);
+                        setterOrNull(null);
+                    });
+                }
+                menu.AddSeparator("");
 
                 bool curPaging = listViewWrapper.Pager.style.display != DisplayStyle.None;
                 menu.AddItem("Paging", curPaging, () =>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
@@ -83,6 +84,15 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
         private bool _tableCondition;
+
+        private static readonly ListDrawerSettingsAttribute DefaultListDrawerSettingsAttribute =
+            new ListDrawerSettingsAttribute(searchable: false);
+
+        private ListDrawerSettingsAttribute GetListDrawerSettingsAttribute()
+        {
+            return FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault()
+                   ?? DefaultListDrawerSettingsAttribute;
+        }
 
         public ListDrawerSettingsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {

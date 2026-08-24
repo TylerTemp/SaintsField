@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +20,33 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
         private const float TablePadding = 2f;
         private const float CellPadding = 2f;
         private const float AddPanelPadding = 4f;
+        private const double DebounceTime = 0.6d;
+        private const float PagerInputWidth = 30f;
+        private const float PagerItemsLabelWidth = 65f;
+        private const float PagerButtonWidth = 19f;
+        private const float PagerPageLabelWidth = 30f;
+        private const float PagerSeparatorWidth = 8f;
+        private const float SearchGap = 5f;
+
+        private static readonly SaintsDictionaryAttribute DefaultSaintsDictionaryAttribute =
+            new SaintsDictionaryAttribute(searchable: false, numberOfItemsPerPage: 0);
+
+        private sealed class AsyncSearchItems
+        {
+            public bool Started = true;
+            public bool Finished = true;
+            public IEnumerator<object> SourceGenerator;
+            public string KeySearchText = "";
+            public string ValueSearchText = "";
+            public double DebounceSearchTime;
+            public readonly List<object> HitKeys = new List<object>();
+            public readonly List<object> CachedHitKeys = new List<object>();
+            public readonly List<object> VisibleKeys = new List<object>();
+            public int PageIndex;
+            public int Size;
+            public int TotalPage = 1;
+            public int NumberOfItemsPerPage;
+        }
 
         private sealed class DictionaryContext
         {
@@ -46,6 +74,15 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             public object AddValue;
             public string AddError = "";
             public string Error = "";
+            public SaintsDictionaryAttribute Attribute;
+            public bool ConfigurationInitialized;
+            public bool SearchEnabled;
+            public bool ObjectSearch;
+            public readonly AsyncSearchItems SearchItems = new AsyncSearchItems();
+            public readonly IMGUILoading KeyLoading = new IMGUILoading();
+            public readonly IMGUILoading ValueLoading = new IMGUILoading();
+            public Texture2D LeftIcon;
+            public Texture2D RightIcon;
         }
 
         private static readonly Dictionary<string, DictionaryContext> DictionaryContexts =
@@ -165,6 +202,8 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             context.AllAttributes = allAttributes;
             context.Targets = targets;
             context.RichTextTagProvider = richTextTagProvider;
+            context.Attribute = allAttributes?.OfType<SaintsDictionaryAttribute>().FirstOrDefault()
+                                ?? DefaultSaintsDictionaryAttribute;
             (string accessError, PropertyInfo keysProperty, PropertyInfo indexerProperty, MethodInfo removeMethod,
                     MethodInfo containsKeyMethod) =
                 GetDictionaryAccess(valueType, value, keyType);
@@ -184,7 +223,9 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                 context.AddError = GetAddKeyError(context);
             }
 
-            ClampDictionarySelection(context, GetDictionaryKeys(context).Count());
+            object[] keys = GetDictionaryKeys(context).ToArray();
+            EnsureSearchState(context, keys);
+            ClampDictionarySelection(context, keys.Length);
             return context;
         }
 
@@ -246,6 +287,8 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
 
         private static float GetDictionaryHeight(DictionaryContext context)
         {
+            TickAsyncSearch(context);
+
             float singleLineHeight = EditorGUIUtility.singleLineHeight;
             float height = singleLineHeight + VerticalPadding * 2;
             if (context.Error != "")
@@ -260,7 +303,12 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             }
 
             height += TablePadding * 2 + singleLineHeight + singleLineHeight;
-            foreach (object key in GetDictionaryKeys(context))
+            if (context.SearchEnabled)
+            {
+                height += singleLineHeight;
+            }
+
+            foreach (object key in context.SearchItems.VisibleKeys)
             {
                 object dictValue = GetDictionaryValue(context, key);
                 height += GetDictionaryRowHeight(context, key, dictValue) + 1f;
@@ -276,6 +324,8 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
 
         private static void DrawDictionary(Rect position, DictionaryContext context)
         {
+            TickAsyncSearch(context);
+
             Rect contentRect = new Rect(position)
             {
                 y = position.y + VerticalPadding,
@@ -313,15 +363,29 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             DrawDictionaryTableHeader(tableHeaderRect);
             leftRect = afterHeaderRect;
 
-            object[] keys = GetDictionaryKeys(context).ToArray();
-            for (int index = 0; index < keys.Length; index++)
+            if (context.SearchEnabled)
             {
-                object key = keys[index];
+                (Rect searchRect, Rect afterSearchRect) =
+                    RectUtils.SplitHeightRect(leftRect, EditorGUIUtility.singleLineHeight);
+                (Rect keySearchRect, Rect valueSearchRect) = GetDictionaryCellRects(searchRect);
+                DrawSearchField(ShrinkRect(keySearchRect, CellPadding), true, context);
+                DrawSearchField(ShrinkRect(valueSearchRect, CellPadding), false, context);
+                leftRect = afterSearchRect;
+            }
+
+            object[] allKeys = GetDictionaryKeys(context).ToArray();
+            object[] visibleKeys = context.SearchItems.VisibleKeys
+                .Where(allKeys.Contains)
+                .ToArray();
+            for (int displayIndex = 0; displayIndex < visibleKeys.Length; displayIndex++)
+            {
+                object key = visibleKeys[displayIndex];
+                int sourceIndex = Array.IndexOf(allKeys, key);
                 object dictValue = GetDictionaryValue(context, key);
                 float rowHeight = GetDictionaryRowHeight(context, key, dictValue);
 
                 (Rect rowRect, Rect afterRowRect) = RectUtils.SplitHeightRect(leftRect, rowHeight);
-                DrawDictionaryRow(rowRect, context, index, key, dictValue);
+                DrawDictionaryRow(rowRect, context, sourceIndex, key, dictValue);
                 leftRect = afterRowRect;
             }
 
@@ -349,14 +413,24 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                 x = rect.xMax - SizeWidth,
                 width = SizeWidth,
             };
+            Rect menuRect = new Rect(rect)
+            {
+                x = sizeRect.x - ButtonWidth - ControlGap,
+                width = ButtonWidth,
+            };
             Rect foldoutRect = new Rect(rect)
             {
-                width = Mathf.Max(0f, rect.width - SizeWidth - ControlGap),
+                width = Mathf.Max(0f, menuRect.x - rect.x - ControlGap),
             };
 
             bool expanded = EditorGUI.Foldout(foldoutRect, IsExpanded(context.Key), new GUIContent(context.Label),
                 true);
             SetExpanded(context.Key, expanded);
+
+            if (GUI.Button(menuRect, "...", EditorStyles.miniButton))
+            {
+                ShowMenu(menuRect, context);
+            }
 
             using (new EditorGUI.DisabledScope(!CanEditDictionary(context)))
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
@@ -366,6 +440,361 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                 {
                     ChangeDictionarySize(context, Mathf.Max(0, newSize));
                 }
+            }
+        }
+
+        private static void ShowMenu(Rect rect, DictionaryContext context)
+        {
+            GenericMenu menu = new GenericMenu();
+            if (context.SetterOrNull == null)
+            {
+                menu.AddDisabledItem(new GUIContent("Set To Null"));
+            }
+            else
+            {
+                menu.AddItem(new GUIContent("Set To Null"), false, () =>
+                {
+                    context.BeforeSet?.Invoke(context.RawValue);
+                    context.SetterOrNull(null);
+                });
+            }
+            menu.AddSeparator("");
+
+            AsyncSearchItems searchItems = context.SearchItems;
+            bool pagingEnabled = searchItems.NumberOfItemsPerPage > 0;
+            menu.AddItem(new GUIContent("Paging"), pagingEnabled, () =>
+            {
+                int configuredItemsPerPage = context.Attribute.NumberOfItemsPerPage;
+                searchItems.NumberOfItemsPerPage = pagingEnabled
+                    ? 0
+                    : configuredItemsPerPage > 0
+                        ? configuredItemsPerPage
+                        : Mathf.Max(5, GetDictionaryKeys(context).Count() / 2);
+                searchItems.PageIndex = 0;
+                RefreshView(context);
+            });
+
+            bool searchEnabled = context.SearchEnabled;
+            menu.AddItem(new GUIContent("Search"), searchEnabled, () =>
+            {
+                context.SearchEnabled = !searchEnabled;
+                if (searchEnabled)
+                {
+                    RestartSearch(context, "", "", true);
+                }
+                RefreshView(context);
+            });
+
+            if (searchEnabled)
+            {
+                menu.AddItem(new GUIContent("Object Search"), context.ObjectSearch, () =>
+                {
+                    context.ObjectSearch = !context.ObjectSearch;
+                    if (!string.IsNullOrEmpty(searchItems.KeySearchText)
+                        || !string.IsNullOrEmpty(searchItems.ValueSearchText))
+                    {
+                        RestartSearch(context, searchItems.KeySearchText, searchItems.ValueSearchText, false);
+                    }
+                    RefreshView(context);
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Object Search"), context.ObjectSearch);
+            }
+
+            menu.DropDown(rect);
+        }
+
+        private static void RefreshView(DictionaryContext context)
+        {
+            UpdateVisibleKeys(context.SearchItems);
+            GUI.changed = true;
+            EditorWindow.focusedWindow?.Repaint();
+        }
+
+        private static void DrawSearchField(Rect rect, bool isKeySearch, DictionaryContext context)
+        {
+            AsyncSearchItems searchItems = context.SearchItems;
+            bool searching = searchItems.Started && !searchItems.Finished;
+            IMGUILoading loading = isKeySearch ? context.KeyLoading : context.ValueLoading;
+            string controlName = $"{(isKeySearch ? "IMGUIEditDictionaryKeySearch" : "IMGUIEditDictionaryValueSearch")}_{context.Key}";
+            string placeholder = isKeySearch ? "Key Search" : "Value Search";
+            string currentText = isKeySearch ? searchItems.KeySearchText : searchItems.ValueSearchText;
+
+            Rect fieldRect = new Rect(rect)
+            {
+                width = Mathf.Max(0f, rect.width - (searching ? 16f : 0f) - SearchGap),
+            };
+            if (searching)
+            {
+                Rect loadingRect = new Rect(rect)
+                {
+                    x = rect.xMax - 14f,
+                    width = 12f,
+                };
+                loading.Draw(loadingRect);
+            }
+
+            GUI.SetNextControlName(controlName);
+            string newText = EditorGUI.TextField(fieldRect, GUIContent.none, currentText);
+            if (newText != currentText)
+            {
+                RestartSearch(context,
+                    isKeySearch ? newText : searchItems.KeySearchText,
+                    isKeySearch ? searchItems.ValueSearchText : newText,
+                    true);
+            }
+
+            if (Event.current.type == EventType.KeyDown
+                && Event.current.keyCode == KeyCode.Return
+                && GUI.GetNameOfFocusedControl() == controlName
+                && !searchItems.Started
+                && searchItems.SourceGenerator != null
+                && searchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
+            {
+                searchItems.DebounceSearchTime = EditorApplication.timeSinceStartup - 1d;
+                CompleteSearchImmediately(context);
+                GUI.changed = true;
+            }
+
+            string activeText = isKeySearch ? searchItems.KeySearchText : searchItems.ValueSearchText;
+            if (string.IsNullOrEmpty(activeText))
+            {
+                EditorGUI.LabelField(new Rect(rect)
+                {
+                    width = Mathf.Max(0f, rect.width - 6f),
+                }, placeholder, PlaceholderStyle);
+            }
+        }
+
+        private static void EnsureSearchState(DictionaryContext context, IReadOnlyList<object> keys)
+        {
+            AsyncSearchItems searchItems = context.SearchItems;
+            if (!context.ConfigurationInitialized)
+            {
+                context.ConfigurationInitialized = true;
+                context.SearchEnabled = context.Attribute.Searchable;
+                context.ObjectSearch = context.Attribute.ObjectSearch;
+                searchItems.NumberOfItemsPerPage = context.Attribute.NumberOfItemsPerPage;
+                SetFullResults(searchItems, keys);
+                return;
+            }
+
+            if (searchItems.Size != keys.Count)
+            {
+                RestartSearch(context, searchItems.KeySearchText, searchItems.ValueSearchText, false);
+            }
+        }
+
+        private static void RestartSearch(DictionaryContext context, string keySearchText, string valueSearchText,
+            bool resetPage)
+        {
+            AsyncSearchItems searchItems = context.SearchItems;
+            string safeKeySearch = keySearchText ?? "";
+            string safeValueSearch = valueSearchText ?? "";
+            object[] keys = GetDictionaryKeys(context).ToArray();
+
+            if (resetPage)
+            {
+                searchItems.PageIndex = 0;
+            }
+
+            searchItems.Size = keys.Length;
+            searchItems.SourceGenerator?.Dispose();
+            searchItems.SourceGenerator = null;
+
+            if (string.IsNullOrEmpty(safeKeySearch) && string.IsNullOrEmpty(safeValueSearch))
+            {
+                searchItems.KeySearchText = "";
+                searchItems.ValueSearchText = "";
+                SetFullResults(searchItems, keys);
+                return;
+            }
+
+            IReadOnlyList<object> currentResults = GetCurrentResults(searchItems);
+            searchItems.CachedHitKeys.Clear();
+            searchItems.CachedHitKeys.AddRange(currentResults);
+            searchItems.HitKeys.Clear();
+            searchItems.KeySearchText = safeKeySearch;
+            searchItems.ValueSearchText = safeValueSearch;
+            searchItems.Started = false;
+            searchItems.Finished = false;
+            searchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
+            searchItems.SourceGenerator = Search(context, keys, safeKeySearch, safeValueSearch).GetEnumerator();
+            UpdateVisibleKeys(searchItems);
+        }
+
+        private static void SetFullResults(AsyncSearchItems searchItems, IReadOnlyList<object> keys)
+        {
+            searchItems.Started = true;
+            searchItems.Finished = true;
+            searchItems.Size = keys.Count;
+            searchItems.SourceGenerator?.Dispose();
+            searchItems.SourceGenerator = null;
+            searchItems.HitKeys.Clear();
+            searchItems.HitKeys.AddRange(keys);
+            searchItems.CachedHitKeys.Clear();
+            searchItems.CachedHitKeys.AddRange(keys);
+            UpdateVisibleKeys(searchItems);
+        }
+
+        private static void TickAsyncSearch(DictionaryContext context)
+        {
+            if (Event.current == null || Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            AsyncSearchItems searchItems = context.SearchItems;
+            if (!searchItems.Started
+                && searchItems.SourceGenerator != null
+                && EditorApplication.timeSinceStartup > searchItems.DebounceSearchTime)
+            {
+                searchItems.Started = true;
+                UpdateVisibleKeys(searchItems);
+            }
+
+            if (!searchItems.Started || searchItems.Finished || searchItems.SourceGenerator == null)
+            {
+                return;
+            }
+
+            bool emptySearch = string.IsNullOrEmpty(searchItems.KeySearchText)
+                               && string.IsNullOrEmpty(searchItems.ValueSearchText);
+            int searchBatch = emptySearch ? int.MaxValue : 50;
+            bool needRefresh = false;
+            for (int searchTick = 0; searchTick < searchBatch; searchTick++)
+            {
+                if (searchItems.SourceGenerator.MoveNext())
+                {
+                    object current = searchItems.SourceGenerator.Current;
+                    if (current != null)
+                    {
+                        searchItems.HitKeys.Add(current);
+                        needRefresh = true;
+                    }
+                }
+                else
+                {
+                    searchItems.Finished = true;
+                    searchItems.CachedHitKeys.Clear();
+                    searchItems.CachedHitKeys.AddRange(searchItems.HitKeys);
+                    searchItems.SourceGenerator.Dispose();
+                    searchItems.SourceGenerator = null;
+                    needRefresh = true;
+                    break;
+                }
+            }
+
+            if (needRefresh)
+            {
+                searchItems.Size = GetDictionaryKeys(context).Count();
+                UpdateVisibleKeys(searchItems);
+                EditorWindow.focusedWindow?.Repaint();
+            }
+        }
+
+        private static void CompleteSearchImmediately(DictionaryContext context)
+        {
+            AsyncSearchItems searchItems = context.SearchItems;
+            if (searchItems.SourceGenerator == null || searchItems.Finished)
+            {
+                return;
+            }
+
+            searchItems.Started = true;
+            while (searchItems.SourceGenerator.MoveNext())
+            {
+                object current = searchItems.SourceGenerator.Current;
+                if (current != null)
+                {
+                    searchItems.HitKeys.Add(current);
+                }
+            }
+
+            searchItems.Finished = true;
+            searchItems.CachedHitKeys.Clear();
+            searchItems.CachedHitKeys.AddRange(searchItems.HitKeys);
+            searchItems.SourceGenerator.Dispose();
+            searchItems.SourceGenerator = null;
+            searchItems.Size = GetDictionaryKeys(context).Count();
+            UpdateVisibleKeys(searchItems);
+        }
+
+        private static IReadOnlyList<object> GetCurrentResults(AsyncSearchItems searchItems) =>
+            searchItems.Started ? searchItems.HitKeys : searchItems.CachedHitKeys;
+
+        private static void UpdateVisibleKeys(AsyncSearchItems searchItems)
+        {
+            IReadOnlyList<object> source = GetCurrentResults(searchItems);
+            int numberOfItemsPerPage = searchItems.NumberOfItemsPerPage;
+
+            int pageCount;
+            int pageIndex;
+            int skipStart;
+            int itemCount;
+            if (numberOfItemsPerPage <= 0)
+            {
+                pageCount = 1;
+                pageIndex = 0;
+                skipStart = 0;
+                itemCount = int.MaxValue;
+            }
+            else
+            {
+                pageCount = Mathf.Max(1, Mathf.CeilToInt(source.Count / (float)numberOfItemsPerPage));
+                pageIndex = Mathf.Clamp(searchItems.PageIndex, 0, pageCount - 1);
+                skipStart = pageIndex * numberOfItemsPerPage;
+                itemCount = numberOfItemsPerPage;
+            }
+
+            searchItems.TotalPage = pageCount;
+            searchItems.PageIndex = pageIndex;
+            searchItems.VisibleKeys.Clear();
+            searchItems.VisibleKeys.AddRange(source.Skip(skipStart).Take(itemCount));
+        }
+
+        private static IEnumerable<object> Search(DictionaryContext context, IReadOnlyList<object> keys,
+            string keySearch, string valueSearch)
+        {
+            bool keySearchEmpty = string.IsNullOrEmpty(keySearch);
+            bool valueSearchEmpty = string.IsNullOrEmpty(valueSearch);
+            if (keySearchEmpty && valueSearchEmpty)
+            {
+                foreach (object key in keys)
+                {
+                    yield return key;
+                }
+                yield break;
+            }
+
+            IReadOnlyList<ListSearchToken> valueSearchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
+            if (keySearchEmpty)
+            {
+                foreach (object key in keys)
+                {
+                    object value = GetDictionaryValue(context, key);
+                    yield return Util.SearchObjectWithTokens(value, valueSearchTokens, context.ObjectSearch)
+                        ? key
+                        : null;
+                }
+                yield break;
+            }
+
+            foreach (int index in Util.SearchArrayObjects(keys, keySearch, context.ObjectSearch))
+            {
+                if (index == -1)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                object key = keys[index];
+                object value = GetDictionaryValue(context, key);
+                yield return Util.SearchObjectWithTokens(value, valueSearchTokens, context.ObjectSearch)
+                    ? key
+                    : null;
             }
         }
 
@@ -529,6 +958,8 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
         private static void DrawDictionaryFooter(Rect rect, DictionaryContext context)
         {
             int count = RuntimeUtil.IsNull(context.RawValue) ? 0 : GetDictionaryKeys(context).Count();
+            AsyncSearchItems searchItems = context.SearchItems;
+            bool pagingEnabled = searchItems.NumberOfItemsPerPage > 0;
             Rect addButtonRect = new Rect(rect)
             {
                 x = rect.xMax - ButtonWidth,
@@ -538,27 +969,128 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             {
                 x = addButtonRect.x - ControlGap - ButtonWidth,
             };
-            Rect sizeRect = new Rect(rect)
+            Rect controlsRect = new Rect(rect)
             {
-                width = SizeWidth,
-            };
-            Rect labelRect = new Rect(rect)
-            {
-                x = sizeRect.xMax + ControlGap,
-                width = Mathf.Max(0f, removeButtonRect.x - sizeRect.xMax - ControlGap * 2),
+                width = Mathf.Max(0f, removeButtonRect.x - ControlGap - rect.x),
             };
 
-            using (new EditorGUI.DisabledScope(!CanEditDictionary(context)))
-            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            if (pagingEnabled)
             {
-                int newSize = EditorGUI.DelayedIntField(sizeRect, count);
-                if (changed.changed)
+                Rect numberOfItemsPerPageRect = new Rect(controlsRect)
                 {
-                    ChangeDictionarySize(context, Mathf.Max(0, newSize));
+                    width = PagerInputWidth,
+                };
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newNumberOfItemsPerPage = EditorGUI.DelayedIntField(numberOfItemsPerPageRect,
+                        GUIContent.none, searchItems.NumberOfItemsPerPage);
+                    if (changed.changed)
+                    {
+                        searchItems.NumberOfItemsPerPage = Mathf.Max(newNumberOfItemsPerPage, 0);
+                        searchItems.PageIndex = 0;
+                        RefreshView(context);
+                    }
+                }
+
+                Rect numberOfItemsSeparatorRect = new Rect(numberOfItemsPerPageRect)
+                {
+                    x = numberOfItemsPerPageRect.xMax,
+                    width = PagerSeparatorWidth,
+                };
+                EditorGUI.LabelField(numberOfItemsSeparatorRect, "/");
+
+                Rect totalItemsRect = new Rect(numberOfItemsSeparatorRect)
+                {
+                    x = numberOfItemsSeparatorRect.xMax,
+                    width = PagerItemsLabelWidth,
+                };
+                using (new EditorGUI.DisabledScope(!CanEditDictionary(context)))
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newCount = EditorGUI.DelayedIntField(totalItemsRect, GUIContent.none, count);
+                    if (changed.changed)
+                    {
+                        ChangeDictionarySize(context, Mathf.Max(0, newCount));
+                        return;
+                    }
+                }
+                EditorGUI.LabelField(totalItemsRect, "Items", PlaceholderStyle);
+
+                Rect previousPageRect = new Rect(totalItemsRect)
+                {
+                    x = totalItemsRect.xMax,
+                    width = PagerButtonWidth,
+                };
+                using (new EditorGUI.DisabledScope(searchItems.PageIndex <= 0))
+                {
+                    context.LeftIcon ??= Util.LoadResource<Texture2D>("classic-dropdown-left.png");
+                    if (GUI.Button(previousPageRect, context.LeftIcon, EditorStyles.miniButtonLeft))
+                    {
+                        searchItems.PageIndex = Mathf.Max(0, searchItems.PageIndex - 1);
+                        RefreshView(context);
+                    }
+                }
+
+                Rect pageRect = new Rect(previousPageRect)
+                {
+                    x = previousPageRect.xMax,
+                    width = PagerInputWidth,
+                };
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newPageIndex = EditorGUI.DelayedIntField(pageRect, GUIContent.none,
+                        searchItems.PageIndex + 1) - 1;
+                    if (changed.changed)
+                    {
+                        searchItems.PageIndex = Mathf.Max(newPageIndex, 0);
+                        RefreshView(context);
+                    }
+                }
+
+                Rect totalPageRect = new Rect(pageRect)
+                {
+                    x = pageRect.xMax,
+                    width = PagerPageLabelWidth,
+                };
+                EditorGUI.LabelField(totalPageRect, $"/ {searchItems.TotalPage}");
+
+                Rect nextPageRect = new Rect(totalPageRect)
+                {
+                    x = totalPageRect.xMax,
+                    width = PagerButtonWidth,
+                };
+                using (new EditorGUI.DisabledScope(searchItems.PageIndex >= searchItems.TotalPage - 1))
+                {
+                    context.RightIcon ??= Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+                    if (GUI.Button(nextPageRect, context.RightIcon, EditorStyles.miniButtonRight))
+                    {
+                        searchItems.PageIndex = Mathf.Min(searchItems.PageIndex + 1, searchItems.TotalPage - 1);
+                        RefreshView(context);
+                    }
                 }
             }
-
-            EditorGUI.LabelField(labelRect, "Items", EditorStyles.miniLabel);
+            else
+            {
+                Rect sizeRect = new Rect(controlsRect)
+                {
+                    width = SizeWidth,
+                };
+                Rect labelRect = new Rect(controlsRect)
+                {
+                    x = sizeRect.xMax + ControlGap,
+                    width = Mathf.Max(0f, controlsRect.xMax - sizeRect.xMax - ControlGap),
+                };
+                using (new EditorGUI.DisabledScope(!CanEditDictionary(context)))
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newSize = EditorGUI.DelayedIntField(sizeRect, count);
+                    if (changed.changed)
+                    {
+                        ChangeDictionarySize(context, Mathf.Max(0, newSize));
+                    }
+                }
+                EditorGUI.LabelField(labelRect, "Items", EditorStyles.miniLabel);
+            }
 
             using (new EditorGUI.DisabledScope(!CanEditDictionary(context) || count == 0))
             {
@@ -906,6 +1438,13 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                 ? innerException.Message
                 : exception.Message;
 
+        private static GUIStyle PlaceholderStyle => new GUIStyle("label")
+        {
+            alignment = TextAnchor.MiddleRight,
+            normal = { textColor = Color.gray },
+            fontStyle = FontStyle.Italic,
+        };
+
         private sealed class ZeroLabelWidthScope : IDisposable
         {
             private readonly float _oldLabelWidth;
@@ -926,6 +1465,8 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
         {
             context.BeforeSet?.Invoke(context.RawValue);
             context.SetterOrNull?.Invoke(context.RawValue);
+            RestartSearch(context, context.SearchItems.KeySearchText, context.SearchItems.ValueSearchText, false);
+            GUI.changed = true;
         }
     }
 }

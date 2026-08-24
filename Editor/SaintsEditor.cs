@@ -1040,27 +1040,26 @@ namespace SaintsField.Editor
             {
                 case SaintsRenderType.SerializedField:
                 {
+                    bool hasListDrawerSettings = false;
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         switch (playaAttribute)
                         {
-                            // ReSharper disable once RedundantDiscardDesignation
-                            case TableAttribute _:
+                            case TableAttribute:
                                 yield return new[]{new TableRenderer(serializedObject, fieldWithInfo)};
                                 yield break;
-                                // return pre.Append(new SaintsFieldWithRenderer(tableAttribute, new TableRenderer(serializedObject, fieldWithInfo))).Concat(post);
-
-
-
-                            // ReSharper disable once RedundantDiscardDesignation
-                            case ListDrawerSettingsAttribute _:
-                                yield return new []{new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo)};
-                                yield break;
-                                // return WrapAroundSaintsRenderer(new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo),
-                                //     fieldWithInfo, serializedObject);
-                                // return pre.Append(new SaintsFieldWithRenderer(tableAttribute, new TableRenderer(serializedObject, fieldWithInfo))).Concat(post);
-                                // Break the switch, but continue the logic
+                            case ListDrawerSettingsAttribute:
+                                hasListDrawerSettings = true;
+                                break;
                         }
+                    }
+
+                    if (hasListDrawerSettings
+                        || (fieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic
+                            && fieldWithInfo.SerializedProperty.isArray))
+                    {
+                        yield return new []{new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo)};
+                        yield break;
                     }
 
                     yield return new[]{new SerializedFieldRenderer(serializedObject, fieldWithInfo)};

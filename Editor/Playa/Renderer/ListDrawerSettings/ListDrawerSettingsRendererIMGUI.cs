@@ -1086,7 +1086,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().First();
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute = GetListDrawerSettingsAttribute();
 
             bool hasSearch = listDrawerSettingsAttribute.Searchable;
             bool hasPaging = listDrawerSettingsAttribute.NumberOfItemsPerPage > 0;
@@ -1155,7 +1155,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
 #endif
 
-                ListDrawerSettingsAttribute listDrawerSettingsAttribute = FieldWithInfo.PlayaAttributes.OfType<ListDrawerSettingsAttribute>().First();
+                ListDrawerSettingsAttribute listDrawerSettingsAttribute = GetListDrawerSettingsAttribute();
                 if(_imGuiListInfo != null)
                 {
                     _imGuiListInfo.PreCheckResult = preCheckResult;
