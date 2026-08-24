@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using SaintsField.Utils;
+using Debug = UnityEngine.Debug;
 
 
 namespace SaintsField.Playa
@@ -12,21 +13,26 @@ namespace SaintsField.Playa
         public readonly int NumberOfItemsPerPage;
         public readonly bool Searchable;
 
-        public readonly bool Delayed;
+        // public readonly bool Delayed;
 
         public readonly string ExtraSearch;
-        public readonly string OverrideSearch;
+        // public readonly string OverrideSearch;
 
         public ListDrawerSettingsAttribute(bool searchable = true, int numberOfItemsPerPage = 0, string extraSearch = null, string overrideSearch = null)
         {
             NumberOfItemsPerPage = numberOfItemsPerPage;
             // Delayed = delayedSearch;
-            Searchable = Delayed || searchable;
+            Searchable = searchable;
 
             ExtraSearch = RuntimeUtil.ParseCallback(extraSearch).content;
-            OverrideSearch = RuntimeUtil.ParseCallback(overrideSearch).content;
+            // OverrideSearch = RuntimeUtil.ParseCallback(overrideSearch).content;
 
-            if (ExtraSearch != null || OverrideSearch != null)
+            if (!string.IsNullOrEmpty(overrideSearch))
+            {
+                Debug.LogWarning("`overrideSearch` is no longer supported and will be ignored");
+            }
+
+            if (ExtraSearch != null)
             {
                 Searchable = true;
             }

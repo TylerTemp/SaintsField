@@ -16,6 +16,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.UIToolkitElements.CharacterDrawer;
 using SaintsField.Editor.UIToolkitElements.QuaternionType;

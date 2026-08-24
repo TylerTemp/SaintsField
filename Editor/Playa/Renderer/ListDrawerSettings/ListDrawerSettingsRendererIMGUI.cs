@@ -67,6 +67,9 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             public bool HasSearch;
             public bool HasPaging;
+            public bool DefaultSearch = true;
+            public bool ObjectNestedSearch = true;
+            public bool ExtraSearch;
             public PagingInfo PagingInfo;
             public string SearchText = string.Empty;
             public int PageIndex;
@@ -86,7 +89,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
             string extraSearchCallback = listDrawerSettingsAttribute.ExtraSearch;
-            string overrideSearchCallback = listDrawerSettingsAttribute.OverrideSearch;
+            // string overrideSearchCallback = listDrawerSettingsAttribute.OverrideSearch;
 
             (MethodInfo methodInfo, ParamType paramType) extraSearchMethod = default;
             (MethodInfo methodInfo, ParamType paramType) overrideSearchMethod = default;
@@ -96,10 +99,10 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, extraSearchCallback);
             }
 
-            if (!string.IsNullOrEmpty(overrideSearchCallback))
-            {
-                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
-            }
+            // if (!string.IsNullOrEmpty(overrideSearchCallback))
+            // {
+            //     overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
+            // }
 
             IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(search).ToList();
             IEnumerable rawValueList = (IEnumerable)(FieldWithInfo.FieldInfo != null
@@ -172,7 +175,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
             }
 
-            if (extraSearchMethod.methodInfo != null)
+            if (_imGuiListInfo.ExtraSearch && extraSearchMethod.methodInfo != null)
             {
                 if (extraSearchMethod.paramType == ParamType.Index)
                 {
@@ -197,7 +200,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                             {
                                 ListSearchToken token = searchTokens[index];
                                 HashSet<object> searchedObject = searchedObjectsArray[index];
-                                if (!SerializedUtils.SearchProp(itemProp, token.Token, true, searchedObject))
+                                if (!SerializedUtils.SearchProp(itemProp, token.Token,
+                                        _imGuiListInfo.ObjectNestedSearch, searchedObject))
                                 {
                                     all = false;
                                     break;
@@ -253,7 +257,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                             {
                                 ListSearchToken token = searchTokens[index];
                                 HashSet<object> searchedObjects = searchedObjectsArray[index];
-                                if (!SerializedUtils.SearchProp(itemProp, token.Token, true, searchedObjects))
+                                if (!SerializedUtils.SearchProp(itemProp, token.Token,
+                                        _imGuiListInfo.ObjectNestedSearch, searchedObjects))
                                 {
                                     all = false;
                                     break;
@@ -285,9 +290,15 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
             }
 
+            if (!_imGuiListInfo.DefaultSearch)
+            {
+                yield break;
+            }
+
             List<int> defaultBatchResults = new List<int>();
             int defaultBatchCount = 0;
-            foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search, true))
+            foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search,
+                         _imGuiListInfo.ObjectNestedSearch))
             {
                 if (i != -1)
                 {
@@ -295,12 +306,14 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
 
                 defaultBatchCount++;
-                if (defaultBatchCount / batchLimit >= 1)
+                if (defaultBatchCount / batchLimit < 1)
                 {
-                    yield return defaultBatchResults.ToArray();
-                    defaultBatchCount = 0;
-                    defaultBatchResults.Clear();
+                    continue;
                 }
+
+                yield return defaultBatchResults.ToArray();
+                defaultBatchCount = 0;
+                defaultBatchResults.Clear();
             }
 
             if (defaultBatchResults.Count > 0)
@@ -404,6 +417,113 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             }
         }
 
+        private void RefreshSearchingStatus(SerializedProperty property,
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            string searchText = _imGuiListInfo.SearchText;
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                UpdatePage(property, 0, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+            }
+            else
+            {
+                _asyncSearchItems.DebounceSearchTime = 0;
+                _asyncSearchItems.Started = false;
+                _asyncSearchItems.Finished = false;
+                _asyncSearchItems.FullSources.Clear();
+                _asyncSearchItems.SourceGenerator?.Dispose();
+                _asyncSearchItems.SourceGenerator = SearchCallback(property, searchText,
+                    listDrawerSettingsAttribute).GetEnumerator();
+                _asyncSearchItems.SearchText = searchText;
+                UpdatePage(property, 0, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+            }
+
+            _imGuiReorderableList = null;
+            GUI.changed = true;
+            EditorWindow.focusedWindow?.Repaint();
+        }
+
+        private void ShowListDrawerMenu(Rect rect, SerializedProperty property,
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            GenericMenu menu = new GenericMenu();
+
+            bool hasPaging = _imGuiListInfo.HasPaging;
+            menu.AddItem(new GUIContent("Paging"), hasPaging, () =>
+            {
+                _imGuiListInfo.HasPaging = !hasPaging;
+                _imGuiListInfo.NumberOfItemsPrePage = hasPaging
+                    ? 0
+                    : listDrawerSettingsAttribute.NumberOfItemsPerPage > 0
+                        ? listDrawerSettingsAttribute.NumberOfItemsPerPage
+                        : Mathf.Max(5, property.arraySize / 2);
+                UpdatePage(property, 0, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+                _imGuiReorderableList = null;
+                GUI.changed = true;
+                EditorWindow.focusedWindow?.Repaint();
+            });
+
+            bool hasSearch = _imGuiListInfo.HasSearch;
+            menu.AddItem(new GUIContent("Search"), hasSearch, () =>
+            {
+                _imGuiListInfo.HasSearch = !hasSearch;
+                if (hasSearch)
+                {
+                    _imGuiListInfo.SearchText = "";
+                }
+                RefreshSearchingStatus(property, listDrawerSettingsAttribute);
+            });
+
+            Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                                           FieldWithInfo.PropertyInfo.PropertyType);
+            bool hasExtraSearch = !string.IsNullOrEmpty(listDrawerSettingsAttribute.ExtraSearch) &&
+                                  GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType,
+                                      listDrawerSettingsAttribute.ExtraSearch).Item1 != null;
+            if (hasSearch && hasExtraSearch)
+            {
+                menu.AddItem(new GUIContent("Default Search"), _imGuiListInfo.DefaultSearch, () =>
+                {
+                    _imGuiListInfo.DefaultSearch = !_imGuiListInfo.DefaultSearch;
+                    RefreshSearchingStatus(property, listDrawerSettingsAttribute);
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Default Search"), _imGuiListInfo.DefaultSearch);
+            }
+
+            if (hasSearch)
+            {
+                menu.AddItem(new GUIContent("Object Search"), _imGuiListInfo.ObjectNestedSearch, () =>
+                {
+                    _imGuiListInfo.ObjectNestedSearch = !_imGuiListInfo.ObjectNestedSearch;
+                    RefreshSearchingStatus(property, listDrawerSettingsAttribute);
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Object Search"), _imGuiListInfo.ObjectNestedSearch);
+            }
+
+            if (hasExtraSearch)
+            {
+                if (hasSearch)
+                {
+                    menu.AddItem(new GUIContent("Extra Search"), _imGuiListInfo.ExtraSearch, () =>
+                    {
+                        _imGuiListInfo.ExtraSearch = !_imGuiListInfo.ExtraSearch;
+                        RefreshSearchingStatus(property, listDrawerSettingsAttribute);
+                    });
+                }
+                else
+                {
+                    menu.AddDisabledItem(new GUIContent("Extra Search"), _imGuiListInfo.ExtraSearch);
+                }
+            }
+
+            menu.DropDown(rect);
+        }
+
         private void SetArraySize(SerializedProperty property, int newSize, ArraySizeAttribute arraySizeAttribute,
             ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
@@ -498,7 +618,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             {
                 _imGuiReorderableList = new ReorderableList(property.serializedObject, property, true, true, true, true)
                     {
-                        headerHeight = SaintsPropertyDrawer.SingleLineHeight * ((_imGuiListInfo.HasPaging || _imGuiListInfo.HasSearch)? 2: 1),
+                        headerHeight = SaintsPropertyDrawer.SingleLineHeight * (_imGuiListInfo.HasSearch ? 2 : 1),
+                        footerHeight = SaintsPropertyDrawer.SingleLineHeight,
                     };
 
                 Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
@@ -506,6 +627,12 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     arraySizeAttribute, listDrawerSettingsAttribute);
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
+                _imGuiReorderableList.drawFooterCallback += footerRect =>
+                {
+                    ReorderableList.defaultBehaviours.DrawFooter(footerRect, _imGuiReorderableList);
+                    DrawListDrawerPagingFooter(footerRect, property, arraySizeAttribute,
+                        listDrawerSettingsAttribute);
+                };
 
                 if(arraySizeAttribute != null)
                 {
@@ -585,6 +712,10 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         private Texture2D _iconLeft;
         private Texture2D _iconRight;
 
+        private const float HeaderSizeWidth = 50f;
+        private const float HeaderMenuWidth = 20f;
+        private const float FooterButtonsWidth = 58f;
+
         private void DrawListDrawerHeader(Rect rect, Type elementType, SerializedProperty property,
             ArraySizeAttribute arraySizeAttribute, ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
@@ -607,41 +738,39 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             DragAndDropImGui(rect, elementType, property);
 
-            // const float twoNumberInputWidth = 20;
-            const float inputWidth = 30;
-            // const float itemsLabelWidth = 75;
-            const float itemsLabelWidth = 65;
-            const float buttonWidth = 19;
-            // const float pagingLabelWidth = 35;
-            const float pagingLabelWidth = 30;
-            const float pagingSepWidth = 8;
-
-            const float gap = 5;
-
             (Rect titleRect, Rect controlRect) = RectUtils.SplitHeightRect(rect, EditorGUIUtility.singleLineHeight);
             controlRect.height -= 1;
 
             (Rect titleFoldRect, Rect titleButtonRect) = RectUtils.SplitWidthRect(titleRect, 16);
 
-            if (!_imGuiListInfo.HasPaging && !_imGuiListInfo.HasSearch)  // draw element count container
+            Rect titleItemTotalRect = new Rect(titleButtonRect)
             {
-                (Rect titleButtonNewRect, Rect titleItemTotalRect) =
-                    RectUtils.SplitWidthRect(titleButtonRect, titleButtonRect.width - 50);
-                titleItemTotalRect.y += 1;
-                titleItemTotalRect.height -= 2;
+                x = titleRect.xMax - HeaderSizeWidth,
+                width = HeaderSizeWidth,
+                y = titleRect.y + 1,
+                height = titleRect.height - 2,
+            };
+            Rect menuRect = new Rect(titleButtonRect)
+            {
+                x = titleItemTotalRect.x - HeaderMenuWidth - 4f,
+                width = HeaderMenuWidth,
+            };
+            titleButtonRect.width = Mathf.Max(0f, menuRect.x - titleButtonRect.x - 4f);
 
-                using(new EditorGUI.DisabledScope(min > 0 && min == max))
-                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                    {
-                    int newCount = EditorGUI.DelayedIntField(titleItemTotalRect, GUIContent.none, property.arraySize);
-                    if (changed.changed)
-                    {
-                        SetArraySize(property, newCount, arraySizeAttribute, listDrawerSettingsAttribute);
-                        return;
-                    }
+            if (GUI.Button(menuRect, "...", EditorStyles.miniButton))
+            {
+                ShowListDrawerMenu(menuRect, property, listDrawerSettingsAttribute);
+            }
+
+            using(new EditorGUI.DisabledScope(min > 0 && min == max))
+            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                int newCount = EditorGUI.DelayedIntField(titleItemTotalRect, GUIContent.none, property.arraySize);
+                if (changed.changed)
+                {
+                    SetArraySize(property, newCount, arraySizeAttribute, listDrawerSettingsAttribute);
+                    return;
                 }
-
-                titleButtonRect = titleButtonNewRect;
             }
 
             if(GUI.Button(titleButtonRect, "", GUIStyle.none))
@@ -695,17 +824,13 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 return;
             }
 
-            float searchInputWidth = rect.width - inputWidth * 2 - itemsLabelWidth - pagingSepWidth - buttonWidth * 2 - pagingLabelWidth;
-
-            (Rect searchRect, Rect pagingRect) = RectUtils.SplitWidthRect(controlRect, _imGuiListInfo.HasPaging? searchInputWidth: controlRect.width);
-
             if(_imGuiListInfo.HasSearch)
             {
                 string searchControlName = $"ListDrawerSettingsSearch_{property.propertyPath}";
                 string oldSearchText = _imGuiListInfo.SearchText;
-                Rect searchFieldRect = new Rect(searchRect)
+                Rect searchFieldRect = new Rect(controlRect)
                 {
-                    width = searchRect.width - gap,
+                    width = controlRect.width,
                 };
                 if (_asyncSearchItems.Started && !_asyncSearchItems.Finished)
                 {
@@ -737,9 +862,9 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
                 if (string.IsNullOrEmpty(_imGuiListInfo.SearchText))
                 {
-                    EditorGUI.LabelField(new Rect(searchRect)
+                    EditorGUI.LabelField(new Rect(controlRect)
                     {
-                        width = searchRect.width - 6,
+                        width = controlRect.width - 6,
                     }, "Search", new GUIStyle("label") { alignment = TextAnchor.MiddleRight, normal =
                     {
                         textColor = Color.gray,
@@ -747,9 +872,28 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
             }
 
-            if(_imGuiListInfo.HasPaging)
+        }
+
+        private void DrawListDrawerPagingFooter(Rect rect, SerializedProperty property,
+            ArraySizeAttribute arraySizeAttribute, ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            if(!_imGuiListInfo.HasPaging)
             {
-                Rect numberOfItemsPerPageRect = new Rect(pagingRect)
+                return;
+            }
+
+            const float inputWidth = 30;
+            const float itemsLabelWidth = 65;
+            const float buttonWidth = 19;
+            const float pagingLabelWidth = 30;
+            const float pagingSepWidth = 8;
+
+            Rect pagingRect = new Rect(rect)
+            {
+                width = Mathf.Max(0f, rect.width - FooterButtonsWidth),
+            };
+
+            Rect numberOfItemsPerPageRect = new Rect(pagingRect)
                 {
                     width = inputWidth,
                 };
@@ -852,7 +996,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                         }
                     }
                 }
-            }
         }
 
         private float DrawListDrawerItemHeight(int index)
@@ -958,6 +1101,11 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     PreCheckResult = preCheckResult,
                     HasSearch = hasSearch,
                     HasPaging = hasPaging,
+                    ExtraSearch = !string.IsNullOrEmpty(listDrawerSettingsAttribute.ExtraSearch) &&
+                                  GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(),
+                                      ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                                                  FieldWithInfo.PropertyInfo.PropertyType),
+                                      listDrawerSettingsAttribute.ExtraSearch).Item1 != null,
                     PagingInfo = GetPagingInfo(0, fullList, numberOfItemsPrePage),
                     NumberOfItemsPrePage = numberOfItemsPrePage,
                     PageIndex = 0,
@@ -988,7 +1136,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 return SaintsPropertyDrawer.SingleLineHeight;
             }
 
-            int extraLineCount = (hasSearch || hasPaging) ? 4 : 3;
+            int extraLineCount = _imGuiListInfo.HasSearch ? 4 : 3;
 
             float height = _imGuiListInfo.PagingInfo.IndexesCurPage
                                .Select(index => EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty.GetArrayElementAtIndex(index), true))

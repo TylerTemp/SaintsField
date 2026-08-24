@@ -43,27 +43,23 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         private (VisualElement root, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, ArraySizeAttribute arraySizeAttribute)
         {
-
+            bool defaultSearch = true;
+            bool objectNestedSearch = true;
 
             Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
                                                            FieldWithInfo.PropertyInfo.PropertyType);
 
             // search functions
             string extraSearchCallback = listDrawerSettingsAttribute.ExtraSearch;
-            string overrideSearchCallback = listDrawerSettingsAttribute.OverrideSearch;
 
             (MethodInfo methodInfo, ParamType paramType) extraSearchMethod = default;
-            (MethodInfo methodInfo, ParamType paramType) overrideSearchMethod = default;
 
             if (!string.IsNullOrEmpty(extraSearchCallback))
             {
                 extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, extraSearchCallback);
             }
 
-            if (!string.IsNullOrEmpty(overrideSearchCallback))
-            {
-                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
-            }
+            bool extraSearch = extraSearchMethod.methodInfo != null;
 
             IEnumerable<IReadOnlyList<int>> SearchCallbackWithCustom(SerializedProperty arrayProperty, string search)
             {
@@ -71,83 +67,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
                 IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(search).ToList();
 
-                if (overrideSearchMethod.methodInfo != null)
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
-                    Debug.Log($"#Search# use override search method");
-#endif
-                    if (overrideSearchMethod.paramType == ParamType.Index)
-                    {
-                        List<int> batchResults = new List<int>();
-                        int batchCount = 0;
-                        foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
-                        {
-                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
-                                    new object[] { fullIndex, searchTokens }))
-                            {
-                                // yield return fullIndex;
-                                batchResults.Add(fullIndex);
-                            }
-
-                            batchCount++;
-
-                            // ReSharper disable once InvertIf
-                            if (batchCount / batchLimit >= 1)
-                            {
-                                yield return batchResults.ToArray();
-                                batchCount = 0;
-                                batchResults.Clear();
-                            }
-                        }
-
-                        if (batchResults.Count > 0)
-                        {
-                            yield return batchResults;
-                        }
-
-                        yield break;
-                    }
-
-                    {
-                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Targets[0]);
-
-                        int curIndex = 0;
-
-                        List<int> batchResults = new List<int>();
-                        int batchCount = 0;
-
-                        foreach (object rawValue in rawValueList)
-                        {
-                            object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
-                                ? new[] { rawValue, searchTokens }
-                                : new[] { rawValue, curIndex, searchTokens };
-
-                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
-                            {
-                                batchResults.Add(curIndex);
-                            }
-
-                            curIndex++;
-
-                            batchCount++;
-                            if (batchCount / batchLimit >= 1)
-                            {
-                                yield return batchResults.ToArray();
-                                batchCount = 0;
-                                batchResults.Clear();
-                            }
-                        }
-
-                        if (batchResults.Count > 0)
-                        {
-                            yield return batchResults;
-                        }
-
-                        yield break;
-                    }
-                }
-
-                if (extraSearchMethod.methodInfo != null)
+                if (extraSearch && extraSearchMethod.methodInfo != null)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"#Search# use extra search method");
@@ -276,13 +196,14 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     }
                 }
 
+                if(defaultSearch)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"#Search# use default search method");
 #endif
                     List<int> batchResults = new List<int>();
                     int batchCount = 0;
-                    foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search, true))
+                    foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search, objectNestedSearch))
                     {
                         if(i != -1)
                         {
@@ -306,9 +227,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             }
 
             SerializedProperty property = FieldWithInfo.SerializedProperty;
-            VisualElement root = new Foldout
+            CollectionFoldout root = new CollectionFoldout(property.displayName)
             {
-                text = property.displayName,
                 style =
                 {
                     flexGrow = 1,
@@ -474,27 +394,16 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             listContent.AddToClassList("unity-collection-view--with-border");
             listContent.AddToClassList("unity-list-view__scroll-view--with-footer");
 
-            VisualElement preContent = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    display = (listDrawerSettingsAttribute.Searchable || listDrawerSettingsAttribute.NumberOfItemsPerPage > 0)
-                        ? DisplayStyle.Flex
-                        : DisplayStyle.None,
-                },
-            };
-            listContent.Add(preContent);
-
             #region Search
 
             ToolbarSearchField searchField = new ToolbarSearchField
             {
                 style =
                 {
-                    visibility = listDrawerSettingsAttribute.Searchable? Visibility.Visible :Visibility.Hidden,
+                    display = listDrawerSettingsAttribute.Searchable ? DisplayStyle.Flex : DisplayStyle.None,
                     flexGrow = 1,
                     flexShrink = 1,
+                    width = StyleKeyword.Auto,
                 },
             };
 
@@ -532,143 +441,46 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             UIToolkitUtils.SetKeepRotate(loadingImage);
             loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage));
 
-            preContent.Add(searchField);
+            listContent.Add(searchField);
 
             #endregion
 
             #region Paging
 
-            VisualElement pagingContainer = new VisualElement
+            ListViewPagerElement pager = new ListViewPagerElement
             {
                 style =
                 {
-                    // visibility = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0? Visibility.Hidden: Visibility.Visible,
-                    display = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0? DisplayStyle.None: DisplayStyle.Flex,
+                    display = listDrawerSettingsAttribute.NumberOfItemsPerPage > 0
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None,
+                },
+            };
+
+            IntegerField numberOfItemsPerPageField = pager.NumberOfItemsPerPageField;
+            IntegerField numberOfItemsTotalField = pager.NumberOfItemsTotalField;
+            numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
+            IntegerField numberOfItemsTopRightField = root.ArraySizeField;
+            numberOfItemsTopRightField.SetValueWithoutNotify(property.arraySize);
+
+            Button pagePreButton = pager.PagePreButton;
+            IntegerField pageField = pager.PageField;
+            Label pageLabel = pager.PageLabel;
+            Button pageNextButton = pager.PageNextButton;
+
+            VisualElement footer = new VisualElement
+            {
+                style =
+                {
                     flexDirection = FlexDirection.Row,
-                    flexGrow = 0,
-                    flexShrink = 0,
+                    justifyContent = Justify.FlexEnd,
                 },
             };
+            footer.Add(pager);
 
-            IntegerField numberOfItemsPerPageField = new IntegerField
-            {
-                isDelayed = true,
-                style =
-                {
-                    minWidth = 30,
-                },
-            };
-            TextElement numberOfItemsPerPageFieldTextElement = numberOfItemsPerPageField.Q<TextElement>();
-            if(numberOfItemsPerPageFieldTextElement != null)
-            {
-                numberOfItemsPerPageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
-            }
-            Label numberOfItemsSep = new Label("/")
-            {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                },
-            };
-
-            IntegerField numberOfItemsTotalField = new IntegerField
-            {
-                isDelayed = true,
-                style =
-                {
-                    minWidth = 30,
-                },
-                value = property.arraySize,
-            };
-            IntegerField numberOfItemsTopRightField = new IntegerField
-            {
-                isDelayed = true,
-                style =
-                {
-                    position = Position.Absolute,
-                    right = 2,
-                    top = 1,
-                    minWidth = 50,
-                },
-                value = property.arraySize,
-            };
-            root.hierarchy.Add(numberOfItemsTopRightField);
-
-            Label numberOfItemsDesc = new Label("Items")
-            {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                },
-            };
-
-
-            Button pagePreButton = new Button
-            {
-                style =
-                {
-                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-left.png"),
-#if UNITY_2022_2_OR_NEWER
-                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                },
-            };
-            IntegerField pageField = new IntegerField
-            {
-                isDelayed = true,
-                value = 1,
-                style =
-                {
-                    minWidth = 30,
-                },
-            };
-            TextElement pageFieldTextElement = pageField.Q<TextElement>();
-            if(pageFieldTextElement != null)
-            {
-                pageFieldTextElement.style.unityTextAlign = TextAnchor.MiddleRight;
-            }
-            Label pageLabel = new Label(" / 1")
-            {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter,
-                },
-            };
-            Button pageNextButton = new Button
-            {
-                style =
-                {
-                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-right.png"),
-#if UNITY_2022_2_OR_NEWER
-                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                },
-                // text = ">",
-            };
-
-            ListViewFooterButtonsElement listViewFooterButtons = new ListViewFooterButtonsElement
-            {
-                // AddButton =
-                // {
-                //     name = NameAddButton(arrayProp),
-                // },
-                // RemoveButton =
-                // {
-                //     name = NameRemoveButton(arrayProp),
-                // },
-            };
-
-            root.Add(listViewFooterButtons);
+            ListViewFooterButtonsElement listViewFooterButtons = new ListViewFooterButtonsElement();
+            footer.Add(listViewFooterButtons);
+            root.Add(footer);
 
             void LocalUpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
@@ -744,6 +556,25 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 // Debug.Log("rebuild listView");
 
                 // UpdateAddRemoveButtons();
+            }
+
+            void RefreshSearchingStatus()
+            {
+                string searchText = searchField.value;
+                if (string.IsNullOrWhiteSpace(searchText))
+                {
+                    LocalUpdatePage(0, numberOfItemsPerPageField.value);
+                    return;
+                }
+
+                _asyncSearchItems.DebounceSearchTime = 0;
+                _asyncSearchItems.Started = false;
+                _asyncSearchItems.Finished = false;
+                _asyncSearchItems.FullSources.Clear();
+                _asyncSearchItems.SourceGenerator?.Dispose();
+                _asyncSearchItems.SourceGenerator = SearchCallbackWithCustom(property, searchText).GetEnumerator();
+                _asyncSearchItems.SearchText = searchText;
+                LocalUpdatePage(0, numberOfItemsPerPageField.value);
             }
 
             int arraySize = property.arraySize;
@@ -894,7 +725,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
             {
-                // preContent.style.display = DisplayStyle.Flex;
                 // pagingContainer.style.visibility = Visibility.Visible;
 
                 _listView.RegisterCallback<AttachToPanelEvent>(_ =>
@@ -906,20 +736,108 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 });
             }
 
-            pagingContainer.Add(numberOfItemsPerPageField);
-            pagingContainer.Add(numberOfItemsSep);
-            if(listDrawerSettingsAttribute.NumberOfItemsPerPage > 0)
+            #endregion
+
+            #region Menu
+
+            root.MenuButton.clicked += () =>
             {
-                pagingContainer.Add(numberOfItemsTotalField);
-            }
-            pagingContainer.Add(numberOfItemsDesc);
+                GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
+                bool curPaging = pager.style.display != DisplayStyle.None;
+                genericDropdownMenu.AddItem("Paging", curPaging, () =>
+                {
+                    if (curPaging)
+                    {
+                        pager.style.display = DisplayStyle.None;
+                        numberOfItemsPerPageField.value = -1;
+                    }
+                    else
+                    {
+                        int configuredItemsPerPage = listDrawerSettingsAttribute.NumberOfItemsPerPage;
+                        int itemsPerPage = configuredItemsPerPage > 0
+                            ? configuredItemsPerPage
+                            : Mathf.Max(5, property.arraySize / 2);
+                        pager.style.display = DisplayStyle.Flex;
+                        numberOfItemsPerPageField.value = itemsPerPage;
+                    }
+                });
 
-            pagingContainer.Add(pagePreButton);
-            pagingContainer.Add(pageField);
-            pagingContainer.Add(pageLabel);
-            pagingContainer.Add(pageNextButton);
+                bool curSearch = searchField.style.display != DisplayStyle.None;
+                genericDropdownMenu.AddItem("Search", curSearch, () =>
+                {
+                    searchField.style.display = curSearch ? DisplayStyle.None : DisplayStyle.Flex;
+                    if (curSearch)
+                    {
+                        searchField.SetValueWithoutNotify("");
+                    }
+                    RefreshSearchingStatus();
+                });
+                // default search
+                if(curSearch)
+                {
+                    // when has extra search, we can toggle off default search
+                    if (extraSearchMethod.methodInfo != null)
+                    {
+                        genericDropdownMenu.AddItem("Default Search", defaultSearch,
+                            () =>
+                            {
+                                defaultSearch = !defaultSearch;
+                                RefreshSearchingStatus();
+                            });
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Default Search", defaultSearch);
+                    }
+                }
+                else
+                {
+                    genericDropdownMenu.AddDisabledItem("Default Search", defaultSearch);
+                }
 
-            preContent.Add(pagingContainer);
+                // Object Search
+                if(curSearch)
+                {
+                    genericDropdownMenu.AddItem("Object Search", objectNestedSearch,
+                        () =>
+                        {
+                            objectNestedSearch = !objectNestedSearch;
+                            RefreshSearchingStatus();
+                        });
+                }
+                else
+                {
+                    genericDropdownMenu.AddDisabledItem("Object Search", objectNestedSearch);
+                }
+
+                if (extraSearchMethod.methodInfo != null)
+                {
+                    if(curSearch)
+                    {
+                        genericDropdownMenu.AddItem("Extra Search", extraSearch, () =>
+                        {
+                            extraSearch = !extraSearch;
+                            RefreshSearchingStatus();
+                        });
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Extra Search", extraSearch);
+                    }
+                }
+
+                Rect menuBound = root.MenuButton.worldBound;
+#if !UNITY_6000_3_OR_NEWER
+                menuBound.xMin = menuBound.xMax - Mathf.Max(menuBound.width, 120f);
+#endif
+                genericDropdownMenu.DropDown(menuBound, root.MenuButton,
+#if UNITY_6000_3_OR_NEWER
+                    DropdownMenuSizeMode.Auto
+#else
+                    true
+#endif
+                );
+            };
 
             #endregion
 
@@ -1036,8 +954,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     }
                 }
             });
-
-            // foldoutContent.Insert(0, preContent);
 
             _listView.schedule.Execute(() =>
             {

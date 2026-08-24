@@ -33,7 +33,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             return RuntimeUtil.SimpleSearch(searchName, tokens);
         }
 
-        [ListDrawerSettings(extraSearch: nameof(ExtraSearch))]
+        [ListDrawerSettings(numberOfItemsPerPage: 2, extraSearch: nameof(ExtraSearch)), FieldDefaultExpand]
         public Weapon[] weapons;
     }
 }
