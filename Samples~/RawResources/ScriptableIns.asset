@@ -56,7 +56,7 @@ MonoBehaviour:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   publicValue: 45
-  noLabel: 
+  noLabel: FindMe
   myStruct:
     structContent: 0
   myStructs:

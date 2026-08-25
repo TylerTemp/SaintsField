@@ -8,8 +8,20 @@ using UnityEngine;
 // ReSharper disable once CheckNamespace
 namespace SaintsField
 {
+#if UNITY_EDITOR
+    public interface ISaintsDictionaryEditorTool
+    {
+        public IReadOnlyList<ISaintsWrapEditorTool> EditorSaintsKeys();
+        public IReadOnlyList<ISaintsWrapEditorTool> EditorSaintsValues();
+    }
+#endif
+
     [Serializable]
     public class SaintsDictionary<TKey, TValue>: IDictionary, IDictionary<TKey, TValue>, ISerializationCallbackReceiver
+#if UNITY_EDITOR
+        , ISaintsDictionaryEditorTool
+#endif
+
     {
         // [SerializeField]
         // ReSharper disable once InconsistentNaming
@@ -590,5 +602,17 @@ namespace SaintsField
         public static implicit operator SaintsDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict) => new SaintsDictionary<TKey, TValue>(dict);
 
         #endregion
+
+#if UNITY_EDITOR
+        public IReadOnlyList<ISaintsWrapEditorTool> EditorSaintsKeys()
+        {
+            return _saintsKeys;
+        }
+
+        public IReadOnlyList<ISaintsWrapEditorTool> EditorSaintsValues()
+        {
+            return _saintsValues;
+        }
+#endif
     }
 }

@@ -9,10 +9,17 @@ using System;
 // ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
 {
+#if UNITY_EDITOR
+    public interface ISaintsWrapEditorTool
+    {
+        public object EditorGetValue();
+    }
+#endif
+
     [Serializable]
     public class SaintsWrap<T>
 #if UNITY_EDITOR
-        : ISerializationCallbackReceiver
+        : ISerializationCallbackReceiver, ISaintsWrapEditorTool
 #endif
     {
         [SerializeField] public T value;
@@ -295,6 +302,13 @@ namespace SaintsField.Utils
             return _runtimeResult;
 
         }
+
+#if UNITY_EDITOR
+        public object EditorGetValue()
+        {
+            return GetValue();
+        }
+#endif
 
         public SaintsWrap(WrapType wrapType, T v)
         {

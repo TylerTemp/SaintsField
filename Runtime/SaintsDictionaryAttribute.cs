@@ -13,16 +13,18 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "";
 
-        public readonly string KeyLabel;
-        public readonly string ValueLabel;
+        // ReSharper disable FieldCanBeMadeReadOnly.Global
+        public string KeyLabel;
+        public string ValueLabel;
 
-        public readonly int NumberOfItemsPerPage;
-        public readonly bool Searchable;
-        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public int NumberOfItemsPerPage;
+        public bool Searchable;
         public bool ObjectSearch;
+        public string ExtraSearch;
 
-        public readonly ResponsiveLength KeyWidth;
-        public readonly ResponsiveLength ValueWidth;
+        public ResponsiveLength KeyWidth;
+        public ResponsiveLength ValueWidth;
+        // ReSharper enable FieldCanBeMadeReadOnly.Global
 
         public SaintsDictionaryAttribute(
             string keyLabel = "Keys",
@@ -31,13 +33,15 @@ namespace SaintsField
             int numberOfItemsPerPage = 0,
             bool objectSearch = true,
             string keyWidth = null,
-            string valueWidth = null)
+            string valueWidth = null,
+            string extraSearch = null)
         {
             KeyLabel = keyLabel;
             ValueLabel = valueLabel;
             NumberOfItemsPerPage = numberOfItemsPerPage;
             Searchable = searchable;
             ObjectSearch = objectSearch;
+            ExtraSearch = RuntimeUtil.ParseCallback(extraSearch).content;
 
             KeyWidth = RuntimeUtil.ParseResponsiveLength(keyWidth);
             ValueWidth = RuntimeUtil.ParseResponsiveLength(valueWidth);

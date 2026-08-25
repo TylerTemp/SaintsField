@@ -1964,7 +1964,6 @@ Parameters:
 *   `bool searchable = false`: allow search in the list/array
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
 *   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
-*   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
 
 Note about input:
 
@@ -2000,7 +1999,7 @@ In UI Toolkit you can also see the async searching which does not block the edit
 
 **Custom Search**
 
-`extraSearch` & `overrideSearch` uses the following signiture:
+`extraSearch` uses the following signiture:
 
 *   `bool CustomSearch(T item, int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
 *   `bool CustomSearch(T item, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
@@ -8530,6 +8529,7 @@ However, adding `SaintsDictionary` attribute can change it's default behavior an
 *   `bool objectSearch = true`: should it search inside a `ScriptableObject` target? Useful if you have a gaint `ScriptableObject` (like `Timeline`) but you only want to search the name
 *   `string keyWidth = null`: key column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
 *   `string valueWidth = null`: value column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
+*   `string extraSearch = null`: allow an custom callback search which can search alone, or search with default search functions
 
 ```csharp
 using SaintsField;
@@ -8568,6 +8568,25 @@ using SaintsField;
 ```
 
 ![](https://github.com/user-attachments/assets/8ef121c0-9762-49ad-915b-cf83e1ef79f9)
+
+You can use a custom search. This is helpful if the target is a gaint `ScriptableObject` and you want the search to be limited to certain fields.
+
+```csharp
+[SaintsDictionary(extraSearch: nameof(DictSearch))]
+public SaintsDictionary<int, ScriptableObject> p;
+
+private bool DictSearch(KeyValuePair<int, ScriptableObject> pair, IReadOnlyList<ListSearchToken> keyTokens,
+    IReadOnlyList<ListSearchToken> valueTokens)
+{
+    bool keyFound = RuntimeUtil.SimpleSearch($"{pair.Key}", keyTokens);
+    bool valueFound = RuntimeUtil.SimpleSearch(pair.Value?.name ?? "", valueTokens)  // search name
+        || RuntimeUtil.SimpleSearch((pair.Value as Scriptable)?.noLabel ?? "", valueTokens);  // search `noLabel` field
+
+    return keyFound && valueFound;
+}
+```
+
+![custom search example](https://github.com/user-attachments/assets/bbc38fec-b801-41cb-835a-eea20420e55b)
 
 `[SaintsDictionary]` can work with `[ShowInInspector]`
 

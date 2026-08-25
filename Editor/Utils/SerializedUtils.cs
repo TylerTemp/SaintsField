@@ -509,24 +509,7 @@ namespace SaintsField.Editor.Utils
             for (int arrayElementIndex = 0; arrayElementIndex < property.arraySize; arrayElementIndex++)
             {
                 SerializedProperty childProperty = property.GetArrayElementAtIndex(arrayElementIndex);
-                bool all = true;
-                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
-                    .Select(_ => new HashSet<object>())
-                    .ToArray();
-                for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
-                {
-                    ListSearchToken search = searchTokens[tokenIndex];
-                    HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
-                    Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
-#endif
-                    if (!SearchProp(childProperty, search.Token, objectNestSearch, searchedObjects))
-                    {
-                        all = false;
-                        break;
-                    }
-                }
-
+                bool all = SearchArrayPropertyItem(childProperty, searchTokens, objectNestSearch);
                 if (all)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
@@ -539,6 +522,29 @@ namespace SaintsField.Editor.Utils
                     yield return -1;
                 }
             }
+        }
+
+        public static bool SearchArrayPropertyItem(SerializedProperty childProperty, IReadOnlyList<ListSearchToken> searchTokens, bool objectNestSearch)
+        {
+            bool all = true;
+            HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                .Select(_ => new HashSet<object>())
+                .ToArray();
+            for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+            {
+                ListSearchToken search = searchTokens[tokenIndex];
+                HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                    Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
+#endif
+                if (!SearchProp(childProperty, search.Token, objectNestSearch, searchedObjects))
+                {
+                    all = false;
+                    break;
+                }
+            }
+
+            return all;
         }
 
         public static bool SearchProp(SerializedProperty property, string rawToken, bool objectNestSearch, HashSet<object> searchedObjects)

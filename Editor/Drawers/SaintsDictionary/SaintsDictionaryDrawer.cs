@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
@@ -96,7 +98,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             return (_keysPropName, _valuesPropName);
         }
 
-        private static IEnumerable<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch, bool objectSearch)
+        private static IEnumerable<int> Search(ISaintsDictionaryEditorTool dictionaryTool, SerializedProperty keysProp, SerializedProperty valuesProp,
+            Type keyType, Type valueType,
+            string keySearch, string valueSearch, bool defaultSearch, bool objectSearch, object parent, MethodInfo extraSearchMethod)
         {
             int size = keysProp.arraySize;
 
@@ -113,52 +117,80 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 yield break;
             }
 
+            IReadOnlyList<ListSearchToken> valueSearchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
+            Type pairType = typeof(KeyValuePair<,>).MakeGenericType(keyType, valueType);
+
             if (keySearchEmpty)
             {
-                foreach (int index in SerializedUtils.SearchArrayProperty(valuesProp, valueSearch, objectSearch))
+                for (int index = 0; index < dictionaryTool.EditorSaintsKeys().Count; index++)
                 {
-                    yield return index;
+                    bool matched = false;
+                    if (defaultSearch)
+                    {
+                        matched = SerializedUtils.SearchArrayPropertyItem(valuesProp.GetArrayElementAtIndex(index),
+                            valueSearchTokens, objectSearch);
+                    }
+
+                    if (!matched && extraSearchMethod != null)
+                    {
+                        matched = SearchExtra(
+                            dictionaryTool,
+                            index,
+                            Array.Empty<ListSearchToken>(),
+                            valueSearchTokens,
+                            pairType,
+                            parent,
+                            extraSearchMethod);
+                    }
+                    yield return matched? index: -1;
                 }
 
                 yield break;
             }
 
-            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
-            foreach (int index in SerializedUtils.SearchArrayProperty(keysProp, keySearch, objectSearch))
-            {
-                if (index == -1)
-                {
-                    yield return -1;
-                }
-                else
-                {
-                    SerializedProperty valueProp = valuesProp.GetArrayElementAtIndex(index);
-                    HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
-                        .Select(_ => new HashSet<object>())
-                        .ToArray();
-                    bool all = true;
-                    for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
-                    {
-                        ListSearchToken search = searchTokens[tokenIndex];
-                        HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
-                        // ReSharper disable once InvertIf
-                        if (!SerializedUtils.SearchProp(valueProp, search.Token, objectSearch, searchedObjects))
-                        {
-                            all = false;
-                            break;
-                        }
-                    }
+            IReadOnlyList<ListSearchToken> keySearchTokens = SerializedUtils.ParseSearch(keySearch).ToArray();
 
-                    if (all)
-                    {
-                        yield return index;
-                    }
-                    else
-                    {
-                        yield return -1;
-                    }
+            for (int index = 0; index < dictionaryTool.EditorSaintsKeys().Count; index++)
+            {
+                bool matched = false;
+                if (defaultSearch)
+                {
+                    bool keyMatched = SerializedUtils.SearchArrayPropertyItem(keysProp.GetArrayElementAtIndex(index),
+                        keySearchTokens, objectSearch);
+                    bool bothMatched = keyMatched && SerializedUtils.SearchArrayPropertyItem(valuesProp.GetArrayElementAtIndex(index),
+                            valueSearchTokens, objectSearch);
+
+                    matched = bothMatched;
                 }
+
+                if (!matched && extraSearchMethod != null)
+                {
+                    matched = SearchExtra(
+                        dictionaryTool,
+                        index,
+                        Array.Empty<ListSearchToken>(),
+                        valueSearchTokens,
+                        pairType,
+                        parent,
+                        extraSearchMethod);
+                }
+
+                yield return matched? index: -1;
             }
+        }
+
+        private static bool SearchExtra(
+            ISaintsDictionaryEditorTool dictionaryTool, int index,
+            IReadOnlyList<ListSearchToken> keySearchTokens, IReadOnlyList<ListSearchToken> valueSearchTokens,
+            Type pairType,
+            object parent,
+            MethodInfo extraSearchMethod)
+        {
+            ISaintsWrapEditorTool key = dictionaryTool.EditorSaintsKeys()[index];
+            ISaintsWrapEditorTool value = dictionaryTool.EditorSaintsValues()[index];
+            object pair = Activator.CreateInstance(pairType, key.EditorGetValue(), value.EditorGetValue());
+            object methodReturn = extraSearchMethod.Invoke(parent, new[]{pair, keySearchTokens, valueSearchTokens});
+            return (bool)methodReturn;
         }
 
         private static string GetKeyLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null
@@ -186,6 +218,58 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             return accProp;
+        }
+
+        private static MethodInfo GetSearchMethodInfo(string methodName, Type targetType, Type keyType, Type valueType)
+        {
+            Type pairType = typeof(KeyValuePair<,>).MakeGenericType(keyType, valueType);
+
+            Type tokenListType = typeof(IEnumerable<ListSearchToken>);
+
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(targetType))
+            {
+                foreach (MethodInfo methodInfo in eachType.GetMethods(ReflectUtils.FindTargetBindAttr))
+                {
+                    if (methodInfo.Name != methodName)
+                    {
+                        continue;
+                    }
+
+                    if (methodInfo.ReturnParameter?.ParameterType != typeof(bool))
+                    {
+                        continue;
+                    }
+
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    if(methodParams.Length != 3)
+                    {
+                        continue;
+                    }
+
+                    bool tokenMatch = true;
+                    foreach (ParameterInfo parameterInfo in new[]{methodParams[1], methodParams[2]})
+                    {
+                        if (!tokenListType.IsAssignableFrom(parameterInfo.ParameterType))
+                        {
+                            tokenMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (!tokenMatch)
+                    {
+                        continue;
+                    }
+
+                    if (pairType.IsAssignableFrom(methodParams[0].ParameterType))
+                    {
+                        return methodInfo;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

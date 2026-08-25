@@ -35,6 +35,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             public ToolbarSearchField KeySearchField;
             public ToolbarSearchField ValueSearchField;
             public bool ObjectNestedSearch;
+            public bool DefaultSearch;
+            public bool ExtraSearch;
+            public Type PairType;
+            public object ExtraSearchTarget;
+            public MethodInfo ExtraSearchMethod;
             public List<object> itemIndexToKeys;
 
             public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
@@ -313,6 +318,19 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SaintsDictionaryAttribute saintsDictionaryAttribute = allAttributes.OfType<SaintsDictionaryAttribute>().FirstOrDefault()
                                                                   ?? new SaintsDictionaryAttribute(searchable: false, numberOfItemsPerPage: 0);
 
+            object extraSearchTarget = targets.FirstOrDefault(each => each != null);
+            string extraSearchCallback = saintsDictionaryAttribute.ExtraSearch;
+            MethodInfo extraSearchMethod = null;
+            if (!string.IsNullOrEmpty(extraSearchCallback) && extraSearchTarget != null)
+            {
+                extraSearchMethod = GetSearchMethodInfo(extraSearchCallback, extraSearchTarget.GetType(), dictKeyType,
+                    dictValueType);
+            }
+            Debug.Assert(string.IsNullOrEmpty(extraSearchCallback) || extraSearchTarget != null,
+                $"extraSearchTarget not found for `{extraSearchCallback}`");
+            Debug.Assert(string.IsNullOrEmpty(extraSearchCallback) || extraSearchMethod != null,
+                $"extraSearchMethod `{extraSearchCallback}` not found with KeyValuePair<{dictKeyType}, {dictValueType}>, IReadOnlyList<ListSearchToken> keyTokens, IReadOnlyList<ListSearchToken> valueTokens");
+
             int initNumberOfItemsPerPage = saintsDictionaryAttribute.NumberOfItemsPerPage;
             List<object> initKeys = ((IEnumerable)keysProperty.GetValue(rawDictValue)).Cast<object>().ToList();
             int initCount = initKeys.Count;
@@ -336,6 +354,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 itemIndexToKeys = initKeys,
                 ObjectNestedSearch = saintsDictionaryAttribute.ObjectSearch,
+                DefaultSearch = true,
+                ExtraSearch = extraSearchMethod != null,
+                PairType = typeof(KeyValuePair<,>).MakeGenericType(dictKeyType, dictValueType),
+                ExtraSearchTarget = extraSearchTarget,
+                ExtraSearchMethod = extraSearchMethod,
             };
 
             dictField = new SaintsDictionaryWrapper(label, new MultiColumnListView
@@ -693,6 +716,39 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             #endregion
 
+            void RefreshSearchingStatus()
+            {
+                if (string.IsNullOrEmpty(payload.AsyncSearchItems.KeySearchText) &&
+                    string.IsNullOrEmpty(payload.AsyncSearchItems.ValueSearchText))
+                {
+                    return;
+                }
+
+                payload.AsyncSearchItems.DebounceSearchTime = 0;
+                payload.AsyncSearchItems.Started = false;
+                payload.AsyncSearchItems.Finished = false;
+                payload.AsyncSearchItems.HitTargetIndexes.Clear();
+                payload.AsyncSearchItems.SourceGenerator?.Dispose();
+                payload.AsyncSearchItems.SourceGenerator = SearchPayload(payload);
+                RefreshFieldWithPayload(dictField, payload);
+            }
+
+            void SetSearchDisplay(bool enabled)
+            {
+                if (enabled && !payload.DefaultSearch && !payload.ExtraSearch)
+                {
+                    payload.DefaultSearch = true;
+                }
+
+                DisplayStyle display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+                payload.KeySearchRoot.style.display = payload.ValueSearchRoot.style.display = display;
+                if (!enabled)
+                {
+                    payload.KeySearchField.value = "";
+                    payload.ValueSearchField.value = "";
+                }
+            }
+
             #region Menu
 
             dictField.Foldout.MenuButton.clicked += () =>
@@ -736,36 +792,70 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     bool curSearch = payload.KeySearchRoot.style.display != DisplayStyle.None;
                     genericDropdownMenu.AddItem("Search", curSearch, () =>
                     {
-                        DisplayStyle toDisplay = curSearch ? DisplayStyle.None : DisplayStyle.Flex;
-                        payload.KeySearchRoot.style.display = payload.ValueSearchRoot.style.display = toDisplay;
-                        if (curSearch)
-                        {
-                            payload.KeySearchField.value = "";
-                            payload.ValueSearchField.value = "";
-                        }
+                        SetSearchDisplay(!curSearch);
                     });
 
                     if (curSearch)
                     {
+                        if (payload.ExtraSearchMethod != null)
+                        {
+                            genericDropdownMenu.AddItem("Default Search", payload.DefaultSearch, () =>
+                            {
+                                payload.DefaultSearch = !payload.DefaultSearch;
+                                if (!payload.DefaultSearch && !payload.ExtraSearch)
+                                {
+                                    SetSearchDisplay(false);
+                                }
+                                else
+                                {
+                                    RefreshSearchingStatus();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            genericDropdownMenu.AddDisabledItem("Default Search", payload.DefaultSearch);
+                        }
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Default Search", payload.DefaultSearch);
+                    }
+
+                    if (curSearch && payload.DefaultSearch)
+                    {
                         genericDropdownMenu.AddItem("Object Search", payload.ObjectNestedSearch, () =>
                         {
                             payload.ObjectNestedSearch = !payload.ObjectNestedSearch;
-                            if (!string.IsNullOrEmpty(payload.AsyncSearchItems.KeySearchText) ||
-                                !string.IsNullOrEmpty(payload.AsyncSearchItems.ValueSearchText))
-                            {
-                                payload.AsyncSearchItems.DebounceSearchTime = 0;
-                                payload.AsyncSearchItems.Started = false;
-                                payload.AsyncSearchItems.Finished = false;
-                                payload.AsyncSearchItems.HitTargetIndexes.Clear();
-                                payload.AsyncSearchItems.SourceGenerator?.Dispose();
-                                payload.AsyncSearchItems.SourceGenerator = SearchPayload(payload);
-                                RefreshFieldWithPayload(dictField, payload);
-                            }
+                            RefreshSearchingStatus();
                         });
                     }
                     else
                     {
                         genericDropdownMenu.AddDisabledItem("Object Search", payload.ObjectNestedSearch);
+                    }
+
+                    if (payload.ExtraSearchMethod != null)
+                    {
+                        if (curSearch)
+                        {
+                            genericDropdownMenu.AddItem("Extra Search", payload.ExtraSearch, () =>
+                            {
+                                payload.ExtraSearch = !payload.ExtraSearch;
+                                if (!payload.DefaultSearch && !payload.ExtraSearch)
+                                {
+                                    SetSearchDisplay(false);
+                                }
+                                else
+                                {
+                                    RefreshSearchingStatus();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            genericDropdownMenu.AddDisabledItem("Extra Search", payload.ExtraSearch);
+                        }
                     }
                 }
                 else
@@ -1034,45 +1124,30 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             IReadOnlyList<ListSearchToken> valueSearchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
+            IReadOnlyList<ListSearchToken> keySearchTokens = SerializedUtils.ParseSearch(keySearch).ToArray();
 
-            if (keySearchEmpty)
+            foreach (object key in keys)
             {
-                foreach (object key in keys)
+                object value = payload.GetValue(key);
+                bool matched = false;
+                if (payload.DefaultSearch)
                 {
-                    object value = payload.GetValue(key);
-                    if (Util.SearchObjectWithTokens(value, valueSearchTokens, payload.ObjectNestedSearch))
-                    {
-                        yield return key;
-                    }
-                    else
-                    {
-                        // Debug.Log($"value failed {value} -> {valueSearch}");
-                        yield return null;
-                    }
+                    bool keyMatched = keySearchEmpty ||
+                                      Util.SearchObjectWithTokens(key, keySearchTokens, payload.ObjectNestedSearch);
+                    bool valueMatched = valueSearchEmpty ||
+                                        Util.SearchObjectWithTokens(value, valueSearchTokens,
+                                            payload.ObjectNestedSearch);
+                    matched = keyMatched && valueMatched;
                 }
-                yield break;
-            }
 
+                if (!matched && payload.ExtraSearch && payload.ExtraSearchMethod != null)
+                {
+                    object pair = Activator.CreateInstance(payload.PairType, key, value);
+                    matched = (bool)payload.ExtraSearchMethod.Invoke(payload.ExtraSearchTarget,
+                        new object[] { pair, keySearchTokens, valueSearchTokens });
+                }
 
-            foreach (int index in Util.SearchArrayObjects(keys, keySearch, payload.ObjectNestedSearch))
-            {
-                if (index == -1)
-                {
-                    yield return null;
-                }
-                else
-                {
-                    object key = keys[index];
-                    object valueProp = payload.GetValue(key);
-                    if (Util.SearchObjectWithTokens(valueProp, valueSearchTokens, payload.ObjectNestedSearch))
-                    {
-                        yield return key;
-                    }
-                    else
-                    {
-                        yield return null;
-                    }
-                }
+                yield return matched ? key : null;
             }
         }
     }

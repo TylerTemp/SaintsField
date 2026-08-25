@@ -66,6 +66,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             public bool ConfigurationInitialized;
             public bool SearchEnabled;
             public bool ObjectSearch;
+            public bool DefaultSearch;
+            public bool ExtraSearch;
             public SaintsDictionaryTable Table;
             public DictionaryContextIMGUI Context;
             public string KeysPropPath;
@@ -597,26 +599,36 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             bool searchEnabled = cache.SearchEnabled;
             menu.AddItem(new GUIContent("Search"), searchEnabled, () =>
             {
-                cache.SearchEnabled = !searchEnabled;
-                if (searchEnabled)
-                {
-                    RestartSearch(cache, context.KeysProp, context.ValuesProp, "", "", true);
-                }
-                RefreshView(cache);
+                SetSearchEnabled(cache, context, !searchEnabled);
             });
 
-            if (searchEnabled)
+            bool hasExtraSearch = GetExtraSearchMethod(context, context.Parent) != null;
+            if (searchEnabled && hasExtraSearch)
+            {
+                menu.AddItem(new GUIContent("Default Search"), cache.DefaultSearch, () =>
+                {
+                    cache.DefaultSearch = !cache.DefaultSearch;
+                    if (!cache.DefaultSearch && !cache.ExtraSearch)
+                    {
+                        SetSearchEnabled(cache, context, false);
+                    }
+                    else
+                    {
+                        RefreshSearchingStatus(cache, context);
+                    }
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Default Search"), cache.DefaultSearch);
+            }
+
+            if (searchEnabled && cache.DefaultSearch)
             {
                 menu.AddItem(new GUIContent("Object Search"), cache.ObjectSearch, () =>
                 {
                     cache.ObjectSearch = !cache.ObjectSearch;
-                    if (!string.IsNullOrEmpty(searchItems.KeySearchText)
-                        || !string.IsNullOrEmpty(searchItems.ValueSearchText))
-                    {
-                        RestartSearch(cache, context.KeysProp, context.ValuesProp,
-                            searchItems.KeySearchText, searchItems.ValueSearchText, false);
-                    }
-                    RefreshView(cache);
+                    RefreshSearchingStatus(cache, context);
                 });
             }
             else
@@ -624,7 +636,57 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 menu.AddDisabledItem(new GUIContent("Object Search"), cache.ObjectSearch);
             }
 
+            if (hasExtraSearch)
+            {
+                if (searchEnabled)
+                {
+                    menu.AddItem(new GUIContent("Extra Search"), cache.ExtraSearch, () =>
+                    {
+                        cache.ExtraSearch = !cache.ExtraSearch;
+                        if (!cache.DefaultSearch && !cache.ExtraSearch)
+                        {
+                            SetSearchEnabled(cache, context, false);
+                        }
+                        else
+                        {
+                            RefreshSearchingStatus(cache, context);
+                        }
+                    });
+                }
+                else
+                {
+                    menu.AddDisabledItem(new GUIContent("Extra Search"), cache.ExtraSearch);
+                }
+            }
+
             menu.DropDown(rect);
+        }
+
+        private static void SetSearchEnabled(InfoIMGUI cache, DictionaryContextIMGUI context, bool enabled)
+        {
+            if (enabled && !cache.DefaultSearch && !cache.ExtraSearch)
+            {
+                cache.DefaultSearch = true;
+            }
+
+            cache.SearchEnabled = enabled;
+            if (!enabled)
+            {
+                RestartSearch(cache, context.KeysProp, context.ValuesProp, "", "", true);
+            }
+            RefreshView(cache);
+        }
+
+        private static void RefreshSearchingStatus(InfoIMGUI cache, DictionaryContextIMGUI context)
+        {
+            AsyncSearchItemsIMGUI searchItems = cache.AsyncSearchItems;
+            if (!string.IsNullOrEmpty(searchItems.KeySearchText)
+                || !string.IsNullOrEmpty(searchItems.ValueSearchText))
+            {
+                RestartSearch(cache, context.KeysProp, context.ValuesProp,
+                    searchItems.KeySearchText, searchItems.ValueSearchText, false);
+            }
+            RefreshView(cache);
         }
 
         private static void RefreshView(InfoIMGUI cache)
@@ -1109,6 +1171,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 cache.ConfigurationInitialized = true;
                 cache.SearchEnabled = attribute?.Searchable ?? true;
                 cache.ObjectSearch = attribute?.ObjectSearch ?? true;
+                cache.DefaultSearch = true;
+                cache.ExtraSearch = GetExtraSearchMethod(cache.Context, cache.Context.Parent) != null;
                 asyncSearchItems.NumberOfItemsPerPage = attribute?.NumberOfItemsPerPage ?? -1;
                 SetFullResults(asyncSearchItems, keysProp.arraySize);
                 return;
@@ -1154,9 +1218,45 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             asyncSearchItems.Started = false;
             asyncSearchItems.Finished = false;
             asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTimeIMGUI;
-            asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, safeKeySearch, safeValueSearch,
-                cache.ObjectSearch).GetEnumerator();
+
+            DictionaryContextIMGUI context = cache.Context;
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(context.RootProperty).parent;
+            object fieldValue = context.Info.GetValue(parent);
+            int arrayIndex = SerializedUtils.PropertyPathIndex(context.RootProperty.propertyPath);
+            if (arrayIndex != -1)
+            {
+                fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+            }
+
+            Type keyType = context.KeyCellContext.RawType;
+            Type valueType = context.ValueCellContext.RawType;
+            MethodInfo extraSearchMethod = cache.ExtraSearch ? GetExtraSearchMethod(context, parent) : null;
+            asyncSearchItems.SourceGenerator = Search(
+                (ISaintsDictionaryEditorTool)fieldValue,
+                keysProp,
+                valuesProp,
+                keyType,
+                valueType,
+                safeKeySearch,
+                safeValueSearch,
+                cache.DefaultSearch,
+                cache.ObjectSearch,
+                parent,
+                extraSearchMethod
+            ).GetEnumerator();
             UpdateVisibleIndexes(asyncSearchItems);
+        }
+
+        private static MethodInfo GetExtraSearchMethod(DictionaryContextIMGUI context, object parent)
+        {
+            string extraSearchCallback = context.Attribute?.ExtraSearch;
+            if (string.IsNullOrEmpty(extraSearchCallback) || parent == null)
+            {
+                return null;
+            }
+
+            return GetSearchMethodInfo(extraSearchCallback, parent.GetType(), context.KeyCellContext.RawType,
+                context.ValueCellContext.RawType);
         }
 
         private static void SetFullResults(AsyncSearchItemsIMGUI asyncSearchItems, int size)

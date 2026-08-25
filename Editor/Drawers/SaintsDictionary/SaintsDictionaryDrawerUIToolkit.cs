@@ -1,4 +1,4 @@
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
+#if UNITY_2022_2_OR_NEWER
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -248,11 +248,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private AsyncSearchItems<int> _asyncSearchItems;
 
         private const float DebounceTime = 0.6f;
-        private bool _objectNestedSearch = true;
+        // private bool _objectNestedSearch = true;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            bool objectNestedSearch = true;
+            bool defaultSearch = true;
+
             CollectionFoldout foldout = container.Q<CollectionFoldout>(name: NameFoldout(property));
             ListViewPagerElement pager = container.Q<ListViewPagerElement>(name: NamePager(property));
 
@@ -266,6 +269,21 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
             // Debug.Log(info.FieldType);
             (string propKeysNameCompact, string propValuesNameCompact) = GetKeysValuesPropName(rawType);
+            Type rawKeyType = null;
+            Type rawValueType = null;
+            foreach (Type thisType in RectUtils.GetGenBaseTypes(rawType))
+            {
+                if (thisType.IsGenericType && thisType.GetGenericTypeDefinition() == typeof(SaintsDictionary<,>))
+                {
+                    Type[] genericArguments = thisType.GetGenericArguments();
+                    // Debug.Log($"from {thisType.Name} get types: {string.Join(",", genericArguments.Select(each => each.Name))}");
+                    // Debug.Log();
+                    rawKeyType = genericArguments[0];
+                    rawValueType = genericArguments[1];
+                }
+            }
+            Debug.Assert(rawKeyType != null);
+            Debug.Assert(rawValueType != null);
 
             // Debug.Log(propKeysName);
 
@@ -348,6 +366,22 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, valueHasSerializeReference);
             // Debug.Log($"decide valueWrapType={valueWrapType} for {valuesField.Name}/{valueType}");
 
+            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
+
+            string extraSearchCallback = saintsDictionaryAttribute?.ExtraSearch;
+            MethodInfo extraSearchMethod = null;
+            if (!string.IsNullOrEmpty(extraSearchCallback))
+            {
+                extraSearchMethod = GetSearchMethodInfo(
+                        extraSearchCallback,
+                        parent.GetType(),
+                        rawKeyType,
+                        rawValueType
+                );
+                Debug.Assert(extraSearchMethod != null, $"extraSearchMethod `{extraSearchCallback}` not found in {parent.GetType()} with KeyValuePair<{keyType}, {valueType}>, IReadOnlyList<ListSearchToken> keyTokens, IReadOnlyList<ListSearchToken> valueTokens");
+            }
+            bool extraSearch = extraSearchMethod != null;
+
             IntegerField totalCountFieldTop = foldout.ArraySizeField;
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
 
@@ -399,10 +433,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             #region Paging & Search
 
-            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
             if (saintsDictionaryAttribute != null)
             {
-                _objectNestedSearch = saintsDictionaryAttribute.ObjectSearch;
+                objectNestedSearch = saintsDictionaryAttribute.ObjectSearch;
             }
 
             int initNumberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
@@ -449,8 +482,27 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     _asyncSearchItems.Finished = false;
                     _asyncSearchItems.HitTargetIndexes.Clear();
                     _asyncSearchItems.SourceGenerator?.Dispose();
-                    _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp,
-                        _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText, _objectNestedSearch).GetEnumerator();
+
+                    // always refresh this
+                    parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                    fieldValue = info.GetValue(parent);
+                    if (insideArray)
+                    {
+                        fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+                    }
+                    _asyncSearchItems.SourceGenerator = Search(
+                            (ISaintsDictionaryEditorTool) fieldValue,
+                            keysProp,
+                            valuesProp,
+                            rawKeyType,
+                            rawValueType,
+                            _asyncSearchItems.KeySearchText,
+                            _asyncSearchItems.ValueSearchText,
+                            defaultSearch,
+                            objectNestedSearch,
+                            parent,
+                            extraSearch? extraSearchMethod: null
+                        ).GetEnumerator();
 
                     // Debug.Log("size changed, tail call refresh list");
                     // ReSharper disable once TailRecursiveCall
@@ -622,7 +674,26 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         _asyncSearchItems.Started = false;
                         _asyncSearchItems.Finished = false;
                         _asyncSearchItems.HitTargetIndexes.Clear();
-                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText, _objectNestedSearch).GetEnumerator();
+                        // always refresh this
+                        parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        fieldValue = info.GetValue(parent);
+                        if (insideArray)
+                        {
+                            fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+                        }
+                        _asyncSearchItems.SourceGenerator = Search(
+                            (ISaintsDictionaryEditorTool) fieldValue,
+                            keysProp,
+                            valuesProp,
+                            rawKeyType,
+                            rawValueType,
+                            _asyncSearchItems.KeySearchText,
+                            _asyncSearchItems.ValueSearchText,
+                            defaultSearch,
+                            objectNestedSearch,
+                            parent,
+                            extraSearch? extraSearchMethod: null
+                        ).GetEnumerator();
                         _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
                         RefreshList();
                     });
@@ -770,7 +841,26 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         _asyncSearchItems.Started = false;
                         _asyncSearchItems.Finished = false;
                         _asyncSearchItems.HitTargetIndexes.Clear();
-                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText, _objectNestedSearch).GetEnumerator();
+                        // always refresh this
+                        parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                        fieldValue = info.GetValue(parent);
+                        if (insideArray)
+                        {
+                            fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+                        }
+                        _asyncSearchItems.SourceGenerator = Search(
+                            (ISaintsDictionaryEditorTool) fieldValue,
+                            keysProp,
+                            valuesProp,
+                            rawKeyType,
+                            rawValueType,
+                            _asyncSearchItems.KeySearchText,
+                            _asyncSearchItems.ValueSearchText,
+                            defaultSearch,
+                            objectNestedSearch,
+                            parent,
+                            extraSearch? extraSearchMethod: null
+                        ).GetEnumerator();
                         _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
                         RefreshList();
                     });
@@ -929,6 +1019,59 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 // multiColumnListView.Rebuild();
             };
 
+            void RefreshSearchingStatus()
+            {
+                if (string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) &&
+                    string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText))
+                {
+                    return;
+                }
+
+                _asyncSearchItems.DebounceSearchTime = 0;
+                _asyncSearchItems.Started = false;
+                _asyncSearchItems.Finished = false;
+                _asyncSearchItems.HitTargetIndexes.Clear();
+                _asyncSearchItems.SourceGenerator?.Dispose();
+
+                // always refresh this
+                parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                fieldValue = info.GetValue(parent);
+                if (insideArray)
+                {
+                    fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+                }
+                _asyncSearchItems.SourceGenerator = Search(
+                    (ISaintsDictionaryEditorTool) fieldValue,
+                    keysProp,
+                    valuesProp,
+                    rawKeyType,
+                    rawValueType,
+                    _asyncSearchItems.KeySearchText,
+                    _asyncSearchItems.ValueSearchText,
+                    defaultSearch,
+                    objectNestedSearch,
+                    parent,
+                    extraSearch? extraSearchMethod: null
+                ).GetEnumerator();
+                RefreshList();
+            }
+
+            void SetSearchDisplay(bool enabled)
+            {
+                if (enabled && !defaultSearch && !extraSearch)
+                {
+                    defaultSearch = true;
+                }
+
+                DisplayStyle display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+                keySearchField.style.display = valueSearchField.style.display = display;
+                if (!enabled)
+                {
+                    keySearchField.value = "";
+                    valueSearchField.value = "";
+                }
+            }
+
             #region Menu
 
             foldout.MenuButton.clicked += () =>
@@ -955,43 +1098,74 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                 if(keySearchField != null && valueSearchField != null)
                 {
-                    bool curOn = keySearchField.style.display != DisplayStyle.None;
+                    bool searchOn = keySearchField.style.display != DisplayStyle.None;
 
-                    genericDropdownMenu.AddItem("Search", curOn, () =>
+                    genericDropdownMenu.AddItem("Search", searchOn, () =>
                     {
-                        DisplayStyle toDisplay = curOn ? DisplayStyle.None : DisplayStyle.Flex;
-                        keySearchField.style.display = valueSearchField.style.display = toDisplay;
-                        // ReSharper disable once InvertIf
-                        if (curOn)
-                        {
-                            keySearchField.value = "";
-                            valueSearchField.value = "";
-                        }
+                        SetSearchDisplay(!searchOn);
                     });
 
-                    if(curOn)
+                    if (searchOn)
                     {
-                        genericDropdownMenu.AddItem("Object Search", _objectNestedSearch, () =>
+                        if (extraSearchMethod != null)
                         {
-                            _objectNestedSearch = !_objectNestedSearch;
-                            if (!string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) ||
-                                !string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText))
+                            genericDropdownMenu.AddItem("Default Search", defaultSearch, () =>
                             {
-                                _asyncSearchItems.DebounceSearchTime = 0;
-                                _asyncSearchItems.Started = false;
-                                _asyncSearchItems.Finished = false;
-                                _asyncSearchItems.HitTargetIndexes.Clear();
-                                _asyncSearchItems.SourceGenerator?.Dispose();
-                                _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp,
-                                    _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText,
-                                    _objectNestedSearch).GetEnumerator();
-                                RefreshList();
-                            }
+                                defaultSearch = !defaultSearch;
+                                if (!defaultSearch && !extraSearch)
+                                {
+                                    SetSearchDisplay(false);
+                                }
+                                else
+                                {
+                                    RefreshSearchingStatus();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            genericDropdownMenu.AddDisabledItem("Default Search", defaultSearch);
+                        }
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Default Search", defaultSearch);
+                    }
+
+                    if(searchOn && defaultSearch)
+                    {
+                        genericDropdownMenu.AddItem("Object Search", objectNestedSearch, () =>
+                        {
+                            objectNestedSearch = !objectNestedSearch;
+                            RefreshSearchingStatus();
                         });
                     }
                     else
                     {
-                        genericDropdownMenu.AddDisabledItem("Object Search", _objectNestedSearch);
+                        genericDropdownMenu.AddDisabledItem("Object Search", objectNestedSearch);
+                    }
+
+                    if (extraSearchMethod != null)
+                    {
+                        if (searchOn)
+                        {
+                            genericDropdownMenu.AddItem("Extra Search", extraSearch, () =>
+                            {
+                                extraSearch = !extraSearch;
+                                if (!defaultSearch && !extraSearch)
+                                {
+                                    SetSearchDisplay(false);
+                                }
+                                else
+                                {
+                                    RefreshSearchingStatus();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            genericDropdownMenu.AddDisabledItem("Extra Search", extraSearch);
+                        }
                     }
                 }
                 else
@@ -1179,102 +1353,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 default:
                     throw new ArgumentOutOfRangeException(nameof(responsiveLength.Type), responsiveLength.Type, null);
             }
-        }
-    }
-}
-#elif UNITY_2021_3_OR_NEWER || SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-using System.Collections.Generic;
-using System.Reflection;
-using SaintsField.Editor.Utils;
-using SaintsField.Interfaces;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
-
-namespace SaintsField.Editor.Drawers.SaintsDictionary
-{
-    public partial class SaintsDictionaryDrawer
-    {
-        protected override bool UseCreateFieldUIToolKit => true;
-
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, FieldInfo info, object parent)
-        {
-            // Action<object> onValueChangedCallback = null;
-            // onValueChangedCallback = value =>
-            // {
-            //     object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            //     if (newFetchParent == null)
-            //     {
-            //         Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
-            //         return;
-            //     }
-            //
-            //     foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
-            //     {
-            //         saintsPropertyInfo.Drawer.OnValueChanged(
-            //             property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
-            //             info, newFetchParent,
-            //             onValueChangedCallback,
-            //             value);
-            //     }
-            // };
-
-            IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
-
-            IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
-            {
-                GUIContent label = imguiLabelHelper.NoLabel
-                    ? GUIContent.none
-                    : new GUIContent(imguiLabelHelper.RichLabel, property.tooltip);
-
-                property.serializedObject.Update();
-
-                using(new ImGuiFoldoutStyleRichTextScoop())
-                using(new ImGuiLabelStyleRichTextScoop())
-                // using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    float height =
-                        GetFieldHeight(property, label, Screen.width, saintsAttribute, info, true, parent);
-                    Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-
-                    DrawField(rect, property, label, saintsAttribute, allAttributes, info, parent);
-                    // ReSharper disable once InvertIf
-                    // if (changed.changed)
-                    // {
-                    //     object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                    //     if (newFetchParent == null)
-                    //     {
-                    //         Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
-                    //         return;
-                    //     }
-                    //
-                    //     (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
-                    //     if (error == "")
-                    //     {
-                    //         onValueChangedCallback(value);
-                    //     }
-                    // }
-                }
-
-                property.serializedObject.ApplyModifiedProperties();
-            })
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    flexShrink = 0,
-                },
-                userData = imguiLabelHelper,
-            };
-            imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
-            if (!string.IsNullOrEmpty(property.tooltip))
-            {
-                imGuiContainer.tooltip = property.tooltip;
-            }
-
-            return imGuiContainer;
         }
     }
 }
