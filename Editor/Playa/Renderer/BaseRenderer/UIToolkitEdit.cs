@@ -21,6 +21,7 @@ using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ResizableTextAreaDrawer;
 using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Drawers.SaintsDictionary;
+using SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer;
 using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
@@ -4506,6 +4507,31 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             #endregion
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
+
+            #region HashSet
+            if (!valueIsNull)
+            {
+                IEnumerable<Type> setTypes = valueType.GetInterfaces().Where(each => each.IsGenericType);
+                if (valueType.IsGenericType)
+                {
+                    setTypes = setTypes.Prepend(valueType);
+                }
+
+                foreach (Type setType in setTypes)
+                {
+                    if (setType.GetGenericTypeDefinition() != typeof(ISet<>))
+                    {
+                        continue;
+                    }
+
+                    Type elementType = setType.GetGenericArguments()[0];
+                    return (SaintsHashSetDrawer.UIToolkitValueEdit(
+                        oldElement, label, valueType, value, setType, elementType, beforeSet, setterOrNull,
+                        labelGrayColor, inHorizontalLayout, allAttributes, targets, richTextTagProvider,
+                        foldoutViewKey), false);
+                }
+            }
+            #endregion
 
             #region Dictionary
             IEnumerable<Type> genTypes = valueType.GetInterfaces()

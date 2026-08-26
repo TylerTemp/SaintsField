@@ -342,6 +342,12 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                 return;
             }
 
+            if (IMGUIEditHashSet.TryOnGUI(position, label, valueType, value, beforeSet, setterOrNull,
+                    labelGrayColor, inHorizontalLayout, allAttributes, targets, richTextTagProvider, foldoutViewKey))
+            {
+                return;
+            }
+
             if (IMGUIEditDictionary.TryOnGUI(position, label, valueType, value, beforeSet, setterOrNull,
                     labelGrayColor, inHorizontalLayout, allAttributes, targets, richTextTagProvider, foldoutViewKey))
             {

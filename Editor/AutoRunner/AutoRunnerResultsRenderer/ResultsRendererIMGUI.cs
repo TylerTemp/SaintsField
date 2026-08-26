@@ -23,7 +23,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            if (!RenderField || !preCheckResult.IsShown || _autoRunner.Results.Count == 0)
+            if (!preCheckResult.IsShown || _autoRunner.Results.Count == 0)
             {
                 return 0f;
             }
@@ -84,7 +84,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            if (!RenderField || !preCheckResult.IsShown || _autoRunner.Results.Count == 0)
+            if (!preCheckResult.IsShown || _autoRunner.Results.Count == 0)
             {
                 return;
             }

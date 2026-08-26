@@ -84,20 +84,20 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
-            VisualElement container1)
+            VisualElement container)
         {
             // _lastValueChangedTime = EditorApplication.timeSinceStartup;
-            if (!RenderField)
-            {
-                return (null, false);
-            }
+            // if (!RenderField)
+            // {
+            //     return (null, false);
+            // }
 
             bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
             (string error, object value) = GetValue(FieldWithInfo);
             // Debug.Log($"error={error}, value={value}");
 
-            VisualElement container = new VisualElement
+            VisualElement root = new VisualElement
             {
                 style =
                 {
@@ -117,9 +117,9 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             {
                 name = NameResult(),
             };
-            container.Add(resultElement);
+            root.Add(resultElement);
             NativeFieldPropertyRendererErrorField errorElement = MakeNativeFieldPropertyRendererErrorField("");
-            container.Add(errorElement);
+            root.Add(errorElement);
 
             // Debug.Log(NameContainer());
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
@@ -131,7 +131,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 #endif
                 // container.Add(MakeNativeFieldPropertyRendererErrorField(error));
                 errorElement.SetErrorMessage(error);
-                container.userData = new DataPayload
+                root.userData = new DataPayload
                 {
                     HasDrawer = false,
                     Value = null,
@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                     OldCollection = Array.Empty<object>(),
                     AlwaysCheckUpdate = true,
                 };
-                return (container, true);
+                return (root, true);
             }
 
             // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
@@ -165,7 +165,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             );
 
             _onSearchFieldUIToolkit.AddListener(Search);
-            container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+            root.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 // result.name = NameResult();
                 // container.Add(result);
                 resultElement.Add(result);
-                container.userData = new DataPayload
+                root.userData = new DataPayload
                 {
                     HasDrawer = true,
                     Value = value,
@@ -200,7 +200,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             }
             else
             {
-                container.userData = new DataPayload
+                root.userData = new DataPayload
                 {
                     HasDrawer = false,
                     Value = null,
@@ -211,7 +211,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 };
             }
 
-            container.AddManipulator(new ContextualMenuManipulator(evt =>
+            root.AddManipulator(new ContextualMenuManipulator(evt =>
             {
                 (string newValueError, object newValue) = GetValue(FieldWithInfo);
                 if (newValueError != "")
@@ -301,16 +301,16 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 }
             }));
 
-            return (container, true);
+            return (root, true);
 
             void Search(string search)
             {
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
                     ? DisplayStyle.Flex
                     : DisplayStyle.None;
-                if (container.style.display != display)
+                if (root.style.display != display)
                 {
-                    container.style.display = display;
+                    root.style.display = display;
                 }
             }
         }
@@ -323,10 +323,10 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
             // Debug.Log(preCheckResult.RichLabelXml);
-            if (!RenderField)
-            {
-                return preCheckResult;
-            }
+            // if (!RenderField)
+            // {
+            //     return preCheckResult;
+            // }
 
             VisualElement container = root.Q<VisualElement>(name: NameContainer());
             Debug.Assert(container != null, $"not found: {NameContainer()}");

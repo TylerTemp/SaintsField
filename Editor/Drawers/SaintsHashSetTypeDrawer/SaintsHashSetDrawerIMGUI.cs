@@ -41,6 +41,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             public FieldInfo WrapField;
             public object WrapParent;
             public Type WrapType;
+            public Type ElementType;
             public WrapType ValueWrapType;
             public bool HasSerializeReference;
             public IReadOnlyList<Attribute> CellAttributes;
@@ -48,6 +49,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             public object Parent;
             public string LabelText;
             public bool InHorizontalLayout;
+            public SaintsHashSetAttribute Attribute;
         }
 
         private sealed class InfoIMGUI
@@ -59,6 +61,11 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             public ElementContext Context;
             public bool NeedsHeightRefresh;
             public bool HeightRefreshScheduled;
+            public bool ConfigurationInitialized;
+            public bool SearchEnabled;
+            public bool ObjectSearch;
+            public bool DefaultSearch;
+            public bool ExtraSearch;
         }
 
         private sealed class UnsetGuiStyleFixedHeight : IDisposable
@@ -81,9 +88,10 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
         private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
         private const float SearchGap = 5f;
-        private const float HeaderFoldWidth = 16f;
         private const float HeaderSizeWidth = 50f;
+        private const float HeaderMenuWidth = 20f;
         private const float HeaderGap = 4f;
+        private const float FooterButtonsWidth = 58f;
         private const float PagerInputWidth = 30f;
         private const float PagerItemsLabelWidth = 65f;
         private const float PagerButtonWidth = 19f;
@@ -121,7 +129,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
             SaintsHashSetAttribute saintsHashSetAttribute =
                 saintsAttribute as SaintsHashSetAttribute ?? new SaintsHashSetAttribute();
-            (string contextError, ElementContext context) = TryBuildElementContext(property, label, info, parent);
+            (string contextError, ElementContext context) =
+                TryBuildElementContext(property, label, saintsHashSetAttribute, info, parent);
             if (contextError != "")
             {
                 return GetContextErrorHeight(width, contextError);
@@ -132,7 +141,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
             EnsureSearchState(cache, context.WrapProp, saintsHashSetAttribute);
             TickAsyncSearch(cache, context.WrapProp);
-            EnsureReorderableList(cache, saintsHashSetAttribute);
+            EnsureReorderableList(cache);
 
             if (!property.isExpanded)
             {
@@ -153,7 +162,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 cache.ReorderableList = null;
             }
 
-            EnsureReorderableList(cache, saintsHashSetAttribute);
+            EnsureReorderableList(cache);
             return SaintsPropertyDrawer.SingleLineHeight +
                    (cache.ReorderableList?.GetHeight() ?? SaintsPropertyDrawer.SingleLineHeight);
         }
@@ -166,7 +175,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
             SaintsHashSetAttribute saintsHashSetAttribute =
                 saintsAttribute as SaintsHashSetAttribute ?? new SaintsHashSetAttribute();
-            (string contextError, ElementContext context) = TryBuildElementContext(property, label, info, parent);
+            (string contextError, ElementContext context) =
+                TryBuildElementContext(property, label, saintsHashSetAttribute, info, parent);
             if (contextError != "")
             {
                 DrawContextError(position, property, label, contextError);
@@ -197,7 +207,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 return;
             }
 
-            EnsureReorderableList(cache, saintsHashSetAttribute);
+            EnsureReorderableList(cache);
             Rect listRect = new Rect(usePosition)
             {
                 y = headerRect.yMax,
@@ -221,7 +231,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             }
         }
 
-        private void EnsureReorderableList(InfoIMGUI cache, SaintsHashSetAttribute saintsHashSetAttribute)
+        private void EnsureReorderableList(InfoIMGUI cache)
         {
             ElementContext context = cache.Context;
             if (context == null || context.WrapProp == null)
@@ -235,8 +245,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 cache.ReorderableList = null;
             }
 
-            bool hasHeaderControls = HasHeaderControls(saintsHashSetAttribute);
-            float expectedHeaderHeight = hasHeaderControls
+            float expectedHeaderHeight = cache.SearchEnabled
                 ? SaintsPropertyDrawer.SingleLineHeight
                 : 0f;
 
@@ -247,13 +256,19 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             }
 
             cache.ReorderableList = new ReorderableList(context.WrapProp.serializedObject, context.WrapProp, true,
-                hasHeaderControls, true, true)
+                cache.SearchEnabled, true, true)
             {
                 headerHeight = expectedHeaderHeight,
+                footerHeight = SaintsPropertyDrawer.SingleLineHeight,
             };
-            cache.ReorderableList.drawHeaderCallback += rect => DrawHeaderControls(rect, cache, saintsHashSetAttribute);
+            cache.ReorderableList.drawHeaderCallback += rect => DrawSearchField(rect, cache);
             cache.ReorderableList.elementHeightCallback += itemIndex => DrawElementHeight(cache, itemIndex);
             cache.ReorderableList.drawElementCallback += (rect, itemIndex, _, _) => DrawElement(rect, cache, itemIndex);
+            cache.ReorderableList.drawFooterCallback += rect =>
+            {
+                ReorderableList.defaultBehaviours.DrawFooter(rect, cache.ReorderableList);
+                DrawPagingFooter(rect, cache);
+            };
             cache.ReorderableList.onAddCallback += _ =>
             {
                 ElementContext currentContext = cache.Context;
@@ -447,9 +462,6 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             return false;
         }
 
-        private static bool HasHeaderControls(SaintsHashSetAttribute saintsHashSetAttribute) =>
-            saintsHashSetAttribute.Searchable || saintsHashSetAttribute.NumberOfItemsPerPage > 0;
-
         private void DrawHeader(Rect rect, InfoIMGUI cache)
         {
             ElementContext context = cache.Context;
@@ -457,8 +469,6 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             {
                 return;
             }
-
-            EnsureHeaderIcons();
 
             Rect titleRect = new Rect(rect)
             {
@@ -470,18 +480,14 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 x = titleRect.xMax - HeaderSizeWidth,
                 width = HeaderSizeWidth,
             };
+            Rect menuRect = new Rect(titleRect)
+            {
+                x = sizeRect.x - HeaderMenuWidth - HeaderGap,
+                width = HeaderMenuWidth,
+            };
             Rect titleAreaRect = new Rect(titleRect)
             {
-                width = Mathf.Max(0f, titleRect.width - HeaderSizeWidth - HeaderGap),
-            };
-            Rect titleFoldRect = new Rect(titleAreaRect)
-            {
-                width = HeaderFoldWidth,
-            };
-            Rect titleButtonRect = new Rect(titleAreaRect)
-            {
-                x = titleFoldRect.xMax,
-                width = Mathf.Max(0f, titleAreaRect.width - HeaderFoldWidth),
+                width = Mathf.Max(0f, menuRect.x - titleRect.x - HeaderGap),
             };
 
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
@@ -495,7 +501,12 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 }
             }
 
-            DrawOverrideRichText(titleRect, new GUIContent(context.LabelText), overrideRichTextChunks);
+            DrawOverrideRichText(titleAreaRect, new GUIContent(context.LabelText), overrideRichTextChunks);
+
+            if (GUI.Button(menuRect, "...", EditorStyles.miniButton))
+            {
+                ShowMenu(menuRect, cache);
+            }
 
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
@@ -509,7 +520,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             }
         }
 
-        private void DrawHeaderControls(Rect rect, InfoIMGUI cache, SaintsHashSetAttribute saintsHashSetAttribute)
+        private static void ShowMenu(Rect rect, InfoIMGUI cache)
         {
             ElementContext context = cache.Context;
             if (context == null || context.WrapProp == null)
@@ -517,186 +528,301 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 return;
             }
 
-            EnsureHeaderIcons();
+            GenericMenu menu = new GenericMenu();
+            AsyncSearchItemsIMGUI searchItems = cache.AsyncSearchItems;
 
-            bool hasSearch = saintsHashSetAttribute.Searchable;
-            bool hasPaging = saintsHashSetAttribute.NumberOfItemsPerPage > 0;
-            if (!hasSearch && !hasPaging)
+            bool hasPaging = searchItems.NumberOfItemsPerPage > 0;
+            menu.AddItem(new GUIContent("Paging"), hasPaging, () =>
+            {
+                int configuredItemsPerPage = context.Attribute?.NumberOfItemsPerPage ?? -1;
+                searchItems.NumberOfItemsPerPage = hasPaging
+                    ? -1
+                    : configuredItemsPerPage > 0
+                        ? configuredItemsPerPage
+                        : Mathf.Max(5, context.WrapProp.arraySize / 2);
+                searchItems.PageIndex = 0;
+                RefreshVisibleIndexes(cache);
+                GUI.changed = true;
+            });
+
+            bool searchEnabled = cache.SearchEnabled;
+            menu.AddItem(new GUIContent("Search"), searchEnabled,
+                () => SetSearchEnabled(cache, !searchEnabled));
+
+            bool hasExtraSearch = GetExtraSearchMethod(context, context.Parent).methodInfo != null;
+            if (searchEnabled && hasExtraSearch)
+            {
+                menu.AddItem(new GUIContent("Default Search"), cache.DefaultSearch, () =>
+                {
+                    cache.DefaultSearch = !cache.DefaultSearch;
+                    if (!cache.DefaultSearch && !cache.ExtraSearch)
+                    {
+                        SetSearchEnabled(cache, false);
+                    }
+                    else
+                    {
+                        RefreshSearchingStatus(cache);
+                    }
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Default Search"), cache.DefaultSearch);
+            }
+
+            if (searchEnabled && cache.DefaultSearch)
+            {
+                menu.AddItem(new GUIContent("Object Search"), cache.ObjectSearch, () =>
+                {
+                    cache.ObjectSearch = !cache.ObjectSearch;
+                    RefreshSearchingStatus(cache);
+                });
+            }
+            else
+            {
+                menu.AddDisabledItem(new GUIContent("Object Search"), cache.ObjectSearch);
+            }
+
+            if (hasExtraSearch)
+            {
+                if (searchEnabled)
+                {
+                    menu.AddItem(new GUIContent("Extra Search"), cache.ExtraSearch, () =>
+                    {
+                        cache.ExtraSearch = !cache.ExtraSearch;
+                        if (!cache.DefaultSearch && !cache.ExtraSearch)
+                        {
+                            SetSearchEnabled(cache, false);
+                        }
+                        else
+                        {
+                            RefreshSearchingStatus(cache);
+                        }
+                    });
+                }
+                else
+                {
+                    menu.AddDisabledItem(new GUIContent("Extra Search"), cache.ExtraSearch);
+                }
+            }
+
+            menu.DropDown(rect);
+        }
+
+        private static void SetSearchEnabled(InfoIMGUI cache, bool enabled)
+        {
+            ElementContext context = cache.Context;
+            if (context == null || context.WrapProp == null)
             {
                 return;
             }
 
-            Rect controlRect = new Rect(rect)
+            if (enabled && !cache.DefaultSearch && !cache.ExtraSearch)
+            {
+                cache.DefaultSearch = true;
+            }
+
+            cache.SearchEnabled = enabled;
+            if (!enabled)
+            {
+                RestartSearch(cache, context.WrapProp, "", true);
+            }
+            RefreshVisibleIndexes(cache);
+            GUI.changed = true;
+            EditorWindow.focusedWindow?.Repaint();
+        }
+
+        private static void RefreshSearchingStatus(InfoIMGUI cache)
+        {
+            ElementContext context = cache.Context;
+            if (context?.WrapProp == null)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(cache.AsyncSearchItems.SearchText))
+            {
+                RestartSearch(cache, context.WrapProp, cache.AsyncSearchItems.SearchText, false);
+            }
+            RefreshVisibleIndexes(cache);
+            GUI.changed = true;
+            EditorWindow.focusedWindow?.Repaint();
+        }
+
+        private void DrawSearchField(Rect rect, InfoIMGUI cache)
+        {
+            ElementContext context = cache.Context;
+            if (context == null || context.WrapProp == null || !cache.SearchEnabled)
+            {
+                return;
+            }
+
+            Rect searchRect = new Rect(rect)
             {
                 height = EditorGUIUtility.singleLineHeight,
             };
-
-            float searchWidth = controlRect.width - PagerInputWidth * 2f - PagerItemsLabelWidth - PagerSepWidth -
-                                PagerButtonWidth * 2f - PagerPageLabelWidth;
-            Rect searchRect = hasPaging
-                ? new Rect(controlRect)
-                {
-                    width = Mathf.Max(0f, searchWidth),
-                }
-                : controlRect;
-            Rect pagingRect = new Rect(controlRect)
+            string searchControlName = $"SaintsHashSetSearch_{context.RootProperty.propertyPath}";
+            string oldSearch = cache.AsyncSearchItems.SearchText;
+            Rect searchFieldRect = new Rect(searchRect)
             {
-                x = searchRect.xMax,
-                width = Mathf.Max(0f, controlRect.xMax - searchRect.xMax),
+                width = Mathf.Max(0f, searchRect.width - SearchGap),
             };
 
-            if (hasSearch)
+            if (cache.AsyncSearchItems.Started && !cache.AsyncSearchItems.Finished)
             {
-                string searchControlName = $"SaintsHashSetSearch_{context.RootProperty.propertyPath}";
-                string oldSearch = cache.AsyncSearchItems.SearchText;
-                Rect searchFieldRect = new Rect(searchRect)
+                Rect loadingRect = new Rect(searchFieldRect)
                 {
-                    width = Mathf.Max(0f, searchRect.width - SearchGap),
+                    x = searchFieldRect.xMax - 14f,
+                    width = 12f,
                 };
-
-                if (cache.AsyncSearchItems.Started && !cache.AsyncSearchItems.Finished)
-                {
-                    Rect loadingRect = new Rect(searchFieldRect)
-                    {
-                        x = searchFieldRect.xMax - 14f,
-                        width = 12f,
-                    };
-                    cache.Loading.Draw(loadingRect);
-                    searchFieldRect.xMax -= 16f;
-                }
-
-                GUI.SetNextControlName(searchControlName);
-                cache.AsyncSearchItems.SearchText =
-                    EditorGUI.TextField(searchFieldRect, GUIContent.none, cache.AsyncSearchItems.SearchText);
-
-                if (oldSearch != cache.AsyncSearchItems.SearchText)
-                {
-                    RestartSearch(cache, context.WrapProp, cache.AsyncSearchItems.SearchText, true);
-                }
-
-                if (Event.current.type == EventType.KeyDown
-                    && Event.current.keyCode == KeyCode.Return
-                    && GUI.GetNameOfFocusedControl() == searchControlName
-                    && !cache.AsyncSearchItems.Started
-                    && cache.AsyncSearchItems.SourceGenerator != null
-                    && cache.AsyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
-                {
-                    cache.AsyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup - 1d;
-                }
-
-                if (string.IsNullOrEmpty(cache.AsyncSearchItems.SearchText))
-                {
-                    EditorGUI.LabelField(new Rect(searchRect)
-                    {
-                        width = Mathf.Max(0f, searchRect.width - 6f),
-                    }, "Search", new GUIStyle("label")
-                    {
-                        alignment = TextAnchor.MiddleRight,
-                        normal = { textColor = Color.gray },
-                        fontStyle = FontStyle.Italic,
-                    });
-                }
+                cache.Loading.Draw(loadingRect);
+                searchFieldRect.xMax -= 16f;
             }
 
-            if (hasPaging)
+            GUI.SetNextControlName(searchControlName);
+            cache.AsyncSearchItems.SearchText =
+                EditorGUI.TextField(searchFieldRect, GUIContent.none, cache.AsyncSearchItems.SearchText);
+
+            if (oldSearch != cache.AsyncSearchItems.SearchText)
             {
-                Rect numberOfItemsPerPageRect = new Rect(pagingRect)
-                {
-                    width = PagerInputWidth,
-                };
-                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    int newNumberOfItemsPerPage = EditorGUI.DelayedIntField(numberOfItemsPerPageRect,
-                        GUIContent.none, cache.AsyncSearchItems.NumberOfItemsPerPage);
-                    if (changed.changed)
-                    {
-                        cache.AsyncSearchItems.NumberOfItemsPerPage = Mathf.Max(newNumberOfItemsPerPage, 0);
-                        cache.AsyncSearchItems.PageIndex = 0;
-                        RefreshVisibleIndexes(cache);
-                    }
-                }
+                RestartSearch(cache, context.WrapProp, cache.AsyncSearchItems.SearchText, true);
+            }
 
-                Rect numberOfItemsSepRect = new Rect(numberOfItemsPerPageRect)
-                {
-                    x = numberOfItemsPerPageRect.xMax,
-                    width = PagerSepWidth,
-                };
-                EditorGUI.LabelField(numberOfItemsSepRect, "/");
+            if (Event.current.type == EventType.KeyDown
+                && Event.current.keyCode == KeyCode.Return
+                && GUI.GetNameOfFocusedControl() == searchControlName
+                && !cache.AsyncSearchItems.Started
+                && cache.AsyncSearchItems.SourceGenerator != null
+                && cache.AsyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
+            {
+                cache.AsyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup - 1d;
+            }
 
-                Rect numberOfItemsTotalRect = new Rect(numberOfItemsSepRect)
+            if (string.IsNullOrEmpty(cache.AsyncSearchItems.SearchText))
+            {
+                EditorGUI.LabelField(new Rect(searchRect)
                 {
-                    x = numberOfItemsSepRect.xMax,
-                    width = PagerItemsLabelWidth,
-                };
-                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    int newCount = EditorGUI.DelayedIntField(numberOfItemsTotalRect, GUIContent.none,
-                        context.WrapProp.arraySize);
-                    if (changed.changed)
-                    {
-                        SetArraySize(cache, context.WrapProp, Mathf.Max(newCount, 0));
-                        ApplyAndTrigger(context.RootProperty, context.Info, context.Parent);
-                        return;
-                    }
-                }
-                EditorGUI.LabelField(numberOfItemsTotalRect, "Items", new GUIStyle("label")
+                    width = Mathf.Max(0f, searchRect.width - 6f),
+                }, "Search", new GUIStyle("label")
                 {
                     alignment = TextAnchor.MiddleRight,
                     normal = { textColor = Color.gray },
                     fontStyle = FontStyle.Italic,
                 });
+            }
+        }
 
-                Rect prePageRect = new Rect(numberOfItemsTotalRect)
+        private void DrawPagingFooter(Rect rect, InfoIMGUI cache)
+        {
+            ElementContext context = cache.Context;
+            if (context?.WrapProp == null || cache.AsyncSearchItems.NumberOfItemsPerPage <= 0)
+            {
+                return;
+            }
+
+            EnsureHeaderIcons();
+
+            Rect pagingRect = new Rect(rect)
+            {
+                width = Mathf.Max(0f, rect.width - FooterButtonsWidth),
+            };
+
+            Rect numberOfItemsPerPageRect = new Rect(pagingRect)
+            {
+                width = PagerInputWidth,
+            };
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                int newNumberOfItemsPerPage = EditorGUI.DelayedIntField(numberOfItemsPerPageRect,
+                    GUIContent.none, cache.AsyncSearchItems.NumberOfItemsPerPage);
+                if (changed.changed)
                 {
-                    x = numberOfItemsTotalRect.xMax,
-                    width = PagerButtonWidth,
-                };
-                using (new EditorGUI.DisabledScope(cache.AsyncSearchItems.PageIndex <= 0))
-                {
-                    if (GUI.Button(prePageRect, _iconLeft, EditorStyles.miniButtonLeft))
-                    {
-                        cache.AsyncSearchItems.PageIndex = Mathf.Max(0, cache.AsyncSearchItems.PageIndex - 1);
-                        RefreshVisibleIndexes(cache);
-                    }
+                    cache.AsyncSearchItems.NumberOfItemsPerPage = Mathf.Max(newNumberOfItemsPerPage, 0);
+                    cache.AsyncSearchItems.PageIndex = 0;
+                    RefreshVisibleIndexes(cache);
                 }
+            }
 
-                Rect pageRect = new Rect(prePageRect)
+            Rect numberOfItemsSepRect = new Rect(numberOfItemsPerPageRect)
+            {
+                x = numberOfItemsPerPageRect.xMax,
+                width = PagerSepWidth,
+            };
+            EditorGUI.LabelField(numberOfItemsSepRect, "/");
+
+            Rect numberOfItemsTotalRect = new Rect(numberOfItemsSepRect)
+            {
+                x = numberOfItemsSepRect.xMax,
+                width = PagerItemsLabelWidth,
+            };
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                int newCount = EditorGUI.DelayedIntField(numberOfItemsTotalRect, GUIContent.none,
+                    context.WrapProp.arraySize);
+                if (changed.changed)
                 {
-                    x = prePageRect.xMax,
-                    width = PagerInputWidth,
-                };
-                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    int newPageIndex = EditorGUI.DelayedIntField(pageRect, GUIContent.none,
-                        cache.AsyncSearchItems.PageIndex + 1) - 1;
-                    if (changed.changed)
-                    {
-                        cache.AsyncSearchItems.PageIndex = Mathf.Max(newPageIndex, 0);
-                        RefreshVisibleIndexes(cache);
-                    }
+                    SetArraySize(cache, context.WrapProp, Mathf.Max(newCount, 0));
+                    ApplyAndTrigger(context.RootProperty, context.Info, context.Parent);
+                    return;
                 }
+            }
+            EditorGUI.LabelField(numberOfItemsTotalRect, "Items", new GUIStyle("label")
+            {
+                alignment = TextAnchor.MiddleRight,
+                normal = { textColor = Color.gray },
+                fontStyle = FontStyle.Italic,
+            });
 
-                Rect totalPageRect = new Rect(pageRect)
+            Rect prePageRect = new Rect(numberOfItemsTotalRect)
+            {
+                x = numberOfItemsTotalRect.xMax,
+                width = PagerButtonWidth,
+            };
+            using (new EditorGUI.DisabledScope(cache.AsyncSearchItems.PageIndex <= 0))
+            {
+                if (GUI.Button(prePageRect, _iconLeft, EditorStyles.miniButtonLeft))
                 {
-                    x = pageRect.xMax,
-                    width = PagerPageLabelWidth,
-                };
-                EditorGUI.LabelField(totalPageRect, $"/ {cache.AsyncSearchItems.TotalPage}");
+                    cache.AsyncSearchItems.PageIndex = Mathf.Max(0, cache.AsyncSearchItems.PageIndex - 1);
+                    RefreshVisibleIndexes(cache);
+                }
+            }
 
-                Rect nextPageRect = new Rect(totalPageRect)
+            Rect pageRect = new Rect(prePageRect)
+            {
+                x = prePageRect.xMax,
+                width = PagerInputWidth,
+            };
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            {
+                int newPageIndex = EditorGUI.DelayedIntField(pageRect, GUIContent.none,
+                    cache.AsyncSearchItems.PageIndex + 1) - 1;
+                if (changed.changed)
                 {
-                    x = totalPageRect.xMax,
-                    width = PagerButtonWidth,
-                };
-                using (new EditorGUI.DisabledScope(cache.AsyncSearchItems.PageIndex >=
-                                                   cache.AsyncSearchItems.TotalPage - 1))
+                    cache.AsyncSearchItems.PageIndex = Mathf.Max(newPageIndex, 0);
+                    RefreshVisibleIndexes(cache);
+                }
+            }
+
+            Rect totalPageRect = new Rect(pageRect)
+            {
+                x = pageRect.xMax,
+                width = PagerPageLabelWidth,
+            };
+            EditorGUI.LabelField(totalPageRect, $"/ {cache.AsyncSearchItems.TotalPage}");
+
+            Rect nextPageRect = new Rect(totalPageRect)
+            {
+                x = totalPageRect.xMax,
+                width = PagerButtonWidth,
+            };
+            using (new EditorGUI.DisabledScope(cache.AsyncSearchItems.PageIndex >=
+                                               cache.AsyncSearchItems.TotalPage - 1))
+            {
+                if (GUI.Button(nextPageRect, _iconRight, EditorStyles.miniButtonRight))
                 {
-                    if (GUI.Button(nextPageRect, _iconRight, EditorStyles.miniButtonRight))
-                    {
-                        cache.AsyncSearchItems.PageIndex =
-                            Mathf.Min(cache.AsyncSearchItems.PageIndex + 1, cache.AsyncSearchItems.TotalPage - 1);
-                        RefreshVisibleIndexes(cache);
-                    }
+                    cache.AsyncSearchItems.PageIndex =
+                        Mathf.Min(cache.AsyncSearchItems.PageIndex + 1, cache.AsyncSearchItems.TotalPage - 1);
+                    RefreshVisibleIndexes(cache);
                 }
             }
         }
@@ -711,20 +837,16 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             SaintsHashSetAttribute saintsHashSetAttribute)
         {
             AsyncSearchItemsIMGUI asyncSearchItems = cache.AsyncSearchItems;
-            int numberOfItemsPerPage = saintsHashSetAttribute.NumberOfItemsPerPage;
-            if (asyncSearchItems.Size == 0 && asyncSearchItems.HitTargetIndexes.Count == 0 &&
-                asyncSearchItems.CachedHitTargetIndexes.Count == 0 && wrapProp.arraySize >= 0 &&
-                string.IsNullOrEmpty(asyncSearchItems.SearchText))
+            if (!cache.ConfigurationInitialized)
             {
-                asyncSearchItems.NumberOfItemsPerPage = numberOfItemsPerPage;
+                cache.ConfigurationInitialized = true;
+                cache.SearchEnabled = saintsHashSetAttribute.Searchable;
+                cache.ObjectSearch = saintsHashSetAttribute.ObjectSearch;
+                cache.DefaultSearch = true;
+                cache.ExtraSearch = GetExtraSearchMethod(cache.Context, cache.Context?.Parent).methodInfo != null;
+                asyncSearchItems.NumberOfItemsPerPage = saintsHashSetAttribute.NumberOfItemsPerPage;
                 SetFullResults(cache, wrapProp.arraySize);
                 return;
-            }
-
-            if (asyncSearchItems.NumberOfItemsPerPage != numberOfItemsPerPage)
-            {
-                asyncSearchItems.NumberOfItemsPerPage = numberOfItemsPerPage;
-                RefreshVisibleIndexes(cache);
             }
 
             if (asyncSearchItems.Size != wrapProp.arraySize)
@@ -762,8 +884,42 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             asyncSearchItems.Started = false;
             asyncSearchItems.Finished = false;
             asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
-            asyncSearchItems.SourceGenerator = Search(wrapProp, safeSearchText).GetEnumerator();
+
+            ElementContext context = cache.Context;
+            object callbackParent = SerializedUtils.GetFieldInfoAndDirectParent(context.RootProperty).parent;
+            object fieldValue = context.Info.GetValue(callbackParent);
+            int arrayIndex = SerializedUtils.PropertyPathIndex(context.RootProperty.propertyPath);
+            if (arrayIndex != -1)
+            {
+                fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+            }
+
+            (MethodInfo methodInfo, SearchParamType paramType) extraSearchMethod = cache.ExtraSearch
+                ? GetExtraSearchMethod(context, callbackParent)
+                : default;
+            asyncSearchItems.SourceGenerator = Search(
+                (ISaintsHashSetEditorTool)fieldValue,
+                wrapProp,
+                context.ElementType,
+                safeSearchText,
+                cache.DefaultSearch,
+                cache.ObjectSearch,
+                callbackParent,
+                extraSearchMethod
+            ).GetEnumerator();
             RefreshVisibleIndexes(cache);
+        }
+
+        private static (MethodInfo methodInfo, SearchParamType paramType) GetExtraSearchMethod(
+            ElementContext context, object parent)
+        {
+            string extraSearchCallback = context?.Attribute?.ExtraSearch;
+            if (string.IsNullOrEmpty(extraSearchCallback) || parent == null || context.ElementType == null)
+            {
+                return default;
+            }
+
+            return GetSearchMethodInfo(extraSearchCallback, parent.GetType(), context.ElementType);
         }
 
         private static void SetFullResults(InfoIMGUI cache, int size)
@@ -927,7 +1083,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
         }
 
         private (string error, ElementContext context) TryBuildElementContext(SerializedProperty property,
-            GUIContent label, FieldInfo info, object parent)
+            GUIContent label, SaintsHashSetAttribute attribute, FieldInfo info, object parent)
         {
             (string sharedError, HashSetFieldContext sharedContext) = TryGetHashSetContext(property, info, parent);
             if (sharedError != "")
@@ -958,6 +1114,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 WrapField = sharedContext.WrapField,
                 WrapParent = sharedContext.WrapParent,
                 WrapType = sharedContext.WrapType,
+                ElementType = sharedContext.ElementType,
                 ValueWrapType = valueWrapType,
                 HasSerializeReference = hasSerializeReference,
                 CellAttributes = ReflectCache.GetCustomAttributes<Attribute>(info)
@@ -968,6 +1125,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 Parent = parent,
                 LabelText = labelText,
                 InHorizontalLayout = InHorizontalLayout,
+                Attribute = attribute,
             });
         }
 

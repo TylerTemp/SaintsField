@@ -253,6 +253,14 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                     labelGrayColor, inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
             }
 
+            (bool hasHashSetHeight, float hashSetHeight) = IMGUIEditHashSet.GetPropertyHeight(label, valueType,
+                value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes, targets,
+                richTextTagProvider, foldoutViewKey);
+            if (hasHashSetHeight)
+            {
+                return hashSetHeight;
+            }
+
             (bool hasDictionaryHeight, float dictionaryHeight) = IMGUIEditDictionary.GetPropertyHeight(label, valueType,
                 value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes, targets,
                 richTextTagProvider, foldoutViewKey);

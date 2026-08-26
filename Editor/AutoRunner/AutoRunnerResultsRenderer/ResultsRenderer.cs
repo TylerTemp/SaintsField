@@ -15,7 +15,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         public ResultsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
-            RenderField = true;
+            // RenderField = true;
             _autoRunner = (AutoRunnerWindowBase) serializedObject.targetObject;
         }
 

@@ -9,6 +9,13 @@ using UnityEngine;
 // ReSharper disable once CheckNamespace
 namespace SaintsField
 {
+#if UNITY_EDITOR
+    public interface ISaintsHashSetEditorTool
+    {
+        public IReadOnlyList<ISaintsWrapEditorTool> EditorSaintsValues();
+    }
+#endif
+
     [Serializable]
     public class SaintsHashSet<T>:
         // ICollection<T>,  --> ISet<T>
@@ -20,6 +27,9 @@ namespace SaintsField
         IReadOnlyCollection<T>,
 
         ISerializationCallbackReceiver
+#if UNITY_EDITOR
+        , ISaintsHashSetEditorTool
+#endif
     {
         // [SerializeField]
         public List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
@@ -363,5 +373,12 @@ namespace SaintsField
         int IReadOnlyCollection<T>.Count => _hashSet.Count;
         public int Count => _hashSet.Count;
         #endregion
+
+#if UNITY_EDITOR
+        public IReadOnlyList<ISaintsWrapEditorTool> EditorSaintsValues()
+        {
+            return _saintsList;
+        }
+#endif
     }
 }

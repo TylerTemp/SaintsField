@@ -27,7 +27,7 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
     ```
     https://github.com/TylerTemp/SaintsField.git
     ```
-    
+
 *   Using git upm:
 
     add to `Packages/manifest.json` in your project
@@ -52,7 +52,7 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
     ```bash
     git submodule add https://github.com/TylerTemp/SaintsField.git Packages/today.comes.saintsfield
     ```
-    
+
     Note: submodule will not auto upgrade. please read [Git Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to know how to upgrade
 
 *   Using a `unitypackage` (NOT RECOMMENDED):
@@ -62,14 +62,13 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
 
 *   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)  (NOT RECOMMENDED)
 
-If you have DOTween installed
-*   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
-*   Or disable related functions with `Tools` - `Saints Field` - `Disable DOTween Support`
-*   If you can not find this menu, please read the "Add a Macro" section about how to manually disable DOTween support in SaintsField.
-
 [**Optional**] To use the full functions of this project, please also do: `Tools` - `Saints Field` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
-If you need to put this project under another folder rather than `Packages/today.comes.saintsfield`, please also do the following:
+If you want DOTween support:
+*   Ensure: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+*   Then do: `Tools` - `Saints Field` - `Enable DOTween Support`
+
+If you need to put this project under another folder rather than `Packages/today.comes.saintstionfield`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy files from the project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.

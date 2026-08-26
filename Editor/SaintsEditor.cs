@@ -11,6 +11,7 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonCustomContextMenuFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.HeaderRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer;
@@ -19,6 +20,7 @@ using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
 using SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.SpaceRenderer;
 using SaintsField.Editor.Playa.Renderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
@@ -1078,8 +1080,28 @@ namespace SaintsField.Editor
 
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.NativeProperty:
-                    yield return new []{new ShowInInspectorFieldRenderer(serializedObject, fieldWithInfo)};
+                {
+                    List<AbsRenderer> renderers = new List<AbsRenderer>(1);
+                    Attribute[] attributes = ReflectCache.GetCustomAttributes<Attribute>(
+                        (MemberInfo)fieldWithInfo.PropertyInfo ?? fieldWithInfo.FieldInfo);
+                    foreach (Attribute attribute in attributes)
+                    {
+                        switch (attribute)
+                        {
+                            case ShowInInspectorAttribute:
+                                renderers.Add(new ShowInInspectorFieldRenderer(serializedObject, fieldWithInfo));
+                                break;
+                            case HeaderAttribute headerAttribute:
+                                renderers.Add(new HeaderAttributeRenderer(headerAttribute, serializedObject, fieldWithInfo));
+                                break;
+                            case SpaceAttribute spaceAttribute:
+                                renderers.Add(new SpaceAttributeRenderer(spaceAttribute, serializedObject, fieldWithInfo));
+                                break;
+                        }
+                    }
+                    yield return renderers;
                     yield break;
+                }
                     // return WrapAroundSaintsRenderer(new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo),
                     //     fieldWithInfo, serializedObject);
 

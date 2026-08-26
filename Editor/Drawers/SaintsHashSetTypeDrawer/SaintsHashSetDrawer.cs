@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,15 +30,17 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             public readonly FieldInfo WrapField;
             public readonly object WrapParent;
             public readonly Type WrapType;
+            public readonly Type ElementType;
 
             public HashSetFieldContext(Type rawType, SerializedProperty wrapProp, FieldInfo wrapField,
-                object wrapParent, Type wrapType)
+                object wrapParent, Type wrapType, Type elementType)
             {
                 RawType = rawType;
                 WrapProp = wrapProp;
                 WrapField = wrapField;
                 WrapParent = wrapParent;
                 WrapType = wrapType;
+                ElementType = elementType;
             }
         }
 
@@ -215,10 +219,25 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 return ($"Failed to get hash set element type from {property.propertyPath}", default);
             }
 
-            return ("", new HashSetFieldContext(rawType, wrapProp, wrapField, wrapParent, wrapType));
+            Type elementType = wrapType.IsGenericType ? wrapType.GetGenericArguments()[0] : null;
+            if (elementType == null)
+            {
+                return ($"Failed to unwrap hash set element type from {property.propertyPath}", default);
+            }
+
+            return ("", new HashSetFieldContext(rawType, wrapProp, wrapField, wrapParent, wrapType, elementType));
         }
 
-        private static IEnumerable<int> Search(SerializedProperty wrapProp, string searchText)
+        internal enum SearchParamType
+        {
+            TargetAndIndex,
+            Target,
+            Index,
+        }
+
+        private static IEnumerable<int> Search(ISaintsHashSetEditorTool hashSetTool, SerializedProperty wrapProp,
+            Type elementType, string searchText, bool defaultSearch, bool objectSearch, object parent,
+            (MethodInfo methodInfo, SearchParamType paramType) extraSearchMethod)
         {
             int size = wrapProp.arraySize;
 
@@ -234,10 +253,79 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 yield break;
             }
 
-            foreach (int index in SerializedUtils.SearchArrayProperty(wrapProp, searchText, true))
+            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(searchText).ToArray();
+            IReadOnlyList<ISaintsWrapEditorTool> values = hashSetTool.EditorSaintsValues();
+            int useSize = Mathf.Min(size, values.Count);
+            for (int index = 0; index < useSize; index++)
             {
-                yield return index;
+                bool matched = defaultSearch && SerializedUtils.SearchArrayPropertyItem(
+                    wrapProp.GetArrayElementAtIndex(index), searchTokens, objectSearch);
+
+                if (!matched && extraSearchMethod.methodInfo != null)
+                {
+                    object value = values[index].EditorGetValue();
+                    object[] methodParams = extraSearchMethod.paramType switch
+                    {
+                        SearchParamType.Index => new object[] { index, searchTokens },
+                        SearchParamType.Target => new[] { value, searchTokens },
+                        _ => new[] { value, index, searchTokens },
+                    };
+                    matched = (bool)extraSearchMethod.methodInfo.Invoke(parent, methodParams);
+                }
+
+                yield return matched ? index : -1;
             }
+
+            for (int index = useSize; index < size; index++)
+            {
+                yield return defaultSearch && SerializedUtils.SearchArrayPropertyItem(
+                    wrapProp.GetArrayElementAtIndex(index), searchTokens, objectSearch)
+                    ? index
+                    : -1;
+            }
+        }
+
+        internal static (MethodInfo methodInfo, SearchParamType paramType) GetSearchMethodInfo(
+            string methodName, Type targetType, Type elementType)
+        {
+            Type tokenListType = typeof(IEnumerable<ListSearchToken>);
+
+            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(targetType))
+            {
+                foreach (MethodInfo methodInfo in eachType.GetMethods(ReflectUtils.FindTargetBindAttr))
+                {
+                    if (methodInfo.Name != methodName || methodInfo.ReturnParameter?.ParameterType != typeof(bool))
+                    {
+                        continue;
+                    }
+
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+                    if (methodParams.Length == 0 ||
+                        !tokenListType.IsAssignableFrom(methodParams[methodParams.Length - 1].ParameterType))
+                    {
+                        continue;
+                    }
+
+                    if (methodParams.Length == 3
+                        && elementType.IsAssignableFrom(methodParams[0].ParameterType)
+                        && methodParams[1].ParameterType == typeof(int))
+                    {
+                        return (methodInfo, SearchParamType.TargetAndIndex);
+                    }
+
+                    if (methodParams.Length == 2 && elementType.IsAssignableFrom(methodParams[0].ParameterType))
+                    {
+                        return (methodInfo, SearchParamType.Target);
+                    }
+
+                    if (methodParams.Length == 2 && methodParams[0].ParameterType == typeof(int))
+                    {
+                        return (methodInfo, SearchParamType.Index);
+                    }
+                }
+            }
+
+            return (null, default);
         }
     }
 }

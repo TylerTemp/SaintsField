@@ -148,10 +148,10 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (!RenderField)
-            {
-                return 0f;
-            }
+            // if (!RenderField)
+            // {
+            //     return 0f;
+            // }
 
             if (!preCheckResult.IsShown)
             {
@@ -197,10 +197,10 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            if (!RenderField)
-            {
-                return;
-            }
+            // if (!RenderField)
+            // {
+            //     return;
+            // }
 
             if (!preCheckResult.IsShown)
             {
