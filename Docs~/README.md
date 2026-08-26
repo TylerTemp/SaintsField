@@ -7385,6 +7385,8 @@ Parameters:
 *   `string space = "this"`: when using on a `Vector3` or `Vector2`, `"this"` means using current object as the space container, null means world space, otherwise use the space from this callback/field value.
 *   `string color = null`: use a html color if this starts with `#`, otherwise use a callback/field value as the color.
 
+You can also use `DrawLabelShowIf`/`DrawLabelHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
+
 ```csharp
 using SaintsField;
 
@@ -7413,9 +7415,11 @@ Draw and use a position handle in the scene. If The decorated field is a `GameOb
 
 Parameters:
 
-*   `string space="this"`:the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
+*   `string space="this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
 
 You can use right click to show/hide handles.
+
+You can also use `PositionHandleShowIf`/`PositionHandleHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`. 
 
 Example of using it with vector types + `DrawLabel`:
 
@@ -7461,6 +7465,8 @@ Draw a rotation handle on the target to adjust.
 *   `float posYOffset = 0f`: local position offset at the y axis
 *   `float posZOffset = 0f`: local position offset at the z axis
 *   `string posOffsetCallback = null`: use a field/callback as the local position offset. Must return a Vector3.
+
+You can also use `RotationHandleShowIf`/`RotationHandleHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 ```csharp
 using SaintsField;
@@ -7510,6 +7516,8 @@ Draw a scale handle on the target to adjust.
 *   `float posZOffset = 0f`: local position offset at the z axis
 *   `string posOffsetCallback = null`: use a field/callback as the local position offset. Must return a Vector3.
 
+You can also use `ScaleHandleShowIf`/`ScaleHandleHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
+
 ```csharp
 using SaintsField;
 
@@ -7553,6 +7561,8 @@ Parameters:
 *   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 *   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
+You can also use `DrawLineShowIf`/`DrawLineHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
+
 And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field with another:
 
 *   `string target = null`: target point of the line from current field
@@ -7563,6 +7573,8 @@ And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field wit
 *   `float alpha = 1f`: the alpha of the color. Not works with `color`.
 *   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 *   `float dotted = -1f`: when `>=0`, draw dotted line instead.
+
+You can also use `DrawLineFromShowIf`/`DrawLineFromHideIf` and `DrawLineToShowIf`/`DrawLineToHideIf` to control their visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 ```csharp
 using SaintsField;
@@ -7614,6 +7626,8 @@ Parameters:
 *   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 *   `float headLength = 0.5f`: the length of the arrow head.
 *   `float headAngle = 20.0f`: the angle of the arrow head.
+
+You can also use `SaintsArrowShowIf`/`SaintsArrowHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 Specially
 1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
@@ -7670,6 +7684,8 @@ Parameters:
 *   `float alpha = 1f`: the alpha of the color. Not works with `color`.
 *   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 *   `float dotted = -1f`: when `>=0`, draw dotted line instead.
+
+You can also use `ArrowHandleCapShowIf`/`ArrowHandleCapHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 Specially
 1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
@@ -7733,6 +7749,8 @@ Parameters:
 *   `EColor eColor = EColor.White`: color
 *   `float alpha = 1f`: the alpha of the color. Not works with `color`.
 *   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+
+You can also use `DrawWireDiscShowIf`/`DrawWireDiscHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 ```csharp
 using SaintsField;
@@ -7828,6 +7846,8 @@ Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d
 *   `float alpha = 1f`: the alpha of the color. Not works with `color`.
 *   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 
+You can also use `SphereHandleCapShowIf`/`SphereHandleCapHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
+
 ```csharp
 [DrawLine]  // also draw the lines
 [SphereHandleCap(color: "#FF000099", radius: 0.1f)]
@@ -7856,6 +7876,8 @@ The target filed must be number types, like int, float, double, long, short, etc
 *   `EColor eColor = EColor.White`: color of the handle
 *   `float alpha = 1f`: color's alpha of the handle
 *   `string color = null`: use a color for the handle. If starts with `#`, a hex color is used. Otherwise, use the target field/callback which the value/return-value must be a Color.
+
+You can also use `RadiusHandleShowIf`/`RadiusHandleHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 ```csharp
 [RadiusHandle] public float floatRadius;
@@ -7897,6 +7919,8 @@ This is useful as a ruler.
 *   `float alpha = 1f`: alpha of the color.
 *   `string color = null`: optional hex color (`#...`) or callback.
 
+You can also use `SliderHandleShowIf`/`SliderHandleHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
+
 ```csharp
 using SaintsField;
 
@@ -7928,6 +7952,8 @@ Draw a rect handle (for `Rect`, `RectInt`) or bounds handle (for `Bounds`, `Boun
 *   `EColor eColor = EColor.White`: color of the handle
 *   `float alpha = 1f`: color's alpha of the handle
 *   `string color = null`: use a color for the handle. If starts with `#`, a hex color is used. Otherwise, use the target field/callback which the value/return-value must be a Color.
+
+You can also use `PrimitiveBoundsHandleShowIf`/`PrimitiveBoundsHandleHideIf` to control its visibility programmatically. They share the same syntax as `ShowIf`/`HideIf`.
 
 ```csharp
 using SaintsField;

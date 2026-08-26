@@ -59,7 +59,7 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
     ```
     https://github.com/TylerTemp/SaintsField.git
     ```
-    
+
 *   Using git upm:
 
     add to `Packages/manifest.json` in your project
@@ -84,7 +84,7 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
     ```bash
     git submodule add https://github.com/TylerTemp/SaintsField.git Packages/today.comes.saintsfield
     ```
-    
+
     Note: submodule will not auto upgrade. please read [Git Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to know how to upgrade
 
 *   Using a `unitypackage` (NOT RECOMMENDED):
@@ -94,14 +94,13 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
 
 *   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)  (NOT RECOMMENDED)
 
-If you have DOTween installed
-*   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
-*   Or disable related functions with `Tools` - `Saints Field` - `Disable DOTween Support`
-*   If you can not find this menu, please read the "Add a Macro" section about how to manually disable DOTween support in SaintsField.
-
 [**Optional**] To use the full functions of this project, please also do: `Tools` - `Saints Field` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
-If you need to put this project under another folder rather than `Packages/today.comes.saintsfield`, please also do the following:
+If you want DOTween support:
+*   Ensure: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
+*   Then do: `Tools` - `Saints Field` - `Enable DOTween Support`
+
+If you need to put this project under another folder rather than `Packages/today.comes.saintstionfield`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy files from the project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
@@ -115,13 +114,14 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.25.13**
+**5.26.0**
 
-1.  Improve: `ListDrawerSettings` now use menu button to toggle paging, searching etc.
-2.  Changes: `ListDrawerSettings` now can use menu button to control how you want it to be searched. `string overrideSearch` is now deprecated and has no effect at all as this is now merged into menu button
-3.  Improve: If you have `SaintsEditor` enabled, the default list/array will be rendered like it has `[ListDrawerSettings(searchable: false)]`, and you can still toggle the search in menu button.
-4.  Fix: Safely enumerate assembly types everywhere for Unity 6000.4. [PR#436](https://github.com/TylerTemp/SaintsField/pull/436) by [@Insprill](https://github.com/Insprill)
-5.  Add: `[SaintsDictionary]` now support `extraSearch` to define a custom search function. Fix [#432](https://github.com/TylerTemp/SaintsField/issues/432)
+1.  Add: `ShowInInspector` now support decorator attribute [#437](https://github.com/TylerTemp/SaintsField/issues/437)
+2.  Fix: possible wrong order when mix decorator attributes with others
+3.  Add: `PositonShowIf`/`PositionHideIf` etc. for handle attributes [#425](https://github.com/TylerTemp/SaintsField/discussions/425)
+
+> [!CAUTION]
+> `MakeRenderer` API has been changed. if you override renderers for `SaintsEditor`, you need to update the code.
 
 ## Usage ##
 
@@ -302,7 +302,7 @@ namespace: `SaintsField`
     *   [Setup](https://saintsfield.comes.today/saintseditor/setup)
     *   [Inherent](https://saintsfield.comes.today/saintseditor/inherent)
     *   [Extend](https://saintsfield.comes.today/saintseditor/extend)
-    *   [Integerate](https://saintsfield.comes.today/saintseditor/integerate)
+    *   [Integrate](https://saintsfield.comes.today/saintseditor/integrate)
     *   [`Animator`](https://saintsfield.comes.today/saintseditor/animator)
     *   [Netcode for Game Objects](https://saintsfield.comes.today/saintseditor/netcode-for-game-objects)
     *   [Scriptable Renderer Data](https://saintsfield.comes.today/saintseditor/scriptable-renderer-data)
