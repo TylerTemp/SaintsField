@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -20,6 +22,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             public MemberInfo MemberInfo;
             public object Parent;
 
+            public IReadOnlyList<SphereHandleCapShowIfAttribute> ShowHideAttributes;
+
             public string Error;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
             public Transform SpaceTransform;
@@ -31,7 +35,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             public string Id;
         }
 
-        private static SphereInfo CreateSphereInfo(SphereHandleCapAttribute sphereHandleCapAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
+        private static SphereInfo CreateSphereInfo(SphereHandleCapAttribute sphereHandleCapAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             return new SphereInfo
             {
@@ -41,6 +45,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<SphereHandleCapShowIfAttribute>().ToArray(),
                 Radius = sphereHandleCapAttribute.Radius,
                 Color = sphereHandleCapAttribute.Color,
                 // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
@@ -51,6 +56,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 
         private static void OnSceneGUIInternal(SceneView _, SphereInfo sphereInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(sphereInfo.ShowHideAttributes, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent))
+            {
+                return;
+            }
+
             UpdateSphereInfo(sphereInfo);
 
             if (!string.IsNullOrEmpty(sphereInfo.TargetWorldPosInfo.Error))

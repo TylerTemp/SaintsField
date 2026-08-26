@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -23,6 +25,19 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             }
 
             return _icon;
+        }
+
+        protected override IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<PropertyAttribute> allAttributes)
+        {
+            switch (oneDirectionBaseAttribute)
+            {
+                case DrawLineFromAttribute _:
+                    return allAttributes.OfType<DrawLineFromShowIfAttribute>().ToArray();
+                case DrawLineToAttribute _:
+                    return allAttributes.OfType<DrawLineToShowIfAttribute>().ToArray();
+                default:
+                    return allAttributes.OfType<DrawLineShowIfAttribute>().ToArray();
+            }
         }
 
         protected override bool OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd)

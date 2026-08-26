@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -37,6 +38,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 MemberInfo = info,
                 Parent = parent,
                 Space = positionHandleAttribute.Space,
+                ShowHideAttributes = allAttributes.OfType<PositionHandleShowIfAttribute>().ToArray(),
 
                 TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(positionHandleAttribute.Space, property, info, parent),
 

@@ -105,6 +105,23 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 {
                     (AsyncReturnType returnAsync, Type returnAsyncValueType) =
                         GetAsyncReturnInfo(methodInfo.ReturnType);
+#if UNITY_6000_0_OR_NEWER
+                    if (result is Awaitable awaitable)
+                    {
+                        buttonUserData.Enumerators.Add(new Waiter(awaitable));
+                    }
+                    else if (returnAsync == AsyncReturnType.Awaitable && returnAsyncValueType != null)
+                    {
+                        Waiter waiter = Waiter.AwaitableT(result, returnAsyncValueType);
+                        buttonUserData.Enumerators.Add(waiter);
+                        if (!decButtonAttribute.HideReturnValue)
+                        {
+                            refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                            waiterReturnTargets[waiter] = (methodInfo, refreshedParent);
+                        }
+                    }
+                    else  // shit... DONT REMOVE THIS!
+#endif
                     if (result is IEnumerator ie)
                     {
                         buttonUserData.Enumerators.Add(new Waiter(ie));
@@ -119,22 +136,6 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                             waiterReturnTargets[waiter] = (methodInfo, refreshedParent);
                         }
                     }
-#if UNITY_6000_0_OR_NEWER
-                    else if (result is Awaitable awaitable)
-                    {
-                        buttonUserData.Enumerators.Add(new Waiter(awaitable));
-                    }
-                    else if (returnAsync == AsyncReturnType.Awaitable && returnAsyncValueType != null)
-                    {
-                        Waiter waiter = Waiter.AwaitableT(result, returnAsyncValueType);
-                        buttonUserData.Enumerators.Add(waiter);
-                        if (!decButtonAttribute.HideReturnValue)
-                        {
-                            refreshedParent ??= SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                            waiterReturnTargets[waiter] = (methodInfo, refreshedParent);
-                        }
-                    }
-#endif
 #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
                     else if (result is UniTask uniTask)
                     {

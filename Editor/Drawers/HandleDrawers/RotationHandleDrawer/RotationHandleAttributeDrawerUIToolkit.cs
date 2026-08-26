@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
         {
             HelpBox helpBox = container.Q<HelpBox>(NameRotationHandleHelpBox(property, index));
             RotationHandleAttribute rotationHandleAttribute = (RotationHandleAttribute)saintsAttribute;
-            RotationHandleInfo rotationHandleInfo = CreateRotationHandleInfo(rotationHandleAttribute, property, index, onValueChangedCallback, info, parent);
+            RotationHandleInfo rotationHandleInfo = CreateRotationHandleInfo(rotationHandleAttribute, property, index, onValueChangedCallback, info, parent, allAttributes);
             helpBox.userData = rotationHandleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();

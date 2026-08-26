@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -19,6 +21,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
             public RotationHandleAttribute RotationHandleAttribute;
             public MemberInfo MemberInfo;
             public object Parent;
+
+            public IReadOnlyList<RotationHandleShowIfAttribute> ShowHideAttributes;
 
             public string Error;
             public Transform SpaceTransform;
@@ -128,6 +132,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
 
         private static void OnSceneGUIInternal(SceneView _, RotationHandleInfo rotationHandleInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(rotationHandleInfo.ShowHideAttributes, rotationHandleInfo.SerializedProperty, rotationHandleInfo.MemberInfo, rotationHandleInfo.Parent))
+            {
+                return;
+            }
+
             UpdateRotationHandleInfo(rotationHandleInfo);
             if (rotationHandleInfo.Error != "")
             {
@@ -320,7 +329,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
             return Quaternion.Inverse(info.SpaceTransform.rotation) * worldRotation;
         }
 
-        private static RotationHandleInfo CreateRotationHandleInfo(RotationHandleAttribute rotationHandleAttribute, SerializedProperty serializedProperty, int index, Action<object> onValueChangedCallback, MemberInfo memberInfo, object parent)
+        private static RotationHandleInfo CreateRotationHandleInfo(RotationHandleAttribute rotationHandleAttribute, SerializedProperty serializedProperty, int index, Action<object> onValueChangedCallback, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             return new RotationHandleInfo
             {
@@ -330,6 +339,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<RotationHandleShowIfAttribute>().ToArray(),
 
                 OnValueChangedCallback = onValueChangedCallback,
 

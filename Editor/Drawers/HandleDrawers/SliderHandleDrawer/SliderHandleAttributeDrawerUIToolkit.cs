@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
         {
             HelpBox helpBox = container.Q<HelpBox>(NameSliderHandleHelpBox(property, index));
             SliderHandleInfo sliderHandleInfo =
-                CreateSliderHandleInfo((SliderHandleAttribute)saintsAttribute, property, index, info, parent);
+                CreateSliderHandleInfo((SliderHandleAttribute)saintsAttribute, property, index, info, parent, allAttributes);
             helpBox.userData = sliderHandleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -21,6 +23,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             public MemberInfo MemberInfo;
             public object Parent;
 
+            public IReadOnlyList<PrimitiveBoundsHandleShowIfAttribute> ShowHideAttributes;
+
             public string Error;
             public Transform SpaceTransform;
 
@@ -35,6 +39,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
 
         private static void OnSceneGUIInternal(SceneView _, PrimitiveBoundsHandleInfo handleInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(handleInfo.ShowHideAttributes, handleInfo.SerializedProperty, handleInfo.MemberInfo, handleInfo.Parent))
+            {
+                return;
+            }
+
             UpdatePrimitiveBoundsHandleInfo(handleInfo);
 
             if (!string.IsNullOrEmpty(handleInfo.Error))
@@ -248,7 +257,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             }
         }
 
-        private static PrimitiveBoundsHandleInfo CreatePrimitiveBoundsHandleInfo(PrimitiveBoundsHandleAttribute primitiveBoundsHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent)
+        private static PrimitiveBoundsHandleInfo CreatePrimitiveBoundsHandleInfo(PrimitiveBoundsHandleAttribute primitiveBoundsHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             return new PrimitiveBoundsHandleInfo
             {
@@ -257,6 +266,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<PrimitiveBoundsHandleShowIfAttribute>().ToArray(),
                 Color = primitiveBoundsHandleAttribute.Color,
                 BoxBoundsHandle = new BoxBoundsHandle(),
                 Id = $"{SerializedUtils.GetUniqueId(serializedProperty)}_{index}",

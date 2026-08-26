@@ -32,6 +32,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
                 Color = oneDirectionBaseAttribute.Color,
 
+                ShowHideAttributes = GetShowHideAttributes(oneDirectionBaseAttribute, allAttributes),
+
                 Id = SerializedUtils.GetUniqueId(property),
             };
 

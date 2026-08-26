@@ -12,12 +12,12 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
         private static readonly Dictionary<string, RadiusHandleInfo> IDToInfoImGui = new Dictionary<string, RadiusHandleInfo>();
 
         private static RadiusHandleInfo EnsureKey(SerializedProperty property, RadiusHandleAttribute radiusHandleAttribute,
-            int index, MemberInfo info, object parent)
+            int index, MemberInfo info, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             string key = $"{SerializedUtils.GetUniqueId(property)}_{index}";
             if (!IDToInfoImGui.TryGetValue(key, out RadiusHandleInfo radiusHandleInfo))
             {
-                IDToInfoImGui[key] = radiusHandleInfo = CreateRadiusHandleInfo(radiusHandleAttribute, property, index, info, parent);
+                IDToInfoImGui[key] = radiusHandleInfo = CreateRadiusHandleInfo(radiusHandleAttribute, property, index, info, parent, allAttributes);
 
                 // ReSharper disable once InconsistentNaming
                 void OnSceneGUIIMGUI(SceneView sceneView)
@@ -46,14 +46,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            return EnsureKey(property, (RadiusHandleAttribute)saintsAttribute, index, info, parent).Error != "";
+            return EnsureKey(property, (RadiusHandleAttribute)saintsAttribute, index, info, parent, allAttributes).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width, IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            string error = EnsureKey(property, (RadiusHandleAttribute)saintsAttribute, index, info, parent).Error;
+            string error = EnsureKey(property, (RadiusHandleAttribute)saintsAttribute, index, info, parent, allAttributes).Error;
             return error == ""
                 ? 0
                 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = EnsureKey(property, (RadiusHandleAttribute)saintsAttribute, index, info, parent).Error;
+            string error = EnsureKey(property, (RadiusHandleAttribute)saintsAttribute, index, info, parent, allAttributes).Error;
             return error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, error, MessageType.Error);

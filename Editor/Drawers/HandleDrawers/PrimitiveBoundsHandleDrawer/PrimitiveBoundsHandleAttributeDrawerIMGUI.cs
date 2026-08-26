@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -12,12 +13,12 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
         private static readonly Dictionary<string, PrimitiveBoundsHandleInfo> IdToInfoImGui = new Dictionary<string, PrimitiveBoundsHandleInfo>();
 
         private static PrimitiveBoundsHandleInfo EnsureKey(SerializedProperty property, PrimitiveBoundsHandleAttribute primitiveBoundsHandleAttribute,
-            int index, MemberInfo info, object parent)
+            int index, MemberInfo info, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             string key = $"{SerializedUtils.GetUniqueId(property)}_{index}";
             if (!IdToInfoImGui.TryGetValue(key, out PrimitiveBoundsHandleInfo handleInfo))
             {
-                IdToInfoImGui[key] = handleInfo = CreatePrimitiveBoundsHandleInfo(primitiveBoundsHandleAttribute, property, index, info, parent);
+                IdToInfoImGui[key] = handleInfo = CreatePrimitiveBoundsHandleInfo(primitiveBoundsHandleAttribute, property, index, info, parent, allAttributes);
 
                 void OnSceneGuiImGui(SceneView sceneView)
                 {
@@ -46,14 +47,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            return EnsureKey(property, (PrimitiveBoundsHandleAttribute)saintsAttribute, index, info, parent).Error != "";
+            return EnsureKey(property, (PrimitiveBoundsHandleAttribute)saintsAttribute, index, info, parent, allAttributes).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width, IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            string error = EnsureKey(property, (PrimitiveBoundsHandleAttribute)saintsAttribute, index, info, parent).Error;
+            string error = EnsureKey(property, (PrimitiveBoundsHandleAttribute)saintsAttribute, index, info, parent, allAttributes).Error;
             return error == ""
                 ? 0
                 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -63,7 +64,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = EnsureKey(property, (PrimitiveBoundsHandleAttribute)saintsAttribute, index, info, parent).Error;
+            string error = EnsureKey(property, (PrimitiveBoundsHandleAttribute)saintsAttribute, index, info, parent, allAttributes).Error;
             return error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, error, MessageType.Error);

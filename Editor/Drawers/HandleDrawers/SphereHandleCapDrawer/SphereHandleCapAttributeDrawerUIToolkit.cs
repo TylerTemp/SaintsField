@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 name = NameSphereHandleDisc(property, index),
             };
 
-            SphereInfo sphereInfo = CreateSphereInfo((SphereHandleCapAttribute) saintsAttribute, property, info, parent);
+            SphereInfo sphereInfo = CreateSphereInfo((SphereHandleCapAttribute) saintsAttribute, property, info, parent, allAttributes);
             HelpBox helpBox = container.Q<HelpBox>(name: NameSphereHandleDiscHelpBox(property, index));
 
             UpdateErrorBox(helpBox, sphereInfo);

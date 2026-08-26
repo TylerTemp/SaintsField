@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -12,7 +13,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
         private static readonly Dictionary<string, ScaleHandleInfo> IDToInfoImGui = new Dictionary<string, ScaleHandleInfo>();
 
         private static ScaleHandleInfo EnsureKey(SerializedProperty property, ScaleHandleAttribute scaleHandleAttribute,
-            int index, MemberInfo info, object parent)
+            int index, MemberInfo info, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             string key = $"{SerializedUtils.GetUniqueId(property)}_{index}";
             if (!IDToInfoImGui.TryGetValue(key, out ScaleHandleInfo scaleHandleInfo))
@@ -23,7 +24,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
                     index,
                     _ => { },
                     info,
-                    parent);
+                    parent,
+                    allAttributes);
 
                 void OnSceneGUIIMGUI(SceneView sceneView)
                 {
@@ -52,14 +54,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            return EnsureKey(property, (ScaleHandleAttribute) saintsAttribute, index, info, parent).Error != "";
+            return EnsureKey(property, (ScaleHandleAttribute) saintsAttribute, index, info, parent, allAttributes).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width, IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            string error = EnsureKey(property, (ScaleHandleAttribute) saintsAttribute, index, info, parent).Error;
+            string error = EnsureKey(property, (ScaleHandleAttribute) saintsAttribute, index, info, parent, allAttributes).Error;
             return error == ""
                 ? 0
                 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -69,7 +71,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = EnsureKey(property, (ScaleHandleAttribute) saintsAttribute, index, info, parent).Error;
+            string error = EnsureKey(property, (ScaleHandleAttribute) saintsAttribute, index, info, parent, allAttributes).Error;
             return error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, error, MessageType.Error);

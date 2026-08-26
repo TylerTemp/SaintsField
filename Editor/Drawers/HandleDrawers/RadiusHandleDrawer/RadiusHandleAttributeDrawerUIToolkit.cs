@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameRadiusHandleInfoHelpBox(property, index));
-            RadiusHandleInfo radiusHandleInfo = CreateRadiusHandleInfo((RadiusHandleAttribute) saintsAttribute, property, index, info, parent);
+            RadiusHandleInfo radiusHandleInfo = CreateRadiusHandleInfo((RadiusHandleAttribute) saintsAttribute, property, index, info, parent, allAttributes);
             helpBox.userData = radiusHandleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();

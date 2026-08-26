@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -12,7 +13,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
         private static readonly Dictionary<string, LabelInfo> IDToLabelInfo = new Dictionary<string, LabelInfo>();
 
         private static LabelInfo EnsureKey(DrawLabelAttribute drawLabelAttribute, SerializedProperty property, MemberInfo info,
-            object parent)
+            object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             string key = SerializedUtils.GetUniqueId(property);
             if(!IDToLabelInfo.TryGetValue(key, out LabelInfo labelInfo))
@@ -24,6 +25,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
                     MemberInfo = info,
                     Parent = parent,
                     Error = "",
+
+                    ShowHideAttributes = allAttributes.OfType<DrawLabelShowIfAttribute>().ToArray(),
 
                     Content = drawLabelAttribute.Content,
                     Color = drawLabelAttribute.Color,
@@ -61,7 +64,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             FieldInfo info,
             object parent)
         {
-            return EnsureKey((DrawLabelAttribute) saintsAttribute, property, info, parent).Error != "";
+            return EnsureKey((DrawLabelAttribute) saintsAttribute, property, info, parent, allAttributes).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
@@ -69,7 +72,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string error = EnsureKey((DrawLabelAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureKey((DrawLabelAttribute)saintsAttribute, property, info, parent, allAttributes).Error;
             return error == ""? 0: ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
@@ -77,7 +80,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = EnsureKey((DrawLabelAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureKey((DrawLabelAttribute)saintsAttribute, property, info, parent, allAttributes).Error;
             return error == ""? position: ImGuiHelpBox.Draw(position, error, MessageType.Error);
         }
 

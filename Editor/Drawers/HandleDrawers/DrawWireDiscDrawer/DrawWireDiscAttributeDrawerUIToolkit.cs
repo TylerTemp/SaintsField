@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             {
                 name = NameDrawWireDisc(property, index),
             };
-            _wireDiscInfo = CreateWireDiscInfo((DrawWireDiscAttribute) saintsAttribute, property, info, parent);
+            _wireDiscInfo = CreateWireDiscInfo((DrawWireDiscAttribute) saintsAttribute, property, info, parent, allAttributes);
             SceneView.duringSceneGui += OnSceneGUIUIToolkit;
             SceneView.RepaintAll();
             child.RegisterCallback<DetachFromPanelEvent>(_ =>

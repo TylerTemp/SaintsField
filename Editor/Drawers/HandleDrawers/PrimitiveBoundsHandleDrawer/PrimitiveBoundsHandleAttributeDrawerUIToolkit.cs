@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NamePrimitiveBoundsHandleHelpBox(property, index));
-            PrimitiveBoundsHandleInfo handleInfo = CreatePrimitiveBoundsHandleInfo((PrimitiveBoundsHandleAttribute)saintsAttribute, property, index, info, parent);
+            PrimitiveBoundsHandleInfo handleInfo = CreatePrimitiveBoundsHandleInfo((PrimitiveBoundsHandleAttribute)saintsAttribute, property, index, info, parent, allAttributes);
             helpBox.userData = handleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();

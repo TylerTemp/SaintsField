@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -20,6 +22,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             public MemberInfo MemberInfo;
             public object Parent;
 
+            public IReadOnlyList<DrawWireDiscShowIfAttribute> ShowHideAttributes;
+
             public string Error;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
             public Transform SpaceTransform;
@@ -34,6 +38,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
         private static void OnSceneGUIInternal(SceneView _, WireDiscInfo wireDiscInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(wireDiscInfo.ShowHideAttributes, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent))
+            {
+                return;
+            }
+
             UpdateWireDiscInfo(wireDiscInfo);
 
             if (!string.IsNullOrEmpty(wireDiscInfo.TargetWorldPosInfo.Error) || !string.IsNullOrEmpty(wireDiscInfo.Error))
@@ -259,7 +268,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             wireDiscInfo.Error = "";
         }
 
-        private static WireDiscInfo CreateWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
+        private static WireDiscInfo CreateWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             WireDiscInfo wireDiscInfo = new WireDiscInfo
             {
@@ -269,6 +278,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<DrawWireDiscShowIfAttribute>().ToArray(),
                 Radius = drawWireDiscAttribute.Radius,
                 Color = drawWireDiscAttribute.Color,
                 // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),

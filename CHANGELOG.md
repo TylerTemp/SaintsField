@@ -1,9 +1,10 @@
 # Changelog
 
-## WIP ##
+## 5.26.0 ##
 
 1.  Add: `ShowInInspector` now support decorator attribute [#437](https://github.com/TylerTemp/SaintsField/issues/437)
 2.  Fix: possible wrong order when mix decorator attributes with others
+3.  Add: `PositonShowIf`/`PositionHideIf` etc. for handle attributes [#425](https://github.com/TylerTemp/SaintsField/discussions/425)
 
 > [!CAUTION]
 > `MakeRenderer` API has been changed. if you override renderers for `SaintsEditor`, you need to update the code.

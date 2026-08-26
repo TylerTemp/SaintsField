@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
         // private string _cacheKey;
 
         private OneDirectionInfo EnsureKey(OneDirectionBaseAttribute oneDirectionBaseAttribute,
-            SerializedProperty property, MemberInfo info, object parent)
+            SerializedProperty property, MemberInfo info, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             string key = SerializedUtils.GetUniqueId(property);
             if (!IDToInfoImGui.TryGetValue(key, out OneDirectionInfo oneDirectionInfo))
@@ -30,6 +30,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
                     OneDirectionAttribute = oneDirectionBaseAttribute,
                     Color = oneDirectionBaseAttribute.Color,
+
+                    ShowHideAttributes = GetShowHideAttributes(oneDirectionBaseAttribute, allAttributes),
 
                     Error = "",
                 };
@@ -68,7 +70,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             FieldInfo info,
             object parent)
         {
-            return EnsureKey((OneDirectionBaseAttribute) saintsAttribute, property, info, parent).Error != "";
+            return EnsureKey((OneDirectionBaseAttribute) saintsAttribute, property, info, parent, allAttributes).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
@@ -76,7 +78,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string error = EnsureKey((OneDirectionBaseAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureKey((OneDirectionBaseAttribute)saintsAttribute, property, info, parent, allAttributes).Error;
             return error == ""
                 ? 0
                 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -86,7 +88,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = EnsureKey((OneDirectionBaseAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureKey((OneDirectionBaseAttribute)saintsAttribute, property, info, parent, allAttributes).Error;
             return error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, error, MessageType.Error);

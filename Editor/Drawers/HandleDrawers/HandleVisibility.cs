@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SceneViewPickerDrawer;
 using SaintsField.Editor.Utils;
@@ -12,6 +13,41 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
     public static class HandleVisibility
     {
         private static readonly Dictionary<string, bool> _idToHide = new Dictionary<string, bool>();
+
+        public static bool IsShowByCondition<T>(IReadOnlyList<T> showHideAttributes, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent) where T : HandleShowIfAttribute
+        {
+            if (showHideAttributes.Count == 0)
+            {
+                return true;
+            }
+
+            List<bool> showOrResults = new List<bool>();
+
+            foreach (T showIfAttribute in showHideAttributes)
+            {
+                (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(
+                    showIfAttribute.ConditionInfos,
+                    serializedProperty,
+                    memberInfo,
+                    parent);
+
+                if (errors.Count > 0)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(string.Join("\n", errors));
+#endif
+                    showOrResults.Add(true);
+                    continue;
+                }
+
+                bool thisShow = showIfAttribute.IsShow
+                    ? boolResults.All(each => each)
+                    : !boolResults.Any(each => each);
+                showOrResults.Add(thisShow);
+            }
+
+            return showOrResults.Count == 0 || showOrResults.Any(each => each);
+        }
 
         public static bool IsHidden(string id)
         {

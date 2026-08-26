@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -105,6 +107,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             public MemberInfo MemberInfo;
             public object Parent;
             public string Space;
+            public IReadOnlyList<PositionHandleShowIfAttribute> ShowHideAttributes;
 
             public string Error;
             public Vector3 Center;
@@ -131,6 +134,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             if (_moveIcon is null)
             {
                 _moveIcon = Util.LoadResource<Texture2D>("position-handle.png");
+            }
+
+            if (!HandleVisibility.IsShowByCondition(positionHandleInfo.ShowHideAttributes, positionHandleInfo.SerializedProperty, positionHandleInfo.MemberInfo, positionHandleInfo.Parent))
+            {
+                return;
             }
 
             HandleVisibility.SetInView(positionHandleInfo.Id,

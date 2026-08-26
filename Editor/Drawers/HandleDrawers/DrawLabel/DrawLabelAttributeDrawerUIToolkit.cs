@@ -1,6 +1,7 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -36,6 +37,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
                 MemberInfo = info,
                 Parent = parent,
                 Error = "",
+
+                ShowHideAttributes = allAttributes.OfType<DrawLabelShowIfAttribute>().ToArray(),
 
                 Content = drawLabelAttribute.Content,
                 Color = drawLabelAttribute.Color,

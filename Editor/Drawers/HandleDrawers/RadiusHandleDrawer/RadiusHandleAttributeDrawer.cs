@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -20,6 +22,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             public MemberInfo MemberInfo;
             public object Parent;
 
+            public IReadOnlyList<RadiusHandleShowIfAttribute> ShowHideAttributes;
+
             public string Error;
             // public Util.TargetWorldPosInfo TargetWorldPosInfo;
             public Transform SpaceTransform;
@@ -35,6 +39,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
 
         private static void OnSceneGUIInternal(SceneView _, RadiusHandleInfo radiusHandleInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(radiusHandleInfo.ShowHideAttributes, radiusHandleInfo.SerializedProperty, radiusHandleInfo.MemberInfo, radiusHandleInfo.Parent))
+            {
+                return;
+            }
+
             UpdateRadiusHandleInfo(radiusHandleInfo);
 
             if (!string.IsNullOrEmpty(radiusHandleInfo.Error))
@@ -222,7 +231,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             radiusHandleInfo.Center = center + Vector3.Scale(positionOffset, scale);
         }
 
-        private static RadiusHandleInfo CreateRadiusHandleInfo(RadiusHandleAttribute radiusHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent)
+        private static RadiusHandleInfo CreateRadiusHandleInfo(RadiusHandleAttribute radiusHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             return new RadiusHandleInfo
             {
@@ -232,6 +241,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<RadiusHandleShowIfAttribute>().ToArray(),
                 Color = radiusHandleAttribute.Color,
                 // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
 

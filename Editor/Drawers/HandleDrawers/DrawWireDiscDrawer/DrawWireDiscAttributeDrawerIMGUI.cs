@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -14,13 +15,13 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
         private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
         private static WireDiscInfo EnsureWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute,
-            SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
+            SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             string key = GetKey(serializedProperty);
             if (!_idToWireDiscInfo.TryGetValue(key, out WireDiscInfo wireDiscInfo))
             {
                 _idToWireDiscInfo[key] = wireDiscInfo =
-                    CreateWireDiscInfo(drawWireDiscAttribute, serializedProperty, memberInfo, parent);
+                    CreateWireDiscInfo(drawWireDiscAttribute, serializedProperty, memberInfo, parent, allAttributes);
 
                 // ReSharper disable once InconsistentNaming
                 void OnSceneGUIIMGUI(SceneView sceneView)
@@ -55,7 +56,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             FieldInfo info,
             object parent)
         {
-            return EnsureWireDiscInfo((DrawWireDiscAttribute)saintsAttribute, property, info, parent).Error != "";
+            return EnsureWireDiscInfo((DrawWireDiscAttribute)saintsAttribute, property, info, parent, allAttributes).Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
@@ -63,7 +64,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string error = EnsureWireDiscInfo((DrawWireDiscAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureWireDiscInfo((DrawWireDiscAttribute)saintsAttribute, property, info, parent, allAttributes).Error;
             return error == ""
                 ? 0
                 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -73,7 +74,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = EnsureWireDiscInfo((DrawWireDiscAttribute)saintsAttribute, property, info, parent).Error;
+            string error = EnsureWireDiscInfo((DrawWireDiscAttribute)saintsAttribute, property, info, parent, allAttributes).Error;
 
             return error == ""
                 ? position

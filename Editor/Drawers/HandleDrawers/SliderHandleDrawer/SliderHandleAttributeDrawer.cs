@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -20,6 +22,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
             public MemberInfo MemberInfo;
             public object Parent;
 
+            public IReadOnlyList<SliderHandleShowIfAttribute> ShowHideAttributes;
+
             public string Error;
             public Transform SpaceTransform;
 
@@ -38,6 +42,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
 
         private static void OnSceneGUIInternal(SceneView _, SliderHandleInfo sliderHandleInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(sliderHandleInfo.ShowHideAttributes, sliderHandleInfo.SerializedProperty, sliderHandleInfo.MemberInfo, sliderHandleInfo.Parent))
+            {
+                return;
+            }
+
             UpdateSliderHandleInfo(sliderHandleInfo);
             if (!string.IsNullOrEmpty(sliderHandleInfo.Error))
             {
@@ -364,7 +373,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
         }
 
         private static SliderHandleInfo CreateSliderHandleInfo(SliderHandleAttribute sliderHandleAttribute,
-            SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent)
+            SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             return new SliderHandleInfo
             {
@@ -373,6 +382,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<SliderHandleShowIfAttribute>().ToArray(),
                 Color = sliderHandleAttribute.Color,
                 Id = $"{SerializedUtils.GetUniqueId(serializedProperty)}_{index}",
             };

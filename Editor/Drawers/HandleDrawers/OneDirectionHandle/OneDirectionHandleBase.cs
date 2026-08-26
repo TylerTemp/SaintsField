@@ -27,9 +27,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             public Color Color;
 
             public string Id;
+
+            public IReadOnlyList<HandleShowIfAttribute> ShowHideAttributes;
         }
 
         protected abstract Texture2D GetIcon();
+
+        protected virtual IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<PropertyAttribute> allAttributes)
+        {
+            return Array.Empty<HandleShowIfAttribute>();
+        }
 
         private static void UpdateOneDirectionInfo(OneDirectionInfo oneDirectionConstInfo)
         {
@@ -311,6 +318,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
         protected bool OnSceneGUIInternal(SceneView sceneView, OneDirectionInfo oneDirectionInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(oneDirectionInfo.ShowHideAttributes, oneDirectionInfo.SerializedProperty, oneDirectionInfo.MemberInfo, oneDirectionInfo.Parent))
+            {
+                return false;
+            }
+
             UpdateOneDirectionInfo(oneDirectionInfo);
 
             if (oneDirectionInfo.Skip)

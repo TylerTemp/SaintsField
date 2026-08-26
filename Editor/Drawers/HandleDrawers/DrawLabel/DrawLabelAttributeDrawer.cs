@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -21,6 +22,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             public MemberInfo MemberInfo;
             public object Parent;
 
+            public IReadOnlyList<DrawLabelShowIfAttribute> ShowHideAttributes;
+
             public string Error;
 
             public Vector3 Center;
@@ -33,6 +36,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 
         private static void OnSceneGUIInternal(SceneView _, LabelInfo labelInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(labelInfo.ShowHideAttributes, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent))
+            {
+                return;
+            }
+
             UpdateLabelInfo(labelInfo);
 
             if (!string.IsNullOrEmpty(labelInfo.Error))

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -21,6 +23,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             }
 
             return _icon;
+        }
+
+        protected override IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<PropertyAttribute> allAttributes)
+        {
+            return allAttributes.OfType<ArrowHandleCapShowIfAttribute>().ToArray();
         }
 
         protected override bool OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd)

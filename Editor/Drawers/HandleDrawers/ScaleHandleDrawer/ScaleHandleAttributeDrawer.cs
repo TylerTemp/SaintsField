@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -19,6 +21,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
             public ScaleHandleAttribute ScaleHandleAttribute;
             public MemberInfo MemberInfo;
             public object Parent;
+
+            public IReadOnlyList<ScaleHandleShowIfAttribute> ShowHideAttributes;
 
             public string Error;
             public Transform SpaceTransform;
@@ -127,6 +131,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
 
         private static void OnSceneGUIInternal(SceneView _, ScaleHandleInfo scaleHandleInfo)
         {
+            if (!HandleVisibility.IsShowByCondition(scaleHandleInfo.ShowHideAttributes, scaleHandleInfo.SerializedProperty, scaleHandleInfo.MemberInfo, scaleHandleInfo.Parent))
+            {
+                return;
+            }
+
             UpdateScaleHandleInfo(scaleHandleInfo);
             if (scaleHandleInfo.Error != "")
             {
@@ -278,7 +287,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
 
         private static ScaleHandleInfo CreateScaleHandleInfo(ScaleHandleAttribute scaleHandleAttribute,
             SerializedProperty serializedProperty, int index, Action<object> onValueChangedCallback,
-            MemberInfo memberInfo, object parent)
+            MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             return new ScaleHandleInfo
             {
@@ -287,6 +296,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
                 SerializedProperty = serializedProperty,
                 MemberInfo = memberInfo,
                 Parent = parent,
+                ShowHideAttributes = allAttributes.OfType<ScaleHandleShowIfAttribute>().ToArray(),
                 OnValueChangedCallback = onValueChangedCallback,
                 Id = $"{SerializedUtils.GetUniqueId(serializedProperty)}_{index}",
             };

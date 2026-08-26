@@ -40,7 +40,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
                 index,
                 onValueChangedCallback,
                 info,
-                parent);
+                parent,
+                allAttributes);
             helpBox.userData = scaleHandleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();
