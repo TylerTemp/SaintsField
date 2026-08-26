@@ -1305,11 +1305,17 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             {
                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                 {
-                    foreach (IReadOnlyList<AbsRenderer> renderers in SaintsEditor.HelperMakeRenderer(
+                    foreach (IReadOnlyList<SaintsFieldWithRenderer> renderers in SaintsEditor.HelperMakeRenderer(
                                  FieldWithInfo.SerializedProperty.serializedObject, saintsFieldWithInfo))
                     {
-                        foreach (AbsRenderer renderer in renderers)
+                        foreach (SaintsFieldWithRenderer rendererInfo in renderers)
                         {
+                            AbsRenderer renderer = rendererInfo.Renderer;
+                            if (renderer == null)
+                            {
+                                continue;
+                            }
+
                             renderer.NoLabel = noLabel;
                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
                             content.Renderers.Add(renderer);

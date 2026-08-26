@@ -25,7 +25,7 @@ namespace SaintsField.Editor
             _makeRenderer = makeRenderer;
         }
 
-        public virtual IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public virtual IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(so, fieldWithInfo);
         }

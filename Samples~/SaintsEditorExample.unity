@@ -2091,6 +2091,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b684124bb3694a49a47d6fdc4e36243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Issue437ShowInInspectorHeader
+  baseField: 
+  defaultHeader: 
+  num4: 0
 --- !u!1 &187152645
 GameObject:
   m_ObjectHideFlags: 0
@@ -3137,6 +3140,9 @@ MonoBehaviour:
   enumToggleButtonsFlags: 0
   navMeshArea: 0
   navMeshAreaMask: 0
+  addressableAddress: 
+  addressableLabel: 
+  addressableScene: 
   animatorParam: 
   animatorState: 
   inputAxis: 
@@ -5843,6 +5849,9 @@ MonoBehaviour:
   _enumToggleButtonsFlags: 0
   _navMeshArea: 0
   _navMeshAreaMask: 0
+  _addressableAddress: 
+  _addressableLabel: 
+  _addressableScene: 
   _animatorParam: 
   _animatorState: 
   _inputAxis: 
@@ -15197,11 +15206,11 @@ MonoBehaviour:
       rid: -2
     <IsVRef>k__BackingField: 0
   getComponentIList:
-  - <V>k__BackingField: {fileID: 0}
+  - <V>k__BackingField: {fileID: 1704623437}
     <VRef>k__BackingField:
       rid: -2
     <IsVRef>k__BackingField: 0
-  - <V>k__BackingField: {fileID: 0}
+  - <V>k__BackingField: {fileID: 1704623436}
     <VRef>k__BackingField:
       rid: -2
     <IsVRef>k__BackingField: 0

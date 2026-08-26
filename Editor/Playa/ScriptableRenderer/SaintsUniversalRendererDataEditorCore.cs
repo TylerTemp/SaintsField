@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         {
         }
 
-        public override IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public override IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             // Debug.Log(fieldWithInfo.FieldInfo?.Name);
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 case "m_PrepassLayerMask":
                 case "m_TransparentLayerMask":
                 case "shaders":
-                    return Array.Empty<IReadOnlyList<AbsRenderer>>();
+                    return Array.Empty<IReadOnlyList<SaintsFieldWithRenderer>>();
                 default:
                     // Debug.Log(fieldWithInfo.FieldInfo.Name);
                     return base.MakeRenderer(so, fieldWithInfo);

@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                                 this,
                                 this,
                                 null,
-                                true,
+                                false,
                                 valueParent
                             );
                         if (r != null)

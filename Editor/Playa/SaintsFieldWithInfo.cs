@@ -18,6 +18,8 @@ namespace SaintsField.Editor.Playa
         public int TargetMemberIndex;
         public IReadOnlyList<object> Targets;
 
+        internal MemberInfo AttributeMemberInfo;
+
         public SaintsRenderType RenderType;
 
         public SerializedProperty SerializedProperty;
@@ -46,6 +48,7 @@ namespace SaintsField.Editor.Playa
                 TargetMemberInfo = TargetMemberInfo,
                 TargetMemberIndex = TargetMemberIndex,
                 Targets = targets,
+                AttributeMemberInfo = AttributeMemberInfo,
                 RenderType = RenderType,
                 SerializedProperty = SerializedProperty,
                 MemberId = MemberId,

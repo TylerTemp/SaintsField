@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 this,
                 this,
                 null,
-                true,
+                false,
                 FieldWithInfo.Targets[0]
             );
             if (r != null)
@@ -256,7 +256,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // // return (imGuiContainer, false);
         }
 
-        public IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }

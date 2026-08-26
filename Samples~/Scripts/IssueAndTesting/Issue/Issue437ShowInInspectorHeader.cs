@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [Header("Default Header")]
         public string defaultHeader;
 
-        [Header("ShowInInspector Header")] // Doesn't show
+        [Header("ShowInInspector Header")]
         [ShowInInspector] private int _num1;
 
         [Separator(13)]
@@ -20,5 +20,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [Space(13)]
         [AboveText("<b>Space Header")]
         [ShowInInspector] private int _num3;
+
+        [Space(13)]
+        [AboveText("<b>Space Header")]
+        public int num4;
     }
 }

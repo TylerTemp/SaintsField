@@ -14,6 +14,65 @@ namespace SaintsField.Editor.Utils
     public static class UIToolkitCache
     {
 #if UNITY_2021_3_OR_NEWER
+        // public static Type GetDecDrawer(PropertyAttribute propertyAttribute)
+        // {
+        //     var type = SaintsPropertyDrawer.PropertyGetDecoratorDrawer(propertyAttribute.GetType());
+        // }
+
+        public static VisualElement CreateDec(PropertyAttribute propAttribute, Type drawerType)
+        {
+            DecoratorDrawer decorator = (DecoratorDrawer)Activator.CreateInstance(drawerType);
+            FieldInfo mAttributeField = drawerType.GetField("m_Attribute", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (mAttributeField != null)
+            {
+                mAttributeField.SetValue(decorator, propAttribute);
+            }
+
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
+            };
+            root.AddToClassList("unity-decorator-drawers-container");
+
+            VisualElement ve =
+#if UNITY_2022_3_OR_NEWER
+                    decorator.CreatePropertyGUI()
+#else
+                    null
+#endif
+                ;
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (ve == null)
+            {
+                ve = new IMGUIContainer(() =>
+                {
+                    // ReSharper disable once AccessToModifiedClosure
+                    // float styleWidth = root.resolvedStyle.width;
+                    // float width = double.IsNaN(styleWidth)? Screen.width: styleWidth;
+
+                    Rect position = new Rect
+                    {
+                        height = decorator.GetHeight(),
+                        // width = width,
+                    };
+                    decorator.OnGUI(position);
+                    // ReSharper disable once PossibleNullReferenceException
+                    // ReSharper disable once AccessToModifiedClosure
+                    ve.style.height = position.height;
+                });
+                root.style.height = decorator.GetHeight();
+            }
+
+            root.Add(ve);
+
+            return root;
+        }
+
         public static VisualElement MergeWithDec(VisualElement result, IReadOnlyList<PropertyAttribute> allAttributes)
         {
             VisualElement dec = DrawDecorator(allAttributes);
@@ -89,33 +148,7 @@ namespace SaintsField.Editor.Utils
                 result.Add(ve);
             }
 
-            // foreach (DecoratorDrawer decoratorDrawer in decoratorDrawers)
-            // {
-            //     DecoratorDrawer decorator = decoratorDrawer;
-            //     VisualElement ve = decorator.CreatePropertyGUI();
-            //     if (ve == null)
-            //     {
-            //         ve = (VisualElement) new IMGUIContainer((Action) (() =>
-            //         {
-            //             Rect position = new Rect();
-            //             position.height = decorator.GetHeight();
-            //             position.width = this.resolvedStyle.width;
-            //             decorator.OnGUI(position);
-            //             ve.style.height = (StyleLength) position.height;
-            //         }));
-            //         ve.style.height = (StyleLength) decorator.GetHeight();
-            //     }
-            //     this.m_DecoratorDrawersContainer.Add(ve);
-            // }
-
             return hasAny? result: null;
-
-            // // PropertyHandler propertyHandle = UnityEditor.ScriptAttributeUtility.GetHandler(FieldWithInfo.SerializedProperty);
-            // PropertyHandler propertyHandle = (PropertyHandler)typeof(UnityEditor.Editor).Assembly
-            //     .GetType("UnityEditor.ScriptAttributeUtility")
-            //     .GetMethod("GetHandler", BindingFlags.NonPublic | BindingFlags.Static)
-            //     .Invoke(null, new object[] { FieldWithInfo.SerializedProperty });
-
         }
 #endif
     }

@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     {
         private class Helper : IMakeRenderer, IDOTweenPlayRecorder
         {
-            public IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+            public IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
             {
                 return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
             }

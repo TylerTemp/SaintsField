@@ -11,21 +11,22 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Inherent
     [CustomEditor(typeof(MyMonoWithCustom), true)]
     public class MyMonoWithCustomEditor : SaintsField.Editor.SaintsEditor
     {
-        public override IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public override IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
-            if (fieldWithInfo.FieldInfo != null && fieldWithInfo.FieldInfo.Name == "toggle")
+            if (fieldWithInfo.FieldInfo?.Name == nameof(MyMonoWithCustom.toggle))
             {
                 yield break;  // returns nothing to show nothing
             }
 
-            if (fieldWithInfo.FieldInfo != null && fieldWithInfo.FieldInfo.Name == "input")
+            if (fieldWithInfo.FieldInfo?.Name == nameof(MyMonoWithCustom.input))
             {
-                yield return new[]{new ToggleInputRenderer(so, fieldWithInfo)};  // custom rendering
+                yield return WrapAroundSaintsRenderer(
+                    new[] { new ToggleInputRenderer(so, fieldWithInfo) }, so, fieldWithInfo);
                 yield break;
             }
 
             // default rendering
-            foreach (IReadOnlyList<AbsRenderer> defaultRenderer in base.MakeRenderer(so, fieldWithInfo))
+            foreach (IReadOnlyList<SaintsFieldWithRenderer> defaultRenderer in base.MakeRenderer(so, fieldWithInfo))
             {
                 yield return defaultRenderer;
             }

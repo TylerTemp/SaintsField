@@ -557,7 +557,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             UIToolkitUtils.SetDisplayStyle(_invalidStencilOverride, invalidStencilOverrideError? DisplayStyle.Flex: DisplayStyle.None);
         }
 
-        // public IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        // public IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         // {
         //     return SaintsEditor.HelperMakeRenderer(so, fieldWithInfo);
         // }

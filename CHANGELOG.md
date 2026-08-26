@@ -1,5 +1,13 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `ShowInInspector` now support decorator attribute [#437](https://github.com/TylerTemp/SaintsField/issues/437)
+2.  Fix: possible wrong order when mix decorator attributes with others
+
+> [!CAUTION]
+> `MakeRenderer` API has been changed. if you override renderers for `SaintsEditor`, you need to update the code.
+
 ## 5.25.13 ##
 
 1.  Improve: `ListDrawerSettings` now use menu button to toggle paging, searching etc.

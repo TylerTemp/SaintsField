@@ -619,6 +619,10 @@ namespace SaintsField.Editor.Utils
             };
             result.Bind(property.serializedObject);
             result.AddToClassList(PropertyFieldIMGUIFallbackClass);
+            if (!mergeDec)
+            {
+                result.styleSheets.Add(Util.LoadResource<StyleSheet>(NoDecoratorDrawerUssFile));
+            }
             return result;
 
             // // this is the SaintsPropertyDrawer way, but some IMGUI has height issue with IMGUIContainer (e.g. Wwise.EventDrawer)

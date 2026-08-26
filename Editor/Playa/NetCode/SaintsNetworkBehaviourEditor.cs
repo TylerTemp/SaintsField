@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Playa.NetCode
 
         private string[] _netCodeFields;
 
-        public IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             _netCodeFields ??= GetNetCodeVariableFields().Values
                 .Where(each => each != null)
@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Playa.NetCode
             string curName = fieldWithInfo.FieldInfo?.Name ?? fieldWithInfo.PropertyInfo?.Name ?? "";
             if (_netCodeFields.Contains(curName))
             {
-                return Array.Empty<IReadOnlyList<AbsRenderer>>();
+                return Array.Empty<IReadOnlyList<SaintsFieldWithRenderer>>();
             }
 
             return SaintsEditor.HelperMakeRenderer(so, fieldWithInfo);

@@ -396,14 +396,19 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                 {
-                                    foreach (IReadOnlyList<AbsRenderer> renderers in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
+                                    foreach (IReadOnlyList<SaintsFieldWithRenderer> renderers in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
                                     {
-                                        allRenderers.AddRange(renderers);
-
                                         // Debug.Log(renderer);
                                         // ReSharper disable once InvertIf
-                                        foreach (AbsRenderer renderer in renderers)
+                                        foreach (SaintsFieldWithRenderer rendererInfo in renderers)
                                         {
+                                            AbsRenderer renderer = rendererInfo.Renderer;
+                                            if (renderer == null)
+                                            {
+                                                continue;
+                                            }
+
+                                            allRenderers.Add(renderer);
                                             renderer.NoLabel = noLabel;
                                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
                                             VisualElement fieldElement = renderer.CreateVisualElement(element);
@@ -595,12 +600,17 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                 {
-                                    foreach (IReadOnlyList<AbsRenderer> renderers in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
+                                    foreach (IReadOnlyList<SaintsFieldWithRenderer> renderers in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
                                     {
-                                        allRenderers.AddRange(renderers);
-
-                                        foreach (AbsRenderer renderer in renderers)
+                                        foreach (SaintsFieldWithRenderer rendererInfo in renderers)
                                         {
+                                            AbsRenderer renderer = rendererInfo.Renderer;
+                                            if (renderer == null)
+                                            {
+                                                continue;
+                                            }
+
+                                            allRenderers.Add(renderer);
                                             renderer.NoLabel = noLabel;
                                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
                                             VisualElement fieldElement = renderer.CreateVisualElement(element);

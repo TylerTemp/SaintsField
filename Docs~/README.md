@@ -9504,6 +9504,7 @@ public class MyMonoWithCustom : MonoBehaviour
 Now let's make a toggleable input
 
 ```csharp
+using System.Collections.Generic;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEditor;
@@ -9512,21 +9513,23 @@ using UnityEngine.UIElements;
 [CustomEditor(typeof(MyMonoWithCustom), true)]
 public class MyMonoWithCustomEditor : SaintsField.Editor.SaintsEditor
 {
-    public override IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+    public override IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(
+        SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
     {
-        if (fieldWithInfo.FieldInfo != null && fieldWithInfo.FieldInfo.Name == "toggle")
+        if (fieldWithInfo.FieldInfo?.Name == nameof(MyMonoWithCustom.toggle))
         {
             yield break;  // returns nothing to show nothing
         }
 
-        if (fieldWithInfo.FieldInfo != null && fieldWithInfo.FieldInfo.Name == "input")
+        if (fieldWithInfo.FieldInfo?.Name == nameof(MyMonoWithCustom.input))
         {
-            yield return new ToggleInputRenderer(so, fieldWithInfo);  // custom rendering
+            yield return WrapAroundSaintsRenderer(
+                new[] { new ToggleInputRenderer(so, fieldWithInfo) }, so, fieldWithInfo);
             yield break;
         }
 
         // default rendering
-        foreach (AbsRenderer defaultRenderer in base.MakeRenderer(so, fieldWithInfo))
+        foreach (IReadOnlyList<SaintsFieldWithRenderer> defaultRenderer in base.MakeRenderer(so, fieldWithInfo))
         {
             yield return defaultRenderer;
         }
@@ -9605,9 +9608,15 @@ public class ToggleInputRenderer: AbsRenderer
 }
 ```
 
+`WrapAroundSaintsRenderer` means the supplied renderers handle the target field. Saints Field keeps the
+field's other attributes in their declared order and does not create its default target renderer. Put multiple
+custom renderers in the same array when they jointly render one target field. `yield break` hides the whole
+member, including its surrounding renderers. Delegate to `base.MakeRenderer` to keep the complete default
+behavior.
+
 [![video](https://github.com/user-attachments/assets/922d2cf8-267f-4c9c-b30e-c77fb4ed6675)](https://github.com/user-attachments/assets/6feb2f62-6396-4347-87ec-686874524a3a)
 
-### Integerate ###
+### Integrate ###
 
 You can integrate `SaintsEditor` with other editors.
 
@@ -9618,18 +9627,18 @@ public class MyEditorCore: SaintsEditorCore
     {
     }
 
-    public override IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+    public override IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
     {
         if(fieldWithInfo.FieldInfo?.Name == "...")  // skip a field
         {
-            return Array.Empty<IReadOnlyList<AbsRenderer>>();
+            return Array.Empty<IReadOnlyList<SaintsFieldWithRenderer>>();
         }
         if(fieldWithInfo.PlayaAttributes?.Any(each => each is ShowInInspectorAttribute || each is ButtonAttribute))  // render ShowInInspector/Button
         {
             return base.MakeRenderer(so, fieldWithInfo);
         }
         // Otherwise, do not render it
-        return Array.Empty<IReadOnlyList<AbsRenderer>>();
+        return Array.Empty<IReadOnlyList<SaintsFieldWithRenderer>>();
     }
 }
 ```

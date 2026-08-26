@@ -46,7 +46,6 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             }
 
             _imguiAllAttributes = ReflectCache.GetCustomAttributes<Attribute>((MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
-
             _imguiContent = new GUIContent(_imguiLabel);
             _imguiErrorContent = new GUIContent(GetFriendlyName(FieldWithInfo));
             Action<object> setterOrNull = GetSetterOrNull(FieldWithInfo);
@@ -147,19 +146,12 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            // if (!RenderField)
-            // {
-            //     return 0f;
-            // }
-
             if (!preCheckResult.IsShown)
             {
                 return 0f;
             }
 
             EnsureInit();
-
             GUIContent useGUIContent = preCheckResult.HasRichLabel
                 ? new GUIContent(new string(' ', _imguiLabel.Length))
                 : _imguiContent;
@@ -197,18 +189,12 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
-            // if (!RenderField)
-            // {
-            //     return;
-            // }
-
             if (!preCheckResult.IsShown)
             {
                 return;
             }
 
             EnsureInit();
-
             (string error, object value) = GetCachedValue();
             if (error != "")
             {

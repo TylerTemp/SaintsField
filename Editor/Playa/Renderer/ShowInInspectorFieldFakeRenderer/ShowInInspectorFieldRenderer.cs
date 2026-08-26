@@ -14,15 +14,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
     {
         protected override bool AllowGuiColor => true;
 
-        // protected bool RenderField;
-
         public ShowInInspectorFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
-            // RenderField = fieldWithInfo.PlayaAttributes.Any(each => each is ShowInInspectorAttribute);
-            // if (RenderField && FieldWithInfo.PropertyInfo != null)
-            // {
-            //     RenderField = FieldWithInfo.PropertyInfo.CanRead;
-            // }
         }
 
 #if UNITY_2021_3_OR_NEWER
