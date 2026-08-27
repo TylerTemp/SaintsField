@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +13,7 @@ using UnityEngine;
 // ReSharper disable once EmptyNamespace
 namespace SaintsField.Editor.Playa.RendererGroup.DOTweenPlay
 {
-#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
+
     // ReSharper disable once InconsistentNaming
     public partial class DOTweenPlayGroup: ISaintsRendererGroup
     {
@@ -120,5 +121,5 @@ namespace SaintsField.Editor.Playa.RendererGroup.DOTweenPlay
             _groupPath = groupPath;
         }
     }
-#endif
 }
+#endif
