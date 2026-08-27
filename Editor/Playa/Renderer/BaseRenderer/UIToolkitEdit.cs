@@ -517,20 +517,20 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
-#if UNITY_2021_2_OR_NEWER
-                        case ShaderParamAttribute shaderParamAttribute:
-                            return (ShaderParamAttributeDrawer.UIToolkitValueEditInt(
-                                oldElement,
-                                shaderParamAttribute,
-                                label,
-                                (int) value,
-                                beforeSet,
-                                setterOrNull,
-                                labelGrayColor,
-                                inHorizontalLayout,
-                                allAttributes,
-                                targets), false);
-#endif
+// #if UNITY_2021_2_OR_NEWER
+//                         case ShaderParamAttribute shaderParamAttribute:
+//                             return (ShaderParamAttributeDrawer.UIToolkitValueEditInt(
+//                                 oldElement,
+//                                 shaderParamAttribute,
+//                                 label,
+//                                 (int) value,
+//                                 beforeSet,
+//                                 setterOrNull,
+//                                 labelGrayColor,
+//                                 inHorizontalLayout,
+//                                 allAttributes,
+//                                 targets), false);
+// #endif
                         case RateAttribute rateAttribute:
                             return (RateAttributeDrawer.UIToolkitValueEdit(
                                 oldElement,

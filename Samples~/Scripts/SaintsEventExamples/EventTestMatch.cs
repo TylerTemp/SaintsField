@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using SaintsField.Events;
 using SaintsField.Playa;
 using UnityEngine;
@@ -19,6 +21,101 @@ namespace SaintsField.Samples.Scripts.SaintsEventExamples
             TestThreeArgumentRuntimeListener();
             TestFourArgumentRuntimeListener();
             Debug.Log("SaintsEvent patch 1 regression tests passed.", this);
+        }
+
+        [Button]
+        private void RunPatch2RegressionTests()
+        {
+            _persistentInt = 0;
+            _persistentString = null;
+            _persistentFloat = 0f;
+
+            TestSaintsEvent<int, string, float> testEvent = new TestSaintsEvent<int, string, float>();
+            testEvent.SetPersistentCalls(new PersistentCall
+            {
+                callState = UnityEventCallState.EditorAndRuntime,
+                methodName = nameof(PersistentPatch2Probe),
+                target = this,
+                persistentArguments = new[]
+                {
+                    new PersistentArgument
+                    {
+                        callType = PersistentArgument.CallType.Dynamic,
+                        invokedParameterIndex = 0,
+                    },
+                    CreateSerializedStringArgument("serialized"),
+                    new PersistentArgument
+                    {
+                        callType = PersistentArgument.CallType.OptionalDefault,
+                    },
+                },
+            });
+
+            SetArgumentType(testEvent.PersistentCalls[0].persistentArguments[0], typeof(int));
+            SetArgumentType(testEvent.PersistentCalls[0].persistentArguments[2], typeof(float));
+
+            testEvent.Invoke(1, "ignored", 99f);
+            Assert.AreEqual(1, _persistentInt);
+            Assert.AreEqual("serialized", _persistentString);
+            Assert.AreEqual(2.5f, _persistentFloat);
+
+            bool receivedDirectException = false;
+            try
+            {
+                testEvent.Invoke(2, "ignored again", 100f);
+            }
+            catch (InvalidOperationException exception) when (exception.Message == Patch2ExceptionMessage)
+            {
+                receivedDirectException = true;
+            }
+
+            Assert.IsTrue(receivedDirectException,
+                "Persistent listener still used MethodInfo.Invoke, which wraps the callback exception.");
+            Debug.Log("SaintsEvent patch 2 typed persistent delegate test passed.", this);
+        }
+
+        private const string Patch2ExceptionMessage = "patch-2-direct-delegate";
+        private int _persistentInt;
+        private string _persistentString;
+        private float _persistentFloat;
+
+        private int PersistentPatch2Probe(int dynamicValue, string serializedValue, float optionalValue = 2.5f)
+        {
+            if (dynamicValue == 2)
+            {
+                throw new InvalidOperationException(Patch2ExceptionMessage);
+            }
+
+            _persistentInt = dynamicValue;
+            _persistentString = serializedValue;
+            _persistentFloat = optionalValue;
+            return dynamicValue;
+        }
+
+        private static PersistentArgument CreateSerializedStringArgument(string value)
+        {
+            PersistentArgument argument = new PersistentArgument
+            {
+                callType = PersistentArgument.CallType.Serialized,
+            };
+            SetArgumentType(argument, typeof(string));
+            argument.SerializeObject = value;
+            return argument;
+        }
+
+        private static void SetArgumentType(PersistentArgument argument, Type type)
+        {
+            FieldInfo field = typeof(PersistentArgument).GetField("typeReference");
+            Assert.IsNotNull(field);
+            object typeReference = Activator.CreateInstance(field.FieldType, type);
+            field.SetValue(argument, typeReference);
+        }
+
+        [Serializable]
+        private sealed class TestSaintsEvent<T0, T1, T2>: SaintsEvent<T0, T1, T2>
+        {
+            public void SetPersistentCalls(params PersistentCall[] calls) => _persistentCalls = calls;
+            public PersistentCall[] PersistentCalls => _persistentCalls;
         }
 
         private void TestNoArgumentRuntimeListeners()

@@ -18,8 +18,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
     {
         private static string GetTypeMismatchError(SerializedProperty property)
         {
-            if(property.propertyType != SerializedPropertyType.String &&
-               property.propertyType != SerializedPropertyType.Integer)
+            // Shader.PropertyToID values are not stable between runs and must not be serialized.
+            if(property.propertyType != SerializedPropertyType.String
+               // && property.propertyType != SerializedPropertyType.Integer
+              )
             {
                 return $"{property.propertyType} is not supported";
             }
@@ -37,11 +39,11 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     return (true, shaderInfo);
 
                 }
-                if(property.propertyType == SerializedPropertyType.Integer &&
-                        shaderInfo.PropertyID == property.intValue)
-                {
-                    return (true, shaderInfo);
-                }
+                // if(property.propertyType == SerializedPropertyType.Integer &&
+                //         shaderInfo.PropertyID == property.intValue)
+                // {
+                //     return (true, shaderInfo);
+                // }
             }
 
             return (false, default);
@@ -113,8 +115,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 return new AutoRunnerFixerResult
                 {
-                    Error =
-                        $"No shader params found for {(property.propertyType == SerializedPropertyType.String ? property.stringValue : property.intValue.ToString())} in {shader.name}",
+                    Error = $"No shader params found for {property.stringValue} in {shader.name}",
                     ExecError = "",
                 };
             }

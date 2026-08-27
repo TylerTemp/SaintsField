@@ -1479,7 +1479,7 @@ private string ShowInputAxis([InputAxis] string myInput) => myInput;
 
 Select a shader parameter from a `shader`, `material` or `renderer`. (Requires Unity 2021.2+)
 
-For string, it will save the name. For int, it will save the hash.
+It supports string fields and saves the shader parameter name.
 
 **Parameters**:
 
@@ -1490,19 +1490,19 @@ For string, it will save the name. For int, it will save the hash.
 
 ```csharp
 [ShaderParam] public string shaderParamString;
-[ShaderParam(0)] public int shaderParamInt;
-[ShaderParam(ShaderPropertyType.Texture)] public int shaderParamFilter;
+[ShaderParam(0)] public string shaderParamAtIndex;
+[ShaderParam(ShaderPropertyType.Texture)] public string shaderParamFilter;
 
 [Separator("By Target")]
 [GetComponent] public Renderer targetRenderer;
 
-[ShaderParam(nameof(targetRenderer))] public int shaderParamRenderer;
+[ShaderParam(nameof(targetRenderer))] public string shaderParamRenderer;
 
 private Material GetMat() => targetRenderer.sharedMaterial;
-[ShaderParam(nameof(GetMat))] public int shaderParamMat;
+[ShaderParam(nameof(GetMat))] public string shaderParamMat;
 
 private Shader GetShader() => targetRenderer.sharedMaterial.shader;
-[ShaderParam(nameof(GetShader))] public int shaderParamShader;
+[ShaderParam(nameof(GetShader))] public string shaderParamShader;
 ```
 
 ![image](https://github.com/user-attachments/assets/80ba6891-2a7e-41e5-8887-74e29479f1d9)
@@ -1511,10 +1511,10 @@ It works with `ShowInInspector`
 
 ```csharp
 [ShowInInspector, ShaderParam]
-public int ShowShaderParamInt
+public string ShowShaderParamString
 {
-    get => shaderParamInt;
-    set => shaderParamInt = value;
+    get => shaderParamString;
+    set => shaderParamString = value;
 }
 ```
 

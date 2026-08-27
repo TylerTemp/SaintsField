@@ -1,5 +1,12 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `ShaderParams` no longer support `integer` type because `Shader.PropertyToID` is not the same between runtime.
+2.  Fix: `SaintsEvent` invoke error
+3.  Improve: `SaintsEvent` now cache the method delegate for a better performance
+
+
 ## 5.26.1 ##
 
 1.  Add: `DOTweenPlay` now support parameters

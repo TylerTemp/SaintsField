@@ -100,8 +100,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
             ShaderParamInfoIMGUI cache = EnsureKey(property, shaderParamAttribute, info, parent);
 
-            if (property.propertyType != SerializedPropertyType.String &&
-                property.propertyType != SerializedPropertyType.Integer)
+            if (property.propertyType != SerializedPropertyType.String
+                // && property.propertyType != SerializedPropertyType.Integer
+               )
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
                 DrawOverrideRichText(position, label, overrideRichTextChunks);
@@ -134,17 +135,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     (curItem, _) =>
                     {
                         ShaderParamUtils.ShaderCustomInfo shaderInfo = (ShaderParamUtils.ShaderCustomInfo)curItem;
-                        object changedValue;
-                        if (property.propertyType == SerializedPropertyType.String)
-                        {
-                            property.stringValue = shaderInfo.PropertyName;
-                            changedValue = shaderInfo.PropertyName;
-                        }
-                        else
-                        {
-                            property.intValue = shaderInfo.PropertyID;
-                            changedValue = shaderInfo.PropertyID;
-                        }
+                        property.stringValue = shaderInfo.PropertyName;
+                        object changedValue = shaderInfo.PropertyName;
+                        // else
+                        // {
+                        //     property.intValue = shaderInfo.PropertyID;
+                        //     changedValue = shaderInfo.PropertyID;
+                        // }
 
                         property.serializedObject.ApplyModifiedProperties();
                         RefreshCache(cache, property, shaderParamAttribute, info, parent);

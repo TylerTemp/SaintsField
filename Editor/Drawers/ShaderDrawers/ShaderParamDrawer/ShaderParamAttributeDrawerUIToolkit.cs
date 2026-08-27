@@ -27,20 +27,20 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
-                case SerializedPropertyType.Integer:
-                {
-                    ShaderParamIntField r = new ShaderParamIntField(GetPreferredLabel(property), shaderParamAttribute.PropertyType)
-                    {
-                        bindingPath = property.propertyPath,
-                    };
-                    r.AddToClassList(ClassAllowDisable);
-                    r.AddToClassList(ShaderParamIntField.alignedFieldUssClassName);
-                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
-                    {
-                        r.labelElement.tooltip = property.tooltip;
-                    }
-                    return r;
-                }
+                // case SerializedPropertyType.Integer:
+                // {
+                //     ShaderParamIntField r = new ShaderParamIntField(GetPreferredLabel(property), shaderParamAttribute.PropertyType)
+                //     {
+                //         bindingPath = property.propertyPath,
+                //     };
+                //     r.AddToClassList(ClassAllowDisable);
+                //     r.AddToClassList(ShaderParamIntField.alignedFieldUssClassName);
+                //     if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                //     {
+                //         r.labelElement.tooltip = property.tooltip;
+                //     }
+                //     return r;
+                // }
                 case SerializedPropertyType.String:
                 {
                     ShaderParamStringField r =
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (property.propertyType)
             {
-                case SerializedPropertyType.Integer:
+                // case SerializedPropertyType.Integer:
                 case SerializedPropertyType.String:
                     return new HelpBox("", HelpBoxMessageType.Error)
                     {
@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                         name = HelpBoxName(property),
                     };
                 default:
-                    return new HelpBox($"Type {property.propertyType} is not int or string.", HelpBoxMessageType.Error)
+                    return new HelpBox($"Type {property.propertyType} is not string.", HelpBoxMessageType.Error)
                     {
                         style =
                         {
@@ -104,15 +104,15 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
-                case SerializedPropertyType.Integer:
-                {
-                    ShaderParamIntField intDropdownField = container.Q<ShaderParamIntField>();
-                    intDropdownField.ShaderParamIntElement.BindHelpBox(helpBox);
-                    AddContextualMenuManipulator(helpBox, shaderParamAttribute, intDropdownField, property, onValueChangedCallback, info, parent);
-                    bindShader = intDropdownField.ShaderParamIntElement;
-                    intDropdownField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.intValue));
-                }
-                    break;
+                // case SerializedPropertyType.Integer:
+                // {
+                //     ShaderParamIntField intDropdownField = container.Q<ShaderParamIntField>();
+                //     intDropdownField.ShaderParamIntElement.BindHelpBox(helpBox);
+                //     AddContextualMenuManipulator(helpBox, shaderParamAttribute, intDropdownField, property, onValueChangedCallback, info, parent);
+                //     bindShader = intDropdownField.ShaderParamIntElement;
+                //     intDropdownField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.intValue));
+                // }
+                //     break;
                 case SerializedPropertyType.String:
                 {
                     ShaderParamStringField stringDropdownField = container.Q<ShaderParamStringField>();
@@ -152,7 +152,6 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             UIToolkitUtils.AddContextualMenuManipulator(root, property,
                 () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            bool isString = property.propertyType == SerializedPropertyType.String;
             root.AddManipulator(new ContextualMenuManipulator(evt =>
             {
                 string clipboardText = EditorGUIUtility.systemCopyBuffer;
@@ -171,53 +170,46 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 if (shader != _currentShader)
                 {
                     _currentShader = shader;
-                    if (isString)
-                    {
-                        root.Q<ShaderParamStringElement>().BindShader(shader);
-                    }
-                    else
-                    {
-                        root.Q<ShaderParamIntElement>().BindShader(shader);
-                    }
+                    root.Q<ShaderParamStringElement>().BindShader(shader);
+                    // else
+                    // {
+                    //     root.Q<ShaderParamIntElement>().BindShader(shader);
+                    // }
                 }
 
-                bool canBeInt = int.TryParse(clipboardText, out int clipboardInt);
-
-                if (isString)
+                foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
                 {
-                    foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
+                    if (shaderCustomInfo.PropertyName == clipboardText)
                     {
-                        if (shaderCustomInfo.PropertyName == clipboardText)
+                        evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"", _ =>
                         {
-                            evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"", _ =>
-                            {
-                                property.stringValue = shaderCustomInfo.PropertyName;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyName);
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(shaderCustomInfo.PropertyName);
-                            });
-                            return;
-                        }
+                            property.stringValue = shaderCustomInfo.PropertyName;
+                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyName);
+                            property.serializedObject.ApplyModifiedProperties();
+                            onValueChangedCallback.Invoke(shaderCustomInfo.PropertyName);
+                        });
+                        return;
                     }
                 }
-                else
-                {
-                    foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
-                    {
-                        if (shaderCustomInfo.PropertyName == clipboardText
-                            || canBeInt && shaderCustomInfo.PropertyID == clipboardInt)
-                        {
-                            evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"({shaderCustomInfo.PropertyID})", _ =>
-                            {
-                                property.intValue = shaderCustomInfo.PropertyID;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyID);
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(shaderCustomInfo.PropertyID);
-                            });
-                            return;
-                        }
-                    }
-                }
+                // else
+                // {
+                //     bool canBeInt = int.TryParse(clipboardText, out int clipboardInt);
+                //     foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
+                //     {
+                //         if (shaderCustomInfo.PropertyName == clipboardText
+                //             || canBeInt && shaderCustomInfo.PropertyID == clipboardInt)
+                //         {
+                //             evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"({shaderCustomInfo.PropertyID})", _ =>
+                //             {
+                //                 property.intValue = shaderCustomInfo.PropertyID;
+                //                 ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyID);
+                //                 property.serializedObject.ApplyModifiedProperties();
+                //                 onValueChangedCallback.Invoke(shaderCustomInfo.PropertyID);
+                //             });
+                //             return;
+                //         }
+                //     }
+                // }
             }));
         }
 
@@ -282,66 +274,66 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             return element;
         }
 
-        private class ShaderParamValueEditInt : VisualElement
-        {
-            public readonly ShaderParamIntField Field;
-            public readonly HelpBox HelpBox;
-
-            public ShaderParamValueEditInt(ShaderParamIntField field)
-            {
-                Field = field;
-                Add(field);
-                HelpBox = new HelpBox("", HelpBoxMessageType.Error)
-                {
-                    style =
-                    {
-                        display = DisplayStyle.None,
-                        flexGrow = 1,
-                    },
-                };
-                Add(HelpBox);
-                field.ShaderParamIntElement.BindHelpBox(HelpBox);
-            }
-        }
-
-        public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, ShaderParamAttribute shaderParamAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
-        {
-            (string error, Shader shader) = ShaderUtils.GetShaderForShowInInspector(
-                value,
-                shaderParamAttribute.TargetName,
-                shaderParamAttribute.Index,
-                targets[0]);
-
-            if (oldElement is ShaderParamValueEditInt oldContainer)
-            {
-                oldContainer.Field.ShaderParamIntElement.value = value;
-                oldContainer.Field.ShaderParamIntElement.BindShader(shader);
-                ShaderUtils.UpdateHelpBox(oldContainer.HelpBox, error);
-                return null;
-            }
-
-            ShaderParamIntField field =
-                new ShaderParamIntField(label, shaderParamAttribute.PropertyType)
-                {
-                    value = value,
-                };
-            ShaderParamValueEditInt element = new ShaderParamValueEditInt(field);
-            field.ShaderParamIntElement.BindShader(shader);
-            ShaderUtils.UpdateHelpBox(element.HelpBox, error);
-
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
-                labelGrayColor, inHorizontalLayout);
-
-            if (setterOrNull != null)
-            {
-                field.RegisterValueChangedCallback(evt =>
-                {
-                    beforeSet?.Invoke(value);
-                    setterOrNull(evt.newValue);
-                });
-            }
-            return element;
-        }
+        // private class ShaderParamValueEditInt : VisualElement
+        // {
+        //     public readonly ShaderParamIntField Field;
+        //     public readonly HelpBox HelpBox;
+        //
+        //     public ShaderParamValueEditInt(ShaderParamIntField field)
+        //     {
+        //         Field = field;
+        //         Add(field);
+        //         HelpBox = new HelpBox("", HelpBoxMessageType.Error)
+        //         {
+        //             style =
+        //             {
+        //                 display = DisplayStyle.None,
+        //                 flexGrow = 1,
+        //             },
+        //         };
+        //         Add(HelpBox);
+        //         field.ShaderParamIntElement.BindHelpBox(HelpBox);
+        //     }
+        // }
+        //
+        // public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, ShaderParamAttribute shaderParamAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        // {
+        //     (string error, Shader shader) = ShaderUtils.GetShaderForShowInInspector(
+        //         value,
+        //         shaderParamAttribute.TargetName,
+        //         shaderParamAttribute.Index,
+        //         targets[0]);
+        //
+        //     if (oldElement is ShaderParamValueEditInt oldContainer)
+        //     {
+        //         oldContainer.Field.ShaderParamIntElement.value = value;
+        //         oldContainer.Field.ShaderParamIntElement.BindShader(shader);
+        //         ShaderUtils.UpdateHelpBox(oldContainer.HelpBox, error);
+        //         return null;
+        //     }
+        //
+        //     ShaderParamIntField field =
+        //         new ShaderParamIntField(label, shaderParamAttribute.PropertyType)
+        //         {
+        //             value = value,
+        //         };
+        //     ShaderParamValueEditInt element = new ShaderParamValueEditInt(field);
+        //     field.ShaderParamIntElement.BindShader(shader);
+        //     ShaderUtils.UpdateHelpBox(element.HelpBox, error);
+        //
+        //     UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
+        //         labelGrayColor, inHorizontalLayout);
+        //
+        //     if (setterOrNull != null)
+        //     {
+        //         field.RegisterValueChangedCallback(evt =>
+        //         {
+        //             beforeSet?.Invoke(value);
+        //             setterOrNull(evt.newValue);
+        //         });
+        //     }
+        //     return element;
+        // }
     }
 }
 #endif
