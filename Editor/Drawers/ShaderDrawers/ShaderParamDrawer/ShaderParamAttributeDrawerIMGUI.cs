@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -27,6 +28,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
         private static readonly Dictionary<string, ShaderParamInfoIMGUI> CachedIMGUI = new Dictionary<string, ShaderParamInfoIMGUI>();
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+        private static readonly RichTextDrawer ValueEditRichTextDrawer = new RichTextDrawer();
+        private const float ValueEditSpacing = 2f;
 
         private static ShaderParamInfoIMGUI EnsureKey(SerializedProperty property, ShaderParamAttribute shaderParamAttribute, FieldInfo info, object parent)
         {
@@ -98,12 +101,11 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamAttribute shaderParamAttribute = saintsAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
             ShaderParamInfoIMGUI cache = EnsureKey(property, shaderParamAttribute, info, parent);
 
-            if (property.propertyType != SerializedPropertyType.String
-                // && property.propertyType != SerializedPropertyType.Integer
-               )
+            SerializedProperty nameProperty = GetShaderParamNameProperty(property);
+            if (nameProperty == null)
             {
                 RawDefaultDrawer(position, property, allAttributes, label, info);
                 DrawOverrideRichText(position, label, overrideRichTextChunks);
@@ -136,17 +138,22 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     (curItem, _) =>
                     {
                         ShaderParamUtils.ShaderCustomInfo shaderInfo = (ShaderParamUtils.ShaderCustomInfo)curItem;
-                        property.stringValue = shaderInfo.PropertyName;
-                        object changedValue = shaderInfo.PropertyName;
-                        // else
-                        // {
-                        //     property.intValue = shaderInfo.PropertyID;
-                        //     changedValue = shaderInfo.PropertyID;
-                        // }
+                        nameProperty.stringValue = shaderInfo.PropertyName;
 
                         property.serializedObject.ApplyModifiedProperties();
                         RefreshCache(cache, property, shaderParamAttribute, info, parent);
-                        TriggerChangedIMGUI(property, changedValue);
+                        if (property.propertyType == SerializedPropertyType.String)
+                        {
+                            TriggerChangedIMGUI(property, shaderInfo.PropertyName);
+                        }
+                        else
+                        {
+                            (string valueError, int _, object value) = Util.GetValue(property, info, parent);
+                            if (valueError == "")
+                            {
+                                TriggerChangedIMGUI(property, value);
+                            }
+                        }
                         return new[] { curItem };
                     }));
             }
@@ -165,7 +172,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamAttribute shaderParamAttribute = saintsAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
             ShaderParamInfoIMGUI cache = EnsureKey(property, shaderParamAttribute, info, parent);
             return cache.Error != "";
         }
@@ -174,7 +181,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamAttribute shaderParamAttribute = saintsAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
             string error = EnsureKey(property, shaderParamAttribute, info, parent).Error;
             return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
@@ -183,9 +190,153 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamAttribute shaderParamAttribute = saintsAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
             string error = EnsureKey(property, shaderParamAttribute, info, parent).Error;
             return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
+        }
+
+        private static (string error, ShaderParamUtils.ShaderCustomInfo[] shaderInfos, bool foundShaderInfo,
+            ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) GetValueEditInfo(
+            ShaderParamAttribute shaderParamAttribute, string value, IReadOnlyList<object> targets)
+        {
+            if (targets == null || targets.Count == 0)
+            {
+                return ("Target not found", Array.Empty<ShaderParamUtils.ShaderCustomInfo>(), false, default);
+            }
+
+            (string error, Shader shader) = ShaderUtils.GetShaderForShowInInspector(
+                value,
+                shaderParamAttribute.TargetName,
+                shaderParamAttribute.Index,
+                targets[0]);
+            if (error != "")
+            {
+                return (error, Array.Empty<ShaderParamUtils.ShaderCustomInfo>(), false, default);
+            }
+            if (shader == null)
+            {
+                return ("Shader not found", Array.Empty<ShaderParamUtils.ShaderCustomInfo>(), false, default);
+            }
+
+            ShaderParamUtils.ShaderCustomInfo[] shaderInfos =
+                ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
+            (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) =
+                GetSelectedShaderInfo(value, shaderInfos);
+            return ("", shaderInfos, foundShaderInfo, selectedShaderInfo);
+        }
+
+        public static float IMGUIValueEditStringGetHeight(ShaderParamAttribute shaderParamAttribute, string value,
+            bool inHorizontalLayout, IReadOnlyList<object> targets)
+        {
+            float fieldHeight = IMGUIShared.GetSingleLineHeight(inHorizontalLayout);
+            (string error, _, _, _) = GetValueEditInfo(shaderParamAttribute, value, targets);
+            if (error == "")
+            {
+                return fieldHeight;
+            }
+
+            float helpBoxWidth = Mathf.Max(1f, EditorGUIUtility.currentViewWidth -
+                (inHorizontalLayout ? 0f : EditorGUIUtility.labelWidth));
+            return fieldHeight + ValueEditSpacing + ImGuiHelpBox.GetHeight(error, helpBoxWidth, MessageType.Error);
+        }
+
+        public static void IMGUIValueEditString(Rect position, ShaderParamAttribute shaderParamAttribute,
+            string label, string value, Action<object> beforeSet, Action<object> setterOrNull,
+            bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets)
+        {
+            (string error, ShaderParamUtils.ShaderCustomInfo[] shaderInfos, bool foundShaderInfo,
+                ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) =
+                GetValueEditInfo(shaderParamAttribute, value, targets);
+
+            float fieldHeight = IMGUIShared.GetSingleLineHeight(inHorizontalLayout);
+            Rect fieldPosition = new Rect(position)
+            {
+                height = fieldHeight,
+            };
+            if (error != "")
+            {
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    string result = IMGUIText.DrawField(fieldPosition, new GUIContent(label), null, value ?? "",
+                        inHorizontalLayout, labelGrayColor);
+                    if (changed.changed && setterOrNull != null)
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull(result);
+                    }
+                }
+
+                Rect helpBoxPosition = new Rect(position)
+                {
+                    yMin = fieldPosition.yMax + ValueEditSpacing,
+                };
+                ImGuiHelpBox.Draw(helpBoxPosition, error, MessageType.Error);
+                return;
+            }
+
+            Rect buttonRect = default;
+            IMGUIShared.DrawStackedField(fieldPosition, new GUIContent(label), inHorizontalLayout, labelGrayColor,
+                (rect, content) =>
+                {
+                    buttonRect = EditorGUI.PrefixLabel(rect, content);
+                    return 0;
+                },
+                rect =>
+                {
+                    buttonRect = rect;
+                    return 0;
+                });
+
+            using (new EditorGUI.DisabledScope(setterOrNull == null))
+            {
+                if (GUI.Button(buttonRect, GUIContent.none, EditorStyles.popup))
+                {
+                    PopupWindow.Show(buttonRect, new SaintsTreeDropdownIMGUI(
+                        GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, true),
+                        Mathf.Max(buttonRect.width, 220f),
+                        320f,
+                        false,
+                        (curItem, _) =>
+                        {
+                            ShaderParamUtils.ShaderCustomInfo shaderInfo =
+                                (ShaderParamUtils.ShaderCustomInfo)curItem;
+                            beforeSet?.Invoke(value);
+                            setterOrNull(shaderInfo.PropertyName);
+                            return new[] { curItem };
+                        }));
+                }
+            }
+
+            Rect drawRect = new Rect(buttonRect)
+            {
+                xMin = buttonRect.xMin + 6f,
+                xMax = buttonRect.xMax - 18f,
+            };
+            ValueEditRichTextDrawer.DrawChunks(drawRect, foundShaderInfo
+                ? selectedShaderInfo.GetDisplayChunks(true)
+                : RichTextDrawer.ParseRichXmlWithProvider("-", new RichTextDrawer.EmptyRichTextTagProvider()));
+        }
+
+        public static float IMGUIValueEditShaderParamGetHeight(ShaderParamAttribute shaderParamAttribute,
+            ShaderParam value, bool inHorizontalLayout, IReadOnlyList<object> targets) =>
+            IMGUIValueEditStringGetHeight(shaderParamAttribute, value?.name ?? "", inHorizontalLayout, targets);
+
+        public static void IMGUIValueEditShaderParam(Rect position, ShaderParamAttribute shaderParamAttribute,
+            string label, ShaderParam value, Action<object> beforeSet, Action<object> setterOrNull,
+            bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets)
+        {
+            Action<object> wrappedBeforeSet = beforeSet == null
+                ? null
+                : _ => beforeSet(value);
+            Action<object> wrappedSetter = setterOrNull == null
+                ? null
+                : newValue => setterOrNull(new ShaderParam
+                {
+                    name = (string)newValue,
+                });
+
+            IMGUIValueEditString(position, shaderParamAttribute, label, value?.name ?? "", wrappedBeforeSet,
+                wrappedSetter, labelGrayColor, inHorizontalLayout, targets);
         }
     }
 }

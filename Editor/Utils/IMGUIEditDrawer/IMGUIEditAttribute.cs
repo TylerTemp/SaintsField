@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -73,6 +74,15 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                         return (true, IMGUITextHeight(inHorizontalLayout));
                     }
                     break;
+#if UNITY_2021_2_OR_NEWER
+                case ShaderParamAttribute shaderParamAttribute:
+                    if (valueType == typeof(string) || value is string)
+                    {
+                        return (true, ShaderParamAttributeDrawer.IMGUIValueEditStringGetHeight(
+                            shaderParamAttribute, (string)value, inHorizontalLayout, targets));
+                    }
+                    break;
+#endif
             }
 
             if ((valueType == typeof(long) || value is long) &&
@@ -130,6 +140,16 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                             return true;
                         }
                         break;
+#if UNITY_2021_2_OR_NEWER
+                    case ShaderParamAttribute shaderParamAttribute:
+                        if (valueType == typeof(string) || value is string)
+                        {
+                            ShaderParamAttributeDrawer.IMGUIValueEditString(position, shaderParamAttribute, label,
+                                (string)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets);
+                            return true;
+                        }
+                        break;
+#endif
                 }
             }
 
@@ -179,6 +199,9 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                     case PropRangeAttribute:
                     case LayerAttribute:
                     case GuidAttribute:
+#if UNITY_2021_2_OR_NEWER
+                    case ShaderParamAttribute:
+#endif
                         return attribute;
                 }
             }

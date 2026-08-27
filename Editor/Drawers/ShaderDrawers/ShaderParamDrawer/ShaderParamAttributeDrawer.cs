@@ -20,31 +20,40 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         private static string GetTypeMismatchError(SerializedProperty property)
         {
             // Shader.PropertyToID values are not stable between runs and must not be serialized.
-            if(property.propertyType != SerializedPropertyType.String
-               // && property.propertyType != SerializedPropertyType.Integer
-              )
+            if (GetShaderParamNameProperty(property) == null)
             {
                 return $"{property.propertyType} is not supported";
             }
             return "";
         }
 
+        private static SerializedProperty GetShaderParamNameProperty(SerializedProperty property)
+        {
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                return property;
+            }
+
+            SerializedProperty nameProperty = property.propertyType == SerializedPropertyType.Generic
+                ? property.FindPropertyRelative(nameof(ShaderParam.name))
+                : null;
+            return nameProperty?.propertyType == SerializedPropertyType.String ? nameProperty : null;
+        }
+
         private static (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) GetSelectedShaderInfo(SerializedProperty property, IEnumerable<ShaderParamUtils.ShaderCustomInfo> shaderInfos)
+        {
+            SerializedProperty nameProperty = GetShaderParamNameProperty(property);
+            return GetSelectedShaderInfo(nameProperty?.stringValue, shaderInfos);
+        }
+
+        private static (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) GetSelectedShaderInfo(string value, IEnumerable<ShaderParamUtils.ShaderCustomInfo> shaderInfos)
         {
             foreach (ShaderParamUtils.ShaderCustomInfo shaderInfo in shaderInfos)
             {
-                // ReSharper disable once ConvertIfStatementToSwitchStatement
-                if (property.propertyType == SerializedPropertyType.String &&
-                    shaderInfo.PropertyName == property.stringValue)
+                if (shaderInfo.PropertyName == value)
                 {
                     return (true, shaderInfo);
-
                 }
-                // if(property.propertyType == SerializedPropertyType.Integer &&
-                //         shaderInfo.PropertyID == property.intValue)
-                // {
-                //     return (true, shaderInfo);
-                // }
             }
 
             return (false, default);
@@ -99,7 +108,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 };
             }
 
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)propertyAttribute;
+            ShaderParamAttribute shaderParamAttribute = propertyAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
             (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, memberInfo, parent);
             if(error != "")
             {
@@ -114,9 +123,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo _) = GetSelectedShaderInfo(property, shaderInfos);
             if (!foundShaderInfo)
             {
+                SerializedProperty nameProperty = GetShaderParamNameProperty(property);
                 return new AutoRunnerFixerResult
                 {
-                    Error = $"No shader params found for {property.stringValue} in {shader.name}",
+                    Error = $"No shader params found for {nameProperty?.stringValue} in {shader.name}",
                     ExecError = "",
                 };
             }
