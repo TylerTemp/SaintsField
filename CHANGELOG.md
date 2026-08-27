@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.26.1 ##
+
+1.  Add: `DOTweenPlay` now support parameters
+2.  Fix: `PropRange` slider bar did not work when drag
+
 ## 5.26.0 ##
 
 1.  Add: `ShowInInspector` now support decorator attribute [#437](https://github.com/TylerTemp/SaintsField/issues/437)
