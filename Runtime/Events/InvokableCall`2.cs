@@ -13,7 +13,7 @@ namespace SaintsField.Events
         public override void Invoke(object[] args)
         {
             if (args.Length != 2)
-                throw new ArgumentException("Passed argument 'args' is invalid size. Expected size is 1");
+                throw new ArgumentException("Passed argument 'args' is invalid size. Expected size is 2");
             ThrowOnInvalidArg<T0>(args[0]);
             ThrowOnInvalidArg<T1>(args[1]);
             if (!AllowInvoke(Delegate))

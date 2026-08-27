@@ -6,7 +6,7 @@ namespace SaintsField.Events
     [Serializable]
     public class SaintsEvent<T0, T1, T2, T3>: SaintsEventBase
     {
-        public void Invoke(T0 arg0, T1 arg1, T3 arg2, T3 arg3)
+        public void Invoke(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
             object[] args = { arg0, arg1, arg2, arg3 };
             foreach (PersistentCall presistentCall in _persistentCalls)
