@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using UnityEditor;
 using UnityEngine;
@@ -320,6 +322,16 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                     inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
                 return;
             }
+
+#if UNITY_2021_2_OR_NEWER
+            if (valueType == typeof(ShaderParam) || value is ShaderParam)
+            {
+                ShaderParamAttributeDrawer.IMGUIValueEditShaderParam(position,
+                    allAttributes.OfType<ShaderParamAttribute>().FirstOrDefault() ?? new ShaderParamAttribute(),
+                    label, (ShaderParam)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets);
+                return;
+            }
+#endif
 
             if (valueType == typeof(decimal) || value is decimal)
             {

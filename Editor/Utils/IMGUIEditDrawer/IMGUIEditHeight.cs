@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using UnityEngine;
 
@@ -234,6 +236,15 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                 return IMGUIEditGuid.GetPropertyHeight(label, valueType, (Guid)value, beforeSet, setterOrNull,
                     labelGrayColor, inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
             }
+
+#if UNITY_2021_2_OR_NEWER
+            if (valueType == typeof(ShaderParam) || value is ShaderParam)
+            {
+                return ShaderParamAttributeDrawer.IMGUIValueEditShaderParamGetHeight(
+                    allAttributes.OfType<ShaderParamAttribute>().FirstOrDefault() ?? new ShaderParamAttribute(),
+                    (ShaderParam)value, inHorizontalLayout, targets);
+            }
+#endif
 
             if (valueType == typeof(decimal) || value is decimal)
             {
