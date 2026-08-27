@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -92,71 +91,17 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             if (hasParameters || hasReturnValue)
             {
                 VisualElement parametersContainer = fancyButton.HasParameters();
-
-                parametersContainer.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(parametersContainer));
-
-                foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
+                if (hasParameters)
                 {
-                    VisualElement paraContainer = new VisualElement
+                    MethodParametersPanel parameterPanel = new MethodParametersPanel(methodInfo,
+                        InAnyHorizontalLayout, FieldWithInfo.Targets, this, buttonId);
+                    parametersContainer.Add(parameterPanel);
+                    parameterValues = parameterPanel.value;
+                    parameterPanel.RegisterValueChangedCallback(evt =>
                     {
-                        style =
-                        {
-                            marginRight = 4,
-                        },
-                    };
-                    parametersContainer.Add(paraContainer);
-
-                    Type paraType = parameterInfo.ParameterType;
-                    object paraValue;
-                    if(parameterInfo.HasDefaultValue)
-                    {
-                        paraValue = parameterInfo.DefaultValue;
-                    }
-                    else
-                    {
-                        paraValue = paraType.IsValueType ? Activator.CreateInstance(paraType) : null;
-                    }
-                    parameterValues[index] = paraValue;
-
-                    Attribute[] attributes = parameterInfo.GetCustomAttributes().ToArray();
-
-                    bool paraValueChanged = true;
-                    paraContainer.schedule.Execute(() =>
-                    {
-                        if (!paraValueChanged)
-                        {
-                            return;
-                        }
-                        // Debug.Log($"para value changed: {parameterInfo.Name}={parameterValues[index]}, {paraContainer.Children().FirstOrDefault()}");
-                        VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
-                            paraContainer.Children().FirstOrDefault(),
-                            parameterInfo.Name,
-                            paraType,
-                            parameterValues[index],
-                            null,
-                            newValue =>
-                            {
-                                parameterValues[index] = newValue;
-                                paraValueChanged = true;
-                                fancyButton.ShowResult(false);
-                                // Debug.Log($"param {index} set to {newValue}");
-                            },
-                            false,
-                            InAnyHorizontalLayout,
-                            attributes,
-                            FieldWithInfo.Targets,
-                            this,
-                            $"{buttonId}.{parameterInfo.Name}"
-                        ).result;
-                        // ReSharper disable once InvertIf
-                        if (r != null)
-                        {
-                            paraContainer.Clear();
-                            paraContainer.Add(r);
-                        }
-
-                        paraValueChanged = false;
-                    }).Every(100);
+                        parameterValues = evt.newValue;
+                        fancyButton.ShowResult(false);
+                    });
                 }
             }
 

@@ -4,8 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -105,66 +105,21 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 _ussClassSaintsFieldEditingDisabledHide ??= Util.LoadResource<StyleSheet>("UIToolkit/ClassSaintsFieldEditingDisabledHide.uss");
                 root.styleSheets.Add(_ussClassSaintsFieldEditingDisabledHide);
 
-                foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
+                MethodParametersPanel parameterPanel = new MethodParametersPanel(
+                    methodInfo,
+                    InAnyHorizontalLayout,
+                    FieldWithInfo.Targets,
+                    this,
+                    targetId)
                 {
-                    VisualElement paraContainer = new VisualElement
+                    style =
                     {
-                        style =
-                        {
-                            marginRight = 4,
-                        },
-                    };
-                    root.Add(paraContainer);
-
-                    Type paraType = parameterInfo.ParameterType;
-                    object paraValue;
-                    if(parameterInfo.HasDefaultValue)
-                    {
-                        paraValue = parameterInfo.DefaultValue;
-                    }
-                    else
-                    {
-                        paraValue = paraType.IsValueType ? Activator.CreateInstance(paraType) : null;
-                    }
-                    _parameterValues[index] = paraValue;
-
-                    bool paraValueChanged = true;
-                    Attribute[] attributes = parameterInfo.GetCustomAttributes().ToArray();
-                    paraContainer.schedule.Execute(() =>
-                    {
-                        if (!paraValueChanged)
-                        {
-                            return;
-                        }
-
-                        VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
-                            paraContainer.Children().FirstOrDefault(),
-                            parameterInfo.Name,
-                            paraType,
-                            paraValue,
-                            null,
-                            newValue =>
-                            {
-                                paraValue = _parameterValues[index] = newValue;
-                                paraValueChanged = true;
-                            },
-                            false,
-                            InAnyHorizontalLayout,
-                            attributes,
-                            FieldWithInfo.Targets,
-                            this,
-                            $"{targetId}.{parameterInfo.Name}"
-                        ).result;
-                        // ReSharper disable once InvertIf
-                        if (r != null)
-                        {
-                            paraContainer.Clear();
-                            paraContainer.Add(r);
-                        }
-
-                        paraValueChanged = false;
-                    }).Every(100);
-                }
+                        marginRight = 4,
+                    },
+                };
+                root.Add(parameterPanel);
+                _parameterValues = parameterPanel.value;
+                parameterPanel.RegisterValueChangedCallback(evt => _parameterValues = evt.newValue);
 
                 root.Add(new VisualElement
                 {

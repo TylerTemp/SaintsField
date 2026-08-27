@@ -1,22 +1,63 @@
 #if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using DG.DOTweenEditor;
 using DG.Tweening;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Utils.IMGUIEditDrawer;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SaintsField.Editor.Playa.RendererGroup
+namespace SaintsField.Editor.Playa.RendererGroup.DOTweenPlay
 {
     // ReSharper disable once InconsistentNaming
     public partial class DOTweenPlayGroup
     {
         #region IMGUI
 
+        private const float ParametersIndentIMGUI = 15f;
         private GUIStyle _iconButtonStyle;
+
+        private void EnsureStatesIMGUI()
+        {
+            if (_imGuiDOTweenStates != null)
+            {
+                return;
+            }
+
+            _imGuiDOTweenStates = _doTweenMethods
+                .Select(each =>
+                {
+                    ParameterInfo[] parameters = each.methodInfo.GetParameters();
+                    return new DOTweenState
+                    {
+                        Stop = each.attribute.DOTweenStop,
+                        Parameters = parameters.Select(GetParameterDefaultValueIMGUI).ToArray(),
+                        ParameterAttributes = parameters
+                            .Select(parameter => (IReadOnlyList<Attribute>)parameter.GetCustomAttributes()
+                                .OfType<Attribute>().ToArray())
+                            .ToArray(),
+                    };
+                })
+                .ToArray();
+        }
+
+        private static object GetParameterDefaultValueIMGUI(ParameterInfo parameterInfo)
+        {
+            if (parameterInfo.HasDefaultValue)
+            {
+                return parameterInfo.DefaultValue;
+            }
+
+            return parameterInfo.ParameterType.IsValueType
+                ? Activator.CreateInstance(parameterInfo.ParameterType)
+                : null;
+        }
 
         public void RenderIMGUI(float width)
         {
@@ -28,15 +69,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
-            if (_imGuiDOTweenStates == null)
-            {
-                _imGuiDOTweenStates = _doTweenMethods
-                    .Select(each => new DOTweenState
-                    {
-                        Stop = each.attribute.DOTweenStop,
-                    })
-                    .ToArray();
-            }
+            EnsureStatesIMGUI();
 
             Debug.Assert(_doTweenMethods.Count > 0);
 
@@ -144,8 +177,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         if (imGuiDOTweenStates.Tween == null)
                         {
-                            imGuiDOTweenStates.Tween = (Tween)methodInfo.Invoke(_target,
-                                methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray());
+                            imGuiDOTweenStates.Tween = (Tween)methodInfo.Invoke(_targets[0],
+                                imGuiDOTweenStates.Parameters);
 
                             DOTweenEditorPreview.PrepareTweenForPreview(imGuiDOTweenStates.Tween);
                         }
@@ -167,13 +200,24 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     }
                 }
 
+                DrawParametersLayoutIMGUI(methodInfo, imGuiDOTweenStates, width);
+
             }
 
         }
 
         public float GetHeightIMGUI(float width)
         {
-            return EditorGUIUtility.singleLineHeight * (_doTweenMethods.Count + 1);
+            EnsureStatesIMGUI();
+
+            float height = EditorGUIUtility.singleLineHeight * (_doTweenMethods.Count + 1);
+            foreach (((MethodInfo methodInfo, DOTweenPlayAttribute _), int index) in _doTweenMethods.WithIndex())
+            {
+                height += GetParametersHeightIMGUI(methodInfo, _imGuiDOTweenStates[index],
+                    Mathf.Max(1f, width - ParametersIndentIMGUI));
+            }
+
+            return height;
         }
 
         public void RenderPositionIMGUI(Rect position)
@@ -186,15 +230,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
             }
 
-            if (_imGuiDOTweenStates == null)
-            {
-                _imGuiDOTweenStates = _doTweenMethods
-                    .Select(each => new DOTweenState
-                    {
-                        Stop = each.attribute.DOTweenStop,
-                    })
-                    .ToArray();
-            }
+            EnsureStatesIMGUI();
 
             Debug.Assert(_doTweenMethods.Count > 0);
 
@@ -319,8 +355,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         if (imGuiDOTweenStates.Tween == null)
                         {
-                            imGuiDOTweenStates.Tween = (Tween)methodInfo.Invoke(_target,
-                                methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray());
+                            imGuiDOTweenStates.Tween = (Tween)methodInfo.Invoke(_targets[0],
+                                imGuiDOTweenStates.Parameters);
 
                             DOTweenEditorPreview.PrepareTweenForPreview(imGuiDOTweenStates.Tween);
                         }
@@ -341,9 +377,97 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         StopTween(imGuiDOTweenStates);
                     }
                 }
+
+                DrawParametersPositionIMGUI(bodyRect, ref yAcc, methodInfo, imGuiDOTweenStates);
             }
 
             // _debugCheck = EditorGUI.ToggleLeft(position, "Debug", _debugCheck);
+        }
+
+        private void DrawParametersLayoutIMGUI(MethodInfo methodInfo, DOTweenState state, float width)
+        {
+            ParameterInfo[] parameters = methodInfo.GetParameters();
+            float contentWidth = Mathf.Max(1f, width - ParametersIndentIMGUI);
+            foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
+            {
+                float height = GetParameterHeightIMGUI(methodInfo, state, parameterInfo, index, contentWidth);
+                Rect parameterRect = EditorGUILayout.GetControlRect(false, height);
+                parameterRect.x += ParametersIndentIMGUI;
+                parameterRect.width = Mathf.Max(1f, parameterRect.width - ParametersIndentIMGUI);
+                DrawParameterIMGUI(parameterRect, methodInfo, state, parameterInfo, index);
+            }
+        }
+
+        private void DrawParametersPositionIMGUI(Rect bodyRect, ref float y, MethodInfo methodInfo,
+            DOTweenState state)
+        {
+            float contentWidth = Mathf.Max(1f, bodyRect.width - ParametersIndentIMGUI);
+            foreach ((ParameterInfo parameterInfo, int index) in methodInfo.GetParameters().WithIndex())
+            {
+                float height = GetParameterHeightIMGUI(methodInfo, state, parameterInfo, index, contentWidth);
+                Rect parameterRect = new Rect(bodyRect)
+                {
+                    x = bodyRect.x + ParametersIndentIMGUI,
+                    y = y,
+                    width = contentWidth,
+                    height = height,
+                };
+                y += height;
+                DrawParameterIMGUI(parameterRect, methodInfo, state, parameterInfo, index);
+            }
+        }
+
+        private float GetParametersHeightIMGUI(MethodInfo methodInfo, DOTweenState state, float width)
+        {
+            return methodInfo.GetParameters()
+                .Select((parameterInfo, index) =>
+                    GetParameterHeightIMGUI(methodInfo, state, parameterInfo, index, width))
+                .Sum();
+        }
+
+        private float GetParameterHeightIMGUI(MethodInfo methodInfo, DOTweenState state,
+            ParameterInfo parameterInfo, int index, float width)
+        {
+            string label = ObjectNames.NicifyVariableName(parameterInfo.Name);
+            return IMGUIEdit.GetPropertyHeight(
+                label,
+                parameterInfo.ParameterType,
+                state.Parameters[index],
+                NoBeforeSetIMGUI,
+                newValue => state.Parameters[index] = newValue,
+                false,
+                InAnyHorizontalLayout || InDirectHorizontalLayout,
+                state.ParameterAttributes[index],
+                _targets,
+                new RichTextDrawer.EmptyRichTextTagProvider(),
+                GetParameterViewKeyIMGUI(methodInfo, parameterInfo));
+        }
+
+        private void DrawParameterIMGUI(Rect position, MethodInfo methodInfo, DOTweenState state,
+            ParameterInfo parameterInfo, int index)
+        {
+            IMGUIEdit.OnGUI(
+                position,
+                ObjectNames.NicifyVariableName(parameterInfo.Name),
+                parameterInfo.ParameterType,
+                state.Parameters[index],
+                NoBeforeSetIMGUI,
+                newValue => state.Parameters[index] = newValue,
+                false,
+                InAnyHorizontalLayout || InDirectHorizontalLayout,
+                state.ParameterAttributes[index],
+                _targets,
+                new RichTextDrawer.EmptyRichTextTagProvider(),
+                GetParameterViewKeyIMGUI(methodInfo, parameterInfo));
+        }
+
+        private string GetParameterViewKeyIMGUI(MethodInfo methodInfo, ParameterInfo parameterInfo)
+        {
+            return $"{_targets[0].GetHashCode()}.{_groupPath}.{methodInfo.MetadataToken}.{parameterInfo.Position}";
+        }
+
+        private static void NoBeforeSetIMGUI(object _)
+        {
         }
 
         public void OnDestroy()

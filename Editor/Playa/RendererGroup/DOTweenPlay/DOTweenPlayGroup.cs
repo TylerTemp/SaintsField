@@ -1,18 +1,16 @@
-﻿using System.Linq;
-using SaintsField.Editor.Playa.Renderer;
-using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
-#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using DG.Tweening;
+using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEngine;
-#endif
 
 // ReSharper disable once EmptyNamespace
-namespace SaintsField.Editor.Playa.RendererGroup
+namespace SaintsField.Editor.Playa.RendererGroup.DOTweenPlay
 {
 #if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
     // ReSharper disable once InconsistentNaming
@@ -21,13 +19,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
         public bool InDirectHorizontalLayout { get; set; }
         public void RefreshTargets(object[] targets)
         {
+            _targets = targets;
         }
 
         public bool InAnyHorizontalLayout { get; set; }
         // public bool NoLabel { get; set; }
 
         private readonly List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods = new List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)>();
-        private readonly object _target;
+        private IReadOnlyList<object> _targets;
 
         // ReSharper disable once InconsistentNaming
         private class DOTweenState
@@ -35,6 +34,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
             public bool AutoPlay;
             public Tween Tween;
             public ETweenStop Stop;
+
+            public object[] Parameters = Array.Empty<object>();
+            public IReadOnlyList<Attribute>[] ParameterAttributes = Array.Empty<IReadOnlyList<Attribute>>();
         }
 
         // ReSharper disable once InconsistentNaming
@@ -45,9 +47,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
         private readonly Texture2D _resumeIcon;
         private readonly Texture2D _stopIcon;
 
-        public DOTweenPlayGroup(object target)
+        public DOTweenPlayGroup(IReadOnlyList<object> targets)
         {
-            _target = target;
+            _targets = targets;
             _playIcon = Util.LoadResource<Texture2D>("play.png");
             _pauseIcon = Util.LoadResource<Texture2D>("pause.png");
             _resumeIcon = Util.LoadResource<Texture2D>("resume.png");
@@ -92,6 +94,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
             doTweenState.Tween = null;
         }
 
+        private string _groupPath;
+
         public void Add(string groupPath, ISaintsRenderer renderer)
         {
             if (renderer is EmptyRenderer)
@@ -113,6 +117,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, doTweenPlayAttribute));
             // }
             _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, doTweenPlayAttribute));
+            _groupPath = groupPath;
         }
     }
 #endif

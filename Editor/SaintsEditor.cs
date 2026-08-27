@@ -23,6 +23,7 @@ using SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
+using SaintsField.Editor.Playa.RendererGroup.DOTweenPlay;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -685,11 +686,11 @@ namespace SaintsField.Editor
 #if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
                     rendererGroupInfo.Config.IsDoTween
                         // ReSharper disable once RedundantCast
-                        ? (ISaintsRendererGroup)new DOTweenPlayGroup(rendererGroupInfo.Target)
-                        : new SaintsRendererGroup(rendererGroupInfo.AbsGroupBy, rendererGroupInfo.Config, rendererGroupInfo.Target)
+                        ? (ISaintsRendererGroup)new DOTweenPlayGroup(rendererGroupInfo.Targets)
+                        : new SaintsRendererGroup(rendererGroupInfo.AbsGroupBy, rendererGroupInfo.Config, rendererGroupInfo.Targets)
 #else
                     new SaintsRendererGroup(rendererGroupInfo.AbsGroupBy, rendererGroupInfo.Config,
-                        rendererGroupInfo.Target)
+                        rendererGroupInfo.Targets)
 #endif
                 ;
             foreach (RendererGroupInfo c in rendererGroupInfo.Children)
@@ -709,7 +710,7 @@ namespace SaintsField.Editor
             public List<RendererGroupInfo> Children;
             public SaintsRendererGroup.Config Config;
             public AbsRenderer Renderer;
-            public object Target;
+            public IReadOnlyList<object> Targets;
         }
 
         public static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted, SerializedObject serializedObject, IMakeRenderer makeRenderer)
@@ -800,7 +801,7 @@ namespace SaintsField.Editor
                                                 AbsGroupBy = openGroupTo,
                                                 Children = new List<RendererGroupInfo>(),
                                                 Config = new SaintsRendererGroup.Config(),
-                                                Target = saintsFieldWithInfo.Targets[0],
+                                                Targets = saintsFieldWithInfo.Targets,
                                             };
                                         }
 
@@ -883,7 +884,7 @@ namespace SaintsField.Editor
                             preAbsGroupBy = groupBy;
                             // Debug.Log($"{saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
 
-                            (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy, saintsFieldWithInfo.Targets[0]);
+                            (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy, saintsFieldWithInfo.Targets);
                             if (newRoot)
                             {
                                 // Debug.Log($"new root {saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
@@ -1281,7 +1282,7 @@ namespace SaintsField.Editor
             }
         }
 
-        private static (bool newRoot, RendererGroupInfo rendererGroupInfo) GetOrCreateGroupInfo(Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo, string path, object target)
+        private static (bool newRoot, RendererGroupInfo rendererGroupInfo) GetOrCreateGroupInfo(Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo, string path, IReadOnlyList<object> targets)
         {
             bool newRoot = false;
             if (!path.Contains('/'))
@@ -1294,7 +1295,7 @@ namespace SaintsField.Editor
                         AbsGroupBy = path,
                         Children = new List<RendererGroupInfo>(),
                         Config = new SaintsRendererGroup.Config(),
-                        Target = target,
+                        Targets = targets,
                     };
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                     Debug.Log($"Layout add node root default for {path}");
@@ -1315,7 +1316,7 @@ namespace SaintsField.Editor
                     AbsGroupBy = rootGroup,
                     Children = new List<RendererGroupInfo>(),
                     Config = new SaintsRendererGroup.Config(),
-                    Target = target,
+                    Targets = targets,
                 };
 
 
@@ -1337,7 +1338,7 @@ namespace SaintsField.Editor
                         AbsGroupBy = pathAcc,
                         Children = new List<RendererGroupInfo>(),
                         Config = new SaintsRendererGroup.Config(),
-                        Target = target,
+                        Targets = targets,
                     };
                     accInfo.Children.Add(found);
 

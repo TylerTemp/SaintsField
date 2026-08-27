@@ -49,6 +49,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .Append(spriteRenderer.DOColor(Color.cyan, 1f))
                 .SetLoops(-1);
         }
+
+        [DOTweenPlay("With Args")]
+        public Tween ChangeColor(Color color, [PropRange(1, 3)] float time)
+        {
+            return spriteRenderer.DOColor(color, time);
+        }
 #endif
 
         public void DoNotIncludeMe() {}

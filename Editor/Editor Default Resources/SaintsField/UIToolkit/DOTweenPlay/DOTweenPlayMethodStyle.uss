@@ -1,0 +1,63 @@
+.rootActive {
+    border-width: 1px;
+    border-color: var(--unity-colors-inspector_titlebar-background-hover);
+    border-radius: 3px;
+}
+
+.args {
+    flex-grow: 1;
+    padding: 2px;
+    padding-left: 15px;
+    margin-right: 4px;
+    display: none;
+}
+
+.argsActive {
+    border-bottom-width: 1px;
+    border-bottom-color: var(--unity-colors-inspector_titlebar-background-hover);
+}
+
+.controls {
+    flex-direction: row;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.autoPlayToggle {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.buttonsRoot {
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-direction: row;
+}
+
+.iconButton {
+    width: 20;
+    background-position-x: center;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.playButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/play.png?fileID=2800000&guid=0d8f6056b9be054428bc5851846b31ba&type=3#play");
+}
+
+.pauseButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/pause.png?fileID=2800000&guid=a220d245105a9b447b5a5f737576d0cd&type=3#pause");
+}
+
+.stopButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/stop.png?fileID=2800000&guid=7e2fb24895f24b445a4430ed75c89feb&type=3#stop");
+}
+
+.resumeButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/resume.png?fileID=2800000&guid=b66404d4cda9808458d44dc72661c0bf&type=3#resume");
+}

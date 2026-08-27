@@ -19,8 +19,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             _slider = new Slider("")
             {
                 showInputField = false,
-                lowValue = float.MinValue / 2,
-                highValue = float.MaxValue / 2,
+                lowValue = float.MinValue / 10,
+                highValue = float.MaxValue / 10,
                 style =
                 {
                     flexGrow = 1,
@@ -43,6 +43,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             _slider.RegisterValueChangedCallback(evt =>
             {
+                evt.StopPropagation();
                 // ReSharper disable once InvertIf
                 if (_init)
                 {
@@ -62,6 +63,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
             _floatField.RegisterValueChangedCallback(evt =>
             {
+                evt.StopPropagation();
                 if (!_init)
                 {
                     return;

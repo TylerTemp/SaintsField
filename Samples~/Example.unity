@@ -3451,6 +3451,8 @@ MonoBehaviour:
   worldPos2: {x: -1.9, y: 1.2846097}
   localPos3: {x: -0.35697484, y: 0.4203025, z: -4.602842}
   localPos2: {x: 0.23284078, y: -4.4419274}
+  showToggle: 0
+  sh: {x: 0, y: 0}
 --- !u!1 &308851076
 GameObject:
   m_ObjectHideFlags: 0

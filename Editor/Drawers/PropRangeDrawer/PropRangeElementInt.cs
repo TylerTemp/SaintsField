@@ -50,6 +50,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             _slider.RegisterValueChangedCallback(evt =>
             {
+                evt.StopPropagation();
                 // ReSharper disable once InvertIf
                 if (_init)
                 {
@@ -69,6 +70,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
             _intField.RegisterValueChangedCallback(evt =>
             {
+                evt.StopPropagation();
                 if (!_init)
                 {
                     return;
