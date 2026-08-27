@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -15,7 +14,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
     public partial class ShaderParamAttributeDrawer
     {
-        private sealed class ShaderParamInfoIMGUI
+        protected override bool UseCreateFieldIMGUI => true;
+
+        private class ShaderParamInfoIMGUI
         {
             public string Error = "";
             public Shader Shader;

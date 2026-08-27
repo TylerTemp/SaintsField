@@ -2054,6 +2054,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             #endregion
 
+            #region ShaderParam
+            if (valueType == typeof(ShaderParam) || value is ShaderParam)
+            {
+                return (ShaderParamAttributeDrawer.UIToolkitValueEditShaderParam(
+                    oldElement,
+                    allAttributes.OfType<ShaderParamAttribute>().FirstOrDefault() ?? new ShaderParamAttribute(),
+                    label,
+                    (ShaderParam)value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
+            }
+            #endregion
+
             #region AnimatorState
 
             if (valueType == typeof(AnimatorState) || value is AnimatorState)

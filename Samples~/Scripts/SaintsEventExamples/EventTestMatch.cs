@@ -74,6 +74,73 @@ namespace SaintsField.Samples.Scripts.SaintsEventExamples
             Debug.Log("SaintsEvent patch 2 typed persistent delegate test passed.", this);
         }
 
+        [Button]
+        private void RunPatch3RegressionTests()
+        {
+            string invocationOrder = "";
+            UnityAction<int, string, float> selfRemovingListener = null;
+            selfRemovingListener = (intValue, stringValue, floatValue) =>
+            {
+                invocationOrder += "A";
+                _threeArguments.RemoveListener(selfRemovingListener);
+            };
+            UnityAction<int, string, float> remainingListener = (intValue, stringValue, floatValue) =>
+            {
+                invocationOrder += "B";
+            };
+
+            _threeArguments.AddListener(selfRemovingListener);
+            _threeArguments.AddListener(remainingListener);
+            try
+            {
+                _threeArguments.Invoke(1, "first", 1f);
+                Assert.AreEqual("AB", invocationOrder,
+                    "Runtime listeners did not use multicast snapshot semantics during removal.");
+
+                _threeArguments.Invoke(2, "second", 2f);
+                Assert.AreEqual("ABB", invocationOrder,
+                    "The self-removing runtime listener was invoked more than once.");
+            }
+            finally
+            {
+                _threeArguments.RemoveListener(selfRemovingListener);
+                _threeArguments.RemoveListener(remainingListener);
+            }
+
+            Debug.Log("SaintsEvent patch 3 direct multicast runtime listener test passed.", this);
+        }
+
+        [Button]
+        private void RunPatch4RegressionTests()
+        {
+            const int invokeCount = 1000;
+            SaintsEvent<int> testEvent = new SaintsEvent<int>();
+            UnityAction<int> listener = Patch4ARuntimeListener;
+            testEvent.AddListener(listener);
+            testEvent.Invoke(0);
+            _patch4AInvocationCount = 0;
+
+            long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+            for (int index = 0; index < invokeCount; index++)
+            {
+                testEvent.Invoke(index);
+            }
+            long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+
+            testEvent.RemoveListener(listener);
+            Assert.AreEqual(invokeCount, _patch4AInvocationCount);
+            Assert.AreEqual(0L, allocatedBytes,
+                $"Runtime-only SaintsEvent<int> allocated {allocatedBytes} bytes during {invokeCount} invokes.");
+            Debug.Log("SaintsEvent patch 4a zero-allocation runtime-only test passed.", this);
+        }
+
+        private int _patch4AInvocationCount;
+
+        private void Patch4ARuntimeListener(int value)
+        {
+            _patch4AInvocationCount++;
+        }
+
         private const string Patch2ExceptionMessage = "patch-2-direct-delegate";
         private int _persistentInt;
         private string _persistentString;

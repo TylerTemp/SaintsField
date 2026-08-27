@@ -20513,6 +20513,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5230f2d1430c07e4e95b1b00e4727da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shaderParamType:
+    name: _WorkflowMode
   shaderParamString: _Metallic
   shaderParamInt: 239
   shaderParamFilter: 432

@@ -6,26 +6,28 @@ namespace SaintsField.Events
     [Serializable]
     public class SaintsEvent<T0, T1, T2>: SaintsEventBase
     {
+        private event UnityAction<T0, T1, T2> _runtimeCalls;
+
         public void Invoke(T0 arg0, T1 arg1, T2 arg2)
         {
-            object[] args = { arg0, arg1, arg2 };
-            foreach (PersistentCall presistentCall in _persistentCalls)
+            if (_persistentCalls.Length > 0)
             {
-                presistentCall.Invoke(args);
+                object[] args = { arg0, arg1, arg2 };
+                foreach (PersistentCall persistentCall in _persistentCalls)
+                {
+                    persistentCall.Invoke(args);
+                }
             }
 
-            foreach (BaseInvokableCall invokableCall in RuntimeCalls)
-            {
-                invokableCall.Invoke(args);
-            }
+            _runtimeCalls?.Invoke(arg0, arg1, arg2);
         }
 
-        public void AddListener(UnityAction<T0, T1, T2> call) => AddCall(GetDelegate(call));
-        public void RemoveListener(UnityAction<T0, T1, T2> call) => RemoveListener(call.Target, call.Method);
+        public void AddListener(UnityAction<T0, T1, T2> call) => _runtimeCalls += call;
+        public void RemoveListener(UnityAction<T0, T1, T2> call) => _runtimeCalls -= call;
 
-        private static BaseInvokableCall GetDelegate(UnityAction<T0, T1, T2> action)
+        protected override void RemoveAllRuntimeListeners()
         {
-            return new InvokableCall<T0, T1, T2>(action);
+            _runtimeCalls = null;
         }
     }
 }

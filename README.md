@@ -114,10 +114,13 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.26.1**
+**5.26.2**
 
-1.  Add: `DOTweenPlay` now support parameters
-2.  Fix: `PropRange` slider bar did not work when drag
+1.  Fix: `ShaderParams` no longer support `integer` type because `Shader.PropertyToID` is not the same between runtime.
+2.  Fix: `SaintsEvent` invoke error
+3.  Improve: `SaintsEvent` now cache the method delegate for a better performance
+4.  Add: `ShaderParams` data type to easily hold a shader name and auto convert to (and cache) `Shader.PropertyToID`. 
+
 
 ## Usage ##
 

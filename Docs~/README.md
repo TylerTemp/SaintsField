@@ -1479,7 +1479,7 @@ private string ShowInputAxis([InputAxis] string myInput) => myInput;
 
 Select a shader parameter from a `shader`, `material` or `renderer`. (Requires Unity 2021.2+)
 
-It supports string fields and saves the shader parameter name.
+It supports string/`ShaderParam` fields and saves the shader parameter.
 
 **Parameters**:
 
@@ -1506,6 +1506,20 @@ private Shader GetShader() => targetRenderer.sharedMaterial.shader;
 ```
 
 ![image](https://github.com/user-attachments/assets/80ba6891-2a7e-41e5-8887-74e29479f1d9)
+
+It's recommended to use `ShaderParam` type because it can auto convert to hash id, which is much faster than using string.
+
+```csharp
+public ShaderParam shaderParamType;
+// attribute is also supported
+[ShaderParam(ShaderPropertyType.Float)] public ShaderParam shaderParamTypeWithFilter;
+
+private void Awake()
+{
+    // directly put into `Set*()` in material, it'll convert & cache the hash id
+    material.SetFloat(shaderParamTypeWithFilter, 2f);
+}
+```
 
 It works with `ShowInInspector`
 

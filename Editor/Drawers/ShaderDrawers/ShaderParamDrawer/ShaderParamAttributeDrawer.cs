@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(ShaderParamAttribute), true)]
+    [CustomPropertyDrawer(typeof(ShaderParam), true)]
     public partial class ShaderParamAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static string GetTypeMismatchError(SerializedProperty property)

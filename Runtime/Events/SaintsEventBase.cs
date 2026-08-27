@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,27 +8,15 @@ namespace SaintsField.Events
     [Serializable]
     public abstract class SaintsEventBase
     {
-        internal readonly List<BaseInvokableCall> RuntimeCalls = new List<BaseInvokableCall>();
-
-        [SerializeField] protected PersistentCall[] _persistentCalls;
-
-        internal void AddCall(BaseInvokableCall call)
-        {
-            RuntimeCalls.Add(call);
-        }
-
-        protected void RemoveListener(object targetObj, MethodInfo method)
-        {
-            int index = RuntimeCalls.FindIndex(each => each.Find(targetObj, method));
-            if (index != -1)
-            {
-                RuntimeCalls.RemoveAt(index);
-            }
-        }
+        [SerializeField] protected PersistentCall[] _persistentCalls = Array.Empty<PersistentCall>();
 
         public void RemoveAllListeners()
         {
-            RuntimeCalls.Clear();
+            RemoveAllRuntimeListeners();
+        }
+
+        protected virtual void RemoveAllRuntimeListeners()
+        {
         }
 
         public int GetPersistentEventCount() => _persistentCalls.Length;

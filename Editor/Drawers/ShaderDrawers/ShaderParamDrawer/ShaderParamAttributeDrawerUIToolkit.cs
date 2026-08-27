@@ -14,6 +14,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
     public partial class ShaderParamAttributeDrawer
     {
+        protected override bool UseCreateFieldUIToolKit => true;
+
         // private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_DropdownButton";
         private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_HelpBox";
 
@@ -22,7 +24,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute) saintsAttribute;
+            ShaderParamAttribute shaderParamAttribute = saintsAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
 
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
@@ -55,6 +57,20 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     }
                     return r;
                 }
+                case SerializedPropertyType.Generic:
+                {
+                    ShaderParamStringField r =
+                        new ShaderParamStringField(GetPreferredLabel(property), shaderParamAttribute.PropertyType){
+                            bindingPath = property.FindPropertyRelative(nameof(ShaderParam.name)).propertyPath,
+                        };
+                    r.AddToClassList(ClassAllowDisable);
+                    r.AddToClassList(ShaderParamStringField.alignedFieldUssClassName);
+                    if (!string.IsNullOrEmpty(property.tooltip) && r.labelElement != null)
+                    {
+                        r.labelElement.tooltip = property.tooltip;
+                    }
+                    return r;
+                }
                 default:
                     return new VisualElement();
             }
@@ -69,8 +85,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (property.propertyType)
             {
-                // case SerializedPropertyType.Integer:
                 case SerializedPropertyType.String:
+                case SerializedPropertyType.Generic:
                     return new HelpBox("", HelpBoxMessageType.Error)
                     {
                         style =
@@ -97,7 +113,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamAttribute shaderParamAttribute = saintsAttribute as ShaderParamAttribute ?? new ShaderParamAttribute();
 
             IBindShader bindShader;
 
@@ -114,12 +130,30 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 // }
                 //     break;
                 case SerializedPropertyType.String:
+                case SerializedPropertyType.Generic:
                 {
                     ShaderParamStringField stringDropdownField = container.Q<ShaderParamStringField>();
                     stringDropdownField.ShaderParamStringElement.BindHelpBox(helpBox);
                     AddContextualMenuManipulator(helpBox, shaderParamAttribute, stringDropdownField, property, onValueChangedCallback, info, parent);
                     bindShader = stringDropdownField.ShaderParamStringElement;
-                    stringDropdownField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.stringValue));
+
+                    bool isString = property.propertyType == SerializedPropertyType.String;
+
+                    stringDropdownField.TrackPropertyValue(property, p =>
+                    {
+                        if(isString)
+                        {
+                            onValueChangedCallback.Invoke(p.stringValue);
+                        }
+                        else
+                        {
+                            (string valueError, int _, object value) = Util.GetValue(property, info, parent);
+                            if (valueError == "")
+                            {
+                                onValueChangedCallback.Invoke(value);
+                            }
+                        }
+                    });
                 }
                     break;
                 default:
@@ -177,16 +211,34 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     // }
                 }
 
+                bool isString = property.propertyType == SerializedPropertyType.String;
+
                 foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
                 {
                     if (shaderCustomInfo.PropertyName == clipboardText)
                     {
                         evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"", _ =>
                         {
-                            property.stringValue = shaderCustomInfo.PropertyName;
-                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyName);
+                            SerializedProperty targetProp =
+                                isString
+                                    ? property
+                                    : property.FindPropertyRelative(nameof(ShaderParam.name));
+
+                            targetProp.stringValue = shaderCustomInfo.PropertyName;
+                            // ReflectUtils.SetValue(targetProp.propertyPath, targetProp.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyName);
                             property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(shaderCustomInfo.PropertyName);
+                            if(isString)
+                            {
+                                onValueChangedCallback.Invoke(shaderCustomInfo.PropertyName);
+                            }
+                            else
+                            {
+                                (string valueError, int _, object value) = Util.GetValue(property, info, parent);
+                                if (valueError == "")
+                                {
+                                    onValueChangedCallback.Invoke(value);
+                                }
+                            }
                         });
                         return;
                     }
@@ -272,6 +324,25 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 });
             }
             return element;
+        }
+
+        public static VisualElement UIToolkitValueEditShaderParam(VisualElement oldElement,
+            ShaderParamAttribute shaderParamAttribute, string label, ShaderParam value, Action<object> beforeSet,
+            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout,
+            IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            Action<object> wrappedBeforeSet = beforeSet == null
+                ? null
+                : _ => beforeSet(value);
+            Action<object> wrappedSetter = setterOrNull == null
+                ? null
+                : newValue => setterOrNull(new ShaderParam
+                {
+                    name = (string)newValue,
+                });
+
+            return UIToolkitValueEditString(oldElement, shaderParamAttribute, label, value?.name ?? "",
+                wrappedBeforeSet, wrappedSetter, labelGrayColor, inHorizontalLayout, allAttributes, targets);
         }
 
         // private class ShaderParamValueEditInt : VisualElement
