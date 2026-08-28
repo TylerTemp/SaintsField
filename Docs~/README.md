@@ -6499,6 +6499,9 @@ Use `Tools` - `Saints Field` - `Color Palette` to manage the color palette.
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
+> [!WARNING]
+> Deprecated. This is now default on and can be controlled by `Tools` - `Saints Field` - `Edit Config...`
+
 > [!NOTE]
 > This is UI Toolkit only
 
@@ -7348,6 +7351,8 @@ public string layoutEnd;
 
 ## Handles ##
 
+### Overview ###
+
 `Handles` is drawn in the scene view instead of inspector.
 
 When using handles (except `SceneViewPicker` and `DrawLabel`), you can use `shift` + `right click` in scene to show/hide some handles.
@@ -7987,6 +7992,8 @@ using SaintsField;
 [![video](https://github.com/user-attachments/assets/6afd879a-724c-4f50-9524-4fef0c0497e2)](https://github.com/user-attachments/assets/7a7c387a-64ef-4219-99db-b492accd13f6)
 
 ## Component Header ##
+
+### Overview ###
 
 Component Header allows you to draw extra stuffs on a component like this:
 
@@ -9019,6 +9026,8 @@ private void Load()
 
 ## Addressable ##
 
+### Overview ###
+
 These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.unity.addressables@latest). It's there only if you have `Addressable` installed.
 
 Namespace: `SaintsField.Addressable`
@@ -9121,6 +9130,8 @@ Validate if a sub-asset is signed in type like `Addressable.AssetReferenceSprite
 
 ## AI Navigation ##
 
+### Overview ###
+
 These tools are for [Unity AI Navigation](https://docs.unity3d.com/Packages/com.unity.ai.navigation@2.0/manual/) (`NavMesh`). It's there only if you have `AI Navigation` installed.
 
 Namespace: `SaintsField.AiNavigation`
@@ -9169,6 +9180,8 @@ public int areaName;
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
 
 ## Spine ##
+
+### Overview ###
 
 [`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
 but it has some limit, e.g. it can not be used on string, it can not report an error if the target is changed, mismatch with skeleton or missing etc.
@@ -9426,6 +9439,11 @@ To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Cr
 
 ## Wwise ##
 
+### Overview ###
+
+> [!TIP]
+> Wwise 2025 in Unity only set the 2024 marco. Please manually set a `WWISE_2025_OR_LATER` so SaintsField can switch to the new API.
+
 Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.
 
 If you can't see the wwise related attributes, please add marco `SAINTSFIELD_WWISE` to enable it.
@@ -9456,6 +9474,8 @@ public Event stopEvents;
 
 ## I2 Localization ##
 
+### Overview ###
+
 Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Tools` - `Saints Field` - `Enable I2 Localization Support`
 
 NameSpace: `SaintsField.I2Loc`
@@ -9472,6 +9492,8 @@ using SaintsField.I2Loc;
 ```
 
 ## SaintsEditor ##
+
+### Overview ###
 
 `SaintsEditor` is a `UnityEditor.Editor` level component, which gives:
 
@@ -9825,6 +9847,8 @@ If you have [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) support, t
 
 ## Extended Serialization ##
 
+### Overview ###
+
 `SaintsEditor` supports some types that usually can not be serialized. To use this function:
 
 1.  Ensure the type is supported by this functionality
@@ -10125,6 +10149,8 @@ public partial class SerDecimalExample : MonoBehaviour
 ![](https://github.com/user-attachments/assets/0f8d6994-5149-441e-b3b0-20a93aa9a421)
 
 ## `SaintsEditorWindow` ##
+
+### Overview ###
 
 An `EditorWindow` class to easily create an editor (a bit like Odin's `OdinEditorWindow`), with support of `StartEditorCoroutine`
 and `StopEditorCoroutine`

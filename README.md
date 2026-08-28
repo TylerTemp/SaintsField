@@ -114,13 +114,12 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.26.2**
+**5.26.3**
 
-1.  Fix: `ShaderParam` no longer support `integer` type because `Shader.PropertyToID` is not the same between runtime.
-2.  Fix: `SaintsEvent` invoke error
-3.  Improve: `SaintsEvent` now cache the method delegate for a better performance
-4.  Add: `ShaderParam` data type to easily hold a shader name and auto convert to (and cache) `Shader.PropertyToID`. 
+Add: Support for Wwise 2025
 
+> [!TIP]
+> Wwise 2025 in Unity only set the 2024 marco. Please manually set a `WWISE_2025_OR_LATER` so SaintsField can switch to the new API.
 
 ## Usage ##
 
@@ -243,7 +242,8 @@ namespace: `SaintsField`
     *   [`LayoutCloseHere` / `LayoutTerminateHere`](https://saintsfield.comes.today/layout-system/layoutclosehere--layoutterminatehere)
     *   [`LayoutDisableIf` / `LayoutEnableIf`](https://saintsfield.comes.today/layout-system/layoutdisableif--layoutenableif)
     *   [`LayoutShowIf` / `LayoutHideIf`](https://saintsfield.comes.today/layout-system/layoutshowif--layouthideif)
-*   [Handles](https://saintsfield.comes.today/handles)
+*   Handles
+    *   [Overview](https://saintsfield.comes.today/handles/overview)
     *   [`SceneViewPicker`](https://saintsfield.comes.today/handles/sceneviewpicker)
     *   [`DrawLabel`](https://saintsfield.comes.today/handles/drawlabel)
     *   [`PositionHandle`](https://saintsfield.comes.today/handles/positionhandle)
@@ -257,7 +257,8 @@ namespace: `SaintsField`
     *   [`RadiusHandle`](https://saintsfield.comes.today/handles/radiushandle)
     *   [`SliderHandle`](https://saintsfield.comes.today/handles/sliderhandle)
     *   [`PrimitiveBoundsHandle`](https://saintsfield.comes.today/handles/primitiveboundshandle)
-*   [Component Header](https://saintsfield.comes.today/component-header)
+*   Component Header
+    *   [Overview](https://saintsfield.comes.today/component-header/overview)
     *   [Runtime Saver](https://saintsfield.comes.today/component-header/runtime-saver)
     *   [`HeaderButton` / `HeaderLeftButton`](https://saintsfield.comes.today/component-header/headerbutton--headerleftbutton)
     *   [`HeaderGhostButton` / `HeaderGhostLeftButton`](https://saintsfield.comes.today/component-header/headerghostbutton--headerghostleftbutton)
@@ -272,16 +273,19 @@ namespace: `SaintsField`
     *   [`TypeReference`](https://saintsfield.comes.today/data-types/typereference)
     *   [`SaintsEvent`](https://saintsfield.comes.today/data-types/saintsevent)
     *   [`SceneReference`](https://saintsfield.comes.today/data-types/scenereference)
-*   [Addressable](https://saintsfield.comes.today/addressable)
+*   Addressable
+    *   [Overview](https://saintsfield.comes.today/addressable/overview)
     *   [`AddressableLabel`](https://saintsfield.comes.today/addressable/addressablelabel)
     *   [`AddressableAddress`](https://saintsfield.comes.today/addressable/addressableaddress)
     *   [`AddressableResource`](https://saintsfield.comes.today/addressable/addressableresource)
     *   [`AddressableScene`](https://saintsfield.comes.today/addressable/addressablescene)
     *   [`AddressableSubAssetRequired`](https://saintsfield.comes.today/addressable/addressablesubassetrequired)
-*   [AI Navigation](https://saintsfield.comes.today/ai-navigation)
+*   AI Navigation
+    *   [Overview](https://saintsfield.comes.today/ai-navigation/overview)
     *   [`NavMeshAreaMask`](https://saintsfield.comes.today/ai-navigation/navmeshareamask)
     *   [`NavMeshArea`](https://saintsfield.comes.today/ai-navigation/navmesharea)
-*   [Spine](https://saintsfield.comes.today/spine)
+*   Spine
+    *   [Overview](https://saintsfield.comes.today/spine/overview)
     *   [`SpineAnimationPicker`](https://saintsfield.comes.today/spine/spineanimationpicker)
     *   [`SpineSkinPicker`](https://saintsfield.comes.today/spine/spineskinpicker)
     *   [`SpineSlotPicker`](https://saintsfield.comes.today/spine/spineslotpicker)
@@ -293,11 +297,14 @@ namespace: `SaintsField`
     *   [`SpineTransformConstraintPicker`](https://saintsfield.comes.today/spine/spinetransformconstraintpicker)
 *   DOTween
     *   [`DOTweenPlay`](https://saintsfield.comes.today/dotween/dotweenplay)
-*   [Wwise](https://saintsfield.comes.today/wwise)
+*   Wwise
+    *   [Overview](https://saintsfield.comes.today/wwise/overview)
     *   [`GetWwise`](https://saintsfield.comes.today/wwise/getwwise)
-*   [I2 Localization](https://saintsfield.comes.today/i-localization)
+*   I2 Localization
+    *   [Overview](https://saintsfield.comes.today/i-localization/overview)
     *   [`LocalizedStringPicker`](https://saintsfield.comes.today/i-localization/localizedstringpicker)
-*   [SaintsEditor](https://saintsfield.comes.today/saintseditor)
+*   SaintsEditor
+    *   [Overview](https://saintsfield.comes.today/saintseditor/overview)
     *   [Setup](https://saintsfield.comes.today/saintseditor/setup)
     *   [Inherent](https://saintsfield.comes.today/saintseditor/inherent)
     *   [Extend](https://saintsfield.comes.today/saintseditor/extend)
@@ -307,7 +314,8 @@ namespace: `SaintsField`
     *   [Scriptable Renderer Data](https://saintsfield.comes.today/saintseditor/scriptable-renderer-data)
     *   [`Unity.Mathematics`](https://saintsfield.comes.today/saintseditor/unitymathematics)
     *   [SaintsBuild Support](https://saintsfield.comes.today/saintseditor/saintsbuild-support)
-*   [Extended Serialization](https://saintsfield.comes.today/extended-serialization)
+*   Extended Serialization
+    *   [Overview](https://saintsfield.comes.today/extended-serialization/overview)
     *   [`Dictionary<,>`](https://saintsfield.comes.today/extended-serialization/dictionary)
     *   [`HashSet<>`](https://saintsfield.comes.today/extended-serialization/hashset)
     *   [`interface`](https://saintsfield.comes.today/extended-serialization/interface)
@@ -316,7 +324,8 @@ namespace: `SaintsField`
     *   [`TimeSpan`](https://saintsfield.comes.today/extended-serialization/timespan)
     *   [`Guid`](https://saintsfield.comes.today/extended-serialization/guid)
     *   [`decimal`](https://saintsfield.comes.today/extended-serialization/decimal)
-*   [`SaintsEditorWindow`](https://saintsfield.comes.today/saintseditorwindow)
+*   `SaintsEditorWindow`
+    *   [Overview](https://saintsfield.comes.today/saintseditorwindow/overview)
     *   [Usage & Example](https://saintsfield.comes.today/saintseditorwindow/usage--example)
     *   [Life Cycle & Functions](https://saintsfield.comes.today/saintseditorwindow/life-cycle--functions)
     *   [`WindowInlineEditor`](https://saintsfield.comes.today/saintseditorwindow/windowinlineeditor)

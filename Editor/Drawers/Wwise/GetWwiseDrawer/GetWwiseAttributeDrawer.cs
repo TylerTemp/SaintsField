@@ -1,4 +1,4 @@
-#if (WWISE_2030_OR_LATER || WWISE_2029_OR_LATER || WWISE_2028_OR_LATER || WWISE_2027_OR_LATER || WWISE_2026_OR_LATER || WWISE_2025_OR_LATER || WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
+#if (WWISE_2025_OR_LATER || WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -302,6 +302,30 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
 
         private static IReadOnlyList<string> ParseBasicPath(string rawPath) => rawPath.Replace("\\", "/").Split('/');
 
+#if WWISE_2025_OR_LATER
+        private static IEnumerable<WwiseBasicInfo> ParseToBasicInfo(WwiseObjectType wwiseObjectType,
+            IEnumerable<AkWwiseProjectData.WwiseTreeObject> treeObjects)
+        {
+            foreach (AkWwiseProjectData.WwiseTreeObject treeObject in treeObjects)
+            {
+                if (treeObject.Type == wwiseObjectType)
+                {
+                    yield return new WwiseBasicInfo(wwiseObjectType, treeObject.Guid, treeObject.Name,
+                        ParseBasicPath(treeObject.Path).Skip(1).ToArray());
+                }
+
+                if (treeObject.Children == null)
+                {
+                    continue;
+                }
+
+                foreach (WwiseBasicInfo childInfo in ParseToBasicInfo(wwiseObjectType, treeObject.Children))
+                {
+                    yield return childInfo;
+                }
+            }
+        }
+#else
         private static IEnumerable<WwiseBasicInfo> ParseToBasicInfo(WwiseObjectType wwiseObjectType, AkWwiseProjectData.AkInfoWorkUnit workUnit)
         {
             return workUnit.List.Select(akInformation => new WwiseBasicInfo(wwiseObjectType, akInformation.Guid, akInformation.Name,
@@ -332,11 +356,27 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
                 }
             }
         }
+#endif
 
         public static GetXPathValuesResult CalcXPathValues(WwiseObjectType wwiseObjectType, IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
         {
             AkWwiseProjectData wwiseData = AkWwiseProjectInfo.GetData();
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+#if WWISE_2025_OR_LATER
+            IReadOnlyList<WwiseBasicInfo> wwiseInfos = wwiseObjectType switch
+            {
+                WwiseObjectType.AuxBus => ParseToBasicInfo(wwiseObjectType, wwiseData.BusRoot).ToArray(),
+                WwiseObjectType.Event => ParseToBasicInfo(wwiseObjectType, wwiseData.EventRoot).ToArray(),
+                WwiseObjectType.Soundbank => ParseToBasicInfo(wwiseObjectType, wwiseData.BankRoot).ToArray(),
+                WwiseObjectType.State => ParseToBasicInfo(wwiseObjectType, wwiseData.StateRoot).ToArray(),
+                WwiseObjectType.Switch => ParseToBasicInfo(wwiseObjectType, wwiseData.SwitchRoot).ToArray(),
+                WwiseObjectType.GameParameter => ParseToBasicInfo(wwiseObjectType, wwiseData.GameParameterRoot).ToArray(),
+                WwiseObjectType.Trigger => ParseToBasicInfo(wwiseObjectType, wwiseData.TriggerRoot).ToArray(),
+                WwiseObjectType.AcousticTexture => ParseToBasicInfo(wwiseObjectType, wwiseData.AcousticTextureRoot).ToArray(),
+                WwiseObjectType.None => Array.Empty<WwiseBasicInfo>(),
+                _ => throw new ArgumentOutOfRangeException(nameof(wwiseObjectType), wwiseObjectType, null),
+            };
+#else
             IReadOnlyList<WwiseBasicInfo> wwiseInfos = wwiseObjectType switch
             {
                 WwiseObjectType.AuxBus => wwiseData.AuxBusWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
@@ -350,6 +390,7 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
                 WwiseObjectType.None => Array.Empty<WwiseBasicInfo>(),
                 _ => throw new ArgumentOutOfRangeException(nameof(wwiseObjectType), wwiseObjectType, null),
             };
+#endif
 
             // foreach (WwiseBasicInfo wwiseBasicInfo in wwiseInfos)
             // {
