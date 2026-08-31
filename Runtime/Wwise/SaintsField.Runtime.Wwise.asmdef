@@ -12,7 +12,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "WWISE_2025_OR_LATER || WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || SAINTSFIELD_WWISE"
     ],
     "versionDefines": [],
     "noEngineReferences": false

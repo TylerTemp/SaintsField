@@ -11,7 +11,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
-#if (WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
+#if SAINTSFIELD_WWISE
 using SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer;
 using SaintsField.Wwise;
 #endif
@@ -225,7 +225,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #endif
                     return (min, max);
                 }
-#if (WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
+#if SAINTSFIELD_WWISE
                 // ReSharper disable once RedundantDiscardDesignation
                 case GetWwiseAttribute _:
                 {

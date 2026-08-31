@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.26.4 ##
+
+1.  Handles now respect Unity's toolbar - Tool Handle Positon - Center/Pivot mode
+2.  Wwise support is disabled by default. Please use `Tools` - `Saints Field` - `Enable Wwise Support` or add marco `SAINTSFIELD_WWISE` to enable it.
+
 ## 5.26.3 ##
 
 Add: Support for Wwise 2025

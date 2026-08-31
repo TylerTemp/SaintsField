@@ -27,6 +27,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             public string Error;
             // public Util.TargetWorldPosInfo TargetWorldPosInfo;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
 
             public float Radius;
             public Color Color;
@@ -196,7 +197,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             // Debug.Log(radiusHandleInfo.Color);
 
             // Debug.Log(wireDiscInfo.TargetWorldPosInfo.IsTransform);
-            Vector3 center = radiusHandleInfo.SpaceTransform.position;
+            Vector3 center = Util.GetHandleCenter(radiusHandleInfo.SpaceTransform,
+                radiusHandleInfo.SpaceRenderers);
             radiusHandleInfo.Rotation = radiusHandleInfo.SpaceTransform.rotation;
 
             Vector3 positionOffset = radiusHandleInfo.RadiusHandleAttribute.PosOffset;
@@ -267,6 +269,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             }
 
             radiusHandleInfo.SpaceTransform = trans;
+            radiusHandleInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }

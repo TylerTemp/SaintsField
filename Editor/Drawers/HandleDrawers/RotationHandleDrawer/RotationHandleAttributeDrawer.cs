@@ -26,6 +26,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
 
             public string Error;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
+            public Transform TargetTransform;
+            public Renderer[] TargetRenderers;
             public Vector3 Center;
             public Quaternion Rotation;
 
@@ -192,18 +195,19 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
                 {
                     case GameObject go:
                         centerSet = true;
-                        rotationHandleInfo.Center = go.transform.position;
+                        rotationHandleInfo.Center = GetTargetCenter(rotationHandleInfo, go.transform);
                         break;
                     case Component comp:
                         centerSet = true;
-                        rotationHandleInfo.Center = comp.transform.position;
+                        rotationHandleInfo.Center = GetTargetCenter(rotationHandleInfo, comp.transform);
                         break;
                 }
             }
 
             if (!centerSet)
             {
-                rotationHandleInfo.Center = rotationHandleInfo.SpaceTransform.position;
+                rotationHandleInfo.Center = Util.GetHandleCenter(rotationHandleInfo.SpaceTransform,
+                    rotationHandleInfo.SpaceRenderers);
             }
 
             Vector3 positionOffset = rotationHandleInfo.RotationHandleAttribute.PosOffset;
@@ -238,6 +242,17 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
 
             rotationHandleInfo.Rotation = GetCurrentRotation(rotationHandleInfo);
             rotationHandleInfo.Error = "";
+        }
+
+        private static Vector3 GetTargetCenter(RotationHandleInfo rotationHandleInfo, Transform targetTransform)
+        {
+            if (rotationHandleInfo.TargetTransform != targetTransform)
+            {
+                rotationHandleInfo.TargetTransform = targetTransform;
+                rotationHandleInfo.TargetRenderers = targetTransform.GetComponentsInChildren<Renderer>(includeInactive: false);
+            }
+
+            return Util.GetHandleCenter(targetTransform, rotationHandleInfo.TargetRenderers);
         }
 
         private static Quaternion GetCurrentRotation(RotationHandleInfo info)
@@ -365,6 +380,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
             }
 
             rotationHandleInfo.SpaceTransform = trans;
+            rotationHandleInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }

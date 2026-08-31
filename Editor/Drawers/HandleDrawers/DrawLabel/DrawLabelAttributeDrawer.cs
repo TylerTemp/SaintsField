@@ -5,7 +5,6 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
@@ -144,7 +143,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             }
 
             labelInfo.Center = labelInfo.TargetWorldPosInfo.IsTransform
-                ? labelInfo.TargetWorldPosInfo.Transform.position
+                ? Util.GetHandleCenter(labelInfo.TargetWorldPosInfo.Transform,
+                    labelInfo.TargetWorldPosInfo.Renderers)
                 : labelInfo.TargetWorldPosInfo.WorldPos;
 
             labelInfo.Error = "";

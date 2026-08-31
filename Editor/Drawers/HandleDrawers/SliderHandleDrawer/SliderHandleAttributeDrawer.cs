@@ -26,6 +26,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
 
             public string Error;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
 
             public float HandleValue;
             public Color Color;
@@ -262,7 +263,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
             Vector3 scale = sliderHandleInfo.SliderHandleAttribute.Space == null
                 ? Vector3.one
                 : HandleUtils.GetLocalToWorldScale(sliderHandleInfo.SpaceTransform);
-            sliderHandleInfo.StartPoint = sliderHandleInfo.SpaceTransform.position + Vector3.Scale(positionOffset, scale);
+            sliderHandleInfo.StartPoint = Util.GetHandleCenter(sliderHandleInfo.SpaceTransform,
+                                              sliderHandleInfo.SpaceRenderers)
+                                          + Vector3.Scale(positionOffset, scale);
 
             Vector3 direction = sliderHandleInfo.SliderHandleAttribute.Direction;
             if (!string.IsNullOrEmpty(sliderHandleInfo.SliderHandleAttribute.DirectionCallback))
@@ -407,6 +410,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
             }
 
             sliderHandleInfo.SpaceTransform = trans;
+            sliderHandleInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
 
             public string Error;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
             public Vector3 Center;
             public Quaternion Rotation;
             public Vector3 Scale;
@@ -190,7 +191,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
             }
 
             scaleHandleInfo.Error = "";
-            scaleHandleInfo.Center = scaleHandleInfo.SpaceTransform.position;
+            scaleHandleInfo.Center = Util.GetHandleCenter(scaleHandleInfo.SpaceTransform,
+                scaleHandleInfo.SpaceRenderers);
             scaleHandleInfo.Rotation = scaleHandleInfo.ScaleHandleAttribute.Space == null
                 ? Quaternion.identity
                 : scaleHandleInfo.SpaceTransform.rotation;
@@ -322,6 +324,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
             }
 
             scaleHandleInfo.SpaceTransform = trans;
+            scaleHandleInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }

@@ -2572,6 +2572,7 @@ namespace SaintsField.Editor.Utils
             public bool IsTransform;
 
             public Transform Transform;
+            public Renderer[] Renderers;
             public Vector3 WorldPos;
             public Transform Space;
 
@@ -2585,6 +2586,39 @@ namespace SaintsField.Editor.Utils
                     ? $"<TargetWorldPosInfo Transform={Transform.gameObject.name} />"
                     : $"<TargetWorldPosInfo WorldPos={WorldPos} />";
             }
+        }
+
+        public static Vector3 GetHandleCenter(Transform transform, Renderer[] renderers)
+        {
+            if (Tools.pivotMode == PivotMode.Pivot)
+            {
+                return transform.position;
+            }
+
+            if (renderers.Length == 0)
+            {
+                return transform.position;
+            }
+
+            Bounds bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
+            {
+                bounds.Encapsulate(renderers[i].bounds);
+            }
+
+            return bounds.center;
+        }
+
+        private static Vector3 TransformPointFromHandleCenter(Transform transform, Vector3 localPosition,
+            Renderer[] renderers)
+        {
+            return GetHandleCenter(transform, renderers) + transform.TransformVector(localPosition);
+        }
+
+        public static Vector3 InverseTransformPointFromHandleCenter(Transform transform, Vector3 worldPosition,
+            Renderer[] renderers)
+        {
+            return transform.InverseTransformVector(worldPosition - GetHandleCenter(transform, renderers));
         }
 
         public static TargetWorldPosInfo GetPropertyTargetWorldPosInfoSpace(string space, SerializedProperty property, MemberInfo info, object parent)
@@ -2616,6 +2650,7 @@ namespace SaintsField.Editor.Utils
                                     Error = "",
                                     IsTransform = true,
                                     Transform = wrapGo.transform,
+                                    Renderers = wrapGo.transform.GetComponentsInChildren<Renderer>(includeInactive: false),
                                 };
                             case Component wrapComp:
                                 return new TargetWorldPosInfo
@@ -2623,6 +2658,7 @@ namespace SaintsField.Editor.Utils
                                     Error = "",
                                     IsTransform = true,
                                     Transform = wrapComp.transform,
+                                    Renderers = wrapComp.transform.GetComponentsInChildren<Renderer>(includeInactive: false),
                                 };
                             default:
                                 return new TargetWorldPosInfo
@@ -2643,6 +2679,7 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = true,
                         Transform = isGo.transform,
+                        Renderers = isGo.transform.GetComponentsInChildren<Renderer>(includeInactive: false),
                     };
                 case SerializedPropertyType.ObjectReference when property.objectReferenceValue is Component comp:
                     return new TargetWorldPosInfo
@@ -2650,6 +2687,7 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = true,
                         Transform = comp.transform,
+                        Renderers = comp.transform.GetComponentsInChildren<Renderer>(includeInactive: false),
                     };
                     // return ("", comp.transform);
                     // go = ((Component) property.objectReferenceValue)?.gameObject;
@@ -2691,11 +2729,13 @@ namespace SaintsField.Editor.Utils
                     };
                 }
 
+                Renderer[] renderers = container.GetComponentsInChildren<Renderer>(includeInactive: false);
+
                 return new TargetWorldPosInfo
                 {
                     Error = "",
                     IsTransform = false,
-                    WorldPos = container.TransformPoint(v3Value),
+                    WorldPos = TransformPointFromHandleCenter(container, v3Value, renderers),
                     // WorldRot = container.rotation,
                 };
             }
@@ -2712,23 +2752,29 @@ namespace SaintsField.Editor.Utils
             switch (value)
             {
                 case GameObject go:
+                {
+                    Renderer[] renderers = go.transform.GetComponentsInChildren<Renderer>(includeInactive: false);
                     return new TargetWorldPosInfo
                     {
                         Error = "",
                         IsTransform = false,
-                        WorldPos = go.transform.TransformPoint(v3Value),
+                        WorldPos = TransformPointFromHandleCenter(go.transform, v3Value, renderers),
                         Space = go.transform,
                         // WorldRot = go.transform.rotation,
                     };
+                }
                 case Component comp:
+                {
+                    Renderer[] renderers = comp.transform.GetComponentsInChildren<Renderer>(includeInactive: false);
                     return new TargetWorldPosInfo
                     {
                         Error = "",
                         IsTransform = false,
-                        WorldPos = comp.transform.TransformPoint(v3Value),
+                        WorldPos = TransformPointFromHandleCenter(comp.transform, v3Value, renderers),
                         Space = comp.transform,
                         // WorldRot = comp.transform.rotation,
                     };
+                }
                 default:
                     return new TargetWorldPosInfo
                     {
@@ -2759,12 +2805,14 @@ namespace SaintsField.Editor.Utils
                 };
             }
 
+            Renderer[] renderers = container.GetComponentsInChildren<Renderer>(includeInactive: false);
+
             return new TargetWorldPosInfo
             {
                 Error = "",
                 IsTransform = false,
                 Transform = container,
-                WorldPos = container.TransformPoint(v3Value),
+                WorldPos = TransformPointFromHandleCenter(container, v3Value, renderers),
             };
         }
 

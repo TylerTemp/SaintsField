@@ -15,7 +15,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
     [CustomPropertyDrawer(typeof(PositionHandleAttribute), true)]
     public partial class PositionHandleAttributeDrawer: SaintsPropertyDrawer
     {
-        private static void SetValue(Vector3 newTargetPosition, string space, SerializedProperty property, MemberInfo info, object parent)
+        private static void SetValue(Vector3 newTargetPosition, string space, SerializedProperty property, MemberInfo info,
+            object parent, Transform vectorSpace)
         {
             // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (property.propertyType)
@@ -65,16 +66,23 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             Vector3 rawValue = newTargetPosition;
             if (space != null)  // world to self
             {
-                (string error, Transform container) = GetContainingTransform(property);
-                if (error != "")
+                Transform container = vectorSpace;
+                if (container == null)
                 {
+                    (string error, Transform containingTransform) = GetContainingTransform(property);
+                    if (error != "")
+                    {
 #if SAINTSFIELD_DEBUG
-                    Debug.LogError(error);
+                        Debug.LogError(error);
 #endif
-                    return;
+                        return;
+                    }
+
+                    container = containingTransform;
                 }
 
-                rawValue = container.InverseTransformPoint(newTargetPosition);
+                Renderer[] renderers = container.GetComponentsInChildren<Renderer>(includeInactive: false);
+                rawValue = Util.InverseTransformPointFromHandleCenter(container, newTargetPosition, renderers);
             }
 
             if(property.propertyType == SerializedPropertyType.Vector3)
@@ -164,7 +172,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
-                    SetValue(newTargetPosition, positionHandleInfo.Space, positionHandleInfo.SerializedProperty, positionHandleInfo.MemberInfo, positionHandleInfo.Parent);
+                    SetValue(newTargetPosition, positionHandleInfo.Space, positionHandleInfo.SerializedProperty,
+                        positionHandleInfo.MemberInfo, positionHandleInfo.Parent,
+                        positionHandleInfo.TargetWorldPosInfo.Space);
                     positionHandleInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
                 }
             }
@@ -189,8 +199,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
             if (positionHandleInfo.TargetWorldPosInfo.IsTransform)
             {
-                positionHandleInfo.Center = positionHandleInfo.TargetWorldPosInfo.Transform.position;
-                positionHandleInfo.Rotation = positionHandleInfo.TargetWorldPosInfo.Transform.rotation;
+                Transform transform = positionHandleInfo.TargetWorldPosInfo.Transform;
+                positionHandleInfo.Center = Util.GetHandleCenter(transform,
+                    positionHandleInfo.TargetWorldPosInfo.Renderers);
+
+                positionHandleInfo.Rotation = transform.rotation;
                 // Debug.Log(positionHandleInfo.Center);
                 positionHandleInfo.Error = "";
                 return;

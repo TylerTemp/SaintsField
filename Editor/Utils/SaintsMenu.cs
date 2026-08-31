@@ -273,19 +273,19 @@ namespace SaintsField.Editor.Utils
         #endregion
 
         #region Wwise
-        private const string DisableWwiseSupportPath = RuntimeUtil.MenuRoot + "Disable Wwise Support";
-        [MenuItem(DisableWwiseSupportPath, priority = 104)]
-        public static void DisableWwiseSupport()
+        private const string EnableWwiseSupportPath = RuntimeUtil.MenuRoot + "Enable Wwise Support";
+        [MenuItem(EnableWwiseSupportPath, priority = 104)]
+        public static void EnableWwiseSupport()
         {
 #if SAINTSFIELD_WWISE_DISABLE
             RemoveCompileDefine
 #else
             AddCompileDefine
 #endif
-                ("SAINTSFIELD_WWISE_DISABLE");
+                ("SAINTSFIELD_WWISE");
         }
-        [MenuItem(DisableWwiseSupportPath, true)]
-        public static bool DisableWwiseSupportValidate() =>
+        [MenuItem(EnableWwiseSupportPath, true)]
+        public static bool EnableWwiseSupportValidate() =>
 #if WWISE_INSTALLED
             true
 #else
@@ -587,11 +587,11 @@ namespace SaintsField.Editor.Utils
 #endif
             );
 
-            Menu.SetChecked(DisableWwiseSupportPath,
-#if WWISE_INSTALLED && !SAINTSFIELD_WWISE_DISABLE
-                false
-#else
+            Menu.SetChecked(EnableWwiseSupportPath,
+#if SAINTSFIELD_WWISE
                 true
+#else
+                false
 #endif
             );
 

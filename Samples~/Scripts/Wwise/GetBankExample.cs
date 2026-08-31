@@ -1,6 +1,6 @@
 using AK.Wwise;
-using SaintsField.Wwise;
 using Event = AK.Wwise.Event;
+using SaintsField.Wwise;
 
 namespace SaintsField.Samples.Scripts.Wwise
 {

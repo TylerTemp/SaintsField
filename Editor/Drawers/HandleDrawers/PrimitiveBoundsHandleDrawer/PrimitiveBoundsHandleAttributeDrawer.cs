@@ -27,6 +27,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
 
             public string Error;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
 
             public Color Color;
             public Vector3 PosOffset;
@@ -186,7 +187,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             if (handleInfo.PrimitiveBoundsHandleAttribute.Space != null)
             {
                 Vector3 scale = HandleUtils.GetLocalToWorldScale(handleInfo.SpaceTransform);
-                matrix = Matrix4x4.TRS(handleInfo.SpaceTransform.position, handleInfo.SpaceTransform.rotation, scale);
+                Vector3 handleCenter = Util.GetHandleCenter(handleInfo.SpaceTransform, handleInfo.SpaceRenderers);
+                matrix = Matrix4x4.TRS(handleCenter, handleInfo.SpaceTransform.rotation, scale);
             }
 
             handleInfo.HandleMatrix = matrix;
@@ -293,6 +295,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             }
 
             handleInfo.SpaceTransform = trans;
+            handleInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }

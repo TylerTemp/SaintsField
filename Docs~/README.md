@@ -9446,9 +9446,7 @@ To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Cr
 
 Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.
 
-If you can't see the wwise related attributes, please add marco `SAINTSFIELD_WWISE` to enable it.
-
-If you face compatibility issue because of API changes in Wwise, please add marco `SAINTSFIELD_WWISE_DISABLE` to disable it.
+Please use `Tools` - `Saints Field` - `Enable Wwise Support` or add marco `SAINTSFIELD_WWISE` to enable it.
 
 ### `GetWwise` ###
 

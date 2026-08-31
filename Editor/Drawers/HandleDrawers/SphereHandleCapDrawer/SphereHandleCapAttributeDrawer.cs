@@ -27,6 +27,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             public string Error;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
 
             public float Radius;
             public Color Color;
@@ -172,7 +173,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                         Error = "",
                         IsTransform = true,
                         Transform = sphereInfo.SpaceTransform,
-                        WorldPos = sphereInfo.SpaceTransform.position,
+                        Renderers = sphereInfo.SpaceRenderers,
                     };
                 }
                 else
@@ -194,7 +195,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 
             // Debug.Log(wireDiscInfo.TargetWorldPosInfo.IsTransform);
             Vector3 center = sphereInfo.TargetWorldPosInfo.IsTransform
-                ? sphereInfo.TargetWorldPosInfo.Transform.position
+                ? Util.GetHandleCenter(sphereInfo.TargetWorldPosInfo.Transform,
+                    sphereInfo.TargetWorldPosInfo.Renderers)
                 : sphereInfo.TargetWorldPosInfo.WorldPos;
 
             Vector3 positionOffset = sphereInfo.SphereHandleCapAttribute.PosOffset;
@@ -257,6 +259,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             }
 
             sphereInfo.SpaceTransform = trans;
+            sphereInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }

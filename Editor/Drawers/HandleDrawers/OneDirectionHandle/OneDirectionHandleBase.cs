@@ -177,19 +177,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                         Error = $"{target} is null",
                     };
                 case GameObject go:
-                    return new Util.TargetWorldPosInfo
-                    {
-                        Error = "",
-                        IsTransform = true,
-                        Transform = go.transform,
-                    };
+                    return GetTransformTargetWorldPosInfo(go.transform);
                 case Component comp:
-                    return new Util.TargetWorldPosInfo
-                    {
-                        Error = "",
-                        IsTransform = true,
-                        Transform = comp.transform,
-                    };
+                    return GetTransformTargetWorldPosInfo(comp.transform);
                 case Vector2 v2:
                     return Util.GetValueFromVector(space, property, v2);
                 case Vector3 v3:
@@ -223,15 +213,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                                 Error = $"Array {target} index {targetIndex} is null",
                             };
                         case GameObject goArr:
-                            return new Util.TargetWorldPosInfo
-                            {
-                                Error = "", IsTransform = true, Transform = goArr.transform,
-                            };
+                            return GetTransformTargetWorldPosInfo(goArr.transform);
                         case Component compArr:
-                            return new Util.TargetWorldPosInfo
-                            {
-                                Error = "", IsTransform = true, Transform = compArr.transform,
-                            };
+                            return GetTransformTargetWorldPosInfo(compArr.transform);
                         case Vector2 v2:
                             return Util.GetValueFromVector(space, property, v2);
                         case Vector3 v3:
@@ -288,15 +272,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                     switch (targetObj)
                     {
                         case GameObject goIE:
-                            return new Util.TargetWorldPosInfo
-                            {
-                                Error = "", IsTransform = true, Transform = goIE.transform,
-                            };
+                            return GetTransformTargetWorldPosInfo(goIE.transform);
                         case Component compIE:
-                            return new Util.TargetWorldPosInfo
-                            {
-                                Error = "", IsTransform = true, Transform = compIE.transform,
-                            };
+                            return GetTransformTargetWorldPosInfo(compIE.transform);
                         case Vector2 v2:
                             return Util.GetValueFromVector(space, property, v2);
                         case Vector3 v3:
@@ -314,6 +292,17 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                         Error = $"{target} type {result.GetType()} is not supported",
                     };
             }
+        }
+
+        private static Util.TargetWorldPosInfo GetTransformTargetWorldPosInfo(Transform transform)
+        {
+            return new Util.TargetWorldPosInfo
+            {
+                Error = "",
+                IsTransform = true,
+                Transform = transform,
+                Renderers = transform.GetComponentsInChildren<Renderer>(includeInactive: false),
+            };
         }
 
         protected bool OnSceneGUIInternal(SceneView sceneView, OneDirectionInfo oneDirectionInfo)
@@ -405,7 +394,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             }
 
             Transform trans = worldPosInfo.Transform;
-            return trans == null ? (false, Vector3.zero) : (true, trans.position);
+            return trans == null
+                ? (false, Vector3.zero)
+                : (true, Util.GetHandleCenter(trans, worldPosInfo.Renderers));
         }
     }
 }

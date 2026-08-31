@@ -27,6 +27,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             public string Error;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
             public Transform SpaceTransform;
+            public Renderer[] SpaceRenderers;
 
             public float Radius;
             public Color Color;
@@ -159,7 +160,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                         Error = "",
                         IsTransform = true,
                         Transform = wireDiscInfo.SpaceTransform,
-                        WorldPos = wireDiscInfo.SpaceTransform.position,
+                        Renderers = wireDiscInfo.SpaceRenderers,
                     };
                 }
                 else
@@ -181,7 +182,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
             // Debug.Log(wireDiscInfo.TargetWorldPosInfo.IsTransform);
             Vector3 center = wireDiscInfo.TargetWorldPosInfo.IsTransform
-                ? wireDiscInfo.TargetWorldPosInfo.Transform.position
+                ? Util.GetHandleCenter(wireDiscInfo.TargetWorldPosInfo.Transform,
+                    wireDiscInfo.TargetWorldPosInfo.Renderers)
                 : wireDiscInfo.TargetWorldPosInfo.WorldPos;
 
             Vector3 positionOffset = wireDiscInfo.DrawWireDiscAttribute.PosOffset;
@@ -306,6 +308,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             }
 
             wireDiscInfo.SpaceTransform = trans;
+            wireDiscInfo.SpaceRenderers = trans.GetComponentsInChildren<Renderer>(includeInactive: false);
         }
     }
 }
