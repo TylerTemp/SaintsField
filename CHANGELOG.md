@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.26.5 ##
+
+1.  Fix: Extended Serialization may failed to generate the namespace if you have duplicated name part in name space
+2.  Fix: When enabling Wwise support, it'll add 2025 marco if Wwise in project is 2025
+
 ## 5.26.4 ##
 
 1.  Handles now respect Unity's toolbar - Tool Handle Positon - Center/Pivot mode
