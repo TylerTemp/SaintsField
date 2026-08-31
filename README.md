@@ -114,12 +114,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.26.3**
+**5.26.4**
 
-Add: Support for Wwise 2025
-
-> [!TIP]
-> Wwise 2025 in Unity only set the 2024 marco. Please manually set a `WWISE_2025_OR_LATER` so SaintsField can switch to the new API.
+1.  Handles now respect Unity's toolbar - Tool Handle Positon - Center/Pivot mode
+2.  Wwise support is disabled by default. Please use `Tools` - `Saints Field` - `Enable Wwise Support` or add marco `SAINTSFIELD_WWISE` to enable it.
 
 ## Usage ##
 
