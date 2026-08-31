@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Utils
         public static void SaintsEditorApply()
         {
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY
-            RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
+            RemoveCompileDefine(SAINTSFIELD_SAINTS_EDITOR_APPLY);
 #else
             SaintsFieldSetupWindow.Open();
 #endif
@@ -277,12 +277,30 @@ namespace SaintsField.Editor.Utils
         [MenuItem(EnableWwiseSupportPath, priority = 104)]
         public static void EnableWwiseSupport()
         {
-#if SAINTSFIELD_WWISE_DISABLE
-            RemoveCompileDefine
+#if SAINTSFIELD_WWISE
+            RemoveCompileDefine("SAINTSFIELD_WWISE");
 #else
-            AddCompileDefine
+            AddCompileDefine("SAINTSFIELD_WWISE");
+
+            const string versionPrefix = "Unity Integration Bundle:";
+            string versionPath = Path.Combine(Application.dataPath, "Wwise", "Version.txt");
+            string versionLine = File.Exists(versionPath)
+                ? File.ReadLines(versionPath).FirstOrDefault(each =>
+                    each.TrimStart().StartsWith(versionPrefix, StringComparison.Ordinal))
+                : null;
+            if (versionLine != null && int.TryParse(
+                    versionLine.TrimStart().Substring(versionPrefix.Length).Split('.')[0], out int wwiseYear))
+            {
+                if (wwiseYear >= 2025)
+                {
+                    AddCompileDefine("WWISE_2025_OR_LATER");
+                }
+                else
+                {
+                    RemoveCompileDefine("WWISE_2025_OR_LATER");
+                }
+            }
 #endif
-                ("SAINTSFIELD_WWISE");
         }
         [MenuItem(EnableWwiseSupportPath, true)]
         public static bool EnableWwiseSupportValidate() =>

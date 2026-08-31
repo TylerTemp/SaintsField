@@ -65,7 +65,6 @@ namespace SaintsField.Editor.Utils
 #pragma warning disable CS0414 // Type or member is only assigned
         private bool _loadingSaintsEditor;
         private bool _loadingAnimator;
-        private bool _loadingCodeAnalysis;
 #pragma warning restore CS0414 // Type or member is only assigned
         // private bool _loadingUnitySerialization;
 
@@ -87,7 +86,6 @@ namespace SaintsField.Editor.Utils
         public override void OnEditorEnable()
         {
             _loadingSaintsEditor = false;
-            _loadingCodeAnalysis = false;
             _loadingAnimator = false;
             // _loadingUnitySerialization = false;
         }
@@ -128,7 +126,7 @@ namespace SaintsField.Editor.Utils
 
         [LayoutStart("./SaintsEditor Buttons", ELayout.Horizontal)]
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY
-        [PlayaDisableIf(true)]
+        [DisableIf(true)]
 #endif
         [Button("Enable")]
         // ReSharper disable once UnusedMember.Local
