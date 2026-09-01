@@ -105,20 +105,26 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             int minValue = Mathf.RoundToInt(min);
             int maxValue = Mathf.RoundToInt(max);
             int x = Mathf.Clamp(newValue.x, minValue, maxValue);
+            int y = Mathf.Clamp(newValue.y, minValue, maxValue);
             int intStep = Mathf.RoundToInt(step);
 
             return intStep > 1
-                ? new Vector2Int(x, Util.BoundIntStep(newValue.y, x, maxValue, intStep))
-                : new Vector2Int(x, Mathf.Clamp(newValue.y, x, maxValue));
+                ? new Vector2Int(
+                    Util.BoundIntStep(x, minValue, maxValue, intStep),
+                    Util.BoundIntStep(y, minValue, maxValue, intStep))
+                : new Vector2Int(x, Mathf.Clamp(y, x, maxValue));
         }
 
         private static Vector2 RemapFloatValue(Vector2 newValue, float step, float min, float max)
         {
             float x = Mathf.Clamp(newValue.x, min, max);
+            float y = Mathf.Clamp(newValue.y, min, max);
 
             return step > float.Epsilon
-                ? new Vector2(x, Util.BoundFloatStep(newValue.y, x, max, step))
-                : new Vector2(x, Mathf.Clamp(newValue.y, x, max));
+                ? new Vector2(
+                    Util.BoundFloatStep(x, min, max, step),
+                    Util.BoundFloatStep(y, min, max, step))
+                : new Vector2(x, Mathf.Clamp(y, x, max));
         }
 
     }

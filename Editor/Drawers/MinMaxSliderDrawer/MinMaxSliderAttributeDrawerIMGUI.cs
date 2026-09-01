@@ -67,7 +67,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
             float minValue = metaInfo.MinValue;
             float maxValue = metaInfo.MaxValue;
-            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            AdaptAttribute unitAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
 
             float labelWidth = label.text == "" ? 0 : EditorGUIUtility.labelWidth;
 
@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     }
                 }
 
-                (string error, float value) preMinValue = PropRangeAttributeDrawer.GetPreValue(sliderValue.x, adaptAttribute);
+                (string error, float value) preMinValue = PropRangeAttributeDrawer.GetPreValue(sliderValue.x, unitAttribute);
                 if (cacheInfo.Error == "" && preMinValue.error != "")
                 {
                     cacheInfo.Error = preMinValue.error;
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     DrawOverrideRichText(labelWithMinFieldRect, label, overrideRichTextChunks);
                     if (changed.changed)
                     {
-                        (string error, float value) postMinValue = PropRangeAttributeDrawer.GetPostValue(sliderX, adaptAttribute);
+                        (string error, float value) postMinValue = PropRangeAttributeDrawer.GetPostValue(sliderX, unitAttribute);
                         if (cacheInfo.Error == "" && postMinValue.error != "")
                         {
                             cacheInfo.Error = postMinValue.error;
@@ -147,7 +147,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     }
                 }
 
-                (string error, float value) preMaxValue = PropRangeAttributeDrawer.GetPreValue(sliderValue.y, adaptAttribute);
+                (string error, float value) preMaxValue = PropRangeAttributeDrawer.GetPreValue(sliderValue.y, unitAttribute);
                 if (cacheInfo.Error == "" && preMaxValue.error != "")
                 {
                     cacheInfo.Error = preMaxValue.error;
@@ -167,7 +167,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     float sliderY = EditorGUI.FloatField(maxFloatFieldRect, preMaxValue.value);
                     if (changed.changed)
                     {
-                        (string error, float value) postMaxValue = PropRangeAttributeDrawer.GetPostValue(sliderY, adaptAttribute);
+                        (string error, float value) postMaxValue = PropRangeAttributeDrawer.GetPostValue(sliderY, unitAttribute);
                         if (cacheInfo.Error == "" && postMaxValue.error != "")
                         {
                             cacheInfo.Error = postMaxValue.error;
@@ -208,7 +208,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     }
                 }
 
-                (string error, int value) preMinValue = PropRangeAttributeDrawer.GetPreValue((int)sliderValue.x, adaptAttribute);
+                (string error, int value) preMinValue = PropRangeAttributeDrawer.GetPreValue((int)sliderValue.x, unitAttribute);
                 if (cacheInfo.Error == "" && preMinValue.error != "")
                 {
                     cacheInfo.Error = preMinValue.error;
@@ -229,7 +229,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     DrawOverrideRichText(labelWithMinFieldRect, label, overrideRichTextChunks);
                     if (changed.changed)
                     {
-                        (string error, int value) postMinValue = PropRangeAttributeDrawer.GetPostValue(sliderX, adaptAttribute);
+                        (string error, int value) postMinValue = PropRangeAttributeDrawer.GetPostValue(sliderX, unitAttribute);
                         if (cacheInfo.Error == "" && postMinValue.error != "")
                         {
                             cacheInfo.Error = postMinValue.error;
@@ -248,7 +248,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     }
                 }
 
-                (string error, int value) preMaxValue = PropRangeAttributeDrawer.GetPreValue((int)sliderValue.y, adaptAttribute);
+                (string error, int value) preMaxValue = PropRangeAttributeDrawer.GetPreValue((int)sliderValue.y, unitAttribute);
                 if (cacheInfo.Error == "" && preMaxValue.error != "")
                 {
                     cacheInfo.Error = preMaxValue.error;
@@ -268,7 +268,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     int sliderY = EditorGUI.IntField(maxFloatFieldRect, preMaxValue.value);
                     if (changed.changed)
                     {
-                        (string error, int value) postMaxValue = PropRangeAttributeDrawer.GetPostValue(sliderY, adaptAttribute);
+                        (string error, int value) postMaxValue = PropRangeAttributeDrawer.GetPostValue(sliderY, unitAttribute);
                         if (cacheInfo.Error == "" && postMaxValue.error != "")
                         {
                             cacheInfo.Error = postMaxValue.error;

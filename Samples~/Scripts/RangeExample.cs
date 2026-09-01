@@ -1,9 +1,22 @@
 ﻿using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
     public class RangeExample: SaintsMonoBehaviour
     {
+
+        [
+            PropRange(0f, 1f, step: 0.05f),
+            Adapt(EUnit.Ratio, EUnit.Percent),
+            BelowText("$" + nameof(DisplayActualValue)),
+        ] public float stepRange;
+
+        private string DisplayActualValue(float av) => $"<color=gray>Actual Value: {av}";
+
+        [Space(50)]
+
+
         [MaxValue(nameof(intMax))] public int intMin = int.MinValue;
         [MinValue(nameof(intMin))] public int intMax = int.MaxValue;
         [OnValueChanged(":Debug.Log")]
@@ -14,7 +27,7 @@ namespace SaintsField.Samples.Scripts
             get => intRange;
             set => intRange = value;
         }
-        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public int intRangeAdapt;
+        [PropRange(0, 10), Adapt(EUnit.Ratio, EUnit.Percent)] public int intRangeAdapt;
 
         public byte byteMin = byte.MinValue;
         public byte byteMax = byte.MaxValue;
@@ -59,7 +72,7 @@ namespace SaintsField.Samples.Scripts
         public uint uIntMin = uint.MinValue;
         public uint uIntMax = uint.MaxValue;
         [PropRange(nameof(uIntMin), nameof(uIntMax))] public uint uIntRange;
-        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public uint uIntAdapt;
+        [PropRange(0, 10), Adapt(EUnit.Ratio, EUnit.Percent)] public uint uIntAdapt;
         [ShowInInspector, PropRange(nameof(uIntMin), nameof(uIntMax))] public uint ShowUIntRange
         {
             get => uIntRange;
@@ -69,7 +82,7 @@ namespace SaintsField.Samples.Scripts
         public float floatMin = float.MinValue;
         public float floatMax = float.MaxValue;
         [PropRange(nameof(floatMin), nameof(floatMax))] public float floatRange;
-        [PropRange(0, 1, 0.1), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public float floatAdapt;
+        [PropRange(0, 1, 0.1), Adapt(EUnit.Ratio, EUnit.Percent)] public float floatAdapt;
 
         [ShowInInspector, PropRange(nameof(floatMin), nameof(floatMax))]
         public float ShowFloatRange
@@ -82,7 +95,7 @@ namespace SaintsField.Samples.Scripts
         public double doubleMax = double.MaxValue / 2;
 
         [PropRange(nameof(doubleMin), nameof(doubleMax))] public double doubleRange;
-        [PropRange(0, 1, 0.1d), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public double doubleAdapt;
+        [PropRange(0, 1, 0.1d), Adapt(EUnit.Ratio, EUnit.Percent)] public double doubleAdapt;
         [ShowInInspector, PropRange(nameof(doubleMin), nameof(doubleMax))]
         public double ShowDoubleRange
         {
@@ -93,7 +106,7 @@ namespace SaintsField.Samples.Scripts
         public long longMin = long.MinValue / 2;
         public long longMax = long.MaxValue / 2;
         [PropRange(nameof(longMin), nameof(longMax))] public long longRange;
-        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public long longAdapt;
+        [PropRange(0, 10), Adapt(EUnit.Ratio, EUnit.Percent)] public long longAdapt;
         [ShowInInspector, PropRange(nameof(longMin), nameof(longMax))]
         public long ShowLongRange
         {
@@ -105,7 +118,7 @@ namespace SaintsField.Samples.Scripts
         public ulong ulongMax = ulong.MaxValue;
 
         [PropRange(nameof(ulongMin), nameof(ulongMax)), BelowText("<field/>")] public ulong ulongRange;
-        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public ulong ulongAdapt;
+        [PropRange(0, 10), Adapt(EUnit.Ratio, EUnit.Percent)] public ulong ulongAdapt;
         [ShowInInspector, PropRange(nameof(ulongMin), nameof(ulongMax))]
         public ulong ShowULongRange
         {
@@ -160,6 +173,7 @@ namespace SaintsField.Samples.Scripts
         //
         // [Range(byte.MinValue, byte.MaxValue)] public byte bt;
         // [Range(uint.MinValue, uint.MaxValue)] public uint ui;
+
 
     }
 }

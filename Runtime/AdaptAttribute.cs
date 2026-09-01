@@ -1,23 +1,37 @@
 using System.Diagnostics;
 using SaintsField.Interfaces;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
-    public class AdaptAttribute: PropertyAttribute, ISaintsAttribute
+    public class AdaptAttribute: UnitAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
+        public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
+        public override string GroupBy => "";
 
-        public readonly EUnit EUnit;
-
-        public AdaptAttribute(EUnit eUnit)
+        public AdaptAttribute(EUnit unit): base(unit)
         {
-            Debug.Assert(eUnit != EUnit.Custom, "Custom is not allowed");
-            EUnit = eUnit;
+        }
+
+        public AdaptAttribute(EUnit baseUnit, EUnit displayUnit): base(baseUnit, displayUnit)
+        {
+        }
+
+        public AdaptAttribute(string unit): base(unit)
+        {
+        }
+
+        public AdaptAttribute(string baseUnit, string displayUnit): base(baseUnit, displayUnit)
+        {
+        }
+
+        public AdaptAttribute(EUnit baseUnit, string displayUnit): base(baseUnit, displayUnit)
+        {
+        }
+
+        public AdaptAttribute(string baseUnit, EUnit displayUnit): base(baseUnit, displayUnit)
+        {
         }
     }
 }

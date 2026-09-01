@@ -55,14 +55,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return;
             }
 
-            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            AdaptAttribute unitAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
 
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 bool isFloat = metaInfo.IsFloat;
                 float curPropValue = isFloat ? property.floatValue : property.intValue;
-                (string error, double value) curValueInfo = GetPreValue(curPropValue, adaptAttribute);
+                (string error, double value) curValueInfo = GetPreValue(curPropValue, unitAttribute);
                 if (curValueInfo.error != "")
                 {
                     metaInfo.Error = curValueInfo.error;
@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 // float minValue = metaInfo.MinValue;
                 // float maxValue = metaInfo.MaxValue;
 
-                (string error, double value) minValueInfo = GetPreValue(metaInfo.MinValue, adaptAttribute);
+                (string error, double value) minValueInfo = GetPreValue(metaInfo.MinValue, unitAttribute);
                 if (minValueInfo.error != "")
                 {
                     metaInfo.Error = minValueInfo.error;
@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 }
                 float minValue = (float)minValueInfo.value;
 
-                (string error, double value) maxValueInfo = GetPreValue(metaInfo.MaxValue, adaptAttribute);
+                (string error, double value) maxValueInfo = GetPreValue(metaInfo.MaxValue, unitAttribute);
                 if (maxValueInfo.error != "")
                 {
                     metaInfo.Error = maxValueInfo.error;
@@ -99,7 +99,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 #endif
                 float adaptedValue = EditorGUI.Slider(position, label, curValue, minValue, maxValue);
                 DrawOverrideRichText(position, label, overrideRichTextChunks);
-                (string error, double value) postValueInfo = GetPostValue(adaptedValue, adaptAttribute);
+                (string error, double value) postValueInfo = GetPostValue(adaptedValue, unitAttribute);
                 if (postValueInfo.error != "")
                 {
                     metaInfo.Error = postValueInfo.error;
@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 if (changed.changed || !Mathf.Approximately(cacheInfo.PreValue, parsedValue))
                 {
                     cacheInfo.PreValue = parsedValue;
-                    (string error, double value) preValueInfo = GetPreValue(parsedValue, adaptAttribute);
+                    (string error, double value) preValueInfo = GetPreValue(parsedValue, unitAttribute);
                     if (preValueInfo.error != "")
                     {
                         metaInfo.Error = preValueInfo.error;

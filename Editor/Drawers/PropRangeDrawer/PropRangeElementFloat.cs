@@ -1,5 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -10,11 +11,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     {
         private readonly Slider _slider;
         private readonly FloatField _floatField;
-        private readonly AdaptAttribute _adaptAttribute;
+        private readonly AdaptAttribute _unitAttribute;
 
-        public PropRangeElementFloat(AdaptAttribute adaptAttribute)
+        public PropRangeElementFloat(AdaptAttribute unitAttribute)
         {
-            _adaptAttribute = adaptAttribute;
+            _unitAttribute = unitAttribute;
+            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -70,7 +72,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 }
 
                 (string error, float actualValue) =
-                    PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                    PropRangeAttributeDrawer.GetPostValue(evt.newValue, _unitAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
@@ -112,7 +114,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         private void SetFloatFieldWithoutNotify(float newValue)
         {
-            float preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            float preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _unitAttribute).value;
             _floatField.SetValueWithoutNotify(preValue);
         }
 
@@ -310,7 +312,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
         }
 
-        public PropRangeFloatField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementFloat(adaptAttribute))
+        public PropRangeFloatField(string label, AdaptAttribute unitAttribute) : this(label, new PropRangeElementFloat(unitAttribute))
         {
         }
 

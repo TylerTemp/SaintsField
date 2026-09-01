@@ -10,15 +10,18 @@ namespace SaintsField.Samples.Scripts.AdaptExamples
         //      "This allows you to reduce unnecessary clutter in your editors, and still have all the relavant information available when required.")]
         // public float fField;
 
-        [Adapt(EUnit.Percent)] public float percentF;
+        [Unit(EUnit.Ratio, EUnit.Percent)] public float percentF;
 
-        [Adapt(EUnit.Percent)] public int percentI;
+        [Unit(EUnit.Ratio, EUnit.Percent)] public int percentI;
 
-        [PropRange(0f, 1f), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true), FieldBelowText("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
+        [Unit(EUnit.MetersPerSecond, EUnit.KilometersPerHour)] public float speed;
+
+        [Unit(EUnit.Meter)] public float distance;
+
+        [PropRange(0f, 1f), Adapt(EUnit.Ratio, EUnit.Percent), FieldBelowText("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
         [
             PropRange(0f, 1f, step: 0.05f),
-            Adapt(EUnit.Percent),
-            OverlayText("<color=gray>%", end: true),
+            Adapt(EUnit.Ratio, EUnit.Percent),
             FieldBelowText("$" + nameof(DisplayActualValue)),
             // BelowButton("$" + nameof(ExternalPumpValueStep), "Pump"),
             // BelowButton("$" + nameof(SetValue))

@@ -1,6 +1,7 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Interfaces;
@@ -12,16 +13,18 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 {
     public partial class SaintsDecimalDrawer: ISaintsSerializedActualDrawer
     {
-        public static VisualElement RenderSerializedActual(string label, SerializedProperty property, bool inHorizontalLayout)
+        public static VisualElement RenderSerializedActual(string label, SerializedProperty property,
+            IReadOnlyList<Attribute> allAttributes, bool inHorizontalLayout)
         {
-            SaintsDecimalFieldActual field = new SaintsDecimalFieldActual(label);
+            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            SaintsDecimalFieldActual field = new SaintsDecimalFieldActual(label, adaptAttribute);
             if (inHorizontalLayout)
             {
                 field.style.flexDirection = FlexDirection.Column;
             }
             else
             {
-                field.DecimalTextField.AddToClassList(DecimalTextField.alignedFieldUssClassName);
+                field.AddToClassList(SaintsDecimalFieldActual.alignedFieldUssClassName);
             }
             EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
             emptyPrefabOverrideElement.Add(field);

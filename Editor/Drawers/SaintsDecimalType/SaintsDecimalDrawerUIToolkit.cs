@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -41,7 +42,8 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property));
+            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property), adaptAttribute);
 
             field.AddToClassList(SaintsDecimalField.alignedFieldUssClassName);
             if (!string.IsNullOrEmpty(property.tooltip) && field.DecimalTextField.labelElement != null)

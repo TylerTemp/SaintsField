@@ -1,5 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 // using UnityEngine;
@@ -12,11 +13,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     {
         private readonly Slider _slider;
         private readonly DoubleField _doubleField;
-        private readonly AdaptAttribute _adaptAttribute;
+        private readonly AdaptAttribute _unitAttribute;
 
-        public PropRangeElementDouble(AdaptAttribute adaptAttribute)
+        public PropRangeElementDouble(AdaptAttribute unitAttribute)
         {
-            _adaptAttribute = adaptAttribute;
+            _unitAttribute = unitAttribute;
+            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -76,7 +78,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     return;
                 }
 
-                (string error, double actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                (string error, double actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _unitAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
@@ -122,7 +124,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         private void SetDoubleFieldWithoutNotify(double newValue)
         {
-            double preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            double preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _unitAttribute).value;
             _doubleField.SetValueWithoutNotify(preValue);
         }
 
@@ -311,7 +313,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
         }
 
-        public PropRangeDoubleField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementDouble(adaptAttribute))
+        public PropRangeDoubleField(string label, AdaptAttribute unitAttribute) : this(label, new PropRangeElementDouble(unitAttribute))
         {
         }
 

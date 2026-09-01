@@ -1974,18 +1974,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_maxValue>k__BackingField: 83
-  <_minValue>k__BackingField: 31
-  <_range>k__BackingField: {x: 31, y: 60.66871}
-  <intRange>k__BackingField: {x: 36, y: 36}
-  serializedRange: {x: 0, y: 0}
-  wrongMin: 0
-  wrongMax: 0
-  errorRange: {x: 0, y: 0}
-  myStruct:
-    minV: -6
-    maxV: 17
-    rV: {x: -2, y: 9}
+  normalizedWindow: {x: 0.2, y: 0.7}
 --- !u!4 &185980176
 Transform:
   m_ObjectHideFlags: 0
@@ -2893,6 +2882,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.RePose.ToolPosSelfPosition
   pos: {fileID: 258102666}
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  radius: 1
+  length: 1
+  scale: {x: 1, y: 1, z: 1}
+  rotation: {x: 0, y: 0, z: 0}
 --- !u!1 &258248131
 GameObject:
   m_ObjectHideFlags: 0
@@ -3601,10 +3597,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ab24fcecf85459b8c5c812cbe6c7870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.RangeExample
+  stepRange: 0.85
   intMin: -2147483648
   intMax: 2147483647
   intRange: 22605056
-  intRangeAdapt: 0
+  intRangeAdapt: 6
   byteMin: 0
   byteMax: 255
   byteRange: 101
@@ -30160,6 +30157,7 @@ Transform:
   - {fileID: 1656727569}
   - {fileID: 516712123}
   - {fileID: 1101882547}
+  - {fileID: 1493894560}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1487457131
@@ -30321,6 +30319,80 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1493894559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1493894560}
+  - component: {fileID: 1493894561}
+  m_Layer: 0
+  m_Name: Adapt Unit Demo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1493894560
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493894559}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1493894561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493894559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d4b532518458d4da147cd8fd6456eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.AdaptUnitDemo
+  distanceInMeters: 1.25
+  speedInMetersPerSecond: 10
+  lengthInCentimeters: 250
+  completionRatio: 0.5
+  temperatureInCelsius: 20
+  weightInKilograms: 2.5
+  fileSizeInBytes: 1048576
+  inspectorPowerInWatts: 745.6999
+  rangedDistanceInMeters: 1.5
+  normalizedWindow: {x: 0, y: 1}
+  preciseDistanceInMeters:
+    flags: 262144
+    hi: 0
+    lo: 12345
+    mid: 0
+  extendedWeightInKilograms__SaintsSerialized__:
+    propertyType: 8
+    longValue: 0
+    uLongValue: 0
+    stringValue: 
+    intValues: 77010000000000000000000000000200
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &1494371783
 GameObject:
   m_ObjectHideFlags: 0
@@ -30498,8 +30570,8 @@ MonoBehaviour:
   min: 11
   max: 83
   rangeFloat: 56.4
-  rangeVector2: {x: 29.113205, y: 48.90566}
-  rangeVector2Int: {x: 36, y: 69}
+  rangeVector2: {x: 11, y: 11}
+  rangeVector2Int: {x: 11, y: 11}
 --- !u!1 &1500203752
 GameObject:
   m_ObjectHideFlags: 0
@@ -30883,6 +30955,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.RePose.ToolPosPosition
   pos: {fileID: 680330511}
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  radius: 1
+  length: 1
+  scale: {x: 1, y: 1, z: 1}
+  rotation: {x: 0, y: 0, z: 0}
 --- !u!1 &1528962969
 GameObject:
   m_ObjectHideFlags: 0
@@ -35642,6 +35721,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   percentF: 0
   percentI: 0
+  speed: 0
+  distance: 0
   percentRange: 0
   stepRange: 0
   v: 0
@@ -37003,6 +37084,53 @@ MonoBehaviour:
   matched:
     buildingAttackBrain:
       damage: 0
+--- !u!1 &1937792796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1937792797}
+  - component: {fileID: 1937792798}
+  m_Layer: 0
+  m_Name: UnitExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1937792797
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937792796}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1937792798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937792796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a65de3988e0674b8f43a168dfae96c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.UnitExample
+  distanceInMeters: 1
+  angle: 45
+  customDistanceInMeters: 1
 --- !u!1 &1951413950
 GameObject:
   m_ObjectHideFlags: 0
@@ -42878,3 +43006,4 @@ SceneRoots:
   - {fileID: 990147712}
   - {fileID: 372525435}
   - {fileID: 468487045}
+  - {fileID: 1937792797}

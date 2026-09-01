@@ -1,5 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -10,17 +11,39 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
     public abstract class SaintsDecimalFieldAbs: BaseField<SaintsDecimal>
     {
         public readonly DecimalTextField DecimalTextField;
-        private SaintsDecimalFieldAbs(string label, DecimalTextField visualInput): base(label, visualInput)
+        private readonly AdaptAttribute _adaptAttribute;
+
+        private SaintsDecimalFieldAbs(string label, AdaptAttribute adaptAttribute, DecimalTextField visualInput)
+            : base(label, visualInput)
         {
+            _adaptAttribute = adaptAttribute;
             DecimalTextField = visualInput;
-            visualInput.RegisterValueChangedCallback(evt =>
+            DecimalTextField.RegisterValueChangedCallback(evt =>
             {
                 evt.StopPropagation();
-                value = evt.newValue;
+                decimal baseValue = evt.newValue;
+                if (_adaptAttribute != null)
+                {
+                    (string error, decimal converted) =
+                        UnitAttributeDrawer.GetDecimalValuePost(evt.newValue, _adaptAttribute);
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        UnityEngine.Debug.LogError(error);
+                        SetValueWithoutNotify(value);
+                        return;
+                    }
+                    baseValue = converted;
+                }
+
+                value = baseValue;
             });
+
+            UnitAttributeDrawer.AddDisplayUnitChangedListener(_adaptAttribute,
+                () => SetValueWithoutNotify(value));
         }
 
-        protected SaintsDecimalFieldAbs(string label): this(label, new DecimalTextField(""))
+        protected SaintsDecimalFieldAbs(string label, AdaptAttribute adaptAttribute = null)
+            : this(label, adaptAttribute, new DecimalTextField(""))
         {
         }
 
@@ -32,7 +55,21 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         public override void SetValueWithoutNotify(SaintsDecimal newValue)
         {
             base.SetValueWithoutNotify(newValue);
-            DecimalTextField.SetValueWithoutNotify(newValue);
+            decimal displayValue = newValue;
+            if (_adaptAttribute != null)
+            {
+                (string error, decimal converted) =
+                    UnitAttributeDrawer.GetDecimalValuePre(newValue, _adaptAttribute);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    UnityEngine.Debug.LogError(error);
+                }
+                else
+                {
+                    displayValue = converted;
+                }
+            }
+            DecimalTextField.SetValueWithoutNotify(displayValue);
         }
 
         private void WriteBackValue(decimal d)

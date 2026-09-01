@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.27.0 ##
+
+1.  Add: `Unit` For different unit for numbernic types
+3.  Add: `Adapt` now supports `SaintsDecimal` (together with `PropRange`, `MinMaxSlider`)
+4.  Fix: `MinMaxSlider` got value reset when select; left handle did not respect step
+
 ## 5.26.5 ##
 
 1.  Fix: Extended Serialization may failed to generate the namespace if you have duplicated name part in name space

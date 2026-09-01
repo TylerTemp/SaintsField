@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -23,20 +24,21 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         private readonly MinMaxSlider _minMaxSlider;
         private readonly IntegerField _maxIntegerField;
 
-        private readonly AdaptAttribute _adaptAttribute;
+        private readonly AdaptAttribute _unitAttribute;
 
         private static VisualTreeAsset _template;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public MinMaxSliderElementInt(): this(null){}
 
-        public MinMaxSliderElementInt(AdaptAttribute adaptAttribute)
+        public MinMaxSliderElementInt(AdaptAttribute unitAttribute)
         {
             _template ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/MinMax/MinMaxSliderWithInt.uxml");
             TemplateContainer root = _template.CloneTree();
             hierarchy.Add(root);
 
-            _adaptAttribute = adaptAttribute;
+            _unitAttribute = unitAttribute;
+            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
 
             _minIntegerField = root.Q<IntegerField>("minInput");
             _minMaxSlider = root.Q<MinMaxSlider>("minMaxSlider");
@@ -68,14 +70,22 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     return;
                 }
 
-                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _unitAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
                     return;
                 }
 
-                Vector2Int newValue = RemapValue(new Vector2Int(actualValue, _maxIntegerField.value));
+                (string otherError, int otherActualValue) =
+                    PropRangeAttributeDrawer.GetPostValue(_maxIntegerField.value, _unitAttribute);
+                if (otherError != "")
+                {
+                    Debug.LogError(otherError);
+                    return;
+                }
+
+                Vector2Int newValue = RemapValue(new Vector2Int(actualValue, otherActualValue));
                 if (newValue == value)
                 {
                     _minMaxSlider.SetValueWithoutNotify(newValue);
@@ -93,14 +103,22 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 {
                     return;
                 }
-                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _unitAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
                     return;
                 }
 
-                Vector2Int newValue = RemapValue(new Vector2Int(_minIntegerField.value, actualValue));
+                (string otherError, int otherActualValue) =
+                    PropRangeAttributeDrawer.GetPostValue(_minIntegerField.value, _unitAttribute);
+                if (otherError != "")
+                {
+                    Debug.LogError(otherError);
+                    return;
+                }
+
+                Vector2Int newValue = RemapValue(new Vector2Int(otherActualValue, actualValue));
                 if (newValue == value)
                 {
                     _minMaxSlider.SetValueWithoutNotify(newValue);
@@ -116,7 +134,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
         private void SetIntFieldWithoutNotify(IntegerField intField, int newValue)
         {
-            int preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            int preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _unitAttribute).value;
             intField.SetValueWithoutNotify(preValue);
         }
 
@@ -256,10 +274,13 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         {
             // Debug.Log($"will remap {newValue} with {_step}");
             int x = Mathf.Clamp(newValue.x, _minValue, _maxValue);
+            int y = Mathf.Clamp(newValue.y, _minValue, _maxValue);
 
             return _step > 1
-                ? new Vector2Int(x, Util.BoundIntStep(newValue.y, x, _maxValue, _step))
-                : new Vector2Int(x, Mathf.Clamp(newValue.y, x, _maxValue));
+                ? new Vector2Int(
+                    Util.BoundIntStep(x, _minValue, _maxValue, _step),
+                    Util.BoundIntStep(y, _minValue, _maxValue, _step))
+                : new Vector2Int(x, Mathf.Clamp(y, x, _maxValue));
         }
 
         private HelpBox _helpBox;
@@ -342,7 +363,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             });
         }
 
-        public MinMaxSliderFieldInt(string label, AdaptAttribute adaptAttribute) : this(label, new MinMaxSliderElementInt(adaptAttribute))
+        public MinMaxSliderFieldInt(string label, AdaptAttribute unitAttribute) : this(label, new MinMaxSliderElementInt(unitAttribute))
         {
         }
 

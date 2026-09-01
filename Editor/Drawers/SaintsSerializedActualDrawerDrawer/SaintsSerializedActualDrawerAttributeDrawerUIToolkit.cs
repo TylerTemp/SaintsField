@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                 case SaintsPropertyType.Decimal:
                 {
                     VisualElement element = SaintsDecimalDrawer.RenderSerializedActual(label, property,
-                        inHorizontalLayout);
+                        attributes, inHorizontalLayout);
                     return (element,
                         element == null
                             ? null

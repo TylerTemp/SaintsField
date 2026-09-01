@@ -3,8 +3,17 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class MinMaxExample: MonoBehaviour
+    public class MinMaxExample: SaintsMonoBehaviour
     {
+        [
+            MinMaxSlider(0f, 1f, 0.05f),
+            Adapt(EUnit.Ratio, EUnit.Percent),
+            BelowText("$" + nameof(normalizedWindow)),
+        ]
+        public Vector2 normalizedWindow = new Vector2(0.25f, 0.75f);
+
+        [field: Space(100)]
+
         [field: SerializeField, MinValue(nameof(_minValue)), Space]
         public int _maxValue { get; private set; }
 

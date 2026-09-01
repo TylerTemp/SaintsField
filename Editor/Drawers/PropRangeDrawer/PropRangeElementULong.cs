@@ -1,5 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 // using UnityEngine;
@@ -12,11 +13,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     {
         private readonly Slider _slider;
         private readonly ULongField _uLongField;
-        private readonly AdaptAttribute _adaptAttribute;
+        private readonly AdaptAttribute _unitAttribute;
 
-        public PropRangeElementULong(AdaptAttribute adaptAttribute)
+        public PropRangeElementULong(AdaptAttribute unitAttribute)
         {
-            _adaptAttribute = adaptAttribute;
+            _unitAttribute = unitAttribute;
+            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -77,7 +79,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     return;
                 }
 
-                (string error, ulong actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                (string error, ulong actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _unitAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
@@ -118,7 +120,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         private void SetULongFieldValueWithoutNotify(ulong newValue)
         {
-            ulong preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            ulong preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _unitAttribute).value;
             _uLongField.SetValueWithoutNotify(preValue);
         }
 
@@ -317,7 +319,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 value = evt.newValue;
             });
         }
-        public PropRangeULongField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementULong(adaptAttribute))
+        public PropRangeULongField(string label, AdaptAttribute unitAttribute) : this(label, new PropRangeElementULong(unitAttribute))
         {
         }
 

@@ -1,82 +1,49 @@
-using System;
+#if UNITY_2021_3_OR_NEWER
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Units;
+using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
 namespace SaintsField.Editor.Drawers.AdaptDrawer
 {
     public partial class AdaptAttributeDrawer
     {
-        private static string NameAdaptHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AdaptHelpBox";
+        protected override bool UseCreateFieldUIToolKit => false;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.None)
+            UnitState state = GetState((AdaptAttribute)saintsAttribute);
+            if (!string.IsNullOrEmpty(state.Error))
             {
-                style =
+                return new HelpBox(state.Error, HelpBoxMessageType.Error)
                 {
-                    display = DisplayStyle.None,
-                },
-                name = NameAdaptHelpBox(property, index),
+                    style = { flexGrow = 1 },
+                };
+            }
+
+            bool hasSupportedFieldDrawer = allAttributes.Any(each =>
+                each is PropRangeAttribute || each is MinMaxSliderAttribute) ||
+                property.type == nameof(SaintsDecimal) || SaintsDecimalDrawer.IsSerializedActualDecimal(property);
+            if (hasSupportedFieldDrawer)
+            {
+                return null;
+            }
+
+            return new HelpBox("Adapt requires PropRange, MinMaxSlider, or SaintsDecimal.",
+                HelpBoxMessageType.Error)
+            {
+                style = { flexGrow = 1 },
             };
         }
-
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            AdaptAttribute adaptAttribute = (AdaptAttribute)saintsAttribute;
-
-            // first is ignore with adaptable input
-            if (allAttributes.Any(each => each is IAdaptable) && allAttributes.OfType<AdaptAttribute>().First().Equals(adaptAttribute))
-            {
-                return;
-            }
-
-            HelpBox helpBox = container.Q<HelpBox>(NameAdaptHelpBox(property, index));
-
-            helpBox.Q<Label>().enableRichText = true;
-
-            helpBox.style.display = DisplayStyle.Flex;
-
-            (string error, string display) initCheck = GetDisplay(property, adaptAttribute);
-            if (!string.IsNullOrEmpty(initCheck.error))
-            {
-                helpBox.messageType = HelpBoxMessageType.Error;
-                helpBox.text = initCheck.error;
-                return;
-            }
-
-            helpBox.text = FormatString(initCheck.display);
-            helpBox.TrackPropertyValue(property, _ =>
-            {
-                (string error, string display) = GetDisplay(property, adaptAttribute);
-                if (error != "")
-                {
-                    helpBox.messageType = HelpBoxMessageType.Error;
-                    helpBox.text = error;
-                }
-                else
-                {
-                    helpBox.messageType = HelpBoxMessageType.None;
-                    helpBox.text = FormatString(display);
-                }
-            });
-        }
-
-        private static string FormatString(string display) => $" <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>{display}</color>";
-
-
-
     }
 }
+
 #endif

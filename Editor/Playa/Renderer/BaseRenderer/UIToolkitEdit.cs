@@ -28,6 +28,7 @@ using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Drawers.SortingLayerDrawer;
 using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.UIToolkitElements;
@@ -74,6 +75,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     labelGrayColor, inHorizontalLayout,
                     allAttributes, targets, richTextTagProvider,
                     foldoutViewKey);
+            }
+
+            UnitAttribute unitAttribute = allAttributes.OfType<UnitAttribute>()
+                .FirstOrDefault(each => each.GetType() == typeof(UnitAttribute));
+            if (unitAttribute != null && UnitAttributeDrawer.SupportsUIToolkitValueEdit(valueType, value))
+            {
+                return (UnitAttributeDrawer.UIToolkitValueEdit(oldElement, unitAttribute, label, valueType, value,
+                    beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout), false);
             }
 
             // Color reColor = EColor.EditorSeparator.GetColor();

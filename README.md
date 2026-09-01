@@ -114,10 +114,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.26.5**
+**5.27.0**
 
-1.  Fix: Extended Serialization may failed to generate the namespace if you have duplicated name part in name space
-2.  Fix: When enabling Wwise support, it'll add 2025 marco if Wwise in project is 2025
+1.  Add: `Unit` For different unit for numbernic types
+3.  Add: `Adapt` now supports `SaintsDecimal` (together with `PropRange`, `MinMaxSlider`)
+4.  Fix: `MinMaxSlider` got value reset when select; left handle did not respect step
 
 ## Usage ##
 
@@ -163,6 +164,7 @@ namespace: `SaintsField`
         *   [`ShowInInspector`](https://saintsfield.comes.today/general-attributes/data-editor/showininspector)
     *   Numerical
         *   [`Rate`](https://saintsfield.comes.today/general-attributes/numerical/rate)
+        *   [`Unit`](https://saintsfield.comes.today/general-attributes/numerical/unit)
         *   [`PropRange`](https://saintsfield.comes.today/general-attributes/numerical/proprange)
         *   [`MinMaxSlider`](https://saintsfield.comes.today/general-attributes/numerical/minmaxslider)
         *   [`ProgressBar`](https://saintsfield.comes.today/general-attributes/numerical/progressbar)

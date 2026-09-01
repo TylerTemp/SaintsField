@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
     public class SaintsDecimalFieldActual: SaintsDecimalFieldAbs
     {
 
-        public SaintsDecimalFieldActual(string label) : base(label)
+        public SaintsDecimalFieldActual(string label, AdaptAttribute adaptAttribute = null) : base(label, adaptAttribute)
         {
         }
 

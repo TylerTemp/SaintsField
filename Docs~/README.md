@@ -2466,6 +2466,66 @@ private int ShowRate([Rate(0, 5)] int rate) => rate;
 
 ![](https://github.com/user-attachments/assets/69762ee9-fcca-44f4-8e69-802fd7b4ebc7)
 
+#### `Unit` ####
+
+`Unit` allows you to input numeric fields in different unit than the serialized type.
+
+Use the unit button at the end of the field to select any registered unit in the same category.
+
+Parameters:
+
+*   `EUnit|string baseUnit`: The unit you want to serialized as
+*   [Optional] `EUnit|string displayUnit`: The default displaying unit.
+
+Allow Multiple: No
+
+```csharp
+using SaintsField;
+
+// saved as meter
+[Unit(EUnit.Meter)] public float distanceInMeters;
+// saved as degree, default displayed as radian
+[Unit(EUnit.Degree, EUnit.Radian)] public float angle;
+```
+
+[![video](https://github.com/user-attachments/assets/55209b94-1a7d-4ae6-8d02-31038ee989c3)](https://github.com/user-attachments/assets/407cc6eb-82bd-4919-aded-76e94433cb4d)
+
+See the [EUnit.cs](https://github.com/TylerTemp/SaintsField/Runtime/EUnit.cs) to know all the supported built-in types.
+
+Custom units are supported (NOTE: THIS IS EDITOR SCRIPT!) from an Editor script.
+
+For example, one meter is two game tiles:
+
+```csharp
+using SaintsField;
+#if UNITY_EDITOR
+using SaintsField.Editor.Units;
+using UnityEditor;
+#endif
+
+[InfoBox("Game Tile is registered below in this file. The value remains serialized in meters.")]
+[Unit(EUnit.Meter, "Game Tile")]
+public float customDistanceInMeters = 1f;
+
+#if UNITY_EDITOR && SAINTSFIELD_DEBUG
+[InitializeOnLoadMethod]
+public static void Register()
+{
+    if (!UnitRegistry.GetUnitInfo("Game Tile").found)
+    {
+        UnitRegistry.AddCustomUnit(
+            "Game Tile",  // name
+            new[] { "tile" },  // symbols
+            EUnitCategory.Distance,  // category, see https://github.com/TylerTemp/SaintsField/Runtime/EUnitCategory.cs
+            2m  // multiplier: how the base unit convert to this
+        );
+    }
+}
+#endif
+```
+
+![](https://github.com/user-attachments/assets/acf2ff22-de8f-4c43-a55a-887db7068d8c)
+
 #### `PropRange` ####
 
 Very like Unity's `Range` but allow you to dynamically change the range, plus allow to set range step.
@@ -2495,20 +2555,22 @@ public int max;
 
 **Adapt**
 
-`PropRange` can work with `[Adapt(EUnit.Percent)]` to show a percent value, but still get the actual float value:
+`Adapt` Changes the unit of how `PropRange` displays. For example,
+`[Adapt(EUnit.Ratio, EUnit.Percent)]` displays percent while serializing the actual ratio.
+
+Adapt shares the same API as `Unit`, except it work with number attributes.
 
 ```csharp
 [
     PropRange(0f, 1f, step: 0.05f),
-    Adapt(EUnit.Percent),
-    OverlayText("<color=gray>%", end: true),
+    Adapt(EUnit.Ratio, EUnit.Percent),
     BelowText("$" + nameof(DisplayActualValue)),
 ] public float stepRange;
 
 private string DisplayActualValue(float av) => $"<color=gray>Actual Value: {av}";
 ```
 
-[![video](https://github.com/user-attachments/assets/82381ab1-9405-4fdc-bf5f-5c9debb56136)](https://github.com/user-attachments/assets/bb322c3a-56ba-48a4-bcba-7c3908ae2c34)
+[![video](https://github.com/user-attachments/assets/e035cbfe-8564-4b0b-8696-efbfcb59d822)](https://github.com/user-attachments/assets/2e21a340-3a38-4207-82cb-11d648161487)
 
 `PropRange` can work with `ShowInInspector`
 
@@ -2583,6 +2645,18 @@ public float DynamicMax { get; private set; }
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
+
+**Adapt**
+
+`MinMaxSlider` supports `Adapt`, allowing its values to be displayed in a different unit while remaining serialized in the base unit. The slider bounds and step are specified in the base unit.
+
+```csharp
+// Values and slider settings use ratios; the inspector displays percentages.
+[MinMaxSlider(0f, 1f, 0.05f), Adapt(EUnit.Ratio, EUnit.Percent), BelowText("$" + nameof(normalizedWindow))]
+public Vector2 normalizedWindow = new Vector2(0.25f, 0.75f);
+```
+
+[![video](https://github.com/user-attachments/assets/8658d5fe-a3b9-41c3-88bf-c6757d7c2264)](https://github.com/user-attachments/assets/b1cc94cb-7bf0-4303-a19d-5fba31867288)
 
 `MinMaxSlider` can work with `ShowInInspector`
 
@@ -8778,6 +8852,16 @@ decimal add = decimal.One + saintsDecimal;
 
 ![](https://github.com/user-attachments/assets/ffa7dd1a-e048-446f-b079-7f01b42c7aae)
 
+**Adapt**
+
+`SaintsDecimal` supports `Adapt`, allowing the inspector to edit the value in a different unit without changing the unit used for serialization.
+
+```csharp
+// Serialized in meters and displayed in centimeters.
+[Adapt(EUnit.Meter, EUnit.Centimeter)]
+public SaintsDecimal preciseDistanceInMeters = new SaintsDecimal(1.2345m);
+```
+
 ### `TypeReference` ###
 
 Serialize a `System.Type`
@@ -10145,6 +10229,15 @@ public partial class SerDecimalExample : MonoBehaviour
 ```
 
 ![](https://github.com/user-attachments/assets/0f8d6994-5149-441e-b3b0-20a93aa9a421)
+
+**Adapt**
+
+`Adapt` also works with a `decimal` field drawn through `SaintsSerialized`:
+
+```csharp
+[SaintsSerialized, Adapt(EUnit.Kilogram, EUnit.Pounds)]
+private decimal weightInKilograms = 3.75m;
+```
 
 ## `SaintsEditorWindow` ##
 

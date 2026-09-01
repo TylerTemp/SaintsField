@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Linq;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -56,21 +58,48 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                 return;
             }
 
+            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
             decimal currentValue = GetDecimalValue(cache.PropertyInfo);
-            DrawDecimalField(position, label, currentValue, newValue =>
+            decimal displayValue = currentValue;
+            if (adaptAttribute != null)
             {
-                if (!SetDecimalValue(cache.PropertyInfo, newValue))
+                (string preError, decimal converted) =
+                    UnitAttributeDrawer.GetDecimalValuePre(currentValue, adaptAttribute);
+                if (!string.IsNullOrEmpty(preError))
+                {
+                    ImGuiHelpBox.Draw(position, preError, MessageType.Error);
+                    return;
+                }
+                displayValue = converted;
+            }
+
+            DrawDecimalField(position, label, displayValue, newValue =>
+            {
+                decimal baseValue = newValue;
+                if (adaptAttribute != null)
+                {
+                    (string postError, decimal converted) =
+                        UnitAttributeDrawer.GetDecimalValuePost(newValue, adaptAttribute);
+                    if (!string.IsNullOrEmpty(postError))
+                    {
+                        Debug.LogError(postError);
+                        return;
+                    }
+                    baseValue = converted;
+                }
+
+                if (!SetDecimalValue(cache.PropertyInfo, baseValue))
                 {
                     return;
                 }
 
-                string error = UpdateCachedDecimalValue(property, info, newValue);
+                string error = UpdateCachedDecimalValue(property, info, baseValue);
                 if (error != "")
                 {
                     Debug.LogError(error);
                 }
 
-                TriggerChangedIMGUI(property, new SaintsDecimal(newValue));
+                TriggerChangedIMGUI(property, new SaintsDecimal(baseValue));
             });
             DrawOverrideRichText(position, label, overrideRichTextChunks);
         }

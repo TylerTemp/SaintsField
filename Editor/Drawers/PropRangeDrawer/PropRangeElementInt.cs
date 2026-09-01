@@ -1,5 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
+using SaintsField.Editor.Drawers.AdaptDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,11 +17,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         private readonly Slider _slider;
         private readonly IntegerField _intField;
 
-        private readonly AdaptAttribute _adaptAttribute;
+        private readonly AdaptAttribute _unitAttribute;
 
-        public PropRangeElementInt(AdaptAttribute adaptAttribute)
+        public PropRangeElementInt(AdaptAttribute unitAttribute)
         {
-            _adaptAttribute = adaptAttribute;
+            _unitAttribute = unitAttribute;
+            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
 
             style.flexDirection = FlexDirection.Row;
 
@@ -76,7 +78,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     return;
                 }
 
-                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _unitAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
@@ -115,7 +117,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         private void SetIntFieldWithoutNotify(int newValue)
         {
-            int preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            int preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _unitAttribute).value;
             _intField.SetValueWithoutNotify(preValue);
         }
 
@@ -323,7 +325,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
         }
 
-        public PropRangeIntField(string label, AdaptAttribute adaptAttribute) : this(label, new PropRangeElementInt(adaptAttribute))
+        public PropRangeIntField(string label, AdaptAttribute unitAttribute) : this(label, new PropRangeElementInt(unitAttribute))
         {
         }
 

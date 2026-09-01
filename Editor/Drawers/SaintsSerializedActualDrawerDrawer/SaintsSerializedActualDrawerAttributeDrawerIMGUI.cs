@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
 
                     break;
                 case SaintsPropertyType.Decimal:
-                    if (SaintsDecimalDrawer.DrawSerializedActualField(position, property, label,
+                    if (SaintsDecimalDrawer.DrawSerializedActualField(position, property, label, attributes,
                             newValue => TriggerChangedIMGUI(property, newValue)))
                     {
                         return;

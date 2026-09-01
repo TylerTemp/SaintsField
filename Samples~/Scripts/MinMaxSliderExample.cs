@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
     {
         [OnValueChanged(":Debug.Log")]
         [MinMaxSlider(-1f, 3f, 0.3f)] public Vector2 vector2Step03;
-        [MinMaxSlider(-1f, 3f, 0.3f), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2 vector2Step03Adapt;
+        [MinMaxSlider(-1f, 3f, 0.3f), Adapt(EUnit.Ratio, EUnit.Percent)] public Vector2 vector2Step03Adapt;
         [ShowInInspector, MinMaxSlider(-1f, 3f, 0.3f)]
         private Vector2 ShowVector2Step03
         {
@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         [MinMaxSlider(0, 20, 3)] public Vector2Int vector2IntStep3;
-        [MinMaxSlider(0, 20, 3), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2Int vector2IntStep3Adapt;
+        [MinMaxSlider(0, 20, 3), Adapt(EUnit.Ratio, EUnit.Percent)] public Vector2Int vector2IntStep3Adapt;
         [ShowInInspector, MinMaxSlider(0, 20, 3)]
         private Vector2Int ShowVector2IntStep3
         {

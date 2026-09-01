@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
@@ -91,130 +91,130 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             };
         }
 
-        public static (string error, int value) GetPreValue(int value, AdaptAttribute adaptAttribute)
+        public static (string error, int value) GetPreValue(int value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetIntValuePre(value);
+            return AdaptAttributeDrawer.GetIntValuePre(value, unitAttribute);
         }
-        public static (string error, uint value) GetPreValue(uint value, AdaptAttribute adaptAttribute)
+        public static (string error, uint value) GetPreValue(uint value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetUIntValuePre(value);
-        }
-
-        public static (string error, long value) GetPreValue(long value, AdaptAttribute adaptAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
-            {
-                return ("", value);
-            }
-
-            return AdaptAttributeDrawer.GetLongValuePre(value);
+            return AdaptAttributeDrawer.GetUIntValuePre(value, unitAttribute);
         }
 
-        public static (string error, ulong value) GetPreValue(ulong value, AdaptAttribute adaptAttribute)
+        public static (string error, long value) GetPreValue(long value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetULongValuePre(value);
+            return AdaptAttributeDrawer.GetLongValuePre(value, unitAttribute);
         }
 
-        public static (string error, double value) GetPreValue(double value, AdaptAttribute adaptAttribute)
+        public static (string error, ulong value) GetPreValue(ulong value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetDoubleValuePre(value);
-        }
-        public static (string error, float value) GetPreValue(float value, AdaptAttribute adaptAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
-            {
-                return ("", value);
-            }
-
-            return AdaptAttributeDrawer.GetFloatValuePre(value);
+            return AdaptAttributeDrawer.GetULongValuePre(value, unitAttribute);
         }
 
-        public static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
+        public static (string error, double value) GetPreValue(double value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetDoubleValuePost(value);
+            return AdaptAttributeDrawer.GetDoubleValuePre(value, unitAttribute);
         }
-        public static (string error, float value) GetPostValue(float value, AdaptAttribute adaptAttribute)
+        public static (string error, float value) GetPreValue(float value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetFloatValuePost(value);
+            return AdaptAttributeDrawer.GetFloatValuePre(value, unitAttribute);
         }
 
-        public static (string error, int value) GetPostValue(int value, AdaptAttribute adaptAttribute)
+        public static (string error, double value) GetPostValue(double value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetIntValuePost(value);
+            return AdaptAttributeDrawer.GetDoubleValuePost(value, unitAttribute);
         }
-        public static (string error, long value) GetPostValue(long value, AdaptAttribute adaptAttribute)
+        public static (string error, float value) GetPostValue(float value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetLongValuePost(value);
+            return AdaptAttributeDrawer.GetFloatValuePost(value, unitAttribute);
         }
-        public static (string error, ulong value) GetPostValue(ulong value, AdaptAttribute adaptAttribute)
+
+        public static (string error, int value) GetPostValue(int value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetULongValuePost(value);
+            return AdaptAttributeDrawer.GetIntValuePost(value, unitAttribute);
         }
-        public static (string error, uint value) GetPostValue(uint value, AdaptAttribute adaptAttribute)
+        public static (string error, long value) GetPostValue(long value, AdaptAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (adaptAttribute == null)
+            if (unitAttribute == null)
             {
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetUIntValuePost(value);
+            return AdaptAttributeDrawer.GetLongValuePost(value, unitAttribute);
+        }
+        public static (string error, ulong value) GetPostValue(ulong value, AdaptAttribute unitAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (unitAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetULongValuePost(value, unitAttribute);
+        }
+        public static (string error, uint value) GetPostValue(uint value, AdaptAttribute unitAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (unitAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetUIntValuePost(value, unitAttribute);
         }
 
         private static float GetValue(MetaInfo metaInfo, float newValue)
