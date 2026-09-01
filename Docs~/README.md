@@ -2490,7 +2490,7 @@ using SaintsField;
 
 [![video](https://github.com/user-attachments/assets/55209b94-1a7d-4ae6-8d02-31038ee989c3)](https://github.com/user-attachments/assets/407cc6eb-82bd-4919-aded-76e94433cb4d)
 
-See the [EUnit.cs](https://github.com/TylerTemp/SaintsField/Runtime/EUnit.cs) to know all the supported built-in types.
+See the [EUnit.cs](https://github.com/TylerTemp/SaintsField/blob/master/Runtime/EUnit.cs) to know all the supported built-in types.
 
 Custom units are supported (NOTE: THIS IS EDITOR SCRIPT!) from an Editor script.
 
@@ -2516,7 +2516,7 @@ public static void Register()
         UnitRegistry.AddCustomUnit(
             "Game Tile",  // name
             new[] { "tile" },  // symbols
-            EUnitCategory.Distance,  // category, see https://github.com/TylerTemp/SaintsField/Runtime/EUnitCategory.cs
+            EUnitCategory.Distance,  // category, see https://github.com/TylerTemp/SaintsField/blob/master/Runtime/EUnitCategory.cs
             2m  // multiplier: how the base unit convert to this
         );
     }
