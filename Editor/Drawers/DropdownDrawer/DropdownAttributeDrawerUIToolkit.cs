@@ -193,41 +193,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             }
         }
 
-        private readonly struct DrawInfo
-        {
-            public readonly struct EnumValueInfo
-            {
-                public readonly bool HasValue;
-                public readonly object Value;
-                public readonly string Label;
-
-                public EnumValueInfo(object value, string label)
-                {
-                    HasValue = true;
-                    Value = value;
-                    Label = label;
-                }
-            }
-
-            public readonly IReadOnlyList<EnumValueInfo> EnumValues;
-            public readonly EnumValueInfo NothingValue;
-            public readonly EnumValueInfo EverythingValue;
-            public readonly object EverythingBit;
-            public readonly bool IsFlags;
-            public readonly bool IsULong;
-
-            public DrawInfo(IReadOnlyList<EnumValueInfo> enumValues, EnumValueInfo everythingValue, EnumValueInfo nothingValue, object everythingBit, bool isFlags, bool isULong)
-            {
-                EnumValues = enumValues;
-                EverythingValue = everythingValue;
-                NothingValue = nothingValue;
-                EverythingBit = everythingBit;
-                IsFlags = isFlags;
-                IsULong = isULong;
-            }
-        }
-
-
     }
 }
 #endif
