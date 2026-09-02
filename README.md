@@ -114,11 +114,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.27.0**
+**5.27.1**
 
-1.  Add: `Unit` For different unit for numbernic types
-3.  Add: `Adapt` now supports `SaintsDecimal` (together with `PropRange`, `MinMaxSlider`)
-4.  Fix: `MinMaxSlider` got value reset when select; left handle did not respect step
+Fix: `MinMaxSlider` incorrectly backwrite slider limit value and override the correct value [#441](https://github.com/TylerTemp/SaintsField/issues/441)
+
 
 ## Usage ##
 
