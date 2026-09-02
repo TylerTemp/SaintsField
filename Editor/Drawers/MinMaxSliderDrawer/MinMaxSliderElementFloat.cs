@@ -2,6 +2,7 @@
 using System;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Drawers.AdaptDrawer;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -38,7 +39,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             hierarchy.Add(root);
 
             _unitAttribute = unitAttribute;
-            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
+            UnitAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
 
             _minIntegerField = root.Q<FloatField>("minInput");
             _minMaxSlider = root.Q<MinMaxSlider>("minMaxSlider");
@@ -53,10 +54,12 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     return;
                 }
 
-                Vector2 newValue = RemapValue(evt.newValue);
+                Vector2 newValue = RemapValue(new Vector2(
+                    SliderToActualValue(evt.newValue.x),
+                    SliderToActualValue(evt.newValue.y)));
                 if (VectorClose(newValue, value))
                 {
-                    _minMaxSlider.SetValueWithoutNotify(newValue);
+                    SetSliderValueWithoutNotify(newValue);
                     SetFloatFieldWithoutNotify(_minIntegerField, newValue.x);
                     SetFloatFieldWithoutNotify(_maxIntegerField, newValue.y);
                 }
@@ -90,7 +93,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 Vector2 newValue = RemapValue(new Vector2(actualValue, otherActualValue));
                 if (VectorClose(newValue, value))
                 {
-                    _minMaxSlider.SetValueWithoutNotify(newValue);
+                    SetSliderValueWithoutNotify(newValue);
                     SetFloatFieldWithoutNotify(_minIntegerField, newValue.x);
                     SetFloatFieldWithoutNotify(_maxIntegerField, newValue.y);
                 }
@@ -124,7 +127,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 Vector2 newValue = RemapValue(new Vector2(otherActualValue, actualValue));
                 if (newValue == value)
                 {
-                    _minMaxSlider.SetValueWithoutNotify(newValue);
+                    SetSliderValueWithoutNotify(newValue);
                     SetFloatFieldWithoutNotify(_minIntegerField, newValue.x);
                     SetFloatFieldWithoutNotify(_maxIntegerField, newValue.y);
                 }
@@ -175,13 +178,13 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             if(!_init || Math.Abs(minResult - _minValue) > float.Epsilon)
             {
-                _minMaxSlider.lowLimit = _minValue = minResult;
+                _minValue = minResult;
                 changed = true;
             }
 
             if(!_init || Math.Abs(_maxValue - maxResult) > float.Epsilon)
             {
-                _minMaxSlider.highLimit = _maxValue = maxResult;
+                _maxValue = maxResult;
                 changed = true;
             }
 
@@ -263,7 +266,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             Vector2 newValue = RemapValue(value);
 
             _cachedValue = newValue;
-            _minMaxSlider.SetValueWithoutNotify(newValue);
+            SetSliderValueWithoutNotify(newValue);
             SetFloatFieldWithoutNotify(_minIntegerField, newValue.x);
             SetFloatFieldWithoutNotify(_maxIntegerField, newValue.y);
             SetHelpBox("");
@@ -280,6 +283,25 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     Util.BoundFloatStep(x, _minValue, _maxValue, _step),
                     Util.BoundFloatStep(y, _minValue, _maxValue, _step))
                 : new Vector2(x, Mathf.Clamp(y, x, _maxValue));
+        }
+
+        private float SliderToActualValue(float sliderValue)
+        {
+            float normalized = Mathf.InverseLerp(_minMaxSlider.lowLimit, _minMaxSlider.highLimit, sliderValue);
+            return Mathf.Lerp(_minValue, _maxValue, normalized);
+        }
+
+        private float ActualToSliderValue(float actualValue)
+        {
+            float normalized = Mathf.InverseLerp(_minValue, _maxValue, actualValue);
+            return Mathf.Lerp(_minMaxSlider.lowLimit, _minMaxSlider.highLimit, normalized);
+        }
+
+        private void SetSliderValueWithoutNotify(Vector2 actualValue)
+        {
+            _minMaxSlider.SetValueWithoutNotify(new Vector2(
+                ActualToSliderValue(actualValue.x),
+                ActualToSliderValue(actualValue.y)));
         }
 
         private HelpBox _helpBox;
