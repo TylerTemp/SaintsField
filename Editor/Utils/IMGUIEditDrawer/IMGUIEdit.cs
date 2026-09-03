@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
+using SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer;
 using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using UnityEditor;
 using UnityEngine;
@@ -351,6 +352,15 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             {
                 IMGUIEditType.OnGUI(position, label, valueType, (TypeInfo)value, beforeSet, setterOrNull,
                     labelGrayColor, inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
+                return;
+            }
+
+            if ((valueType?.IsArray == true && valueType.GetArrayRank() == 2) ||
+                value is Array { Rank: 2 })
+            {
+                SaintsArray2DRDrawer.IMGUIValueEditOnGUI(position, label, valueType, value as Array,
+                    beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes,
+                    targets, richTextTagProvider, foldoutViewKey);
                 return;
             }
 

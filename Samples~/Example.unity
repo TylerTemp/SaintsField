@@ -1634,96 +1634,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsArray2DRExample
   array2Dr:
     _saintsList:
-    - obsoleteValue: 00
+    - obsoleteValue: 
       _saintsList:
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 1
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      _saintsSerializedVersion: 2
-      _wrapType: 4
-    - obsoleteValue: 00
-      _saintsList:
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
       - value: 0
         valueField:
           propertyType: 0
@@ -1782,7 +1694,7 @@ MonoBehaviour:
         wrapType: 4
       _saintsSerializedVersion: 2
       _wrapType: 4
-    - obsoleteValue: 00
+    - obsoleteValue: 
       _saintsList:
       - value: 0
         valueField:
@@ -1799,20 +1711,6 @@ MonoBehaviour:
         valueList: []
         wrapType: 4
       - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 1
         valueField:
           propertyType: 0
           longValue: 0
@@ -1856,81 +1754,7 @@ MonoBehaviour:
         wrapType: 4
       _saintsSerializedVersion: 2
       _wrapType: 4
-    - obsoleteValue: 00
-      _saintsList:
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 1
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      _saintsSerializedVersion: 2
-      _wrapType: 4
-    - obsoleteValue: 00
+    - obsoleteValue: 
       _saintsList:
       - value: 0
         valueField:
@@ -1975,20 +1799,6 @@ MonoBehaviour:
         valueList: []
         wrapType: 4
       - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 1
         valueField:
           propertyType: 0
           longValue: 0
@@ -2005,7 +1815,8 @@ MonoBehaviour:
       _saintsSerializedVersion: 2
       _wrapType: 4
     _wrapType: 4
-    _saintsSerializedVersion: 0
+    _columnCount: 4
+    _saintsSerializedVersion: 1
   array2DrRev:
     _saintsList:
     - obsoleteValue: 00
@@ -2527,7 +2338,8 @@ MonoBehaviour:
       _saintsSerializedVersion: 2
       _wrapType: 4
     _wrapType: 4
-    _saintsSerializedVersion: 0
+    _columnCount: 5
+    _saintsSerializedVersion: 1
   references:
     version: 2
     RefIds:

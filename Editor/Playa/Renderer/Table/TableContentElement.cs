@@ -35,22 +35,9 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             _fieldWithInfo = fieldWithInfo;
             // Empty
             // _emptyNotice = new HelpBox("Table is empty", HelpBoxMessageType.None);
-            Color borderColor = new Color(0.1254902f, 0.1254902f, 0.1254902f);
-            _emptyNotice = new VisualElement
-            {
-                style =
-                {
-                    borderLeftColor = borderColor,
-                    borderLeftWidth = 1,
-                    borderRightColor = borderColor,
-                    borderRightWidth = 1,
-                    borderTopColor = borderColor,
-                    borderTopWidth = 1,
-                    borderBottomColor = borderColor,
-                    borderBottomWidth = 1,
-                    backgroundColor = new Color(0.2745098f, 0.2745098f, 0.2745098f),
-                },
-            };
+            _emptyNotice = new VisualElement();
+            _emptyNotice.AddToClassList("unity-collection-view--with-border");
+            _emptyNotice.AddToClassList("unity-list-view__scroll-view--with-footer");
             _emptyNotice.Add(new Label("Table is empty")
             {
                 style =
@@ -66,6 +53,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             // Filled
             _tableContentContainer = new VisualElement();
+            _tableContentContainer.AddToClassList("unity-collection-view--with-border");
             _tableContentContainer.AddToClassList("unity-list-view__scroll-view--with-footer");
             Add(_tableContentContainer);
 

@@ -204,7 +204,6 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     });
                 });
             }
-            // tableContentElement.AddToClassList("unity-collection-view--with-border");
 
             foldout.ArraySizeField.RegisterValueChangedCallback(evt =>
             {

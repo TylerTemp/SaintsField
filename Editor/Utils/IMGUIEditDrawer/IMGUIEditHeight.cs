@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
+using SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer;
 using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using UnityEngine;
 
@@ -262,6 +263,14 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             {
                 return IMGUIEditType.GetPropertyHeight(label, valueType, (TypeInfo)value, beforeSet, setterOrNull,
                     labelGrayColor, inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
+            }
+
+            if ((valueType?.IsArray == true && valueType.GetArrayRank() == 2) ||
+                value is Array { Rank: 2 })
+            {
+                return SaintsArray2DRDrawer.GetIMGUIValueEditHeight(label, valueType, value as Array,
+                    beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes,
+                    targets, richTextTagProvider, foldoutViewKey);
             }
 
             (bool hasHashSetHeight, float hashSetHeight) = IMGUIEditHashSet.GetPropertyHeight(label, valueType,

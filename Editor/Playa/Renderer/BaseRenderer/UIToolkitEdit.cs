@@ -21,6 +21,7 @@ using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ResizableTextAreaDrawer;
 using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Drawers.SaintsDictionary;
+using SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer;
 using SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer;
 using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
@@ -4533,6 +4534,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             #endregion
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
+
+            if ((valueType?.IsArray == true && valueType.GetArrayRank() == 2) ||
+                value is Array { Rank: 2 })
+            {
+                return (SaintsArray2DRDrawer.UIToolkitValueEdit(oldElement, label, valueType,
+                    value as Array, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout,
+                    allAttributes, targets, richTextTagProvider, foldoutViewKey), false);
+            }
 
             #region HashSet
             if (!valueIsNull)

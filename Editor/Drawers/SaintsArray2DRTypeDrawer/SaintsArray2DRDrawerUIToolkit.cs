@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
     public partial class SaintsArray2DRDrawer
     {
         private const string SerializedRowsName = "_saintsList";
-        // private const string SerializedColumnsName = "_columnCount";
+        private const string SerializedColumnsName = "_columnCount";
         private const string SerializedWrapTypeName = "_wrapType";
 
         private static string NameRoot(SerializedProperty property) =>
@@ -59,24 +59,15 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 reorderMode = ListViewReorderMode.Animated,
             };
 
-            Color borderColor = new Color(0.1254902f, 0.1254902f, 0.1254902f);
             VisualElement emptyNotice = new VisualElement
             {
                 name = NameEmptyNotice(property),
                 style =
                 {
                     display = DisplayStyle.None,
-                    borderLeftColor = borderColor,
-                    borderLeftWidth = 1,
-                    borderRightColor = borderColor,
-                    borderRightWidth = 1,
-                    borderTopColor = borderColor,
-                    borderTopWidth = 1,
-                    borderBottomColor = borderColor,
-                    borderBottomWidth = 1,
-                    backgroundColor = new Color(0.2745098f, 0.2745098f, 0.2745098f),
                 },
             };
+            emptyNotice.AddToClassList("unity-collection-view--with-border");
             emptyNotice.Add(new Label("2D Array is Empty")
             {
                 style =
@@ -122,12 +113,14 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             string propNameCompact = GetPropName(rawType);
             SerializedProperty wrapProp = FindPropertyCompact(property, propNameCompact);
             Debug.Assert(wrapProp != null, $"Failed to get prop from {propNameCompact}");
+            SerializedProperty columnCountProp = property.FindPropertyRelative(SerializedColumnsName);
+            Debug.Assert(columnCountProp != null, $"Failed to get {SerializedColumnsName} from {property.propertyPath}");
             object fieldValue = info.GetValue(parent);
             if (insideArray)
             {
                 fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
             }
-            (FieldInfo wrapField, object wrapParent) = GetTargetInfo(propNameCompact, rawType, fieldValue);
+            (FieldInfo wrapField, object _) = GetTargetInfo(propNameCompact, rawType, fieldValue);
             Debug.Assert(wrapField != null, $"Failed to get field {propNameCompact} from {property.propertyPath}");
             Type rowType = ReflectUtils.GetElementType(wrapField.FieldType);
             Debug.Assert(rowType != null, $"Failed to get row type from {wrapField.FieldType}");
@@ -172,17 +165,25 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             WrapType cellWrapType = SaintsWrapUtils.EnsureWrapType(
                 property.FindPropertyRelative(SerializedWrapTypeName), cellField, hasSerializeReference);
 
-            int cachedColumnCount = wrapProp.arraySize == 0
-                ? 1
-                : Mathf.Max(1, GetColumnCount(wrapProp));
+            root.ColSizeField.SetValueWithoutNotify(wrapProp.arraySize == 0
+                ? Mathf.Max(0, columnCountProp.intValue)
+                : Mathf.Max(0, GetColumnCount(wrapProp)));
 
-            root.ColReduceButton.clicked += () => SetColumnCount(cachedColumnCount - 1);
-            root.ColAddButton.clicked += () => SetColumnCount(cachedColumnCount + 1);
+            root.ColReduceButton.clicked += () => SetColumnCount(root.ColSizeField.value - 1);
+            root.ColAddButton.clicked += () => SetColumnCount(root.ColSizeField.value + 1);
             root.RowReduceButton.clicked += () => SetRowCount(wrapProp.arraySize - 1);
             root.RowAddButton.clicked += () => SetRowCount(wrapProp.arraySize + 1);
             root.ColSizeField.RegisterValueChangedCallback(evt => SetColumnCount(evt.newValue));
             root.RowSizeField.RegisterValueChangedCallback(evt => SetRowCount(evt.newValue));
             root.TrackPropertyValue(wrapProp, _ => Refresh());
+            root.TrackPropertyValue(columnCountProp, trackedProperty =>
+            {
+                if (wrapProp.arraySize == 0)
+                {
+                    root.ColSizeField.SetValueWithoutNotify(Mathf.Max(0, trackedProperty.intValue));
+                }
+                Refresh();
+            });
             listView.RegisterCallback<GeometryChangedEvent>(_ => SyncColumnWidths(listView));
             listView.itemIndexChanged += (fromIndex, toIndex) =>
             {
@@ -194,8 +195,9 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             bool resettingColumnDisplayOrder = false;
             RegisterColumnReorderedCallback(listView.columns, (_, fromIndex, toIndex) =>
             {
+                int columnCount = wrapProp.arraySize == 0 ? 0 : GetColumnCount(wrapProp);
                 if (resettingColumnDisplayOrder || fromIndex == toIndex || fromIndex < 0 || toIndex < 0 ||
-                    fromIndex >= cachedColumnCount || toIndex >= cachedColumnCount)
+                    fromIndex >= columnCount || toIndex >= columnCount)
                 {
                     return;
                 }
@@ -228,15 +230,9 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
 
             void SetColumnCount(int value)
             {
-                if (wrapProp.arraySize == 0)
-                {
-                    Refresh();
-                    return;
-                }
-
-                int newColumnCount = Mathf.Max(1, value);
-                bool changed = false;
-                cachedColumnCount = newColumnCount;
+                int newColumnCount = Mathf.Max(0, value);
+                bool changed = columnCountProp.intValue != newColumnCount;
+                columnCountProp.intValue = newColumnCount;
                 for (int rowIndex = 0; rowIndex < wrapProp.arraySize; rowIndex++)
                 {
                     SerializedProperty row = wrapProp.GetArrayElementAtIndex(rowIndex);
@@ -259,20 +255,19 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             void SetRowCount(int value)
             {
                 int newRowCount = Mathf.Max(0, value);
-                if (wrapProp.arraySize > 0)
-                {
-                    cachedColumnCount = Mathf.Max(1, GetColumnCount(wrapProp));
-                }
-
+                int columnCount = Mathf.Max(0, root.ColSizeField.value);
                 bool changed = wrapProp.arraySize != newRowCount;
+                changed |= columnCountProp.intValue != columnCount;
+                columnCountProp.intValue = columnCount;
+
                 wrapProp.arraySize = newRowCount;
                 for (int rowIndex = 0; rowIndex < newRowCount; rowIndex++)
                 {
                     SerializedProperty row = wrapProp.GetArrayElementAtIndex(rowIndex);
                     SerializedProperty columns = row.FindPropertyRelative(SerializedRowsName);
-                    if (columns.arraySize != cachedColumnCount)
+                    if (columns.arraySize != columnCount)
                     {
-                        columns.arraySize = cachedColumnCount;
+                        columns.arraySize = columnCount;
                         changed = true;
                     }
                 }
@@ -293,10 +288,11 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 root.RowReduceButton.SetEnabled(rowCount > 0);
                 if (rowCount == 0)
                 {
-                    root.ColSizeField.SetValueWithoutNotify(cachedColumnCount);
-                    root.ColSizeField.SetEnabled(false);
-                    root.ColReduceButton.SetEnabled(false);
-                    root.ColAddButton.SetEnabled(false);
+                    int emptyColumnCount = Mathf.Max(0, root.ColSizeField.value);
+                    root.ColSizeField.SetValueWithoutNotify(emptyColumnCount);
+                    root.ColSizeField.SetEnabled(true);
+                    root.ColReduceButton.SetEnabled(emptyColumnCount > 0);
+                    root.ColAddButton.SetEnabled(true);
                     emptyNotice.style.display = DisplayStyle.Flex;
                     listView.style.display = DisplayStyle.None;
                     listView.itemsSource = Array.Empty<object>();
@@ -311,19 +307,27 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 SerializedProperty saintList0 = wrapProp.GetArrayElementAtIndex(0);
                 SerializedProperty itemActualListProp = saintList0.FindPropertyRelative(SerializedRowsName);
                 int columnCount = itemActualListProp.arraySize;
-                if (columnCount < 1)
+                if (columnCountProp.intValue != columnCount)
                 {
-                    SetColumnCount(cachedColumnCount);
-                    return;
+                    columnCountProp.intValue = columnCount;
+                    property.serializedObject.ApplyModifiedProperties();
                 }
-                cachedColumnCount = Mathf.Max(1, columnCount);
-                root.ColSizeField.SetValueWithoutNotify(cachedColumnCount);
+                root.ColSizeField.SetValueWithoutNotify(columnCount);
                 root.ColSizeField.SetEnabled(true);
-                root.ColReduceButton.SetEnabled(cachedColumnCount > 1);
+                root.ColReduceButton.SetEnabled(columnCount > 0);
                 root.ColAddButton.SetEnabled(true);
 
+                if (columnCount == 0)
+                {
+                    emptyNotice.style.display = DisplayStyle.Flex;
+                    listView.style.display = DisplayStyle.None;
+                    listView.itemsSource = Array.Empty<object>();
+                    listView.Rebuild();
+                    return;
+                }
+
                 ReconcileColumns(listView, columnCount, wrapProp, cellWrapType, cellField, cellType,
-                    cellAttributes, injectAttributes, hasSerializeReference, wrapField, wrapParent);
+                    cellAttributes, injectAttributes, hasSerializeReference, wrapField);
                 listView.itemsSource = Enumerable.Range(0, rowCount).ToList();
                 listView.Rebuild();
                 listView.schedule.Execute(() => SyncColumnWidths(listView));
@@ -348,7 +352,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             int columnCount, SerializedProperty wrapProp, WrapType cellWrapType, FieldInfo cellField,
             Type cellType, IReadOnlyList<Attribute> cellAttributes,
             IReadOnlyList<InjectAttributeBase> injectAttributes, bool hasSerializeReference,
-            FieldInfo wrapField, object wrapParent)
+            FieldInfo wrapField)
         {
             for (int columnIndex = listView.columns.Count; columnIndex < columnCount; columnIndex++)
             {
@@ -370,8 +374,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                     bindCell = (element, rowIndex) =>
                     {
                         BindCell(element, wrapProp, rowIndex, capturedColumn, cellWrapType, cellField,
-                            cellType, cellAttributes, injectAttributes, hasSerializeReference, wrapField,
-                            wrapParent);
+                            cellType, cellAttributes, injectAttributes, hasSerializeReference, wrapField);
                     },
                     unbindCell = (element, _) =>
                     {
@@ -422,7 +425,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
         private void BindCell(VisualElement element, SerializedProperty wrapProp, int rowIndex, int columnIndex,
             WrapType cellWrapType, FieldInfo cellField, Type cellType,
             IReadOnlyList<Attribute> cellAttributes, IReadOnlyList<InjectAttributeBase> injectAttributes,
-            bool hasSerializeReference, FieldInfo wrapField, object wrapParent)
+            bool hasSerializeReference, FieldInfo wrapField)
         {
             element.Unbind();
             element.Clear();
@@ -437,16 +440,20 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
 
             if (columnIndex < 0 || columnIndex >= itemActualListWrapProp.arraySize)
             {
-                element.Add(new Label("\u2014"));
+                element.Add(new Label("-"));
                 return;
             }
 
             SerializedProperty saintsWrapProp = itemActualListWrapProp.GetArrayElementAtIndex(columnIndex);
             saintsWrapProp.isExpanded = true;
 
-            IList rows = wrapField.GetValue(wrapParent) as IList;
-            Debug.Assert(rows != null && rowIndex < rows.Count,
-                $"Failed to get row {rowIndex} from {wrapField.Name}");
+            object wrapParent = SerializedUtils.GetFieldInfoAndDirectParent(wrapProp).parent;
+            IList rows = wrapParent == null ? null : wrapField.GetValue(wrapParent) as IList;
+            if (rows == null || rowIndex >= rows.Count)
+            {
+                element.Add(new Label("-"));
+                return;
+            }
             object rowParent = rows[rowIndex];
 
             VisualElement resultElement = SaintsWrapUtils.CreateCellElement(
