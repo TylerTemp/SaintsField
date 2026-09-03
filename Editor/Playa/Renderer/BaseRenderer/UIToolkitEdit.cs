@@ -4535,7 +4535,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
 
-            if ((valueType?.IsArray == true && valueType.GetArrayRank() == 2) ||
+            if ((valueType.IsArray == true && valueType.GetArrayRank() == 2) ||
                 value is Array { Rank: 2 })
             {
                 return (SaintsArray2DRDrawer.UIToolkitValueEdit(oldElement, label, valueType,
