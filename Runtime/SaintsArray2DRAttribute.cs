@@ -1,8 +1,12 @@
+using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Parameter)]
     // ReSharper disable once InconsistentNaming
     public class SaintsArray2DRAttribute: PropertyAttribute, ISaintsAttribute
     {
