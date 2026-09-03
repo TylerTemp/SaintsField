@@ -437,32 +437,32 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
             ToolbarSearchField wrapSearch = payload.SearchPager.ToolbarSearchField;
 
-             TextField searchTextField = wrapSearch.Q<TextField>();
-             searchTextField.style.position = Position.Relative;
+            TextField searchTextField = wrapSearch.Q<TextField>();
+            searchTextField.style.position = Position.Relative;
 
-             searchTextField.Add(loadingImage);
-             UIToolkitUtils.SetKeepRotate(loadingImage);
-             loadingImage.RegisterCallback<AttachToPanelEvent>(_ => loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage)));
-             // _asyncSearchItems.LoadingImage = loadingImage;
+            searchTextField.Add(loadingImage);
+            UIToolkitUtils.SetKeepRotate(loadingImage);
+            loadingImage.RegisterCallback<AttachToPanelEvent>(_ => loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage)));
+            // _asyncSearchItems.LoadingImage = loadingImage;
 
-             wrapSearch.RegisterValueChangedCallback(evt =>
-             {
-                 _asyncSearchItems.SearchText = evt.newValue;
-                 _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
-                 _asyncSearchItems.Started = false;
-                 _asyncSearchItems.Finished = false;
-                 _asyncSearchItems.HitTargetIndexes.Clear();
-                 _asyncSearchItems.SourceGenerator = Search(wrapProp, _asyncSearchItems.SearchText).GetEnumerator();
-                 RefreshList();
-             });
+            wrapSearch.RegisterValueChangedCallback(evt =>
+            {
+                _asyncSearchItems.SearchText = evt.newValue;
+                _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
+                _asyncSearchItems.Started = false;
+                _asyncSearchItems.Finished = false;
+                _asyncSearchItems.HitTargetIndexes.Clear();
+                _asyncSearchItems.SourceGenerator = Search(wrapProp, _asyncSearchItems.SearchText).GetEnumerator();
+                RefreshList();
+            });
 
-             wrapSearch.RegisterCallback<KeyDownEvent>(evt =>
-             {
-                 if (evt.keyCode == KeyCode.Return)
-                 {
-                     _asyncSearchItems.DebounceSearchTime = 0f;
-                 }
-             }, TrickleDown.TrickleDown);
+            wrapSearch.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return)
+                {
+                    _asyncSearchItems.DebounceSearchTime = 0f;
+                }
+            }, TrickleDown.TrickleDown);
 
             listView.makeItem = () => new VisualElement();
 
@@ -494,10 +494,6 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
                 ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 1 - insideArrayOffset, injectAttribute.Decorator,
                     injectAttribute.Parameters);
-                // if(less1DepthInject.Depth > 0)
-                // {
-                //     injectAttributes1.Add(less1DepthInject);
-                // }
                 ValueAttributeAttribute less2DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 2 - insideArrayOffset, injectAttribute.Decorator,
                     injectAttribute.Parameters);
                 if (less2DepthInject.Depth > 0)
@@ -538,26 +534,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 #endif
                     injectCreatedAttributes1.Add(less1DepthInject);
                 }
-
-                // if (injectAttribute.Depth == 2)
-                // {
-                //     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
-                //     if(injectedAttribute != null)
-                //     {
-                //         injectCreatedAttributes2.Add(injectedAttribute);
-                //     }
-                // }
-                // else
-                // {
-                //     injectCreatedAttributes2.Add(less2DepthInject);
-                // }
             }
-
-            // SerializeReference serRef = r.OfType<SerializeReference>().FirstOrDefault();
-            // IReadOnlyList<Attribute> injectedKeyAttributes = serRef == null
-            //     ? Array.Empty<Attribute>()
-            //     : new[]{serRef};
-            // IReadOnlyList<Attribute> injectedKeyAttributes = new List<Attribute>();
 
             WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(
                 property.FindPropertyRelative("_wrapType"), wrapField, hasSerializeReference);

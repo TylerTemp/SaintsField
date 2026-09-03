@@ -1,0 +1,62 @@
+:root {
+}
+
+Foldout > #unity-content {
+    margin-left: 0;
+}
+
+.topRightContainer {
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 20px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.arraySizeField {
+    width: 50px;
+    margin: 0;
+}
+
+.arraySizeField IntegerInput {
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+}
+
+.comma {
+    -unity-text-align: middle-center;
+    margin: 0 0 0 4px;
+    padding: 0;
+}
+
+.sizeButton {
+    -unity-background-scale-mode: scale-to-fit;
+    background-size: 80% 80%;
+    margin: 0;
+    -unity-background-image-tint-color: rgb(204, 204, 204);
+}
+
+.addButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-right.png?fileID=2800000&guid=55dad5685bb71954aa8919431bffb168&type=3#classic-dropdown-right");
+}
+
+.reduceButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-left.png?fileID=2800000&guid=9bba20b448ef9bf4492563cdc5c95f4f&type=3#classic-dropdown-left");
+}
+
+.space {
+    width: 10px;
+}
+
+.control {
+    flex-direction: row;
+}

@@ -4,7 +4,6 @@
 
 Fix: `MinMaxSlider` incorrectly backwrite slider limit value and override the correct value [#441](https://github.com/TylerTemp/SaintsField/issues/441)
 
-
 ## 5.27.0 ##
 
 1.  Add: `Unit` For different unit for numbernic types

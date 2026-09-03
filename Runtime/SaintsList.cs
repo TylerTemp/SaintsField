@@ -2,17 +2,20 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using SaintsField.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Serializable]
-    public class SaintsList<T>: IList<T>, ISerializationCallbackReceiver
+    public class SaintsList<T>: IList<T>, IReadOnlyList<T>, IList, ISerializationCallbackReceiver
     {
+        [FormerlySerializedAs("value")]
         [SerializeField, Obsolete]
-        public List<T> value = new List<T>();
+        public List<T> obsoleteValue = new List<T>();
 
         [SerializeField] private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
         [SerializeField] private int _saintsSerializedVersion;
@@ -39,7 +42,7 @@ namespace SaintsField
                 _saintsSerializedVersion = 1;
                 _saintsList.Clear();
 #pragma warning disable CS0612 // Type or member is obsolete
-                foreach (T oldValue in value)
+                foreach (T oldValue in obsoleteValue)
 #pragma warning restore CS0612 // Type or member is obsolete
                 {
                     _saintsList.Add(new SaintsWrap<T>(_wrapType, oldValue));
@@ -72,7 +75,7 @@ namespace SaintsField
             if (_saintsSerializedVersion == 0)
             {
 #pragma warning disable CS0612 // Type or member is obsolete
-                _list = value;
+                _list = obsoleteValue;
 #pragma warning restore CS0612 // Type or member is obsolete
                 return;
             }
@@ -112,7 +115,7 @@ namespace SaintsField
 
 #if UNITY_EDITOR
         // ReSharper disable once UnusedMember.Local
-        private static string EditorPropertyName => nameof(_saintsList);
+        public static string EditorPropertyName => nameof(_saintsList);
 #endif
 
         public override string ToString()
@@ -138,6 +141,12 @@ namespace SaintsField
         public SaintsList(int capacity): this()
         {
             _list = new List<T>(capacity);
+        }
+
+        public int Capacity
+        {
+            get => _list.Capacity;
+            set => _list.Capacity = value;
         }
 
         // Implicit conversion operator: Converts SaintsArray<T> to T[]
@@ -243,19 +252,193 @@ namespace SaintsField
             }
         }
 
+        bool IList.IsFixedSize => ((IList)_list).IsFixedSize;
+        bool IList.IsReadOnly => ((IList)_list).IsReadOnly;
+        bool ICollection.IsSynchronized => ((ICollection)_list).IsSynchronized;
+        object ICollection.SyncRoot => ((ICollection)_list).SyncRoot;
+
+        object IList.this[int index]
+        {
+            get => ((IList)_list)[index];
+            set
+            {
+                ((IList)_list)[index] = value;
+#if UNITY_EDITOR
+                SyncSerializedList();
+#endif
+            }
+        }
+
+        int IList.Add(object value)
+        {
+            int index = ((IList)_list).Add(value);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+            return index;
+        }
+
+        bool IList.Contains(object value) => ((IList)_list).Contains(value);
+
+        int IList.IndexOf(object value) => ((IList)_list).IndexOf(value);
+
+        void IList.Insert(int index, object value)
+        {
+            ((IList)_list).Insert(index, value);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        void IList.Remove(object value)
+        {
+#if UNITY_EDITOR
+            int count = _list.Count;
+#endif
+            ((IList)_list).Remove(value);
+#if UNITY_EDITOR
+            if (_list.Count != count)
+            {
+                SyncSerializedList();
+            }
+#endif
+        }
+
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)_list).CopyTo(array, index);
+
         #endregion
 
         public void AddRange(IEnumerable<T> collection)
         {
-#if UNITY_EDITOR
-            foreach (T v in collection)
-            {
-                _list.Add(v);
-                _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
-            }
-#else
             _list.AddRange(collection);
+#if UNITY_EDITOR
+            SyncSerializedList();
 #endif
         }
+
+        public ReadOnlyCollection<T> AsReadOnly() => _list.AsReadOnly();
+
+        public int BinarySearch(T item) => _list.BinarySearch(item);
+        public int BinarySearch(T item, IComparer<T> comparer) => _list.BinarySearch(item, comparer);
+        public int BinarySearch(int index, int count, T item, IComparer<T> comparer) =>
+            _list.BinarySearch(index, count, item, comparer);
+
+        public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) => _list.ConvertAll(converter);
+
+        public void CopyTo(T[] array) => _list.CopyTo(array);
+        public void CopyTo(int index, T[] array, int arrayIndex, int count) =>
+            _list.CopyTo(index, array, arrayIndex, count);
+
+        public bool Exists(Predicate<T> match) => _list.Exists(match);
+        public T Find(Predicate<T> match) => _list.Find(match);
+        public List<T> FindAll(Predicate<T> match) => _list.FindAll(match);
+        public int FindIndex(Predicate<T> match) => _list.FindIndex(match);
+        public int FindIndex(int startIndex, Predicate<T> match) => _list.FindIndex(startIndex, match);
+        public int FindIndex(int startIndex, int count, Predicate<T> match) =>
+            _list.FindIndex(startIndex, count, match);
+        public T FindLast(Predicate<T> match) => _list.FindLast(match);
+        public int FindLastIndex(Predicate<T> match) => _list.FindLastIndex(match);
+        public int FindLastIndex(int startIndex, Predicate<T> match) => _list.FindLastIndex(startIndex, match);
+        public int FindLastIndex(int startIndex, int count, Predicate<T> match) =>
+            _list.FindLastIndex(startIndex, count, match);
+        public void ForEach(Action<T> action) => _list.ForEach(action);
+        public List<T> GetRange(int index, int count) => _list.GetRange(index, count);
+        public int IndexOf(T item, int index) => _list.IndexOf(item, index);
+        public int IndexOf(T item, int index, int count) => _list.IndexOf(item, index, count);
+
+        public void InsertRange(int index, IEnumerable<T> collection)
+        {
+            _list.InsertRange(index, collection);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public int LastIndexOf(T item) => _list.LastIndexOf(item);
+        public int LastIndexOf(T item, int index) => _list.LastIndexOf(item, index);
+        public int LastIndexOf(T item, int index, int count) => _list.LastIndexOf(item, index, count);
+
+        public int RemoveAll(Predicate<T> match)
+        {
+            int removed = _list.RemoveAll(match);
+#if UNITY_EDITOR
+            if (removed != 0)
+            {
+                SyncSerializedList();
+            }
+#endif
+            return removed;
+        }
+
+        public void RemoveRange(int index, int count)
+        {
+            _list.RemoveRange(index, count);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public void Reverse()
+        {
+            _list.Reverse();
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public void Reverse(int index, int count)
+        {
+            _list.Reverse(index, count);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public void Sort()
+        {
+            _list.Sort();
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public void Sort(IComparer<T> comparer)
+        {
+            _list.Sort(comparer);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public void Sort(Comparison<T> comparison)
+        {
+            _list.Sort(comparison);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public void Sort(int index, int count, IComparer<T> comparer)
+        {
+            _list.Sort(index, count, comparer);
+#if UNITY_EDITOR
+            SyncSerializedList();
+#endif
+        }
+
+        public T[] ToArray() => _list.ToArray();
+        public void TrimExcess() => _list.TrimExcess();
+        public bool TrueForAll(Predicate<T> match) => _list.TrueForAll(match);
+
+#if UNITY_EDITOR
+        private void SyncSerializedList()
+        {
+            _saintsList.Clear();
+            foreach (T item in _list)
+            {
+                _saintsList.Add(new SaintsWrap<T>(_wrapType, item));
+            }
+        }
+#endif
     }
 }

@@ -1,0 +1,21 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/SaintsArray2DR/SaintsArray2DRFoldoutStyle.uss?fileID=7433441132597879392&amp;guid=1c80c8b4d9022704a9c6da8862630ebd&amp;type=3#SaintsArray2DRFoldoutStyle"/>
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:Foldout/>
+        <ui:VisualElement name="topRightContainer" class="topRightContainer">
+            <ui:VisualElement name="control" class="control">
+                <ui:Label text="W" style="-unity-text-align: lower-left;"/>
+                <ui:Button text="" name="colReduce" class="reduceButton sizeButton"/>
+                <ui:IntegerField is-delayed="true" name="colSizeField" class="arraySizeField colSizeField"/>
+                <ui:Button text="" name="colAdd" class="addButton sizeButton"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="space" class="space"/>
+            <ui:VisualElement name="control" class="control">
+                <ui:Label text="H" style="-unity-text-align: lower-left;"/>
+                <ui:Button text="" name="rowReduce" class="reduceButton sizeButton"/>
+                <ui:IntegerField is-delayed="true" name="rowSizeField" value="1" class="arraySizeField rowSizeField"/>
+                <ui:Button text="" name="rowAdd" class="addButton sizeButton"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

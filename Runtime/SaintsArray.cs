@@ -10,12 +10,13 @@ namespace SaintsField
 {
     [Serializable]
     public class SaintsArray<T>: IWrapProp
+        , IList<T>
         , IReadOnlyList<T>
+        , IList
         , ICollection
         , ICloneable
-        // , IList  this is so fucked up. MS need this for index. Ignore this because IReadOnlyList solved it
-        // , IEnumerable
         , IStructuralComparable
+        , IStructuralEquatable
         , ISerializationCallbackReceiver
     {
         // [SerializeField, Obsolete]
@@ -78,14 +79,59 @@ namespace SaintsField
         public T this[int index]
         {
             get => _array[index];
-            set => _array[index] = value;  // ms just don't give any interface for this
+            set
+            {
+                _array[index] = value;
+#if UNITY_EDITOR
+                _saintsList[index] = new SaintsWrap<T>(_wrapType, value);
+#endif
+            }
         }
+
+        public bool IsReadOnly => ((ICollection<T>)_array).IsReadOnly;
+
+        public void Add(T item) => ((ICollection<T>)_array).Add(item);
+        public void Clear()
+        {
+            ((ICollection<T>)_array).Clear();
+#if UNITY_EDITOR
+            SyncSerializedArray();
+#endif
+        }
+        public bool Contains(T item) => ((ICollection<T>)_array).Contains(item);
+        public void CopyTo(T[] array, int arrayIndex) => _array.CopyTo(array, arrayIndex);
+        public int IndexOf(T item) => ((IList<T>)_array).IndexOf(item);
+        public void Insert(int index, T item) => ((IList<T>)_array).Insert(index, item);
+        public bool Remove(T item) => ((ICollection<T>)_array).Remove(item);
+        public void RemoveAt(int index) => ((IList<T>)_array).RemoveAt(index);
+
+        bool IList.IsFixedSize => ((IList)_array).IsFixedSize;
+        bool IList.IsReadOnly => ((IList)_array).IsReadOnly;
+
+        object IList.this[int index]
+        {
+            get => ((IList)_array)[index];
+            set
+            {
+                ((IList)_array)[index] = value;
+#if UNITY_EDITOR
+                SyncSerializedArray();
+#endif
+            }
+        }
+
+        int IList.Add(object value) => ((IList)_array).Add(value);
+        bool IList.Contains(object value) => ((IList)_array).Contains(value);
+        int IList.IndexOf(object value) => ((IList)_array).IndexOf(value);
+        void IList.Insert(int index, object value) => ((IList)_array).Insert(index, value);
+        void IList.Remove(object value) => ((IList)_array).Remove(value);
 
         #endregion
 
         #region ICollection
 
         public void CopyTo(Array array, int index) => _array.CopyTo(array, index);
+        public void CopyTo(Array array, long index) => _array.CopyTo(array, index);
         public bool IsSynchronized => _array.IsSynchronized;
         public object SyncRoot => _array.SyncRoot;
 
@@ -97,16 +143,52 @@ namespace SaintsField
 
         #region IStructuralComparable
 
-        // array has this actually
-        public int CompareTo(object other, IComparer comparer)
-        {
-            // ReSharper disable once PossibleNullReferenceException
-            throw null;
-        }
+        public int CompareTo(object other, IComparer comparer) =>
+            ((IStructuralComparable)_array).CompareTo(Unwrap(other), comparer);
+        #endregion
+
+        #region IStructuralEquatable
+
+        public bool Equals(object other, IEqualityComparer comparer) =>
+            ((IStructuralEquatable)_array).Equals(Unwrap(other), comparer);
+
+        public int GetHashCode(IEqualityComparer comparer) =>
+            ((IStructuralEquatable)_array).GetHashCode(comparer);
+
         #endregion
 
         // Microsoft is a shithole
         public int Length => _array.Length;
+        public long LongLength => _array.LongLength;
+        public int Rank => _array.Rank;
+
+        public int GetLength(int dimension) => _array.GetLength(dimension);
+        public long GetLongLength(int dimension) => _array.GetLongLength(dimension);
+        public int GetLowerBound(int dimension) => _array.GetLowerBound(dimension);
+        public int GetUpperBound(int dimension) => _array.GetUpperBound(dimension);
+        public T GetValue(int index) => _array[index];
+        public void SetValue(T value, int index) => this[index] = value;
+        public void Initialize()
+        {
+            _array.Initialize();
+#if UNITY_EDITOR
+            SyncSerializedArray();
+#endif
+        }
+
+        private static object Unwrap(object other) =>
+            other is SaintsArray<T> saintsArray ? saintsArray._array : other;
+
+#if UNITY_EDITOR
+        private void SyncSerializedArray()
+        {
+            _saintsList.Clear();
+            foreach (T value in _array)
+            {
+                _saintsList.Add(new SaintsWrap<T>(_wrapType, value));
+            }
+        }
+#endif
 
         public void OnBeforeSerialize()
         {
