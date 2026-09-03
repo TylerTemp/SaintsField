@@ -114,10 +114,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.27.1**
+**5.28.0**
 
-Fix: `MinMaxSlider` incorrectly backwrite slider limit value and override the correct value [#441](https://github.com/TylerTemp/SaintsField/issues/441)
-
+1.  Add: `SaintsArray2DR<T>` to serialize two-dimensional rectangular array
+2.  Add: Extended Serialization now can serialize `T[,]` type.
 
 ## Usage ##
 
@@ -265,6 +265,7 @@ Fix: `MinMaxSlider` incorrectly backwrite slider limit value and override the co
     *   [`HeaderDraw` / `HeaderLeftDraw`](https://saintsfield.comes.today/component-header/headerdraw--headerleftdraw)
 *   Data Types
     *   [`SaintsArray`/`SaintsList`](https://saintsfield.comes.today/data-types/saintsarraysaintslist)
+    *   [`SaintsArray2DR<>`](https://saintsfield.comes.today/data-types/saintsarraydr)
     *   [`SaintsDictionary<,>`](https://saintsfield.comes.today/data-types/saintsdictionary)
     *   [`SaintsInterface<>`](https://saintsfield.comes.today/data-types/saintsinterface)
     *   [`SaintsHashSet<>` / `ReferenceHashSet<>`](https://saintsfield.comes.today/data-types/saintshashset--referencehashset)
@@ -323,6 +324,7 @@ Fix: `MinMaxSlider` incorrectly backwrite slider limit value and override the co
     *   [`TimeSpan`](https://saintsfield.comes.today/extended-serialization/timespan)
     *   [`Guid`](https://saintsfield.comes.today/extended-serialization/guid)
     *   [`decimal`](https://saintsfield.comes.today/extended-serialization/decimal)
+    *   [Two-Dimensional Array](https://saintsfield.comes.today/extended-serialization/two-dimensional-array)
 *   `SaintsEditorWindow`
     *   [Overview](https://saintsfield.comes.today/saintseditorwindow/overview)
     *   [Usage & Example](https://saintsfield.comes.today/saintseditorwindow/usage--example)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.28.0 ##
+
+1.  Add: `SaintsArray2DR<T>` to serialize two-dimensional rectangular array
+2.  Add: Extended Serialization now can serialize `T[,]` type.
+
 ## 5.27.1 ##
 
 Fix: `MinMaxSlider` incorrectly backwrite slider limit value and override the correct value [#441](https://github.com/TylerTemp/SaintsField/issues/441)
