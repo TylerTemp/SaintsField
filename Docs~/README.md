@@ -8482,7 +8482,7 @@ private void AfterBotton()
 
 ### `SaintsArray`/`SaintsList` ###
 
-Unity does not allow to serialize two-dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
+Unity does not serialize nested arrays or lists. `SaintsArray` and `SaintsList` are there to help.
 
 The target can also be interface / abstract type.
 
@@ -8498,19 +8498,19 @@ public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/5c6a5d8d-ec56-45d2-9860-1ecdd6badd3f)
 
-`SaintsArray` implements `IReadOnlyList`, `SaintsList` implements `IList`:
+`SaintsArray` implements `IList` with the fixed-size behavior of an array. `SaintsList` implements `IList` and mirrors the common `List` APIs:
 
 ```csharp
 using SaintsField;
 
 // SaintsArray
 GameObject firstGameObject = saintsArrayGo[0];
-Debug.Log(saintsArrayGo.value); // the actual array value
+saintsArrayGo[0] = anotherGameObject;
 
 // SaintsList
 saintsListGo.Add(new GameObject());
 saintsListGo.RemoveAt(0);
-Debug.Log(saintsListGo.value);  // the actual list value
+saintsListGo.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
 ```
 
 These two can be easily converted to array/list:
@@ -8551,6 +8551,49 @@ public SaintsArray<IInterface1[]> inters;
 ```
 
 ![](https://github.com/user-attachments/assets/e2002b81-ee55-4e08-991c-c0857f3df4be)
+
+### `SaintsArray2DR<>` ###
+
+Unity does not serialize two-dimensional rectangular arrays (`T[,]`).
+Use `SaintsArray2DR<T>` when you need an editable rectangular array on a regular Unity-serialized field.
+
+The inspector draws the value as a grid. Use the `W` and `H` controls to change its column and row counts.
+
+`SaintsArray2DR<T>` converts implicitly to and from `T[,]`.
+
+Use `[SaintsArray2DR]` change settings:
+*   `bool transpose`: when true, for `T[a, b]`, use a as height (row) and b as width (col) 
+
+```csharp
+using SaintsField;
+
+public SaintsArray2DR<bool> array2Dr;
+
+// reverse x, y direction
+[SaintsArray2DR(transpose: true)]
+public SaintsArray2DR<bool> array2DrRev;
+
+private void Awake()
+{
+    bool[,] to2D = array2Dr;  // convert to
+    SaintsArray2DR<bool> from2D = array2DrRev;  // convert from
+}
+```
+
+[![video](https://github.com/user-attachments/assets/de12e6d9-b80e-49b5-a249-a22c275a6c68)](https://github.com/user-attachments/assets/489d6d24-edd2-408e-abc6-887ff2a65f4d)
+
+It works with `ShowInInspector` & `Button`
+
+```csharp
+[ShowInInspector]
+private bool[,] ShowArray2DSerialized
+{
+    get => array2DSerialized;
+    set => array2DSerialized = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/b233120c-8219-442e-8b46-1e89abeb54d0)
 
 ### `SaintsDictionary<,>` ###
 
@@ -10238,6 +10281,30 @@ public partial class SerDecimalExample : MonoBehaviour
 [SaintsSerialized, Adapt(EUnit.Kilogram, EUnit.Pounds)]
 private decimal weightInKilograms = 3.75m;
 ```
+
+
+### Two-Dimensional Array ###
+
+You can serialize a two-dimensional rectangular array directly. SaintsField will internally use `SaintsArray2DR` to serialize it.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+using UnityEngine;
+
+public partial class GridExample : MonoBehaviour
+{
+    [SaintsSerialized]
+    private bool[,] grid = new bool[2, 3];
+
+    [SaintsSerialized, SaintsArray2DR(transpose: true)]
+    private bool[,] gridHeightFirst = new bool[2, 3];
+}
+```
+
+![](https://github.com/user-attachments/assets/ebabf081-31f3-44b8-a98e-4122d4c68811)
 
 ## `SaintsEditorWindow` ##
 

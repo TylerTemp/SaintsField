@@ -1821,6 +1821,80 @@ MonoBehaviour:
     _saintsList:
     - obsoleteValue: 00
       _saintsList:
+      - value: 1
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 1
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 0
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 1
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 0
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      _saintsSerializedVersion: 2
+      _wrapType: 4
+    - obsoleteValue: 00
+      _saintsList:
       - value: 0
         valueField:
           propertyType: 0
@@ -1849,7 +1923,7 @@ MonoBehaviour:
         valueArray: []
         valueList: []
         wrapType: 4
-      - value: 0
+      - value: 1
         valueField:
           propertyType: 0
           longValue: 0
@@ -1923,7 +1997,7 @@ MonoBehaviour:
         valueArray: []
         valueList: []
         wrapType: 4
-      - value: 0
+      - value: 1
         valueField:
           propertyType: 0
           longValue: 0
@@ -1997,81 +2071,7 @@ MonoBehaviour:
         valueArray: []
         valueList: []
         wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      _saintsSerializedVersion: 2
-      _wrapType: 4
-    - obsoleteValue: 00
-      _saintsList:
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          intValues: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
-      - value: 0
+      - value: 1
         valueField:
           propertyType: 0
           longValue: 0
