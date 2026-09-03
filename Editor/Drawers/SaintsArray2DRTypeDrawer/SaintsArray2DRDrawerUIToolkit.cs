@@ -183,6 +183,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             root.ColSizeField.RegisterValueChangedCallback(evt => SetColumnCount(evt.newValue));
             root.RowSizeField.RegisterValueChangedCallback(evt => SetRowCount(evt.newValue));
             root.TrackPropertyValue(wrapProp, _ => Refresh());
+            listView.RegisterCallback<GeometryChangedEvent>(_ => SyncColumnWidths(listView));
             listView.itemIndexChanged += (fromIndex, toIndex) =>
             {
                 wrapProp.MoveArrayElement(fromIndex, toIndex);
@@ -325,6 +326,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                     cellAttributes, injectAttributes, hasSerializeReference, wrapField, wrapParent);
                 listView.itemsSource = Enumerable.Range(0, rowCount).ToList();
                 listView.Rebuild();
+                listView.schedule.Execute(() => SyncColumnWidths(listView));
             }
         }
 
@@ -356,7 +358,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                     name = $"column-{columnIndex}",
                     title = $"{columnIndex}",
                     // minWidth = 120,
-                    stretchable = true,
+                    stretchable = false,
                     makeCell = () => new VisualElement
                     {
                         style =
@@ -366,9 +368,11 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                         },
                     },
                     bindCell = (element, rowIndex) =>
+                    {
                         BindCell(element, wrapProp, rowIndex, capturedColumn, cellWrapType, cellField,
                             cellType, cellAttributes, injectAttributes, hasSerializeReference, wrapField,
-                            wrapParent),
+                            wrapParent);
+                    },
                     unbindCell = (element, _) =>
                     {
                         element.Unbind();
@@ -383,6 +387,36 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             }
 
             listView.columns.primaryColumnName = "column-0";
+        }
+
+        private static void SyncColumnWidths(MultiColumnListView listView)
+        {
+            int columnCount = listView.columns.Count;
+            if (columnCount == 0 || listView.resolvedStyle.display == DisplayStyle.None)
+            {
+                return;
+            }
+
+            ScrollView scrollView = listView.Q<ScrollView>();
+            float availableWidth = scrollView?.contentViewport.resolvedStyle.width ?? listView.contentRect.width;
+            if (float.IsNaN(availableWidth) || availableWidth <= 0)
+            {
+                return;
+            }
+
+            const float dragHandleWidth = 15f;
+            const float reorderableContainerPadding = 18f;
+            const float firstColumnOverhead = dragHandleWidth + reorderableContainerPadding;
+            float cellWidth = Mathf.Max(0, (availableWidth - firstColumnOverhead) / columnCount);
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+            {
+                float width = cellWidth + (columnIndex == 0 ? firstColumnOverhead : 0);
+                Column column = listView.columns[columnIndex];
+                if (!Mathf.Approximately(column.width.value, width))
+                {
+                    column.width = width;
+                }
+            }
         }
 
         private void BindCell(VisualElement element, SerializedProperty wrapProp, int rowIndex, int columnIndex,
