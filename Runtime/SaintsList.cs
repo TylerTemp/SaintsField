@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SaintsField.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 // ReSharper disable once CheckNamespace
@@ -68,6 +69,10 @@ namespace SaintsField
 
 #if UNITY_EDITOR
         private HashSet<SaintsWrap<T>> _editorWatchedKeys = new HashSet<SaintsWrap<T>>();
+        private UnityEvent _editorOnAfterDeserializeChanged = new UnityEvent();
+
+        public UnityEvent EditorOnAfterDeserializeChanged =>
+            _editorOnAfterDeserializeChanged ??= new UnityEvent();
 #endif
         public void OnAfterDeserialize()
         {
@@ -105,7 +110,7 @@ namespace SaintsField
             }
 
 #if UNITY_EDITOR
-            // do nothing
+            EditorOnAfterDeserializeChanged.Invoke();
 #else
             _saintsList.Clear();
 #endif

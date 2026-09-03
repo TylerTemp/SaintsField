@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Utils;
 using UnityEngine;
 
@@ -156,7 +157,26 @@ namespace SaintsField
             _saintsSerializedVersion = SaintsSerializedVersionRuntime;
         }
 
+#if UNITY_EDITOR
+        private HashSet<SaintsList<T>> _editorWatchedRows = new HashSet<SaintsList<T>>();
+#endif
+
         public void OnAfterDeserialize()
+        {
+#if UNITY_EDITOR
+            IEnumerable<SaintsList<T>> extraRows = _saintsList
+                .Where(row => row != null)
+                .Except(_editorWatchedRows);
+            foreach (SaintsList<T> row in extraRows)
+            {
+                row.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                _editorWatchedRows.Add(row);
+            }
+#endif
+            OnAfterDeserializeProcess();
+        }
+
+        private void OnAfterDeserializeProcess()
         {
             int rows = _saintsList.Count;
             if (rows == 0)
