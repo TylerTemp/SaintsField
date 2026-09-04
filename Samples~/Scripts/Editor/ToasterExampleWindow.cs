@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_EDITOR && UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Utils;
 using SaintsField.Editor;
 using SaintsField.Editor.UIToolkitElements.ToasterDrawer;
