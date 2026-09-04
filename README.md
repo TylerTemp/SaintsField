@@ -114,10 +114,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.28.0**
+**5.29.0**
 
-1.  Add: `SaintsArray2DR<T>` to serialize two-dimensional rectangular array
-2.  Add: Extended Serialization now can serialize `T[,]` type.
+1.  Add: `Toast.*` to show a toast at current window
+2.  Add: `SaintsEditorWindow.EditorToast*` to show a toast at Saints Editor Window
 
 ## Usage ##
 
@@ -329,8 +329,10 @@ namespace: `SaintsField`
     *   [Overview](https://saintsfield.comes.today/saintseditorwindow/overview)
     *   [Usage & Example](https://saintsfield.comes.today/saintseditorwindow/usage--example)
     *   [Life Cycle & Functions](https://saintsfield.comes.today/saintseditorwindow/life-cycle--functions)
+    *   [`EditorToast`](https://saintsfield.comes.today/saintseditorwindow/editortoast)
     *   [`WindowInlineEditor`](https://saintsfield.comes.today/saintseditorwindow/windowinlineeditor)
 *   Misc
+    *   [Toast](https://saintsfield.comes.today/misc/toast)
     *   [About GroupBy](https://saintsfield.comes.today/misc/about-groupby)
     *   [`EMode`](https://saintsfield.comes.today/misc/emode)
     *   [Callback](https://saintsfield.comes.today/misc/callback)

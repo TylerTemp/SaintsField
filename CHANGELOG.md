@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.29.0 ##
+
+1.  Add: `Toast.*` to show a toast at current window
+2.  Add: `SaintsEditorWindow.EditorToast*` to show a toast at Saints Editor Window
+
 ## 5.28.0 ##
 
 1.  Add: `SaintsArray2DR<T>` to serialize two-dimensional rectangular array
