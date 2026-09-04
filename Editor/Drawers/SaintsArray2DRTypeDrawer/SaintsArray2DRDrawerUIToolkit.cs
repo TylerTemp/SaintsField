@@ -19,7 +19,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
     public partial class SaintsArray2DRDrawer
     {
         private const string SerializedRowsName = "_saintsList";
-        private const string SerializedColumnsName = "_columnCount";
         private const string SerializedWrapTypeName = "_wrapType";
 
         private static string NameRoot(SerializedProperty property) =>
@@ -113,8 +112,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             string propNameCompact = GetPropName(rawType);
             SerializedProperty wrapProp = FindPropertyCompact(property, propNameCompact);
             Debug.Assert(wrapProp != null, $"Failed to get prop from {propNameCompact}");
-            SerializedProperty columnCountProp = property.FindPropertyRelative(SerializedColumnsName);
-            Debug.Assert(columnCountProp != null, $"Failed to get {SerializedColumnsName} from {property.propertyPath}");
             object fieldValue = info.GetValue(parent);
             if (insideArray)
             {
@@ -166,7 +163,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 property.FindPropertyRelative(SerializedWrapTypeName), cellField, hasSerializeReference);
 
             root.ColSizeField.SetValueWithoutNotify(wrapProp.arraySize == 0
-                ? Mathf.Max(0, columnCountProp.intValue)
+                ? 0
                 : Mathf.Max(0, GetColumnCount(wrapProp)));
 
             root.ColReduceButton.clicked += () => SetColumnCount(root.ColSizeField.value - 1);
@@ -176,14 +173,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             root.ColSizeField.RegisterValueChangedCallback(evt => SetColumnCount(evt.newValue));
             root.RowSizeField.RegisterValueChangedCallback(evt => SetRowCount(evt.newValue));
             root.TrackPropertyValue(wrapProp, _ => Refresh());
-            root.TrackPropertyValue(columnCountProp, trackedProperty =>
-            {
-                if (wrapProp.arraySize == 0)
-                {
-                    root.ColSizeField.SetValueWithoutNotify(Mathf.Max(0, trackedProperty.intValue));
-                }
-                Refresh();
-            });
             listView.RegisterCallback<GeometryChangedEvent>(_ => SyncColumnWidths(listView));
             listView.itemIndexChanged += (fromIndex, toIndex) =>
             {
@@ -231,8 +220,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             void SetColumnCount(int value)
             {
                 int newColumnCount = Mathf.Max(0, value);
-                bool changed = columnCountProp.intValue != newColumnCount;
-                columnCountProp.intValue = newColumnCount;
+                bool changed = false;
                 for (int rowIndex = 0; rowIndex < wrapProp.arraySize; rowIndex++)
                 {
                     SerializedProperty row = wrapProp.GetArrayElementAtIndex(rowIndex);
@@ -257,8 +245,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 int newRowCount = Mathf.Max(0, value);
                 int columnCount = Mathf.Max(0, root.ColSizeField.value);
                 bool changed = wrapProp.arraySize != newRowCount;
-                changed |= columnCountProp.intValue != columnCount;
-                columnCountProp.intValue = columnCount;
 
                 wrapProp.arraySize = newRowCount;
                 for (int rowIndex = 0; rowIndex < newRowCount; rowIndex++)
@@ -307,11 +293,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 SerializedProperty saintList0 = wrapProp.GetArrayElementAtIndex(0);
                 SerializedProperty itemActualListProp = saintList0.FindPropertyRelative(SerializedRowsName);
                 int columnCount = itemActualListProp.arraySize;
-                if (columnCountProp.intValue != columnCount)
-                {
-                    columnCountProp.intValue = columnCount;
-                    property.serializedObject.ApplyModifiedProperties();
-                }
                 root.ColSizeField.SetValueWithoutNotify(columnCount);
                 root.ColSizeField.SetEnabled(true);
                 root.ColReduceButton.SetEnabled(columnCount > 0);

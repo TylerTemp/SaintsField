@@ -21,7 +21,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
         {
             public SerializedProperty RootProperty;
             public SerializedProperty RowsProperty;
-            public SerializedProperty ColumnCountProperty;
             public FieldInfo CellField;
             public Type CellType;
             public WrapType CellWrapType;
@@ -352,11 +351,9 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
         {
             int newRowCount = Mathf.Max(0, rowCount);
             int newColumnCount = Mathf.Max(0, columnCount);
-            bool changed = context.RowsProperty.arraySize != newRowCount ||
-                           context.ColumnCountProperty.intValue != newColumnCount;
+            bool changed = context.RowsProperty.arraySize != newRowCount;
 
             context.RowsProperty.arraySize = newRowCount;
-            context.ColumnCountProperty.intValue = newColumnCount;
             for (int rowIndex = 0; rowIndex < newRowCount; rowIndex++)
             {
                 SerializedProperty row = context.RowsProperty.GetArrayElementAtIndex(rowIndex);
@@ -391,7 +388,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
         {
             if (context.RowsProperty.arraySize == 0)
             {
-                return Mathf.Max(0, context.ColumnCountProperty.intValue);
+                return 0;
             }
 
             SerializedProperty firstRow = context.RowsProperty.GetArrayElementAtIndex(0);
@@ -413,8 +410,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
 
             string propNameCompact = GetPropName(rawType);
             SerializedProperty rowsProperty = FindPropertyCompact(property, propNameCompact);
-            SerializedProperty columnCountProperty = property.FindPropertyRelative(SerializedColumnsName);
-            if (rowsProperty == null || columnCountProperty == null)
+            if (rowsProperty == null)
             {
                 return false;
             }
@@ -480,7 +476,6 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
             {
                 RootProperty = property,
                 RowsProperty = rowsProperty,
-                ColumnCountProperty = columnCountProperty,
                 CellField = cellField,
                 CellType = cellType,
                 CellWrapType = SaintsWrapUtils.EnsureWrapType(

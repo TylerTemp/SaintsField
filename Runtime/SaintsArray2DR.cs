@@ -23,7 +23,6 @@ namespace SaintsField
         // ReSharper disable once InconsistentNaming
         [SerializeField] public List<SaintsList<T>> _saintsList = new List<SaintsList<T>>();
         [SerializeField] private WrapType _wrapType;
-        [SerializeField] private int _columnCount;
 
 #pragma warning disable CS0414 // Field is assigned but its value is never used
         [SerializeField] private int _saintsSerializedVersion;
@@ -57,7 +56,6 @@ namespace SaintsField
             }
 
             _array = (T[,])array.Clone();
-            _columnCount = array.GetLength(1);
 #if UNITY_EDITOR
             CopyToSerializedRows();
 #endif
@@ -66,7 +64,6 @@ namespace SaintsField
         public SaintsArray2DR(int length0, int length1): this()
         {
             _array = new T[length0, length1];
-            _columnCount = length1;
 #if UNITY_EDITOR
             CopyToSerializedRows();
 #endif
@@ -181,8 +178,7 @@ namespace SaintsField
             int rows = _saintsList.Count;
             if (rows == 0)
             {
-                _columnCount = Math.Max(0, _columnCount);
-                _array = new T[0, _columnCount];
+                _array = new T[0, 0];
                 return;
             }
 
@@ -193,7 +189,6 @@ namespace SaintsField
             }
 
             int columns = firstRow.Count;
-            _columnCount = columns;
             T[,] array = new T[rows, columns];
             for (int row = 0; row < rows; row++)
             {
@@ -216,7 +211,6 @@ namespace SaintsField
         {
             int rows = _array.GetLength(0);  // 行，外部
             int columns = _array.GetLength(1);  // 列，内部
-            _columnCount = columns;
             _saintsList.Clear();
             for (int row = 0; row < rows; row++)
             {
