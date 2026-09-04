@@ -1,0 +1,16 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/Toaster/toasterStyle.uss?fileID=7433441132597879392&amp;guid=ba21601451364db49198f944df1fcab1&amp;type=3#toasterStyle" />
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/SaintsRotate.uss?fileID=7433441132597879392&amp;guid=2ab8c04876944150b2df065c28e1dd66&amp;type=3#SaintsRotate" />
+    <ui:VisualElement name="toaster" class="toaster toaster--default">
+        <ui:VisualElement name="icon" picking-mode="Ignore" class="toaster__icon">
+            <ui:VisualElement name="loading-icon" picking-mode="Ignore" class="toaster__loading-icon" />
+            <ui:Image name="custom-icon" picking-mode="Ignore" class="toaster__custom-icon" />
+        </ui:VisualElement>
+        <ui:VisualElement class="toaster__content">
+            <ui:Label name="text" text="Notification" class="toaster__text" />
+            <ui:Label name="description" class="toaster__description" />
+        </ui:VisualElement>
+        <ui:Button name="action" text="Action" class="toaster__action" />
+        <ui:Button name="close" text="×" tooltip="Dismiss" class="toaster__close" />
+    </ui:VisualElement>
+</ui:UXML>

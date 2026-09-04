@@ -9509,11 +9509,11 @@ using SaintsField.Spine;
 > Enable `SaintsEditor` before using
 
 > [!IMPORTANT]
-> Use "Window" - "Saints Field" - "Enable DOTween Support" to enable this function
+> Use "Tools" - "Saints Field" - "Enable DOTween Support" to enable this function
 
 A method decorator to play a `DOTween` animation returned by the method.
 
-The method should not have required parameters, and need to return a `Tween` or a `Sequence` (`Sequence` is actually also a tween).
+The method need to return a `Tween` or a `Sequence` (`Sequence` is actually also a `tween`).
 
 Parameters:
 
@@ -9559,10 +9559,6 @@ The first row is global control. Stop it there will stop all preview.
 The check of each row means autoplay when you click the start in the global control.
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/d9479943-b254-4819-af91-c390a9fb2268)](https://github.com/TylerTemp/SaintsField/assets/6391063/34f36f5d-6697-4b68-9773-ce37672b850c)
-
-**Setup**
-
-To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
 ## Wwise ##
 
@@ -10472,6 +10468,49 @@ The following are the life cycle functions, some are wrapped around Unity Editor
 *   `public void StartEditorCoroutine(IEnumerator routine)`: like `StartCoroutine`, but for editor coroutine. No return value.
 *   `public void StopEditorCoroutine(IEnumerator routine)`: like `StopCoroutine`, but for editor coroutine.
 
+### `EditorToast` ###
+
+`SaintsEditorWindow` provides convenience methods that show a toast in the current window.
+
+Available methods:
+
+*   `EditorToast(string message, Toast.Options? options = null)`
+*   `EditorToastSuccess(string message, Toast.Options? options = null)`
+*   `EditorToastInfo(string message, Toast.Options? options = null)`
+*   `EditorToastWarning(string message, Toast.Options? options = null)`
+*   `EditorToastError(string message, Toast.Options? options = null)`
+*   `EditorToastLoading(string message, Toast.Options? options = null)`
+
+Example:
+
+```csharp
+using SaintsField.Editor;
+using SaintsField.Playa;
+
+public class SaveWindow : SaintsEditorWindow
+{
+    [Button]
+    private IEnumerator Btn()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            if (i % 3 == 0)
+            {
+                EditorToastWarning($"Failed to save {i}");
+            }
+
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        EditorToastSuccess("Save Finished!");
+    }
+}
+```
+
+[![video](https://github.com/user-attachments/assets/7702b515-fe7c-4805-97a4-f024f08169f0)](https://github.com/user-attachments/assets/ba825335-f356-4d2b-b787-7bd4c21035aa)
+
+See Misc - Toast for more information
+
 ### `WindowInlineEditor` ###
 
 This decorator only works in `SaintsEditorWindow`. It'll render the target object's editor in the window. Not work for array/list.
@@ -10479,6 +10518,120 @@ This decorator only works in `SaintsEditorWindow`. It'll render the target objec
 See the example above.
 
 ## Misc ##
+
+### Toast ###
+
+`SaintsField.Editor.Toast` shows a toast. API and behavior similar to [mui-sonner](https://mui-sonner.tsotne.co.uk/) (except the promise API)
+
+It displays the toast at the bottom right of current window.
+
+![](https://github.com/user-attachments/assets/8a3c49fc-2f76-48bb-8b32-2f39076fb2b1)
+
+**API**
+
+All creation methods return the created `Toaster`, or `null` when no UI Toolkit root can be found:
+
+*   `Toast.Show(string message, Toast.Options? options = null, VisualElement element = null)`
+*   `Toast.Success(string message, Toast.Options? options = null, VisualElement element = null)`
+*   `Toast.Info(string message, Toast.Options? options = null, VisualElement element = null)`
+*   `Toast.Warning(string message, Toast.Options? options = null, VisualElement element = null)`
+*   `Toast.Error(string message, Toast.Options? options = null, VisualElement element = null)`
+*   `Toast.Loading(string message, Toast.Options? options = null, VisualElement element = null)`
+*   `Toast.Dismiss(Toaster toaster = null, VisualElement element = null)`
+
+about `Toast.Dismiss()`:
+*   toaster != null: dismiss one toast.
+*   element != null: dismiss all toast in window where element lives
+*   `Toast.Dismiss()`: find the active window and dismiss all toasts inside
+
+**`Toast.Options`**
+
+*   `string Description`: secondary text rendered below the message.
+*   `double? Duration`: auto-close delay in milliseconds. `null` uses the container default of 4000 milliseconds. `double.PositiveInfinity` or `<=0` to never auto-close. `Toast.Loading` also has no default auto-close.
+*   `string Icon`: a custom icon resource path. See `LabelText` to know how the resource is found
+*   `Color? IconColor`: an optional tint applied to the custom icon. The default is white.
+*   `bool CloseButton`: shows a close button when `true`.
+*   `Toast.ActionOptions? Action`: adds an action button.
+*   `Action<Toaster> OnDismiss`: called when the toast is dismissed explicitly.
+*   `Action<Toaster> OnAutoClose`: called when the duration expires.
+
+**`Toast.ActionOptions`**
+
+*   `string Label`: action button text.
+*   `Action OnClick`: callback invoked before the toast is dismissed.
+
+Example:
+
+```csharp
+using SaintsField.Editor;
+using SaintsField.Editor.UIToolkitElements.ToasterDrawer;
+using UnityEngine;
+
+Toast.Show("Default notification");
+Toast.Success("Operation completed successfully");
+Toast.Info("Here is some useful information");
+Toast.Warning("This action may need attention");
+Toast.Error("Something went wrong");
+
+// Loading toasts remain until dismissed unless Duration is set.
+Toaster loading = Toast.Loading("Loading data", new Toast.Options
+{
+    CloseButton = true,
+});
+
+// Later:
+Toast.Dismiss(loading);
+```
+
+[![video](https://github.com/user-attachments/assets/53be4244-0bb0-4b5f-8358-7ad9e84dd136)](https://github.com/user-attachments/assets/e94cdc69-23f5-430b-8dcf-f9bc92192f43)
+
+Config Example:
+
+```csharp
+using SaintsField.Editor;
+Toast.Info("My toast", new Toast.Options
+{
+    Description = "My description",
+    Duration = double.PositiveInfinity,
+    Icon = "star.png",  // or: Assets/my/pic.png
+    IconColor = EColor.Gold.GetColor(),
+    CloseButton = true,
+});
+```
+
+![](https://github.com/user-attachments/assets/357d0ef8-7798-4e3c-9dc9-3b754c65081e)
+
+Action and callbacks
+
+```csharp
+using SaintsField.Editor;
+using UnityEngine;
+
+Toast.Show("Event created", new Toast.Options
+{
+    Action = new Toast.ActionOptions
+    {
+        Label = "Undo",
+        OnClick = () => Debug.Log("Undo"),
+    },
+    OnDismiss = toaster => Debug.Log($"Dismissed {toaster.Text.text}"),
+    OnAutoClose = toaster => Debug.Log($"Auto-closed {toaster.Text.text}"),
+});
+```
+
+**Targeting a window**
+
+Pass any `VisualElement` from a window to target that window explicitly. Usually, you won't need this API. 
+
+```csharp
+Toast.Success("Saved", element: saveButton);
+```
+
+The API finds the containing `EditorWindow` root. If `element` is omitted, the API uses:
+
+```csharp
+EditorWindow.focusedWindow ?? EditorWindow.mouseOverWindow
+```
 
 ### About GroupBy ###
 

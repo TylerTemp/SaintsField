@@ -1,0 +1,232 @@
+.toaster {
+    max-width: 356px;
+    min-height: 48px;
+    padding: 10px 12px;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgb(55, 55, 55);
+    border-width: 1px;
+    border-color: rgb(91, 91, 91);
+    border-radius: 4px;
+    color: rgb(245, 245, 245);
+}
+
+.toaster--ghost {
+    opacity: 0.28;
+}
+
+.toaster-container {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    flex-direction: column;
+    align-items: flex-end;
+    max-width: 100%;
+}
+
+.toaster-container__item {
+    flex-shrink: 0;
+    align-self: flex-end;
+}
+
+.toaster-container__item--latest-stacked {
+    margin-top: 12px;
+}
+
+.toaster-container__item--ghost-near,
+.toaster-container__item--ghost-far {
+    position: absolute;
+}
+
+.toaster-container__item--ghost-near {
+    bottom: 6px;
+}
+
+.toaster-container__item--ghost-far {
+    bottom: 12px;
+}
+
+.toaster-container__item--ghost-far .toaster--ghost {
+    opacity: 0.14;
+}
+
+.toaster-container__item--ghost-hidden {
+    display: none;
+}
+
+.toaster-container:hover .toaster-container__item {
+    position: relative;
+    bottom: auto;
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.toaster-container:hover .toaster--ghost {
+    opacity: 1;
+}
+
+.toaster__icon {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    margin-right: 10px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: resource("console.infoicon");
+}
+
+.toaster__loading-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/refresh.png?fileID=2800000&guid=bfdf848cb00f1544db8f6a367acd4d8e&type=3#refresh");
+    -unity-background-image-tint-color: rgb(230, 230, 230);
+}
+
+.toaster__custom-icon {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.toaster.toaster--custom-icon .toaster__icon {
+    background-image: none;
+}
+
+.toaster--custom-icon .toaster__loading-icon {
+    display: none;
+}
+
+.toaster--custom-icon .toaster__custom-icon {
+    display: flex;
+}
+
+.toaster__content {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.toaster__text {
+    white-space: normal;
+    color: rgb(245, 245, 245);
+    -unity-text-align: middle-left;
+}
+
+.toaster__description {
+    margin-top: 3px;
+    white-space: normal;
+    font-size: 11px;
+    color: rgba(245, 245, 245, 0.72);
+    -unity-text-align: middle-left;
+}
+
+.toaster__action {
+    min-width: 52px;
+    height: 24px;
+    margin: 0 0 0 10px;
+    padding: 2px 8px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.32);
+    border-radius: 3px;
+    color: rgb(245, 245, 245);
+}
+
+.toaster__action:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.toaster__action:active {
+    background-color: rgba(0, 0, 0, 0.16);
+}
+
+.toaster__close {
+    width: 20px;
+    height: 20px;
+    margin: 0 0 0 8px;
+    padding: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-width: 0;
+    border-radius: 10px;
+    color: rgb(245, 245, 245);
+    font-size: 15px;
+}
+
+.toaster__close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.toaster--default {
+    background-color: rgb(55, 55, 55);
+    border-color: rgb(91, 91, 91);
+}
+
+.toaster--default .toaster__icon {
+    background-image: resource("console.infoicon");
+}
+
+.toaster--success {
+    background-color: rgb(35, 91, 47);
+    border-color: rgb(73, 150, 89);
+}
+
+.toaster--success .toaster__icon {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/check.png?fileID=2800000&guid=ed18320f902c7d847bc9df6a063170d0&type=3#check");
+    -unity-background-image-tint-color: rgb(215, 255, 222);
+}
+
+.toaster--info {
+    background-color: rgb(27, 88, 124);
+    border-color: rgb(55, 139, 188);
+}
+
+.toaster--info .toaster__icon {
+    background-image: resource("console.infoicon");
+}
+
+.toaster--error {
+    background-color: rgb(126, 43, 43);
+    border-color: rgb(194, 83, 83);
+}
+
+.toaster--error .toaster__icon {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/close.png?fileID=2800000&guid=f2d0b83660a56994fa039297f84cbf05&type=3#close");
+    -unity-background-image-tint-color: rgb(255, 226, 226);
+}
+
+.toaster--warning {
+    background-color: rgb(125, 82, 24);
+    border-color: rgb(196, 133, 46);
+}
+
+.toaster--warning .toaster__icon {
+    background-image: resource("console.warnicon");
+}
+
+.toaster--loading .toaster__icon {
+    background-image: none;
+}
+
+.toaster--loading .toaster__loading-icon {
+    opacity: 1;
+}
+
+.toaster--hide-icon .toaster__icon,
+.toaster--hide-action .toaster__action,
+.toaster--hide-description .toaster__description,
+.toaster--hide-close .toaster__close {
+    display: none;
+}

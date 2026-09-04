@@ -2,6 +2,7 @@
 using System;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.SaintsEditorWindowUtils;
+using SaintsField.Editor.UIToolkitElements.ToasterDrawer;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -76,6 +77,36 @@ namespace SaintsField.Editor
             VisualElement root = rootVisualElement;
             root.Clear();
             root.Add(EditorCreatInspectingTarget());
+        }
+
+        public ToasterElement EditorToast(string message, Toast.Options? options = null)
+        {
+            return Toast.Show(message, options, rootVisualElement);
+        }
+
+        public ToasterElement EditorToastSuccess(string message, Toast.Options? options = null)
+        {
+            return Toast.Success(message, options, rootVisualElement);
+        }
+
+        public ToasterElement EditorToastInfo(string message, Toast.Options? options = null)
+        {
+            return Toast.Info(message, options, rootVisualElement);
+        }
+
+        public ToasterElement EditorToastWarning(string message, Toast.Options? options = null)
+        {
+            return Toast.Warning(message, options, rootVisualElement);
+        }
+
+        public ToasterElement EditorToastError(string message, Toast.Options? options = null)
+        {
+            return Toast.Error(message, options, rootVisualElement);
+        }
+
+        public ToasterElement EditorToastLoading(string message, Toast.Options? options = null)
+        {
+            return Toast.Loading(message, options, rootVisualElement);
         }
     }
 }
