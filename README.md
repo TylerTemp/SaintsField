@@ -114,10 +114,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.29.0**
+**5.29.1**
 
-1.  Add: `Toast.*` to show a toast at current window
-2.  Add: `SaintsEditorWindow.EditorToast*` to show a toast at Saints Editor Window
+1. Fix: `SaintsArray2DR<T>` failed to serialize in some cases
+2. Fix: some fields failed to deserialize when `Instantiate` from prefab 
 
 ## Usage ##
 

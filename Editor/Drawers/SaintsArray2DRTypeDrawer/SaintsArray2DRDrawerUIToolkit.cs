@@ -253,9 +253,14 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                     SerializedProperty columns = row.FindPropertyRelative(SerializedRowsName);
                     if (columns.arraySize != columnCount)
                     {
+                        // Debug.Log($"adjust row[{rowIndex}].length={columnCount}");
                         columns.arraySize = columnCount;
                         changed = true;
                     }
+                    // else
+                    // {
+                    //     Debug.Log($"row[{rowIndex}].length already {columns.arraySize}=={columnCount}");
+                    // }
                 }
 
                 if (changed)

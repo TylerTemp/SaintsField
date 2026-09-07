@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.29.1 ##
+
+1. Fix: `SaintsArray2DR<T>` failed to serialize in some cases
+2. Fix: some fields failed to deserialize when `Instantiate` from prefab 
+
 ## 5.29.0 ##
 
 1.  Add: `Toast.*` to show a toast at current window

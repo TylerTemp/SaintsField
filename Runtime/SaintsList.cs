@@ -111,9 +111,8 @@ namespace SaintsField
 
 #if UNITY_EDITOR
             EditorOnAfterDeserializeChanged.Invoke();
-#else
-            _saintsList.Clear();
 #endif
+            // Keep serialized cells: Instantiate serializes them again when cloning a prefab.
         }
 
         #endregion
@@ -136,12 +135,11 @@ namespace SaintsField
         public SaintsList(IEnumerable<T> ie): this()
         {
             _list = new List<T>(ie);
-#if UNITY_EDITOR
+            // Runtime-created rows also need serialized cells for prefab cloning.
             foreach (T element in _list)
             {
                 _saintsList.Add(new SaintsWrap<T>(_wrapType, element));
             }
-#endif
         }
         public SaintsList(int capacity): this()
         {

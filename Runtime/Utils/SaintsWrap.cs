@@ -44,7 +44,7 @@ namespace SaintsField.Utils
             _runtimeResult = v;
             // _hasValue = true;
 
-#if UNITY_EDITOR
+            // Runtime-created wrappers must preserve their serialized payload for Instantiate.
             EnsureInit();
             switch (wrapType)
             {
@@ -149,7 +149,6 @@ namespace SaintsField.Utils
                 }
                     break;
             }
-#endif
         }
 
         public T GetValue()

@@ -31,16 +31,31 @@ namespace SaintsField
 
         // actual value
         private T[,] _array = new T[0, 0];
+        private bool _dirty;
+
+        private void MarkDirty() => _dirty = true;
+
+        private T[,] EnsureArray()
+        {
+            // ReSharper disable once InvertIf
+            if (_dirty)
+            {
+                OnAfterDeserializeProcess();
+                _dirty = false;
+            }
+
+            return _array;
+        }
 
 #if UNITY_EDITOR
         public static readonly string EditorPropertyName = nameof(_saintsList);
 #endif
 
-        public static implicit operator T[,](SaintsArray2DR<T> saintsArray) => saintsArray._array;
+        public static implicit operator T[,](SaintsArray2DR<T> saintsArray) => saintsArray.EnsureArray();
 
         public static implicit operator SaintsArray2DR<T>(T[,] array) => new SaintsArray2DR<T>(array);
 
-        public override string ToString() => _array.ToString();
+        public override string ToString() => EnsureArray().ToString();
 
         public SaintsArray2DR()
         {
@@ -73,54 +88,54 @@ namespace SaintsField
 
         public IEnumerator<T> GetEnumerator()
         {
-            foreach (T value in _array)
+            foreach (T value in EnsureArray())
             {
                 yield return value;
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => _array.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => EnsureArray().GetEnumerator();
 
         #endregion
 
         #region ICollection
 
-        public void CopyTo(Array array, int index) => _array.CopyTo(array, index);
-        public int Count => _array.Length;
-        public bool IsSynchronized => _array.IsSynchronized;
-        public object SyncRoot => _array.SyncRoot;
+        public void CopyTo(Array array, int index) => EnsureArray().CopyTo(array, index);
+        public int Count => EnsureArray().Length;
+        public bool IsSynchronized => EnsureArray().IsSynchronized;
+        public object SyncRoot => EnsureArray().SyncRoot;
 
         #endregion
 
         #region ICloneable
 
-        public object Clone() => _array.Clone();
+        public object Clone() => EnsureArray().Clone();
 
         #endregion
 
         #region IStructuralComparable
 
         public int CompareTo(object other, IComparer comparer) =>
-            ((IStructuralComparable)_array).CompareTo(other, comparer);
+            ((IStructuralComparable)EnsureArray()).CompareTo(other, comparer);
 
         #endregion
 
         #region IStructuralEquatable
 
         public bool Equals(object other, IEqualityComparer comparer) =>
-            ((IStructuralEquatable)_array).Equals(other, comparer);
+            ((IStructuralEquatable)EnsureArray()).Equals(other, comparer);
 
         public int GetHashCode(IEqualityComparer comparer) =>
-            ((IStructuralEquatable)_array).GetHashCode(comparer);
+            ((IStructuralEquatable)EnsureArray()).GetHashCode(comparer);
 
         #endregion
 
         public T this[int index0, int index1]
         {
-            get => _array[index0, index1];
+            get => EnsureArray()[index0, index1];
             set
             {
-                _array[index0, index1] = value;
+                EnsureArray()[index0, index1] = value;
 #if UNITY_EDITOR
                 if (_saintsList.Count == _array.GetLength(0) &&
                     index0 < _saintsList.Count &&
@@ -137,14 +152,14 @@ namespace SaintsField
             }
         }
 
-        public int Length => _array.Length;
-        public long LongLength => _array.LongLength;
-        public int Rank => _array.Rank;
+        public int Length => EnsureArray().Length;
+        public long LongLength => EnsureArray().LongLength;
+        public int Rank => EnsureArray().Rank;
 
-        public int GetLength(int dimension) => _array.GetLength(dimension);
-        public long GetLongLength(int dimension) => _array.GetLongLength(dimension);
-        public int GetLowerBound(int dimension) => _array.GetLowerBound(dimension);
-        public int GetUpperBound(int dimension) => _array.GetUpperBound(dimension);
+        public int GetLength(int dimension) => EnsureArray().GetLength(dimension);
+        public long GetLongLength(int dimension) => EnsureArray().GetLongLength(dimension);
+        public int GetLowerBound(int dimension) => EnsureArray().GetLowerBound(dimension);
+        public int GetUpperBound(int dimension) => EnsureArray().GetUpperBound(dimension);
 
         public void OnBeforeSerialize()
         {
@@ -166,11 +181,12 @@ namespace SaintsField
                 .Except(_editorWatchedRows);
             foreach (SaintsList<T> row in extraRows)
             {
-                row.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                row.EditorOnAfterDeserializeChanged.AddListener(MarkDirty);
                 _editorWatchedRows.Add(row);
             }
 #endif
-            OnAfterDeserializeProcess();
+
+            MarkDirty();
         }
 
         private void OnAfterDeserializeProcess()
@@ -195,7 +211,7 @@ namespace SaintsField
                 SaintsList<T> serializedRow = _saintsList[row];
                 if (serializedRow == null || serializedRow.Count != columns)
                 {
-                    throw new InvalidOperationException("All rows in a rectangular array must have the same length.");
+                    throw new InvalidOperationException($"All rows in a rectangular array must have the same length; expect={columns}, get[{row}]={serializedRow?.Count}");
                 }
 
                 for (int column = 0; column < columns; column++)
@@ -209,6 +225,7 @@ namespace SaintsField
 
         private void CopyToSerializedRows()
         {
+            EnsureArray();
             int rows = _array.GetLength(0);  // 行，外部
             int columns = _array.GetLength(1);  // 列，内部
             _saintsList.Clear();
