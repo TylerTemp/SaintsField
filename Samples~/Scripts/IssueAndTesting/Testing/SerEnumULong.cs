@@ -50,27 +50,27 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third,
         }
 
-        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestLongEnumNormal _longNormal;
-        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private LongEnum _longFlags;
-        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestULongEnumNormal _uLongNormal;
-        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestULongEnum _uLongFlags;
+        [SaintsSerialized, NonSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestLongEnumNormal _longNormal;
+        [SaintsSerialized, NonSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private LongEnum _longFlags;
+        [SaintsSerialized, NonSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestULongEnumNormal _uLongNormal;
+        [SaintsSerialized, NonSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestULongEnum _uLongFlags;
 
-        [SaintsSerialized, OnValueChanged(":Debug.Log")] private TestULongEnumNormal ULongEnumNormalNoButton;
-        [SaintsSerialized, OnValueChanged(":Debug.Log")] private LongEnum LongEnumPub;
-        [SaintsSerialized, OnValueChanged(":Debug.Log")] private LongEnum[] LongEnumPubArr;
+        [SaintsSerialized, NonSerialized, OnValueChanged(":Debug.Log")] private TestULongEnumNormal ULongEnumNormalNoButton;
+        [SaintsSerialized, NonSerialized, OnValueChanged(":Debug.Log")] private LongEnum LongEnumPub;
+        [SaintsSerialized, NonSerialized, OnValueChanged(":Debug.Log")] private LongEnum[] LongEnumPubArr;
 
-        [SaintsSerialized, EnumToggleButtons] private TestULongEnum ULongEnumPub;
-        [SaintsSerialized, EnumToggleButtons] private TestULongEnum[] ULongEnumPubs;
-        [SaintsSerialized, EnumToggleButtons] private TestULongEnumNormal ULongEnumNormalPub;
-        [SaintsSerialized] private TestULongEnum _uLongEnumPri;
-        [field: SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
+        [SaintsSerialized, NonSerialized, EnumToggleButtons] private TestULongEnum ULongEnumPub;
+        [SaintsSerialized, NonSerialized, EnumToggleButtons] private TestULongEnum[] ULongEnumPubs;
+        [SaintsSerialized, NonSerialized, EnumToggleButtons] private TestULongEnumNormal ULongEnumNormalPub;
+        [SaintsSerialized, NonSerialized] private TestULongEnum _uLongEnumPri;
+        [field: SaintsSerialized, NonSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 
-        [NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPubArr;
-        [SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
-        [field: SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
+        [SaintsSerialized, NonSerialized] public TestULongEnum[] ULongEnumPubArr;
+        [SaintsSerialized, NonSerialized] private TestULongEnum[] _uLongEnumPriArr;
+        [field: SaintsSerialized, NonSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
 
-        [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
-        [SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
+        [SaintsSerialized, NonSerialized] public List<TestULongEnum> ULongEnumPubLis;
+        [SaintsSerialized, NonSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
         [Serializable]
@@ -79,12 +79,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             [Serializable]
             public partial struct InsideClare
             {
-                [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
-                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+                [SaintsSerialized, NonSerialized] public TestULongEnum Inside;
+                [SaintsSerialized, NonSerialized] public TestULongEnum[] Insides;
             }
 
-            [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
-            [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            [SaintsSerialized, NonSerialized] public TestULongEnum InNested1;
+            [SaintsSerialized, NonSerialized] public TestULongEnum[] InNested1Arr;
             public InsideClare insideClare;
             public InsideClare[] insideClareArr;
         }
@@ -97,12 +97,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             [Serializable]
             public partial struct InsideClare
             {
-                // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
-                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+                // [NonSerialized, SaintsSerialized, NonSerialized] public TestULongEnum Inside;
+                [SaintsSerialized, NonSerialized] public TestULongEnum[] Insides;
             }
 
-            // [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
-            // [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            // [NonSerialized, SaintsSerialized, NonSerialized] public TestULongEnum InNested1;
+            // [NonSerialized, SaintsSerialized, NonSerialized] public TestULongEnum[] InNested1Arr;
             public InsideClare insideClare;
             public InsideClare[] insideClareArr;
         }

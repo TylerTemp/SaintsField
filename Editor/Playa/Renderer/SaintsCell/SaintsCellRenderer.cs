@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -87,6 +88,7 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
 
         private class UserDataPayload
         {
+            public bool Init;
             public string XML;
             // public Label Label;
             // public string FriendlyName;
@@ -141,10 +143,12 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
             if (_richLabelCondition)
             {
                 string xml = preCheckResult.RichLabelXml;
-                // Debug.Log(xml);
+                // Debug.Log($"xml={xml}");
                 UserDataPayload userDataPayload = (UserDataPayload) _container.userData;
-                if (xml != userDataPayload.XML || (xml ?? "").Contains("<field"))
+                if (!userDataPayload.Init || xml != userDataPayload.XML || (xml ?? "").Contains("<field"))
                 {
+                    userDataPayload.Init = true;
+
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                     if (userDataPayload.RichTextDrawer == null)
                     {
@@ -154,7 +158,11 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
                     VisualElement saintsFieldContainer =
                         _container.Q<VisualElement>(className: SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
                         ?? _container;
-                    UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer, RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
+
+                    // saintsFieldContainer.style.backgroundColor = Color.red;
+                    // Debug.Log($"TARGET: {saintsFieldContainer}/{_container}");
+                    IEnumerable<RichTextDrawer.RichTextChunk> chunks = string.IsNullOrEmpty(xml)? null: RichTextDrawer.ParseRichXmlWithProvider(xml, this);
+                    UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer, chunks, userDataPayload.RichTextDrawer);
                 }
             }
 

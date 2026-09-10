@@ -70,9 +70,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Full = None | One | Two | Three,
         }
 
-        [SaintsSerialized, BelowText("<field/>")]
+        [SaintsSerialized, NonSerialized, BelowText("<field/>")]
         public MyEnumFlagsLong defaultMultiFlagsLong;
-        [SaintsSerialized, EnumToggleButtons, BelowText("<field/>")]
+        [SaintsSerialized, NonSerialized, EnumToggleButtons, BelowText("<field/>")]
         public MyEnumFlagsLong buttonMultiFlagsLong;
 
         [Flags]
@@ -94,9 +94,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Full = None | One | Two | Three,
         }
 
-        [SaintsSerialized, BelowText("<field/>")]
+        [SaintsSerialized, NonSerialized, BelowText("<field/>")]
         public MyEnumFlagsULong defaultMultiFlagsULong;
-        [SaintsSerialized, EnumToggleButtons, BelowText("<field/>")]
+        [SaintsSerialized, NonSerialized, EnumToggleButtons, BelowText("<field/>")]
         public MyEnumFlagsULong buttonMultiFlagsULong;
     }
 }

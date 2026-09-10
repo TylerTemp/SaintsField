@@ -322,22 +322,6 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 .OfType<PropertyAttribute>()
                 .ToArray();
 
-            // Attribute[] allCustomAttributes = ReflectCache.GetCustomAttributes<Attribute>(info);
-            // Debug.Log($"{info.Name}: {string.Join<PropertyAttribute>(", ", allAttributes)}");
-
-            // List<Attribute> allAttributes = new List<Attribute>();
-            // List<PropertyAttribute> allPropertyAttributes = new List<PropertyAttribute>();
-
-            // foreach (Attribute attr in injectedAttributes.Concat(allCustomAttributes))
-            // {
-            //     // allAttributes.Add(attr);
-            //     if (attr is PropertyAttribute propAttr)
-            //     {
-            //         allPropertyAttributes.Add(propAttr);
-            //     }
-            //
-            // }
-
             Type useDrawerType = null;
             Attribute useAttribute = null;
 
@@ -718,7 +702,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogException(e);
                 return null;
             }
 

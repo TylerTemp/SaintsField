@@ -13,6 +13,7 @@ namespace SaintsField.Utils
 
         protected InjectAttributeBase(int depth, Type decorator, params object[] parameters)
         {
+            // Debug.Log($"{depth}/{decorator}/{parameters?.Length}");
             Depth = depth;
             Decorator = decorator;
             Parameters = parameters;

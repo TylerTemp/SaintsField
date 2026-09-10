@@ -339,7 +339,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             List<InjectAttributeBase> valueInjectAttributes = new List<InjectAttributeBase>();
             List<Attribute> valueInjectCreatedAttributes = new List<Attribute>();
             bool valueHasSerializeReference = false;
-            foreach (KeyAttributeAttribute injectAttribute in ReflectCache.GetCustomAttributes<KeyAttributeAttribute>(info))
+            foreach (ValueAttributeAttribute injectAttribute in ReflectCache.GetCustomAttributes<ValueAttributeAttribute>(info))
             {
                 if (injectAttribute.Decorator == typeof(SerializeReference))
                 {

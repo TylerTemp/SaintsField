@@ -492,6 +492,8 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     continue;
                 }
 
+                // Debug.Log($"saints array {injectAttribute.Depth}/{injectAttribute.Decorator}/{injectAttribute.Parameters?.Length}");
+
                 ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 1 - insideArrayOffset, injectAttribute.Decorator,
                     injectAttribute.Parameters);
                 ValueAttributeAttribute less2DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 2 - insideArrayOffset, injectAttribute.Decorator,
@@ -503,7 +505,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 #endif
                     injectAttributes2.Add(less2DepthInject);
                 }
-                else
+                else if(less2DepthInject.Depth == 0)
                 {
                     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(less2DepthInject);
                     if(injectedAttribute != null)
@@ -605,16 +607,19 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 Debug.Log($"create CreateCellElement {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectCreatedAttributes={string.Join(", ", injectCreatedAttributes2)}, injectAttributes={string.Join(", ", injectAttributes2)}");
 #endif
+
+                // note about the downpour:
+                // 1. SaintsArray<T>[], List<SaintsArray<T>>, if there is property attribute,
+                //    it should use Unity's normal workflow, and should NOT be applied down
+                // 2. To applied down, it MUST use ValueAttribute
+                // thus, the downpour attribute should only been passed the injection created attributes.
                 VisualElement resultElementNoLabel =
                     SaintsWrapUtils.CreateCellElement(
                         valueWrapType,
                         wrapField,
                         wrapType,
                         elementProp,
-                        ReflectCache.GetCustomAttributes<Attribute>(info)
-                            .Where(each => each is not InjectAttributeBase && each is not SaintsArrayAttribute)
-                            .Concat(injectCreatedAttributes2)
-                            .ToArray(),
+                        injectCreatedAttributes2,
                         injectAttributes2,
                         hasSerializeReference,
                         this,

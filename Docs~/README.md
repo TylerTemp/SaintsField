@@ -10703,6 +10703,25 @@ You can skip the `namespace` part. And if you also skip the `type` part, we'll t
 
 Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet. I'm still working on making all APIs consistent.
 
+### Downpour System ###
+
+> [!WARNING]
+> In-Development feature. Unstable.
+
+`ValueAttribute` & `KeyAttribute` (for dictionary key only) allows to down-pass an attribute into the nested target for 
+combo data types provided by SaintsField, e.g `SaintsDictionary<>`, `SaintsArray`
+
+Even though `SaintsArray` is used to mimic the behavior of a nested array, it still requires downpour to inject into target
+fields.
+
+For example
+
+```csharp
+[ValueAttribute(typeof(ExpandableAttribute))]
+public SaintsArray<Scriptable[]> arrayInsideSaints;
+```
+
+
 ### Syntax for Show/Hide/Enable/Disable/Required-If ###
 
 This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.

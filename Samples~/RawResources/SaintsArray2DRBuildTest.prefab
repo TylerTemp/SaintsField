@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24.1
+  m_fontSizeBase: 24.1
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -247,6 +247,102 @@ MonoBehaviour:
     _wrapType: 4
     _saintsSerializedVersion: 1
   _text: {fileID: 518400083900997380}
+  array2DrS__SaintsSerialized__:
+    _saintsList:
+    - obsoleteValue: 
+      _saintsList:
+      - value: 1
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 0
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 1
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      _saintsSerializedVersion: 2
+      _wrapType: 4
+    - obsoleteValue: 
+      _saintsList:
+      - value: 0
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 1
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 0
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      _saintsSerializedVersion: 2
+      _wrapType: 4
+    _wrapType: 4
+    _saintsSerializedVersion: 1
   references:
     version: 2
     RefIds:
