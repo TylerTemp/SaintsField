@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>(fieldWithInfo.PlayaAttributes.Count);
             (int, int) arraySize = (-1, -1);
 
-            object parent = fieldWithInfo.Targets[0];
+            // object parent = fieldWithInfo.Targets[0];
             // object parent = GetRefreshedTarget(FieldWithInfo, FieldWithInfo.Targets[0]).useTarget;
 
             foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
@@ -120,7 +120,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             visibilityAttribute.IsShow? ToggleType.Show: ToggleType.Hide,
                             visibilityAttribute.ConditionInfos,
-                            parent
+                            fieldWithInfo.Targets
                         ));
                         break;
                     case EnableIfAttribute enableIfAttribute:
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             ToggleType.Enable,
                             enableIfAttribute.ConditionInfos,
-                            parent
+                            fieldWithInfo.Targets
                         ));
                         break;
                     case DisableIfAttribute disableIfAttribute:
@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             ToggleType.Disable,
                             disableIfAttribute.ConditionInfos,
-                            parent
+                            fieldWithInfo.Targets
                         ));
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
@@ -146,7 +146,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             arraySize = (fieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic
                                          && fieldWithInfo.SerializedProperty.isArray)
                                 ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty,
-                                    fieldWithInfo.FieldInfo, parent, isImGui)
+                                    fieldWithInfo.FieldInfo, fieldWithInfo.Targets[0], isImGui)
                                 : (-1, -1);
                         }
                         break;

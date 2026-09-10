@@ -8,16 +8,16 @@ namespace SaintsField.Editor.Playa.Utils
     {
         public readonly ToggleType Type;
         public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-        public readonly object Target;
+        public readonly IReadOnlyList<object> Targets;
 
         public readonly IReadOnlyList<string> Errors;
         public readonly IReadOnlyList<bool> BoolResults;
 
-        public ToggleCheckInfo(ToggleType type, IReadOnlyList<ConditionInfo> conditionInfos, object target)
+        public ToggleCheckInfo(ToggleType type, IReadOnlyList<ConditionInfo> conditionInfos, IReadOnlyList<object> targets)
         {
             Type = type;
             ConditionInfos = conditionInfos;
-            Target = target;
+            Targets = targets;
 
             Errors = Array.Empty<string>();
             BoolResults = Array.Empty<bool>();
@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Playa.Utils
         {
             Type = otherInfo.Type;
             ConditionInfos = otherInfo.ConditionInfos;
-            Target = otherInfo.Target;
+            Targets = otherInfo.Targets;
             Errors = errors;
             BoolResults = boolResults;
         }

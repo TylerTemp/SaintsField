@@ -114,10 +114,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.29.1**
+**5.29.2**
 
-1. Fix: `SaintsArray2DR<T>` failed to serialize in some cases
-2. Fix: some fields failed to deserialize when `Instantiate` from prefab 
+1. Fix: `ValueAttribute` did not work for `SaintsDictionary`
+2. Fix: LayoutShowIf (and some other attributes) show error dialog when using the name of a member [#443](https://github.com/TylerTemp/SaintsField/issues/443)
 
 ## Usage ##
 
@@ -336,6 +336,7 @@ namespace: `SaintsField`
     *   [About GroupBy](https://saintsfield.comes.today/misc/about-groupby)
     *   [`EMode`](https://saintsfield.comes.today/misc/emode)
     *   [Callback](https://saintsfield.comes.today/misc/callback)
+    *   [Downpour System](https://saintsfield.comes.today/misc/downpour-system)
     *   [Syntax for Show/Hide/Enable/Disable/Required-If](https://saintsfield.comes.today/misc/syntax-for-showhideenabledisablerequired-if)
     *   Saints XPath-like Syntax
         *   [XPath](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/xpath)

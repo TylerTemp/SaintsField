@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private readonly List<ToggleCheckInfo> _toggleCheckInfos;
 
-        public SaintsRendererGroup(string groupPath, Config config, object containerObject)
+        public SaintsRendererGroup(string groupPath, Config config, IReadOnlyList<object> containerObjects)
         {
             _groupPath = RuntimeUtil.SeparatePath(groupPath).ToArray();
             _config = config;
@@ -71,7 +71,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Enable,
                             layoutEnableIfAttribute.ConditionInfos,
-                            containerObject
+                            containerObjects
                         ));
                         break;
                     case LayoutReadOnlyAttribute layoutReadOnlyAttribute:
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Disable,
                             layoutReadOnlyAttribute.ConditionInfos,
-                            containerObject
+                            containerObjects
                         ));
                         break;
 
@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Hide,
                             layoutHideIfAttribute.ConditionInfos,
-                            containerObject
+                            containerObjects
                         ));
                         break;
                     case LayoutShowIfAttribute layoutShowIfAttribute:
@@ -96,7 +96,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Show,
                             layoutShowIfAttribute.ConditionInfos,
-                            containerObject
+                            containerObjects
                         ));
                         break;
 

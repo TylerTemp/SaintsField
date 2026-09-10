@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.29.2 ##
+
+1. Fix: `ValueAttribute` did not work for `SaintsDictionary`
+2. Fix: LayoutShowIf (and some other attributes) show error dialog when using the name of a member [#443](https://github.com/TylerTemp/SaintsField/issues/443)
+
 ## 5.29.1 ##
 
 1. Fix: `SaintsArray2DR<T>` failed to serialize in some cases
