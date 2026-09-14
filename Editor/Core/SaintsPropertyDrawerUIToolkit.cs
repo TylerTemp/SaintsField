@@ -845,9 +845,25 @@ namespace SaintsField.Editor.Core
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
+                    InsideSaintsFieldScoop.PropertyKey propertyKey;
                     try
                     {
-                        property.serializedObject.Update();
+                        SerializedObject serializedObject = property.serializedObject;
+                        if (serializedObject == null)
+                        {
+                            return;
+                        }
+
+                        // Update can log native errors instead of throwing for destroyed targets.
+                        UnityEngine.Object[] targets = serializedObject.targetObjects;
+                        if (targets.Length == 0 || targets.Any(target => target == null))
+                        {
+                            return;
+                        }
+
+                        serializedObject.Update();
+                        // Resolve once while guarded; stale IMGUI callbacks must not enter the scopes.
+                        propertyKey = InsideSaintsFieldScoop.MakeKey(property);
                     }
                     catch (Exception)
                     {
@@ -884,8 +900,8 @@ namespace SaintsField.Editor.Core
                         // // ReSharper disable once AccessToModifiedClosure
                         // imGuiContainer.style.height = position.height;
 
-                        using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                        using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        using(new InsideSaintsFieldScoop(SubDrawCounter, propertyKey))
+                        using(new InsideSaintsFieldScoop(SubGetHeightCounter, propertyKey))
                         {
                             // Debug.Log($"Fall {property.propertyPath}");
                             // This works with Wwise.Bank/Event in list; not work with AYellowPaper.SerializedDictionary
