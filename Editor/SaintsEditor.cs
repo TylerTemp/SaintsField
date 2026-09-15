@@ -1254,11 +1254,7 @@ namespace SaintsField.Editor
             switch (fieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField when !hasSerializedTarget:
-                    AbsRenderer serializedRenderer = fieldWithInfo.SerializedProperty.propertyType ==
-                                                     SerializedPropertyType.Generic &&
-                                                     fieldWithInfo.SerializedProperty.isArray
-                        ? new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo)
-                        : new SerializedFieldRenderer(serializedObject, fieldWithInfo);
+                    AbsRenderer serializedRenderer = new SerializedFieldRenderer(serializedObject, fieldWithInfo);
                     renderers.Add(new SaintsFieldWithRenderer(null, serializedRenderer));
                     break;
                 case SaintsRenderType.InjectedSerializedField:

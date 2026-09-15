@@ -11178,6 +11178,7 @@ Transform:
   - {fileID: 1303232495}
   - {fileID: 1703423946}
   - {fileID: 1298266073}
+  - {fileID: 1714574561}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -15106,7 +15107,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1646160687}
-  - component: {fileID: 1646160686}
   m_Layer: 0
   m_Name: WwiseGlobal
   m_TagString: Untagged
@@ -15114,31 +15114,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1646160686
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1646160685}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 711b9f696a6788c429b853153562a331, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkInitializer
-  InitializationSettings: {fileID: 11400000, guid: 3e1fcd43641066c4ab8f3e84ab515fb0, type: 2}
-  basePath: 
-  language: 
-  defaultPoolSize: 0
-  lowerPoolSize: 0
-  streamingPoolSize: 0
-  memoryCutoffThreshold: 0
-  monitorPoolSize: 0
-  monitorQueuePoolSize: 0
-  callbackManagerBufferSize: 0
-  spatialAudioPoolSize: 0
-  maxSoundPropagationDepth: 0
-  engineLogging: 0
 --- !u!4 &1646160687
 Transform:
   m_ObjectHideFlags: 0
@@ -15790,6 +15765,263 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &1714574560
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1714574561}
+  - component: {fileID: 1714574562}
+  m_Layer: 0
+  m_Name: ListDrawRefactory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1714574561
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714574560}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1714574562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714574560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c11f7c088aedb6a448630c7d4f0d72e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ListDrawRefactory
+  plainArray: 0a000000140000001e00000028000000320000003c000000i
+  plainList:
+  - alpha
+  - beta
+  - gamma
+  emptyArray: 
+  rangedArray: 020000000500000008000000i
+  objectReferences:
+  - {fileID: 1714574560}
+  pagedEntries:
+  - id: item-10
+    number: 10
+    tags:
+    - red
+    - small
+  - id: item-20
+    number: 20
+    tags:
+    - blue
+  - id: item-30
+    number: 30
+    tags:
+    - green
+  - id: item-40
+    number: 40
+    tags: []
+  - id: item-50
+    number: 50
+    tags:
+    - last-row
+  limitedFallback: 0b00000016000000i
+  limitedExplicit: 0b00000016000000i
+  fixedEmpty: 
+  referenceItems:
+  - rid: 8619786675366920939
+  - rid: 8619786675366920940
+  arrayCells:
+    _saintsList:
+    - value: 6500000066000000i
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: c9000000ca000000i
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  listCells:
+    _saintsList:
+    - value: 2d0100002e010000i
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 9101000092010000i
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  dictionaryCells:
+    _saintsKeys:
+    - value: first
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: second
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value: f5010000f6010000i
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 590200005a020000i
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+    _keys: []
+  gridCells:
+    _saintsList:
+    - _saintsList:
+      - value: bd020000be020000i
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      - value: 2103000022030000i
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          intValues: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      _saintsSerializedVersion: 2
+      _wrapType: 4
+    _wrapType: 4
+    _saintsSerializedVersion: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 8619786675366920939
+      type: {class: ListDrawRefactory/ReferenceItem, ns: SaintsField.Samples.Scripts.SaintsEditor.Testing, asm: SaintsField.Samples}
+      data:
+        name: 
+        number: 0
+    - rid: 8619786675366920940
+      type: {class: ListDrawRefactory/ReferenceItem, ns: SaintsField.Samples.Scripts.SaintsEditor.Testing, asm: SaintsField.Samples}
+      data:
+        name: 
+        number: 62
 --- !u!1 &1736933212
 GameObject:
   m_ObjectHideFlags: 0

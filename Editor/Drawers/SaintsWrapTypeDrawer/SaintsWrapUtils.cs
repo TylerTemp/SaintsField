@@ -449,6 +449,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 SaintsFieldWithInfo saintsContainerInfo = new SaintsFieldWithInfo
                 {
                     ClassStructType = null,
+                    // This will be empty for e.g. SaintsArray because it has filtered out
                     PlayaAttributes = allCustomAttributes.OfType<IPlayaAttribute>().ToArray(),
                     // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
                     TargetParent = null,
@@ -520,8 +521,10 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             {
                 saintsPropertyDrawer.InHorizontalLayout = true;
                 saintsPropertyDrawer.OverrideAttributes = allAttributes;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 // Debug.Log($"{needUseRef}{saintsPropertyDrawer is BaseWrapDrawer}/{saintsPropertyDrawer}");
-                // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath} -> {string.Join(", ", saintsPropertyDrawer.AppendPropertyAttributes)}");
+                Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath} -> {string.Join(", ", saintsPropertyDrawer.OverrideAttributes)}");
+#endif
             }
 
             MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");

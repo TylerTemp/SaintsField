@@ -766,245 +766,100 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                         Debug.Log($"array process {property.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
 #endif
-                        ListView listView = originalField as ListView;
-                        bool listViewNotExist = listView == null;
-                        if (listViewNotExist)
+                        if (originalField is SerializedListElement existing && existing.Matches(property))
                         {
-                            // List<Attribute> injectedAllAttributes = new List<Attribute>();
-                            List<IPlayaAttribute> injectedIPlayaAttributes = new List<IPlayaAttribute>();
-                            // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();
-                            foreach (Attribute attr in allAttributes)
-                            {
-                                // ReSharper disable once MergeIntoPattern
-                                if(attr is InjectAttributeBase injectAttributeBase && injectAttributeBase.Depth <= 1)
-                                {
-                                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
-                                    // injectedAllAttributes.Add(injectedAttribute);
-                                    if(injectedAttribute is IPlayaAttribute ip)
-                                    {
-                                        injectedIPlayaAttributes.Add(ip);
-                                        // injectedAllAttributes.Add(injectedAttribute);
-                                    }
-                                }
-                                // else
-                                // {
-                                //     // injectedAllAttributes.Add(attr);
-                                //     if(attr is IPlayaAttribute ip)
-                                //     {
-                                //         injectedIPlayaAttributes.Add(ip);
-                                //     }
-                                //     // injectedAllAttributes.Add(attr);
-                                // }
-                            }
-
-                            // Debug.Log($"listView {property.propertyPath}");
-                            listView = new ListView
-                            {
-                                showBorder = true,
-                                selectionType = SelectionType.Multiple,
-                                showAddRemoveFooter = true,
-                                showBoundCollectionSize = true,
-                                showFoldoutHeader = true,
-                                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                                showAlternatingRowBackgrounds = AlternatingRowBackground.None,
-                                reorderable = true,
-                                reorderMode = ListViewReorderMode.Animated,
-
-                                makeItem = () => new VisualElement(),
-                                bindItem = (element, index) =>
-                                {
-                                    SerializedProperty itemProp;
-                                    try
-                                    {
-                                        itemProp = property.GetArrayElementAtIndex(index);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Debug.LogWarning(e);
-                                        return;
-                                    }
-                                    element.Clear();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                                    Debug.Log($"draw item {itemProp.propertyPath}/rawType={rawType}/itemType={ReflectUtils.GetElementType(rawType)}; allAttributes={string.Join(",", allAttributes)}");
-#endif
-                                    string defaultName = itemProp.displayName;
-
-                                    VisualElement result = CreateOrUpdateFieldProperty(
-                                        itemProp,
-                                        allAttributes.Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute).ToArray(),
-                                        ReflectUtils.GetElementType(rawType),
-                                        itemProp.displayName,
-                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, richTextTagProvider, null, false, parent);
-                                    // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");
-                                    if (result != null)
-                                    {
-                                        // injectedIPlayaAttributes = allAttributes.OfType<IPlayaAttribute>().ToList();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                                        Debug.Log($"list item process {itemProp.propertyPath} injectedIPlayaAttributes={string.Join(", ", injectedIPlayaAttributes)}");
-#endif
-                                        if (injectedIPlayaAttributes.Count > 0)
-                                        {
-                                            SaintsCellRenderer cellRenderer = new SaintsCellRenderer(
-                                                itemProp.serializedObject,
-                                                new SaintsFieldWithInfo
-                                                {
-                                                    ClassStructType = null,
-                                                    PlayaAttributes = injectedIPlayaAttributes,
-                                                    // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
-                                                    TargetParent = null,
-                                                    TargetMemberInfo = null,
-                                                    TargetMemberIndex = 0,
-                                                    Targets = new[]{parent},
-
-                                                    RenderType = SaintsRenderType.SerializedField,
-                                                    SerializedProperty = itemProp,
-                                                    MemberId = itemProp.propertyPath,
-                                                    FieldInfo = fieldInfo,
-                                                    InherentDepth = 0,
-                                                }
-                                            );
-                                            element.Add(cellRenderer.GetElementAndInit(result));
-                                        }
-                                        else
-                                        {
-                                            element.Add(result);
-                                        }
-
-                                        if(itemProp.propertyType == SerializedPropertyType.Generic || itemProp.propertyType == SerializedPropertyType.ManagedReference)
-                                        {
-                                            result.schedule.Execute(() =>
-                                            {
-                                                if (SerializedUtils.IsOk(itemProp) &&
-                                                    itemProp.displayName != defaultName)
-                                                {
-                                                    defaultName = itemProp.displayName;
-                                                    ChangeLabel(result,
-                                                        RichTextDrawer.ParseRichXmlWithProvider(defaultName, richTextTagProvider), new RichTextDrawer(), 0);
-                                                }
-                                            }).Every(150);
-                                        }
-                                    }
-                                },
-                                unbindItem = (element, _) =>
-                                {
-                                    element.Clear();
-                                    Unbind(element);
-                                    // Debug.Log(element);
-                                    // Debug.Log(i);
-                                },
-                                tooltip = property.tooltip,
-                            };
-                            Toggle listViewToggle = listView.Q<Toggle>();
-                            if (listViewToggle != null && listViewToggle.style.marginLeft != -12)
-                            {
-                                listViewToggle.style.marginLeft = -12;
-                            }
-                            listView.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
-
-                            // This won't work as itemsSourceSizeChanged is an internal event
-                            // listView.itemsSourceSizeChanged += () =>
-                            // {
-                            //     using (SerializedPropertyChangeEvent pooled = SerializedPropertyChangeEvent.GetPooled(property))
-                            //     {
-                            //         pooled.target = listView;
-                            //         listView.SendEvent(pooled);
-                            //     }
-                            // };
-
-                            int curSize = property.arraySize;
-                            listView.schedule.Execute(() =>
-                            {
-                                if (!SerializedUtils.IsOk(property))
-                                {
-                                    return;
-                                }
-                                int newSize;
-                                try
-                                {
-                                    newSize = property.arraySize;
-                                }
-                                catch (ObjectDisposedException)
-                                {
-                                    return;
-                                }
-                                catch (NullReferenceException)
-                                {
-                                    return;
-                                }
-                                catch (InvalidOperationException)
-                                {
-                                    return;
-                                }
-
-                                if (newSize == curSize)
-                                {
-                                    return;
-                                }
-
-                                curSize = newSize;
-                                // ReSharper disable once ConvertToUsingDeclaration
-                                using (SerializedPropertyChangeEvent pooled = SerializedPropertyChangeEvent.GetPooled(property))
-                                {
-                                    pooled.target = listView;
-                                    listView.SendEvent(pooled);
-                                }
-
-                                SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke();
-                            }).Every(100);
-
-                            if(!rawType.IsAssignableFrom(typeof(UnityEngine.Object)))  // UnityObject can be safely ignored
-                            {
-                                listView.itemsAdded += indices =>
-                                {
-                                    HashSet<int> addedIndices = new HashSet<int>(indices);
-                                    foreach (int index in addedIndices)
-                                    {
-                                        UnlinkAddedArrayElementManagedReferences(property, index, addedIndices);
-                                    }
-                                };
-                            }
-
-#if !UNITY_6000_0_OR_NEWER  // when < 6k, default context menu will be lost if we add menu here...
-                            {
-                                Toggle toggle = listView.Q<Toggle>(className: "unity-toggle");
-                                AddContextualMenuManipulator(toggle, property, () => { });
-                            }
-#endif
-                            AddContextualMenuReset(listViewToggle, property, fieldInfo, parent);
-
-
+                            existing.Refresh(label);
+                            return null;
+                        }
+                        if (originalField is SerializedListElement previous)
+                        {
+                            previous.StopSearch();
+                            Unbind(previous);
                         }
 
-                        listView.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
-
-                        SerializedProperty serializedProperty = property.Copy();
-                        // string str = PropertyField.listViewNamePrefix + property.propertyPath;
-                        string str = "saints-field--list-view--" + property.propertyPath;
-                        listView.headerTitle = string.IsNullOrEmpty(label)
-                            ? property.displayName
-                            : label;
-                        listView.userData = serializedProperty;
-                        listView.bindingPath = property.propertyPath;
-                        listView.viewDataKey = str;
-                        listView.name = str;
-
-                        if (listView.itemsSource?.Count != property.arraySize)
+                        List<IPlayaAttribute> injectedIPlayaAttributes = new List<IPlayaAttribute>();
+                        foreach (Attribute attr in allAttributes)
                         {
-                            listView.itemsSource = Enumerable.Range(0, property.arraySize)
-                                .Select(property.GetArrayElementAtIndex).ToArray();
+                            if(attr is InjectAttributeBase injectAttributeBase && injectAttributeBase.Depth <= 1)
+                            {
+                                Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
+                                if(injectedAttribute is IPlayaAttribute ip)
+                                {
+                                    injectedIPlayaAttributes.Add(ip);
+                                }
+                            }
                         }
 
-                        // this is internal too...
-                        // listView.SetProperty((PropertyName) PropertyField.listViewBoundFieldProperty, (object) this);
-                        // Toggle toggle = listView.Q<Toggle>((string) null, Foldout.toggleUssClassName);
-                        // if (toggle != null)
-                        //     toggle.m_Clickable.acceptClicksIfDisabled = true;
 
-                        listView.BindProperty(property);
-                        listView.RegisterCallback<DetachFromPanelEvent>(_ => Unbind(listView));
+                        VisualElement CreateCell(SerializedProperty itemProp, int index)
+                        {
+                            string defaultName = itemProp.displayName;
 
-                        // Debug.Log($"array created {property.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
-                        return listViewNotExist ? listView : null;
+                            VisualElement result = CreateOrUpdateFieldProperty(
+                                itemProp,
+                                allAttributes.Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute).ToArray(),
+                                ReflectUtils.GetElementType(rawType),
+                                itemProp.displayName,
+                                fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, richTextTagProvider, null, false, parent);
+                            if (result != null)
+                            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+                                Debug.Log($"list item process {itemProp.propertyPath} injectedIPlayaAttributes={string.Join(", ", injectedIPlayaAttributes)}");
+#endif
+                                if (injectedIPlayaAttributes.Count > 0)
+                                {
+                                    SaintsCellRenderer cellRenderer = new SaintsCellRenderer(
+                                        itemProp.serializedObject,
+                                        new SaintsFieldWithInfo
+                                        {
+                                            ClassStructType = null,
+                                            PlayaAttributes = injectedIPlayaAttributes,
+                                            TargetParent = null,
+                                            TargetMemberInfo = null,
+                                            TargetMemberIndex = 0,
+                                            Targets = new[]{parent},
+
+                                            RenderType = SaintsRenderType.SerializedField,
+                                            SerializedProperty = itemProp,
+                                            MemberId = itemProp.propertyPath,
+                                            FieldInfo = fieldInfo,
+                                            InherentDepth = 0,
+                                        }
+                                    );
+                                    result = cellRenderer.GetElementAndInit(result);
+                                }
+
+
+                                if(itemProp.propertyType == SerializedPropertyType.Generic || itemProp.propertyType == SerializedPropertyType.ManagedReference)
+                                {
+                                    result.schedule.Execute(() =>
+                                    {
+                                        if (SerializedUtils.IsOk(itemProp) &&
+                                            itemProp.displayName != defaultName)
+                                        {
+                                            defaultName = itemProp.displayName;
+                                            ChangeLabel(result,
+                                                RichTextDrawer.ParseRichXmlWithProvider(defaultName, richTextTagProvider), new RichTextDrawer(), 0);
+                                        }
+                                    }).Every(150);
+                                }
+                            }
+                            return result;
+                        }
+
+                        ListDrawerSettingsAttribute settings = allAttributes.OfType<ListDrawerSettingsAttribute>().FirstOrDefault()
+                            ?? new ListDrawerSettingsAttribute(searchable: false);
+                        Type elementType = ReflectUtils.GetElementType(rawType);
+                        SerializedListElement list = new SerializedListElement(property, elementType, label, settings,
+                            CreateCell,
+                            SerializedListUtils.CreateExtraSearch(property, elementType, parent, settings.ExtraSearch),
+                            SerializedListUtils.CreateSizeLimits(property, allAttributes.OfType<ArraySizeAttribute>().FirstOrDefault(), fieldInfo, parent))
+                        {
+                            name = "saints-field--list-view--" + property.propertyPath,
+                            tooltip = property.tooltip,
+                        };
+                        AddContextualMenuReset(list.Foldout.Q<Toggle>(), property, fieldInfo, parent);
+                        return list;
 
                     }
                     if (originalField != null &&
@@ -2886,7 +2741,7 @@ namespace SaintsField.Editor.Utils
             }));
         }
 
-        private static void UnlinkAddedArrayElementManagedReferences(
+        public static void UnlinkAddedArrayElementManagedReferences(
             SerializedProperty arrayProperty,
             int addedIndex,
             HashSet<int> addedIndices)

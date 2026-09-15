@@ -1,9 +1,10 @@
 # Changelog
 
-## WIP ##
+## 5.29.3 ##
 
 1.  Add: `LeftToggle` now works with `ShowInInspector` & `Button`
 2.  Add: `ResiableTextArea` add `bool inline=false`, `int minRow=0` parameters
+3.  Internally changed the implement of list. Might cause some issue... I'm still working on the downpour system. Gonna need some time...
 
 ## 5.29.2 ##
 
