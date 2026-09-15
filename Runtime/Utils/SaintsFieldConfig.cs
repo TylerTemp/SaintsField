@@ -32,13 +32,6 @@ namespace SaintsField.Utils
 
         [LayoutEnd]
 
-        // [FieldInfoBox("The minimum row of resizable text area", EMessageType.None)]
-        [LayoutStart("The minimum row of resizable text area", ELayout.Horizontal | ELayout.TitleOut)]
-        [FieldLabelText("Override ResizableTextArea.MinRow")] public bool resizableTextAreaMinRowOverride;
-        [ShowInInspector, PlayaHideIf(nameof(resizableTextAreaMinRowOverride)), LabelText(null)] public const int ResizableTextAreaMinRowDefault = 3;
-        [LayoutEnd]
-        [ShowIf(nameof(resizableTextAreaMinRowOverride)), NoLabel] public int resizableTextAreaMinRow = ResizableTextAreaMinRowDefault;
-
         [LayoutStart("Should the ValidateInput use loop check?", ELayout.TitleOut)]
         [LeftToggle] public bool validateInputLoopCheckUIToolkit = ValidateInputLoopCheckDefault;
         public const bool ValidateInputLoopCheckDefault = false;

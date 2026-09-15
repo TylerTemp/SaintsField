@@ -19,7 +19,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         // [ValueAttribute(typeof(LabelTextAttribute), "OK!")] public SaintsArray<Scriptable[]> arrayInsideSaintsContentLabel;
         // [ValueAttribute(typeof(LabelTextAttribute), new object[]{null})]
-        [ValueAttribute(2, typeof(LabelTextAttribute), new object[]{"LABEL!"})]
+        [ValueAttribute(2, typeof(FieldLabelTextAttribute), "LABEL!")]
         public SaintsArray<Scriptable[]> arrayInsideSaints;
     }
 }

@@ -13,14 +13,14 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
 {
     public partial class UnitAttributeDrawer
     {
-        public static bool SupportsUIToolkitValueEdit(Type valueType, object value)
-        {
-            Type type = valueType ?? value?.GetType();
-            return type == typeof(sbyte) || type == typeof(byte) || type == typeof(short) ||
-                   type == typeof(ushort) || type == typeof(int) || type == typeof(uint) ||
-                   type == typeof(long) || type == typeof(ulong) || type == typeof(float) ||
-                   type == typeof(double) || type == typeof(decimal);
-        }
+        // public static bool SupportsUIToolkitValueEdit(Type valueType, object value)
+        // {
+        //     Type type = valueType ?? value?.GetType();
+        //     return type == typeof(sbyte) || type == typeof(byte) || type == typeof(short) ||
+        //            type == typeof(ushort) || type == typeof(int) || type == typeof(uint) ||
+        //            type == typeof(long) || type == typeof(ulong) || type == typeof(float) ||
+        //            type == typeof(double) || type == typeof(decimal);
+        // }
 
         public static VisualElement UIToolkitValueEdit(VisualElement oldElement, UnitAttribute unitAttribute,
             string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull,

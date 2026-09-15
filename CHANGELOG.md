@@ -1,14 +1,19 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `LeftToggle` now works with `ShowInInspector` & `Button`
+2.  Add: `ResiableTextArea` add `bool inline=false`, `int minRow=0` parameters
+
 ## 5.29.2 ##
 
-1. Fix: `ValueAttribute` did not work for `SaintsDictionary`
-2. Fix: LayoutShowIf (and some other attributes) show error dialog when using the name of a member [#443](https://github.com/TylerTemp/SaintsField/issues/443)
+1.  Fix: `ValueAttribute` did not work for `SaintsDictionary`
+2.  Fix: LayoutShowIf (and some other attributes) show error dialog when using the name of a member [#443](https://github.com/TylerTemp/SaintsField/issues/443)
 
 ## 5.29.1 ##
 
-1. Fix: `SaintsArray2DR<T>` failed to serialize in some cases
-2. Fix: some fields failed to deserialize when `Instantiate` from prefab 
+1.  Fix: `SaintsArray2DR<T>` failed to serialize in some cases
+2.  Fix: some fields failed to deserialize when `Instantiate` from prefab 
 
 ## 5.29.0 ##
 

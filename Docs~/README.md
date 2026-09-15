@@ -5734,7 +5734,25 @@ This `TextArea` will always grow its height to fit the content. (minimal height 
 
 Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
 
-*   Allow Multiple: No
+Parameters:
+
+*   `bool inline=false`: true to use a normal field style that the label & input in the same line
+*   `int minRow=0`: >1 to set the minimal row height  
+
+Allow Multiple: No
+
+Example style: 
+
+```csharp
+using SaintsField;
+
+[ResizableTextArea] public string defaultStyle;
+[ResizableTextArea(inline: true)] public string inlineStyle;
+[ResizableTextArea(minRow: 3)] public string default3;
+[ResizableTextArea(inline: true, minRow: 3)] public string inline3;
+```
+
+![](https://github.com/user-attachments/assets/7e3d4791-6daf-4725-aebb-8cc9e3bffce9)
 
 ```csharp
 using SaintsField;
@@ -5802,6 +5820,8 @@ using SaintsField;
 ```
 
 ![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
+
+This works with `ShowInInspector`/`Button` and their parameters
 
 #### `PrefixToggle` ####
 

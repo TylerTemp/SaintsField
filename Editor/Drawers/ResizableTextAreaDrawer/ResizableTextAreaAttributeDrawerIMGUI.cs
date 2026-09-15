@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,10 +33,16 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             //         : viewWidth - EditorGUIUtility.labelWidth
             // );
             // Debug.Log(hasLabelWidth);
-            return GetHeight(
-                property.stringValue,
-                width
-            ) + (hasLabelWidth ? EditorGUIUtility.singleLineHeight : 0f);
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return EditorGUIUtility.singleLineHeight;
+            }
+
+            bool inline = ((ResizableTextAreaAttribute)saintsAttribute).Inline;
+            float textWidth = width - (inline && hasLabelWidth ? EditorGUIUtility.labelWidth : 0f);
+            return Mathf.Max(GetHeight(property.stringValue, Mathf.Max(1f, textWidth)),
+                EditorGUIUtility.singleLineHeight * Mathf.Max(0, ((ResizableTextAreaAttribute)saintsAttribute).MinRow)
+            ) + (hasLabelWidth && !inline ? EditorGUIUtility.singleLineHeight : 0f);
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
@@ -69,11 +74,13 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 {
                     wordWrap = true,
                 };
-                EditorStyles.textField.wordWrap = true;
-                if (label.text != "")
+                _error = "";
+                if (!string.IsNullOrEmpty(label.text))
                 {
-                    (Rect labelFieldRect, Rect textAreaRect) =
-                        RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                    (Rect labelFieldRect, Rect textAreaRect) = ((ResizableTextAreaAttribute)saintsAttribute).Inline
+                        ? RectUtils.SplitWidthRect(position, EditorGUIUtility.labelWidth)
+                        : RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
+                    labelFieldRect.height = EditorGUIUtility.singleLineHeight;
                     EditorGUI.LabelField(labelFieldRect, label);
                     DrawOverrideRichText(labelFieldRect, label, overrideRichTextChunks);
                     position = textAreaRect;
@@ -93,14 +100,12 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             {
                 wordWrap = true,
             };
-            if (string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrEmpty(text))
             {
                 text = "F";
             }
 
-            float areaHeight = style.CalcHeight(new GUIContent(text), width);
-            return Mathf.Max(areaHeight,
-                EditorGUIUtility.singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow());
+            return style.CalcHeight(new GUIContent(text), width);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,

@@ -5,6 +5,8 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
+using SaintsField.Editor.Drawers.LeftToggleDrawer;
+using SaintsField.Editor.Drawers.ResizableTextAreaDrawer;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Utils;
@@ -18,6 +20,7 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
         private sealed class Info
         {
             public string Error = "";
+            public float TextAreaWidth;
             public readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
         }
 
@@ -47,6 +50,15 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
 
             switch (attribute)
             {
+                case ResizableTextAreaAttribute textAreaAttribute:
+                    float textAreaWidth = EnsureInfo($"{foldoutViewKey}.resizableTextArea").TextAreaWidth;
+                    return (true, ResizableTextAreaAttributeDrawer.IMGUIValueEditStringGetHeight(
+                        textAreaAttribute, label, (string)value,
+                        textAreaWidth > 0f ? textAreaWidth : EditorGUIUtility.currentViewWidth,
+                        inHorizontalLayout));
+                case LeftToggleAttribute:
+                    return (true, LeftToggleAttributeDrawer.IMGUIValueEditGetHeight(valueType, value,
+                        inHorizontalLayout));
                 case ValueButtonsAttribute valueButtonsAttribute:
                     return (true, GetValueButtonsHeight(label, valueType, value, valueButtonsAttribute, targets,
                         richTextTagProvider, foldoutViewKey));
@@ -106,6 +118,15 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
             {
                 switch (attribute)
                 {
+                    case ResizableTextAreaAttribute textAreaAttribute:
+                        EnsureInfo($"{foldoutViewKey}.resizableTextArea").TextAreaWidth = position.width;
+                        ResizableTextAreaAttributeDrawer.IMGUIValueEditString(position, textAreaAttribute,
+                            label, (string)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                        return true;
+                    case LeftToggleAttribute:
+                        LeftToggleAttributeDrawer.IMGUIValueEdit(position, label, valueType, value, beforeSet,
+                            setterOrNull, labelGrayColor, inHorizontalLayout);
+                        return true;
                     case ValueButtonsAttribute valueButtonsAttribute:
                         DrawValueButtons(position, label, valueType, value, valueButtonsAttribute, beforeSet,
                             setterOrNull, targets, richTextTagProvider, foldoutViewKey);
@@ -199,9 +220,12 @@ namespace SaintsField.Editor.Utils.IMGUIEditDrawer
                     case PropRangeAttribute:
                     case LayerAttribute:
                     case GuidAttribute:
+                    case LeftToggleAttribute:
 #if UNITY_2021_2_OR_NEWER
                     case ShaderParamAttribute:
 #endif
+                        return attribute;
+                    case ResizableTextAreaAttribute when valueType == typeof(string) || value is string:
                         return attribute;
                 }
             }

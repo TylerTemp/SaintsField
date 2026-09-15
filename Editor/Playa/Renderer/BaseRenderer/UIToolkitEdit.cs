@@ -14,6 +14,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
+using SaintsField.Editor.Drawers.LeftToggleDrawer;
 using SaintsField.Editor.Drawers.MinMaxSliderDrawer;
 using SaintsField.Editor.Drawers.ProgressBarDrawer;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
@@ -78,14 +79,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     foldoutViewKey);
             }
 
-            UnitAttribute unitAttribute = allAttributes.OfType<UnitAttribute>()
-                .FirstOrDefault(each => each.GetType() == typeof(UnitAttribute));
-            if (unitAttribute != null && UnitAttributeDrawer.SupportsUIToolkitValueEdit(valueType, value))
-            {
-                return (UnitAttributeDrawer.UIToolkitValueEdit(oldElement, unitAttribute, label, valueType, value,
-                    beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout), false);
-            }
-
             // Color reColor = EColor.EditorSeparator.GetColor();
 
             foreach (Attribute attribute in allAttributes)
@@ -122,6 +115,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             allAttributes,
                             targets, richTextTagProvider), false);
                     }
+                    case UnitAttribute unitAttribute:
+                        return (UnitAttributeDrawer.UIToolkitValueEdit(oldElement, unitAttribute, label, valueType, value,
+                            beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout), false);
+                    case LeftToggleAttribute leftToggleAttribute:
+                        return (LeftToggleAttributeDrawer.UIToolkitValueEdit(
+                            oldElement,
+                            leftToggleAttribute,
+                            label,
+                            value,
+                            valueType,
+                            beforeSet,
+                            setterOrNull,
+                            labelGrayColor,
+                            inHorizontalLayout,
+                            allAttributes,
+                            targets), false);
                 }
             }
 

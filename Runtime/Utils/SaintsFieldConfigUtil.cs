@@ -137,7 +137,6 @@ namespace SaintsField.Utils
         public static EXP GetComponentByPathExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentByPathExp: defaultValue;
         public static EXP FindComponentExp(EXP defaultValue) => IsConfigLoaded? Config.findComponentExp: defaultValue;
 
-        public static int ResizableTextAreaMinRow() => IsConfigLoaded && Config.resizableTextAreaMinRowOverride? Config.resizableTextAreaMinRow: SaintsFieldConfig.ResizableTextAreaMinRowDefault;
         public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => IsConfigLoaded && Config.disableOnValueChangedWatchArrayFieldUIToolkit;
 
         // public static int GetByXPathDelayMs() => IsConfigLoaded? Config.getByXPathDelayMs: 0;

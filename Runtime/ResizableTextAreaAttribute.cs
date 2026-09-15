@@ -16,11 +16,15 @@ namespace SaintsField
 
         // public string GroupBy { get; }
 
-        // public readonly bool FullWidth;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public bool Inline;
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public int MinRow;
 
-        // public ResizableTextAreaAttribute()
-        // {
-        //     // FullWidth = fullWidth;
-        // }
+        public ResizableTextAreaAttribute(bool inline=false, int minRow=0)
+        {
+            Inline = inline;
+            MinRow = minRow;
+        }
     }
 }
