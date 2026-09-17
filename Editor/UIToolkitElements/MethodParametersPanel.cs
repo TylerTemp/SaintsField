@@ -79,7 +79,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 }).Every(100);
             }
 
-            UIToolkitUtils.OnAttachToPanelOnce(this, _ => UIToolkitUtils.CheckOutOfScoopFoldout(this, new HashSet<Toggle>()));
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () => UIToolkitUtils.CheckOutOfScoopFoldout(this, new HashSet<Toggle>()));
         }
 
 

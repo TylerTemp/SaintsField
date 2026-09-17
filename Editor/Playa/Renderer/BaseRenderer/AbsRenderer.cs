@@ -401,7 +401,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             OnDestroyIMGUIAbsCallback();
             OnDestroyIMGUI();
 #if UNITY_2021_3_OR_NEWER
-
+            OnDestroyUIToolkit();
 #endif
         }
         public abstract void OnSearchField(string searchString);

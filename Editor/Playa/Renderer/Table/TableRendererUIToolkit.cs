@@ -193,7 +193,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             if(defaultCollapse)
             {
-                UIToolkitUtils.OnAttachToPanelOnce(foldout, _ =>
+                UIToolkitUtils.OnAttachToPanelOnceWithEnsure(foldout, () =>
                 {
                     foldout.schedule.Execute(() =>
                     {

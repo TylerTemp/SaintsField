@@ -39,7 +39,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
             _valueButtonsCalcElement.AddReadyListener(OnCalcReadyEvent);
             // RegisterCallback<AttachToPanelEvent>(_ => CheckWidth());
-            UIToolkitUtils.OnAttachToPanelOnce(this, _ =>
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () =>
             {
                 schedule.Execute(LoopCheck).Every(150);
             });

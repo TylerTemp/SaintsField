@@ -1,10 +1,8 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.UIToolkitElements;
@@ -16,10 +14,6 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-using Cysharp.Threading.Tasks;
-#endif
 
 namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 {
@@ -38,7 +32,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public bool UpdateOneMoreTime;
             public RichTextDrawer RichTextDrawer;
 
-            public List<Waiter> Enumerators = new List<Waiter>();
+            public List<MethodRunnerUtil.Payload> MethodRunners = new List<MethodRunnerUtil.Payload>();
             public IVisualElementScheduledItem ButtonTask;
             public bool WaiterHasError;
             public bool WaiterHasFinished;
@@ -77,14 +71,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // List<VisualElement> parameterElements = new List<VisualElement>();
             object[] parameterValues = new object[parameters.Length];
             // VisualElement root = null;
-            (AsyncReturnType returnAsync, Type returnAsyncValueType) =
-                GetAsyncReturnInfo(methodInfo.ReturnType);
-
             bool hasReturnValue = !_buttonAttribute.HideReturnValue
                 && methodInfo.ReturnType != typeof(void)
-                && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType)
-                && !typeof(Task).IsAssignableFrom(methodInfo.ReturnType)
-                && (returnAsync == AsyncReturnType.None);
+                && !MethodRunnerUtil.IsWaitableReturnType(methodInfo.ReturnType);
 
             string buttonId = $"{FieldWithInfo.Targets[0].GetHashCode()}.{methodInfo.Name}";
 
@@ -110,7 +99,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 Xml = buttonText,
                 Callback = _buttonAttribute.IsCallback ? _buttonAttribute.Label : "",
                 UpdateOneMoreTime = true,
-                Enumerators = new List<Waiter>(),
+                MethodRunners = new List<MethodRunnerUtil.Payload>(),
                 WaiterHasError = false,
                 WaiterHasFinished = false,
             };
@@ -121,11 +110,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 buttonUserData.ButtonTask?.Pause();
 
                 fancyButton.StatusIndicator.EnsureLoading(false, 0);
-                if (buttonUserData.Enumerators.Count > 0)
+                if (buttonUserData.MethodRunners.Count > 0)
                 {
                     fancyButton.StatusIndicator.PlayPause();
                 }
-                buttonUserData.Enumerators.Clear();
+                buttonUserData.MethodRunners.Clear();
                 fancyButton.ShowResult(false);
             };
 
@@ -143,26 +132,23 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                 SaintsContext.SerializedProperty = _serializedProperty;
                 int targetCount = FieldWithInfo.Targets.Count;
-                object[] returnValues = new object[targetCount];
+                MethodRunnerUtil.Payload[] methodRunners = new MethodRunnerUtil.Payload[targetCount];
                 Exception error = null;
                 for (int index = 0; index < targetCount; index++)
                 {
                     object eachTarget = FieldWithInfo.Targets[index];
                     (object rawMemberValue, object useTarget) = GetRefreshedTarget(FieldWithInfo, eachTarget);
 
-                    object result;
-                    try
+                    MethodRunnerUtil.Payload methodRunner =
+                        MethodRunnerUtil.Invoke(methodInfo, useTarget, parameterValues);
+                    methodRunners[index] = methodRunner;
+                    if (methodRunner.Status == MethodRunnerUtil.RunStatus.Faulted)
                     {
-                        result = methodInfo.Invoke(useTarget, parameterValues);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                        error = e;
+                        Debug.LogException(methodRunner.Exception);
+                        error = methodRunner.Exception;
                         break;
                     }
 
-                    returnValues[index] = result;
                     if (isStruct)
                     {
                         BackWriteCallback(rawMemberValue, useTarget);
@@ -183,12 +169,13 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     // Debug.Assert(_returnValueContainer != null);
                     VisualElement returnValueContainer = fancyButton.ShowResult(true);
                     returnValueContainer.Clear();
-                    object returnValue = returnValues[0];
+                    MethodRunnerUtil.ReturnValueInfo returnValue =
+                        MethodRunnerUtil.GetReturnValue(methodRunners[0]).returnValueInfo;
                     VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                         returnValueContainer.Children().FirstOrDefault(),
                         "<color=green>[return]</color>",
-                        methodInfo.ReturnType,
-                        returnValue,
+                        returnValue.Type,
+                        returnValue.Value,
                         null,
                         _ => { },
                         false,
@@ -216,69 +203,16 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     }
                 }
 
-                buttonUserData.Enumerators.Clear();
-                foreach (object returnValue in returnValues)
+                buttonUserData.MethodRunners.Clear();
+                foreach (MethodRunnerUtil.Payload methodRunner in methodRunners)
                 {
-                    switch (returnValue)
+                    if (methodRunner.Status == MethodRunnerUtil.RunStatus.Pending)
                     {
-#if UNITY_6000_0_OR_NEWER
-                        case Awaitable awaitable:
-                        {
-                            Waiter waiter = new Waiter(awaitable);
-                            buttonUserData.Enumerators.Add(waiter);
-                        }
-                            break;
-#endif
-                        case IEnumerator enumerator:
-                        {
-                            Waiter waiter = new Waiter(enumerator);
-                            buttonUserData.Enumerators.Add(waiter);
-                        }
-                            break;
-                        case Task task:
-                        {
-                            Waiter waiter = new Waiter(task);
-                            buttonUserData.Enumerators.Add(waiter);
-                        }
-                            break;
-
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-                        case UniTask uniTask:
-                        {
-                            Waiter waiter = new Waiter(uniTask);
-                            buttonUserData.Enumerators.Add(waiter);
-                        }
-                            break;
-#endif
-                        default:
-                            switch (returnAsync)
-                            {
-                                case AsyncReturnType.None:
-                                    break;
-#if UNITY_6000_0_OR_NEWER
-                                case AsyncReturnType.Awaitable:
-                                {
-                                    Waiter waiter = Waiter.AwaitableT(returnValue, returnAsyncValueType);
-                                    buttonUserData.Enumerators.Add(waiter);
-                                }
-                                    break;
-#endif
-#if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-                                case AsyncReturnType.UniTask:
-                                {
-                                    Waiter waiter = Waiter.UniTaskWithValue(returnValue, returnAsyncValueType);
-                                    buttonUserData.Enumerators.Add(waiter);
-                                }
-                                    break;
-#endif
-                                default:
-                                    throw new ArgumentOutOfRangeException(nameof(returnAsync), returnAsync, null);
-                            }
-                            break;
+                        buttonUserData.MethodRunners.Add(methodRunner);
                     }
                 }
 
-                if (buttonUserData.Enumerators.Count == 0)
+                if (buttonUserData.MethodRunners.Count == 0)
                 {
                     statusIndicatorElement.PlayOk();
                 }
@@ -290,22 +224,21 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                 buttonUserData.ButtonTask?.Pause();
 
-                if (buttonUserData.Enumerators.Count > 0)
+                if (buttonUserData.MethodRunners.Count > 0)
                 {
                     // ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
                     buttonUserData.ButtonTask = fancyButton.schedule.Execute(() =>
                     {
-                        List<Waiter> finishedEnumerators = new List<Waiter>();
-                        int oldCounter = buttonUserData.Enumerators.Count;
+                        List<MethodRunnerUtil.Payload> finishedRunners = new List<MethodRunnerUtil.Payload>();
+                        int oldCounter = buttonUserData.MethodRunners.Count;
                         float progress = -1f;
                         // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                        foreach (Waiter waiter in buttonUserData.Enumerators)
+                        foreach (MethodRunnerUtil.Payload methodRunner in buttonUserData.MethodRunners)
                         {
-                            waiter.Update();
-
-                            if (!waiter.SubWaiterDone())
+                            MethodRunnerUtil.RunStatus status = MethodRunnerUtil.Tick(methodRunner);
+                            if (status == MethodRunnerUtil.RunStatus.Pending)
                             {
-                                float curProcess = waiter.GetProgress();
+                                float curProcess = methodRunner.Progress;
                                 if (curProcess > 0)
                                 {
                                     progress = Mathf.Max(progress, curProcess);
@@ -314,29 +247,25 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 continue;
                             }
 
-                            Waiter.MoveNextResult moveNext = waiter.MoveNext();
-                            if (moveNext.Exception != null)
+                            if (methodRunner.Exception != null)
                             {
-                                Debug.LogException(moveNext.Exception.InnerException ?? moveNext.Exception);
+                                Debug.LogException(methodRunner.Exception.InnerException ?? methodRunner.Exception);
 
                                 VisualElement result = fancyButton.ShowResult(true);
                                 // Debug.Log("show error result");
-                                result.Add(MakeErrorBox(moveNext.Exception));
+                                result.Add(MakeErrorBox(methodRunner.Exception));
                                 buttonUserData.WaiterHasError = true;
                             }
 
-                            if (moveNext.Exception == null && moveNext.Status == Waiter.MoveNextStatus.Pending)
-                            {
-                                waiter.CheckCurrentNeedWaiter();
-                            }
-
-                            if (!_buttonAttribute.HideReturnValue && moveNext.Status == Waiter.MoveNextStatus.Completed && moveNext.ReturnType != null)
+                            (bool hasReturnValue, MethodRunnerUtil.ReturnValueInfo returnValue) =
+                                MethodRunnerUtil.GetReturnValue(methodRunner);
+                            if (!_buttonAttribute.HideReturnValue && hasReturnValue)
                             {
                                 (VisualElement taskResult, bool taskIsNestedField) = UIToolkitEdit.UIToolkitValueEdit(
                                     null,
                                     "<color=green>[return]</color>",
-                                    moveNext.ReturnType,
-                                    moveNext.ReturnValue,
+                                    returnValue.Type,
+                                    returnValue.Value,
                                     null,
                                     _ => { },
                                     false,
@@ -358,26 +287,21 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 }
                             }
 
-                            // Debug.Log(bindEnumerator.Current);
-                            // ReSharper disable once InvertIf
-                            if (moveNext.Status != Waiter.MoveNextStatus.Pending)
-                            {
-                                finishedEnumerators.Add(waiter);
+                            finishedRunners.Add(methodRunner);
 
-                                if(moveNext.Status == Waiter.MoveNextStatus.Completed)
-                                {
-                                    buttonUserData.WaiterHasFinished = true;
-                                }
-                                else if (moveNext.Status == Waiter.MoveNextStatus.Cancelled)
-                                {
-                                    buttonUserData.WaiterHasCancel = true;
-                                }
+                            if(status == MethodRunnerUtil.RunStatus.Completed)
+                            {
+                                buttonUserData.WaiterHasFinished = true;
+                            }
+                            else if (status == MethodRunnerUtil.RunStatus.Cancelled)
+                            {
+                                buttonUserData.WaiterHasCancel = true;
                             }
                         }
 
-                        buttonUserData.Enumerators.RemoveAll(each => finishedEnumerators.Contains(each));
+                        buttonUserData.MethodRunners.RemoveAll(finishedRunners.Contains);
 
-                        bool stillHaveRunner = buttonUserData.Enumerators.Count > 0;
+                        bool stillHaveRunner = buttonUserData.MethodRunners.Count > 0;
                         statusIndicatorElement.EnsureLoading(stillHaveRunner, progress);
 
                         // ReSharper disable once InvertIf

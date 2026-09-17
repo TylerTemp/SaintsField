@@ -2,7 +2,6 @@
 using System.Collections;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.SaintsCell;
-using SaintsField.Interfaces;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
@@ -203,16 +202,47 @@ namespace SaintsField.Editor.Utils
             SetDisplayStyle(label, DisplayStyle.Flex);
         }
 
-        public static void OnAttachToPanelOnce(VisualElement rootElement, EventCallback<AttachToPanelEvent> callback)
+//         public static void OnAttachToPanelOnce(VisualElement rootElement, EventCallback<AttachToPanelEvent> callback)
+//         {
+// #if UNITY_2023_2_OR_NEWER || UNITY_6000_0_OR_NEWER
+//             rootElement.RegisterCallbackOnce(callback);
+// #else
+//             void WrapCallback(AttachToPanelEvent evt)
+//             {
+//                 rootElement.UnregisterCallback<AttachToPanelEvent>(WrapCallback);
+//                 callback(evt);
+//             }
+//             rootElement.RegisterCallback<AttachToPanelEvent>(WrapCallback);
+// #endif
+//         }
+
+        public static void OnAttachToPanelOnceWithEnsure(VisualElement rootElement, Action callback)
         {
+            if (rootElement.panel != null)
+            {
+                callback.Invoke();
+                return;
+            }
+
 #if UNITY_2023_2_OR_NEWER || UNITY_6000_0_OR_NEWER
-// #if false
-            rootElement.RegisterCallbackOnce(callback);
+            rootElement.RegisterCallbackOnce<AttachToPanelEvent>(evt =>
+            {
+                if (evt.target != rootElement)
+                {
+                    return;
+                }
+                callback.Invoke();
+            });
 #else
             void WrapCallback(AttachToPanelEvent evt)
             {
+                if (evt.target != rootElement)
+                {
+                    return;
+                }
+
                 rootElement.UnregisterCallback<AttachToPanelEvent>(WrapCallback);
-                callback(evt);
+                callback.Invoke();
             }
             rootElement.RegisterCallback<AttachToPanelEvent>(WrapCallback);
 #endif

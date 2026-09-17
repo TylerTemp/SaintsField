@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
             wrapper.Add(resultElement);
 
             _container = wrapper;
-            UIToolkitUtils.OnAttachToPanelOnce(_container, _ =>
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(_container, () =>
             {
                 _container.schedule.Execute(() => OnUpdateUIToolKit(_container));
                 _container.schedule.Execute(() => OnUpdateUIToolKit(_container)).Every(100);

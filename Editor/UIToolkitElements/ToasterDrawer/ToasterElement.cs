@@ -66,7 +66,7 @@ namespace SaintsField.Editor.UIToolkitElements.ToasterDrawer
             ActionButton = root.Q<Button>("action");
             CloseButton = root.Q<Button>("close");
 
-            UIToolkitUtils.OnAttachToPanelOnce(this, _ =>
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () =>
             {
                 UIToolkitUtils.HelpKeepRotate(loadingIcon);
                 schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingIcon)).StartingIn(200);

@@ -35,7 +35,7 @@ namespace SaintsField.Editor
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
-            UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(root, () =>
             {
                 root.schedule.Execute(() => HeaderGUI.DrawHeaderGUI.EnsureInitLoad()).StartingIn(500);
             });

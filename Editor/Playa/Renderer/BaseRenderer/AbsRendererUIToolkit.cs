@@ -4,13 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.FieldContextMenuDrawer;
 using SaintsField.Editor.Drawers.GUIColor;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -141,7 +139,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                     else  // we need to update at least once to apply the color
                     {
-                        UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
+                        UIToolkitUtils.OnAttachToPanelOnceWithEnsure(root, () =>
                         {
                             root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement));
                         });
@@ -151,7 +149,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (targetNeedUpdate)
             {
-                UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
+                UIToolkitUtils.OnAttachToPanelOnceWithEnsure(root, () =>
                 {
                     root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement));
                     root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement)).Every(100);

@@ -465,7 +465,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                 tabToolbar.OnValueChangedAddListener(SetDisplayGroups);
                 tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
-                UIToolkitUtils.OnAttachToPanelOnce(tabToolbar, _ =>
+                UIToolkitUtils.OnAttachToPanelOnceWithEnsure(tabToolbar, () =>
                 {
                     SetDisplayGroups(_orderedKeys[0]);
                 });

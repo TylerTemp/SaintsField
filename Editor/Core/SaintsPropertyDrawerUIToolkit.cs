@@ -629,8 +629,8 @@ namespace SaintsField.Editor.Core
             // rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
             rootElement.Add(containerElement);
 
-            UIToolkitUtils.OnAttachToPanelOnce(rootElement,
-                _ => OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes,
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(rootElement,
+                () => OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes,
                     onChangeManuallyWatch));
             // rootElement.schedule.Execute(() =>
             //     OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes, onChangeManuallyWatch));

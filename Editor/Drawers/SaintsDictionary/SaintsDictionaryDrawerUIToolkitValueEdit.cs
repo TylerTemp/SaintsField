@@ -880,7 +880,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             RefreshFieldWithPayload(dictField, payload);
 
-            UIToolkitUtils.OnAttachToPanelOnce(dictField.ListView, _ => dictField.ListView.schedule.Execute(() =>
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(dictField.ListView, () => dictField.ListView.schedule.Execute(() =>
             {
                 if (payload.AsyncSearchItems.Finished)
                 {

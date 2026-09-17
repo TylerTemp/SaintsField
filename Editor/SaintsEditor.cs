@@ -15,6 +15,7 @@ using SaintsField.Editor.Playa.Renderer.DecoratorRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.OnInspectorDisposeAttributeRenderer;
 using SaintsField.Editor.Playa.Renderer.OnInspectorInitAttributeRenderer;
 using SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer;
@@ -1087,6 +1088,13 @@ namespace SaintsField.Editor
                                 fieldWithInfo)));
                         continue;
                     }
+                    case OnInspectorDisposeAttribute onInspectorDisposeAttribute:
+                    {
+                        renderers.Add(new SaintsFieldWithRenderer(onInspectorDisposeAttribute,
+                            new OnInspectorDisposeRenderer(onInspectorDisposeAttribute, serializedObject,
+                                fieldWithInfo)));
+                        continue;
+                    }
                     case LayoutTerminateHereAttribute _:
                         tailRenderers.Add(new SaintsFieldWithRenderer(new LayoutEndAttribute(), null));
                         continue;
@@ -1457,9 +1465,15 @@ namespace SaintsField.Editor
             RemoveInstance(this);
 #endif
 
-            OnDestroyIMGUI();
+            if(_saintsEditorIMGUI)
+            {
+                OnDestroyIMGUI();
+            }
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-            OnDestroyUIToolkit();
+            else
+            {
+                OnDestroyUIToolkit();
+            }
 #endif
         }
 

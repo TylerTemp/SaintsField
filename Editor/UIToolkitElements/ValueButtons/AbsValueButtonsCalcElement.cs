@@ -19,7 +19,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
             // RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
 
-            UIToolkitUtils.OnAttachToPanelOnce(this, _ => schedule.Execute(StartToCalc).Every(150));
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () => schedule.Execute(StartToCalc).Every(150));
 
         }
 
