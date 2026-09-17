@@ -11,7 +11,7 @@ namespace SaintsField
         }
     }
 
-    [System.Obsolete("Use ResourcesFolderAttribute instead.")]
+    [System.Obsolete("Use ResourcesFolder instead.")]
     [Conditional("UNITY_EDITOR")]
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class ResourceFolderAttribute: ResourcesFolderAttribute

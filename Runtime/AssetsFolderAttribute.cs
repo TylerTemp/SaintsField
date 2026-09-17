@@ -11,7 +11,7 @@ namespace SaintsField
         }
     }
 
-    [System.Obsolete("Use AssetsFolderAttribute instead.")]
+    [System.Obsolete("Use AssetsFolder instead.")]
     [Conditional("UNITY_EDITOR")]
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
     public class AssetFolderAttribute: AssetsFolderAttribute
