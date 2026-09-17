@@ -11,8 +11,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(AssetFolderAttribute), true)]
-    public partial class AssetFolderAttributeDrawer: FolderDrawerBase, IAutoRunnerFixDrawer
+    [CustomPropertyDrawer(typeof(AssetsFolderAttribute), true)]
+    public partial class AssetsFolderAttributeDrawer: FolderDrawerBase, IAutoRunnerFixDrawer
     {
         protected override (string error, string actualFolder) ValidateFullFolder(string folderValue)
         {

@@ -5434,7 +5434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2654f5044115c148a357434d453c239, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  assetsFolder: Assets/SaintsField/Runtime
+  assetsFolder: Assets/TextMesh Pro
   assetsFolders:
   - Packages/today.comes.saintsfield/Samples/Script
   - Packages/today.comes.saintsfield/Samples/EditorTest

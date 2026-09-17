@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class AssetFolderExample : MonoBehaviour
     {
-        [AssetFolder] public string assetsFolder;
-        [AssetFolder] public string[] assetsFolders;
+        [AssetsFolder] public string assetsFolder;
+        [AssetsFolder] public string[] assetsFolders;
     }
 }

@@ -5976,7 +5976,7 @@ public string myInterface;
 
 ![resource_path](https://github.com/TylerTemp/SaintsField/assets/6391063/35d683bf-7d19-4854-bdf6-ee63532fed80)
 
-#### `ResourceFolder` ####
+#### `ResourcesFolder` ####
 
 A folder picker to pick a resource folder under any `Resources`. It'll give error if the selected folder is not a resource.
 
@@ -5989,8 +5989,8 @@ Parameters:
 ```csharp
 using SaintsField;
 
-[ResourceFolder] public string resourcesFolder;
-[ResourceFolder] public string[] resourcesFolders;
+[ResourcesFolder] public string resourcesFolder;
+[ResourcesFolder] public string[] resourcesFolders;
 ```
 
 [![video](https://github.com/user-attachments/assets/ad5042db-6de3-4f98-8c5d-6387178e3dec)](https://github.com/user-attachments/assets/3c391078-8fcf-4dba-954d-28b6db21b57b)
@@ -6070,7 +6070,7 @@ public struct TableStruct
 [DefaultExpand, Table] public TableStruct[] table;
 ```
 
-#### `AssetFolder` ####
+#### `AssetsFolder` ####
 
 A folder picker to pick a folder under `Assets`. It'll give error if the selected folder is outside of `Assets`.
 
@@ -6083,8 +6083,8 @@ Parameters:
 ```csharp
 using SaintsField;
 
-[AssetFolder] public string assetsFolder;
-[AssetFolder] public string[] assetsFolders;
+[AssetsFolder] public string assetsFolder;
+[AssetsFolder] public string[] assetsFolders;
 ```
 
 [![video](https://github.com/user-attachments/assets/bb11f6b5-5940-4057-9c5a-e3877ab41b54)](https://github.com/user-attachments/assets/322c6dbb-6fb7-4887-90ad-22aaf3905152)

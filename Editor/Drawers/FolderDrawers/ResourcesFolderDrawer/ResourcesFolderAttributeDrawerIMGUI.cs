@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -6,12 +7,14 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 {
-    public partial class ResourceFolderAttributeDrawer
+    public partial class ResourcesFolderAttributeDrawer
     {
         private static Texture2D _folderIcon;
+        private static Texture2D _openIcon;
 
         private sealed class InfoIMGUI
         {
@@ -46,7 +49,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index,
-            FieldInfo info, object parent) => SingleLineHeight;
+            FieldInfo info, object parent) => SingleLineHeight * 2;
 
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
@@ -56,16 +59,31 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             UpdateStatus(cache, property);
 
             _folderIcon ??= Util.LoadResource<Texture2D>("resources-folder.png");
-            Rect buttonRect = new Rect(position)
+            _openIcon ??= Util.LoadResource<Texture2D>("open-ext.png");
+            Rect linkButtonRect = new Rect(position)
             {
                 x = position.x + 1,
-                width = position.width - 2,
+                width = SingleLineHeight - 1,
+            };
+            Rect pickButtonRect = new Rect(position)
+            {
+                x = position.x + SingleLineHeight,
+                width = SingleLineHeight - 1,
             };
 
             if (property.propertyType == SerializedPropertyType.String)
             {
-                ResourceFolderAttribute folderAttribute = (ResourceFolderAttribute)saintsAttribute;
-                if (GUI.Button(buttonRect, _folderIcon, GUIStyle.none))
+                Object folderObj = GetFolderObjectIMGUI(property.stringValue);
+                using (new EditorGUI.DisabledScope(folderObj == null))
+                {
+                    if (GUI.Button(linkButtonRect, _openIcon, GUIStyle.none))
+                    {
+                        EditorGUIUtility.PingObject(folderObj);
+                    }
+                }
+
+                ResourcesFolderAttribute folderAttribute = (ResourcesFolderAttribute)saintsAttribute;
+                if (GUI.Button(pickButtonRect, _folderIcon, GUIStyle.none))
                 {
                     (string error, string actualFolder) = OnClick(property, folderAttribute);
                     if (error == "")
@@ -95,7 +113,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             {
                 using (new EditorGUI.DisabledScope(true))
                 {
-                    GUI.Button(buttonRect, _folderIcon, GUIStyle.none);
+                    GUI.Button(linkButtonRect, _openIcon, GUIStyle.none);
+                    GUI.Button(pickButtonRect, _folderIcon, GUIStyle.none);
                 }
             }
 
@@ -193,6 +212,25 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             cache.Initialized = true;
             cache.NeedRefresh = false;
             cache.Error = CheckFolder(property.stringValue);
+        }
+
+        private static Object GetFolderObjectIMGUI(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return null;
+            }
+
+            foreach (string resourcesFolder in GetAllResourcesFolders())
+            {
+                string folderPath = $"{resourcesFolder}/{value}";
+                if (Directory.Exists(folderPath))
+                {
+                    return AssetDatabase.LoadAssetAtPath<Object>(folderPath);
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -1,0 +1,5 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/FolderDrawerBase/FolderButtonsStyle.uss?fileID=7433441132597879392&amp;guid=cddf6a5cf2538e0408d8554e1bb6b60a&amp;type=3#ResourcesFolderButtonsStyle"/>
+    <ui:Button name="LinkButton" class="btn left-button left-btn"/>
+    <ui:Button name="PickButton" class="btn left-button right-btn"/>
+</ui:UXML>

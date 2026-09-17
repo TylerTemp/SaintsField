@@ -18,7 +18,6 @@ namespace SaintsField
         public int index;
         public string path;
 
-        // Implicit conversion operator: Converts SaintsArray<T> to T[]
         public static implicit operator string(SceneReference sceneReference) => sceneReference.path;
         // public static implicit operator int(SceneReference sceneReference) => sceneReference.index;
 

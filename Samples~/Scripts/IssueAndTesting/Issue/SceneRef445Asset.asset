@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.SceneRef445Asset
   TheStructs:
   - TheSceneReference:
-      guid: bd3990bba674a4446975557cede326ba
-      index: 0
-      path: Packages/today.comes.saintsfield/Samples/2DR
+      guid: ec022bfc73830ea43b9e37d2a5ca2dd6
+      index: -1
+      path: Packages/today.comes.saintsfield/Samples/NetCode

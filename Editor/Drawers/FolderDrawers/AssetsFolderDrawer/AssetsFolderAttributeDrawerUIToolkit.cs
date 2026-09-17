@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +15,7 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
 {
-    public partial class AssetFolderAttributeDrawer
+    public partial class AssetsFolderAttributeDrawer
     {
         private static string ButtonName(SerializedProperty property) =>
             $"{property.propertyPath}__AssetsFolder_Button";
@@ -25,29 +25,10 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            Button button = new Button
+            return new AssetsFolderButtonsElement
             {
-                style =
-                {
-                    backgroundImage = Util.LoadResource<Texture2D>("folder.png"),
-#if UNITY_2022_2_OR_NEWER
-                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(14, 14),
-#else
-                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                    paddingLeft = 8,
-                    paddingRight = 8,
-                    borderTopLeftRadius = 0,
-                    borderBottomLeftRadius = 0,
-                    flexShrink = 0,
-                    flexGrow = 0,
-                },
                 name = ButtonName(property),
             };
-            return button;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -71,19 +52,19 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(name: HelpBoxName(property));
-            Button button = container.Q<Button>(name: ButtonName(property));
+            AssetsFolderButtonsElement element = container.Q<AssetsFolderButtonsElement>(name: ButtonName(property));
 
             if (property.propertyType != SerializedPropertyType.String)
             {
                 helpBox.text = $"Target is not a string: {property.propertyType}";
                 helpBox.style.display = DisplayStyle.Flex;
-                button.SetEnabled(false);
+                element.SetEnabled(false);
                 return;
             }
 
             FolderAttribute folderAttribute = (FolderAttribute)saintsAttribute;
 
-            button.clickable.clicked += () =>
+            element.PickButton.clicked += () =>
             {
                 (string error, string actualFolder) = OnClick(property, folderAttribute);
                 if(error == "")
@@ -99,6 +80,20 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
                 {
                     helpBox.text = error;
                     helpBox.style.display = DisplayStyle.Flex;
+                }
+            };
+
+            element.LinkButton.clicked += () =>
+            {
+                if (!SerializedUtils.IsOk(property))
+                {
+                    return;
+                }
+
+                Object folderObj = GetFolderObject(property.stringValue);
+                if (folderObj != null)
+                {
+                    EditorGUIUtility.PingObject(folderObj);
                 }
             };
 
@@ -135,22 +130,34 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             });
             #endregion
 
-            CheckHelpBox(property.stringValue, helpBox);
+            CheckHelpBox(property.stringValue, helpBox, element);
             helpBox.TrackPropertyValue(property, p =>
-            {
-                CheckHelpBox(p.stringValue, helpBox);
-            });
+                CheckHelpBox(p.stringValue, helpBox, element));
         }
 
-        private static void CheckHelpBox(string value, HelpBox helpBox)
+        private static void CheckHelpBox(string value, HelpBox helpBox, AssetsFolderButtonsElement folderButtons)
         {
             string error = "";
-            if (!string.IsNullOrEmpty(value) && !Directory.Exists(value))
+            Object folderObj = GetFolderObject(value);
+            bool folderIsNull = folderObj == null;
+            if (!string.IsNullOrEmpty(value) && folderIsNull)
             {
                 error = $"Folder \"{value}\" does not exists";
             }
 
             UIToolkitUtils.SetHelpBox(helpBox, error);
+
+            folderButtons.LinkButton.SetEnabled(!folderIsNull);
+        }
+
+        private static Object GetFolderObject(string value)
+        {
+            if (!Directory.Exists(value))
+            {
+                return null;
+            }
+            Object folder = AssetDatabase.LoadAssetAtPath<Object>(value);
+            return folder;
         }
     }
 }

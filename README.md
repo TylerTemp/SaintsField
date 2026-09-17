@@ -114,11 +114,12 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.29.3**
+**5.29.4**
 
-1.  Add: `LeftToggle` now works with `ShowInInspector` & `Button`
-2.  Add: `ResiableTextArea` add `bool inline=false`, `int minRow=0` parameters
-3.  Internally changed the implement of list. Might cause some issue... I'm still working on the downpour system. Gonna need some time...
+1.  Fix: `SceneReference` darg fix [#445](https://github.com/TylerTemp/SaintsField/issues/445)
+2.  Fix: `SceneReference` now refreshes when scenes in Build Settings change
+3.  Rename: `AssetFolder` -> `AssetsFolder`; `ResourceFolder` -> `ResourcesFolder` (Old name is kept but marked as obsolete)
+4.  Add: `AssetsFolder` and `ResourcesFolder` now have a button to locate the selected folder in the Project window.
 
 ## Usage ##
 
@@ -216,10 +217,10 @@ namespace: `SaintsField`
         *   [`LeftToggle`](https://saintsfield.comes.today/general-attributes/miscellaneous/lefttoggle)
         *   [`PrefixToggle`](https://saintsfield.comes.today/general-attributes/miscellaneous/prefixtoggle)
         *   [`ResourcePath`](https://saintsfield.comes.today/general-attributes/miscellaneous/resourcepath)
-        *   [`ResourceFolder`](https://saintsfield.comes.today/general-attributes/miscellaneous/resourcefolder)
+        *   [`ResourcesFolder`](https://saintsfield.comes.today/general-attributes/miscellaneous/resourcesfolder)
         *   [`FieldDefaultExpand`](https://saintsfield.comes.today/general-attributes/miscellaneous/fielddefaultexpand)
         *   [`DefaultExpand`](https://saintsfield.comes.today/general-attributes/miscellaneous/defaultexpand)
-        *   [`AssetFolder`](https://saintsfield.comes.today/general-attributes/miscellaneous/assetfolder)
+        *   [`AssetsFolder`](https://saintsfield.comes.today/general-attributes/miscellaneous/assetsfolder)
         *   [`AssetPreview`](https://saintsfield.comes.today/general-attributes/miscellaneous/assetpreview)
         *   [`AboveImage`/`BelowImage`](https://saintsfield.comes.today/general-attributes/miscellaneous/aboveimagebelowimage)
         *   [`ParticlePlay`](https://saintsfield.comes.today/general-attributes/miscellaneous/particleplay)

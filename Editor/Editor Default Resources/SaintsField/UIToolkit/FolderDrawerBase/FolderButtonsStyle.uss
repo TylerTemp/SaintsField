@@ -1,0 +1,29 @@
+:root {
+    flex-direction: row;
+}
+
+.btn {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 2px;
+    padding-right: 2px;
+    /*padding-top: 1px;*/
+    /*padding-bottom: 1px;*/
+    width: 15px;
+    background-size: contain;
+}
+
+.left-btn {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-right-width: 0;
+    /*padding-right: 0;*/
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/open-ext.png?fileID=2800000&guid=4ed5fe87e9e68ad489ee54448fc0a259&type=3#open-ext");
+}
+
+.right-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    /*border-left-width: 0;*/
+    /*padding-left: 0;*/
+}

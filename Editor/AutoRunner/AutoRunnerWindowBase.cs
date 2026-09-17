@@ -26,7 +26,7 @@ namespace SaintsField.Editor.AutoRunner
         [Serializable]
         public struct FolderSearch
         {
-            [AssetFolder]
+            [AssetsFolder]
             public string path;
             public string searchPattern;
             [FieldShowIf(nameof(searchPattern))]
