@@ -175,7 +175,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             }
 
             EditorBuildSettingsScene scene = scenes[newValue];
-            _sceneField.SetValueWithoutNotify(AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path));
+            SceneField.SetValueWithoutNotify(AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path));
             _errorEventInt = -1;
             _errorEditorScene = null;
             _errorSceneAsset = null;

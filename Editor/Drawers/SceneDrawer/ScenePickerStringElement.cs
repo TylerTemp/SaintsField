@@ -186,7 +186,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                     // Debug.Log($"found {editorScene.path}");
                     SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(editorScene.path);
                     // Debug.Log($"set {sceneAsset}");
-                    _sceneField.SetValueWithoutNotify(sceneAsset);
+                    SceneField.SetValueWithoutNotify(sceneAsset);
                     _errorEventString = "";
                     _errorEditorScene = null;
                     _errorSceneAsset = null;

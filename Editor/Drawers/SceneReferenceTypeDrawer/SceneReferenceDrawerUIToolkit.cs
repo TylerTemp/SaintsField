@@ -38,6 +38,8 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
             return new SceneHelpBox();
         }
 
+        private bool _listeningToSceneList;
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
@@ -58,7 +60,37 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
             SerializedProperty sceneGuidProp = context.GuidProp;
             SerializedProperty scenePathProp = context.PathProp;
             SerializedProperty sceneIndexProp = context.IndexProp;
-            field.TrackPropertyValue(sceneGuidProp, _ =>
+
+            field.TrackPropertyValue(sceneGuidProp, _ => RefreshField());
+
+            if (!_listeningToSceneList)
+            {
+                EditorBuildSettings.sceneListChanged += RefreshField;
+                _listeningToSceneList = true;
+            }
+            field.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (evt.target != field)
+                {
+                    return;
+                }
+
+                EditorBuildSettings.sceneListChanged -= RefreshField;
+                _listeningToSceneList = false;
+                UIToolkitUtils.Unbind(field);
+            });
+
+            RefreshField();
+
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => onValueChangedCallback(new SceneReference
+            {
+                guid = sceneGuidProp.stringValue,
+                path = scenePathProp.stringValue,
+                index = sceneIndexProp.intValue,
+            }));
+            return;
+
+            void RefreshField()
             {
                 if (!SerializedUtils.IsOk(property))
                 {
@@ -66,19 +98,8 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                 }
 
                 RefreshGuid(context);
-            });
-            RefreshGuid(context);
-
-            field.RegisterCallback<DetachFromPanelEvent>(_ => UIToolkitUtils.Unbind(field));
-
-            field.SceneReferenceElement.SetValueWithoutNotify(sceneGuidProp.stringValue);
-
-            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => onValueChangedCallback(new SceneReference
-            {
-                guid = sceneGuidProp.stringValue,
-                path = scenePathProp.stringValue,
-                index = sceneIndexProp.intValue
-            }));
+                field.SetValueWithoutNotify(sceneGuidProp.stringValue);
+            }
         }
     }
 }

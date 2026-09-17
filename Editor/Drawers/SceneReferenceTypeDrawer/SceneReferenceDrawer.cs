@@ -195,7 +195,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
             }
 
             SceneReferenceState state = GetSceneReferenceState(context.GuidProp.stringValue);
-            if (!state.IsValidEnabledScene)
+            if (state.SceneAsset == null)
             {
                 return false;
             }

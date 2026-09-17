@@ -5,6 +5,7 @@ using System.Linq;
 using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
+using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -195,6 +196,9 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
 
         public override void SetValueWithoutNotify(string newValue)
         {
+            HasCachedValue = true;
+            CachedValue = newValue;
+
             if (string.IsNullOrEmpty(newValue))
             {
                 SetHelpBoxErrorText("Guid is empty");
@@ -222,9 +226,9 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                 return;
             }
 
-            if (_sceneField.value != asset)
+            if (SceneField.value != asset)
             {
-                _sceneField.SetValueWithoutNotify(asset);
+                SceneField.SetValueWithoutNotify(asset);
             }
 
             string scenePath = AssetDatabase.GetAssetPath(asset);
@@ -242,9 +246,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                         return;
                     }
 
-                    HasCachedValue = true;
-                    CachedValue = newValue;
-                    _sceneField.SetValueWithoutNotify(asset);
+                    SceneField.SetValueWithoutNotify(asset);
                     _errorEventString = "";
                     _errorSceneAsset = null;
                     _errorEditorScene = null;
@@ -301,6 +303,8 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
             string scenePath = AssetDatabase.GetAssetPath(sceneAsset);
             string toValue = RuntimeUtil.TrimScenePath(scenePath, true);
 
+            value = AssetDatabase.GUIDFromAssetPath(scenePath).ToString();  // let setter to handle the helpBox
+
             foreach (EditorBuildSettingsScene inBuild in EditorBuildSettings.scenes)
             {
                 if (inBuild.path == scenePath)
@@ -310,10 +314,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                         _errorEventString = toValue;
                         _errorEditorScene = inBuild;
                         UpdateHelpBoxError();
-                        return;
                     }
-
-                    value = toValue;  // let setter to handle the helpBox
                     return;
                 }
             }

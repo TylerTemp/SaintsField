@@ -13,9 +13,10 @@ namespace SaintsField.Editor.UIToolkitElements
 {
     public abstract class ScenePickerBaseElement<T>: BindableElement, INotifyValueChanged<T>
     {
+        // ReSharper disable once StaticMemberInGenericType
         private static VisualTreeAsset _sceneElement;
         // public readonly Button Button;
-        protected readonly ObjectField _sceneField;
+        protected readonly ObjectField SceneField;
 
         private VisualElement _dropdownRoot;
 
@@ -32,7 +33,7 @@ namespace SaintsField.Editor.UIToolkitElements
         //     set => _sceneField.showMixedValue = value;
         // }
 
-        public void SetShowMixedValue(bool showMixedValue) => _sceneField.showMixedValue = showMixedValue;
+        public void SetShowMixedValue(bool showMixedValue) => SceneField.showMixedValue = showMixedValue;
 
         protected ScenePickerBaseElement()
         {
@@ -46,9 +47,12 @@ namespace SaintsField.Editor.UIToolkitElements
 
             Button button = dropdownElement.Q<Button>();
             button.clicked += MakeDropdown;
-            _sceneField = dropdownElement.Q<ObjectField>();
+            SceneField = dropdownElement.Q<ObjectField>();
 
-            _sceneField.RegisterValueChangedCallback(OnSceneFieldChanged);
+            // ObjectField.Label.text trigger disable
+            SceneField.RegisterCallback<ChangeEvent<string>>(evt => evt.StopPropagation());
+
+            SceneField.RegisterValueChangedCallback(OnSceneFieldChanged);
 
             Add(dropdownElement);
         }
