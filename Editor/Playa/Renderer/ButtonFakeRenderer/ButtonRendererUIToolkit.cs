@@ -162,16 +162,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         break;
                     }
 
-// #if SAINTSFIELD_UNITASK && !SAINTSFIELD_UNITASK_DISABLE
-//                     {
-//                         Debug.Log(result?.GetType().FullName);
-//                         if (result is UniTask ut)
-//                         {
-//                             ut.ToCoroutine();
-//                             result = UniTask.ToCoroutine(() => ut);
-//                         }
-//                     }
-// #endif
                     returnValues[index] = result;
                     if (isStruct)
                     {

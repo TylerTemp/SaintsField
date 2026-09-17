@@ -15,6 +15,7 @@ using SaintsField.Editor.Playa.Renderer.DecoratorRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.OnInspectorInitAttributeRenderer;
 using SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
@@ -1077,6 +1078,13 @@ namespace SaintsField.Editor
                         SaintsFieldWithRenderer separator = new SaintsFieldWithRenderer(playaSeparatorAttribute,
                             new PlayaSeparatorRenderer(serializedObject, fieldWithInfo, playaSeparatorAttribute));
                         (playaSeparatorAttribute.Below ? tailRenderers : renderers).Add(separator);
+                        continue;
+                    }
+                    case OnInspectorInitAttribute onInspectorInitAttribute:
+                    {
+                        renderers.Add(new SaintsFieldWithRenderer(onInspectorInitAttribute,
+                            new OnInspectorInitRenderer(onInspectorInitAttribute, serializedObject,
+                                fieldWithInfo)));
                         continue;
                     }
                     case LayoutTerminateHereAttribute _:
