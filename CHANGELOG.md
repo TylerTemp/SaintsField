@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.29.5 ##
+
+1.  Add: `[OnInspectorInit]`
+2.  Add: `[OnInspectorDispose]`
+3.  Fix: rich text sub field failed to obtain the value.
+
 ## 5.29.4 ##
 
 1.  Fix: `SceneReference` darg fix [#445](https://github.com/TylerTemp/SaintsField/issues/445)

@@ -694,7 +694,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             (string error, object value) r = SaintsSerializedEditorUtil.GetValue(ssp);
                             result = (r.error, result.index, r.value);
                         }
-                        if(result.error != "")
+                        if(result.error == "")
                         {
                             if (tagName == "field")
                             {

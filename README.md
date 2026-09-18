@@ -114,12 +114,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.29.4**
+**5.29.5**
 
-1.  Fix: `SceneReference` darg fix [#445](https://github.com/TylerTemp/SaintsField/issues/445)
-2.  Fix: `SceneReference` now refreshes when scenes in Build Settings change
-3.  Rename: `AssetFolder` -> `AssetsFolder`; `ResourceFolder` -> `ResourcesFolder` (Old name is kept but marked as obsolete)
-4.  Add: `AssetsFolder` and `ResourcesFolder` now have a button to locate the selected folder in the Project window.
+1.  Add: `[OnInspectorInit]`
+2.  Add: `[OnInspectorDispose]`
+3.  Fix: rich text sub field failed to obtain the value.
 
 ## Usage ##
 

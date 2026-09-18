@@ -1,0 +1,12 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: IssueFieldDisplayNameConfig
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.IssueFieldDisplayNameConfig
+  m_Script: {fileID: 11500000, guid: 8a4d4f2f1d9e4a7aa2ef2e26d5c6b9f1, type: 3}
+  displayName: DiTing
