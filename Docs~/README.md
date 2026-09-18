@@ -6588,6 +6588,80 @@ Use `Tools` - `Saints Field` - `Color Palette` to manage the color palette.
 
 [![video](https://github.com/user-attachments/assets/f58da949-7d2a-4a52-b2d7-237d7747e88a)](https://github.com/user-attachments/assets/cbbe5269-09f3-49c1-ac02-5ea49d256d9d)
 
+#### `OnInspectorInit` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Invoke a method when its target is initialized in the Inspector. The method can be an async or `IEnumerator` or a normal function. Any parameters must be optional. Returning value is ignored
+
+```csharp
+using SaintsField;
+
+public bool error;
+[ShowInInspector] private bool _ran;
+
+[OnInspectorInit]
+private void OnInspectorInit()
+{
+    _ran = true;
+
+    if (error)
+    {
+        throw new Exception($"Expected Error! {GetId()}");
+    }
+    Debug.Log($"Init done {GetId()}");
+}
+
+[ShowInInspector] private bool _ranAsync;
+
+[OnInspectorInit]
+private IEnumerator OnInspectorAsync()
+{
+    yield return new WaitForSeconds(2);
+    _ranAsync = true;
+    if (error)
+    {
+        throw new Exception($"Expected Error! {GetId()}");
+    }
+    Debug.Log($"Async done {GetId()}");
+}
+```
+
+[![video](https://github.com/user-attachments/assets/53901277-0c71-404c-a68b-a10b301da078)](https://github.com/user-attachments/assets/453d56ec-18b3-430b-ac19-42cb0d98bfbd)
+
+#### `OnInspectorDispose` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Invoke a method when its target is disposed from the Inspector. The method can be an async or `IEnumerator` or a normal function. Any parameters must be optional. Returning value is ignored
+
+```csharp
+using SaintsField;
+
+public bool error;
+
+[OnInspectorDispose]
+private void OnInspectorDispose()
+{
+    if (error)
+    {
+        throw new Exception($"Expected Error! {GetId()}");
+    }
+    Debug.Log($"Dispose done {GetId()}");
+}
+
+[OnInspectorDispose]
+private IEnumerator OnInspectorAsync()
+{
+    string id = GetId();
+
+    yield return new WaitForSeconds(2);
+    Debug.Log($"Dispose async done {id}");
+}
+```
+
 #### `Searchable` ####
 
 > [!IMPORTANT]

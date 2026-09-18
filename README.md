@@ -45,9 +45,6 @@ SaintsField is the [Top 3 updated Unity Package](https://openupm.com/blog/openup
 
 ![](https://github.com/user-attachments/assets/82666e9a-268e-46f8-8413-fe57b90d854a)
 
-> [!NOTE]
-> Since 5.19.0, SaintsField's IMGUI implemention is back to support. But IMGUI support is not in a high priority
-
 ### Installation ###
 
 *   Using git upm (Unity UI):
@@ -231,6 +228,8 @@ namespace: `SaintsField`
         *   [`OnSliderChanged`](https://saintsfield.comes.today/general-attributes/miscellaneous/onsliderchanged)
         *   [`OnInputField*`](https://saintsfield.comes.today/general-attributes/miscellaneous/oninputfield)
         *   [`ColorPalette`](https://saintsfield.comes.today/general-attributes/miscellaneous/colorpalette)
+        *   [`OnInspectorInit`](https://saintsfield.comes.today/general-attributes/miscellaneous/oninspectorinit)
+        *   [`OnInspectorDispose`](https://saintsfield.comes.today/general-attributes/miscellaneous/oninspectordispose)
         *   [`Searchable`](https://saintsfield.comes.today/general-attributes/miscellaneous/searchable)
         *   [`DateTime`](https://saintsfield.comes.today/general-attributes/miscellaneous/datetime)
         *   [`TimeSpan`](https://saintsfield.comes.today/general-attributes/miscellaneous/timespan)

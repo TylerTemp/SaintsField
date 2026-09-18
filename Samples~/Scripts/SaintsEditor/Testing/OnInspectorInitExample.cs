@@ -34,7 +34,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         {
             yield return new WaitForSeconds(2);
             _ranAsync = true;
+            if (error)
+            {
+                throw new Exception($"Expected Error! {GetId()}");
+            }
             Debug.Log($"Async done {GetId()}");
+        }
+
+        [OnInspectorDispose]
+        private void CleanUp()
+        {
+            _ran = _ranAsync = false;
         }
 
         private string GetId()
