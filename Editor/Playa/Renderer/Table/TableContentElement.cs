@@ -147,6 +147,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             {
                 _preArraySize = newArraySize;
                 _emptyNotice.style.display = DisplayStyle.Flex;
+                _tableContentContainer.style.display = DisplayStyle.None;
                 _tableContentContainer.Clear();
                 _multiColumnListView = null;
                 return;
@@ -156,6 +157,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             {
                 _preArraySize = newArraySize;
                 _emptyNotice.style.display = DisplayStyle.None;
+                _tableContentContainer.style.display = DisplayStyle.Flex;
                 _tableContentContainer.Clear();
 
                 MultiColumnListView multiColumnListView = _multiColumnListView = new MultiColumnListView

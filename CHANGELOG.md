@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: Empty `Table` displayed an extra blank container
+
 ## 5.29.5 ##
 
 1.  Add: `[OnInspectorInit]`
