@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/ChipInput/ChipInputStyle.uss?fileID=7433441132597879392&amp;guid=41abb83dc0c3711419d566ad1cbb388c&amp;type=3#ChipInputStyle"/>
+    <ui:VisualElement name="inputWrapper" class="unity-base-field__input unity-base-text-field__input unity-integer-field__input inputWrapper">
+        <ui:VisualElement name="inputContainer" class="unity-text-element unity-text-element__selectable unity-text-element--inner-input-field-component inputContainer">
+            <SaintsField.Editor.UIToolkitElements.TickerTextElement name="tickerTextElement" placeholder-text="Search" class="tickerTextElement"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

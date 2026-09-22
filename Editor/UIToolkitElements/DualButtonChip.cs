@@ -13,6 +13,7 @@ namespace SaintsField.Editor.UIToolkitElements
         public readonly Button Button1;
         public readonly Button Button2;
         public readonly Label Label;
+        public readonly VisualElement ChipRoot;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public DualButtonChip() : this(null)
@@ -22,15 +23,16 @@ namespace SaintsField.Editor.UIToolkitElements
         public DualButtonChip(string label)
         {
             VisualTreeAsset chipTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/Chip/Chip.uxml");
-            TemplateContainer chipClone = chipTree.CloneTree();
+            // TemplateContainer chipClone = chipTree.CloneTree();
+            chipTree.CloneTree(this);
 
-            VisualElement chipRoot = chipClone.Q<VisualElement>("chip-root");
-            Button1 = chipRoot.Q<Button>("chip-button-1");
-            Button2 = chipRoot.Q<Button>("chip-button-2");
+            ChipRoot = this.Q<VisualElement>("chip-root");
+            Button1 = ChipRoot.Q<Button>("chip-button-1");
+            Button2 = ChipRoot.Q<Button>("chip-button-2");
 
-            Label = chipRoot.Q<Label>("chip-label");
+            Label = ChipRoot.Q<Label>("chip-label");
             Label.text = string.IsNullOrEmpty(label) ? "" : label;
-            Add(chipClone);
+            // Add(chipClone);
         }
     }
 }

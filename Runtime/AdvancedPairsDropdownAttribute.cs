@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using SaintsField.Interfaces;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
@@ -7,7 +8,7 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class AdvancedPairsDropdownAttribute: AdvancedDropdownAttribute
     {
-        public override Mode BehaveMode => Mode.Tuples;
+        public override PathedMode PathedMode => PathedMode.Tuples;
 
         public AdvancedPairsDropdownAttribute(params object[] tuples)
         {

@@ -2258,7 +2258,7 @@ namespace SaintsField.Editor.Utils
                 }).Every(150);
             }
 
-            public void ResetTrack()
+            private void ResetTrack()
             {
                 _waiter = null;
                 _scheduler?.Pause();

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using SaintsField.Interfaces;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
@@ -8,7 +9,7 @@ namespace SaintsField
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property | System.AttributeTargets.Method | System.AttributeTargets.Parameter)]
     public class PairsDropdown: DropdownAttribute
     {
-        public override Mode BehaveMode => Mode.Tuples;
+        public override PathedMode PathedMode => PathedMode.Tuples;
 
         public PairsDropdown(params object[] tuples)
         {

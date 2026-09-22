@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.Interfaces;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
@@ -8,7 +9,7 @@ namespace SaintsField
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property | System.AttributeTargets.Method | System.AttributeTargets.Parameter)]
     public class OptionsDropdownAttribute: DropdownAttribute
     {
-        public override Mode BehaveMode => Mode.Options;
+        public override PathedMode PathedMode => PathedMode.Options;
 
         public OptionsDropdownAttribute(params object[] options)
         {

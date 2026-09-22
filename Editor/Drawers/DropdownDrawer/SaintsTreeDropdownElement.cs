@@ -29,10 +29,10 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         private readonly bool _allowToggle;
 
         private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
-        private readonly ToolbarSearchField _toolbarSearchField;
+        public readonly ToolbarSearchField ToolbarSearchField;
         private readonly ScrollView _scrollView;
 
-        public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo, bool toggle)
+        public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo, bool toggle, bool autoFocus=true)
         {
             _allowToggle = toggle;
 
@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
             // CleanableTextInputFullWidth cleanableTextInput = new CleanableTextInputFullWidth(null);
             // Add(cleanableTextInput);
-            _toolbarSearchField = new ToolbarSearchField
+            ToolbarSearchField = new ToolbarSearchField
             {
                 style =
                 {
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                     width = StyleKeyword.None,
                 },
             };
-            Add(_toolbarSearchField);
+            Add(ToolbarSearchField);
 
             HashSet<object> curValues = metaInfo.CurValues.ToHashSet();
 
@@ -107,9 +107,9 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             // });
 
 #if UNITY_6000_0_OR_NEWER
-            _toolbarSearchField.placeholderText = "Search";
+            ToolbarSearchField.placeholderText = "Search";
 #endif
-            _toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
+            ToolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
             {
                 if (evt.direction == NavigationMoveEvent.Direction.Down)
                 {
@@ -117,9 +117,15 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 }
             });
 
-            RegisterCallback<AttachToPanelEvent>(_ =>
+            if (autoFocus)
             {
-                _toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
+                UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () =>
+                {
+                    ToolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
+                });
+            }
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () =>
+            {
                 if(CurrentFocus != null)
                 {
                     treeContainer.schedule
@@ -129,7 +135,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 }
             });
 
-            _toolbarSearchField.RegisterValueChangedCallback(evt =>
+            ToolbarSearchField.RegisterValueChangedCallback(evt =>
             {
                 string searchText = evt.newValue;
 
@@ -144,114 +150,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             });
 
             // navigation
-            RegisterCallback<NavigationMoveEvent>(e =>
-            {
-                // Debug.Log(e.direction);
-                bool isUp;
-                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-                switch (e.direction)
-                {
-                    case NavigationMoveEvent.Direction.Up:
-                        isUp = true;
-                        break;
-                    case NavigationMoveEvent.Direction.Down:
-                        isUp = false;
-                        break;
-                    case NavigationMoveEvent.Direction.Left:
-                    {
-                        switch (CurrentFocus)
-                        {
-                            case TreeRowFoldoutElement { value: true } foldoutElement:
-                                foldoutElement.value = false;
-                                break;
-                            case { Parent: not null }:
-                            {
-                                CurrentFocus = CurrentFocus.Parent;
-                                // Debug.Log($"currentFocus={_currentFocus}");
-                                foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
-                                {
-                                    treeRowAbsElement.SetNavigateHighlight(CurrentFocus == treeRowAbsElement);
-                                }
-
-                                break;
-                            }
-                        }
-
-                        return;
-                    }
-                    case NavigationMoveEvent.Direction.Right:
-                    {
-                        if (CurrentFocus is TreeRowFoldoutElement { value: false } foldoutElement)
-                        {
-                            foldoutElement.value = true;
-                        }
-                        return;
-                    }
-                    default:
-                        return;
-                }
-
-                TreeRowAbsElement toFocus = null;
-                if (CurrentFocus != null)
-                {
-                    List<TreeRowAbsElement> prevList = new List<TreeRowAbsElement>(_flatList.Count);
-                    for (int index = 0; index < _flatList.Count; index++)
-                    {
-                        TreeRowAbsElement current = _flatList[index];
-                        if (current == CurrentFocus)
-                        {
-                            if (isUp)
-                            {
-                                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                                if (prevList.Count > 0)
-                                {
-                                    // Debug.Log(prevList.Count);
-                                    // Debug.Log($"pres: {string.Join(", ", prevList)}");
-                                    toFocus = prevList.LastOrDefault(each => each.Navigateable);
-                                }
-                                else
-                                {
-                                    toFocus = _flatList.LastOrDefault(each => each.Navigateable);
-                                }
-
-                                // Debug.Log($"up to {toFocus}");
-                            }
-                            else
-                            {
-                                toFocus = _flatList.Skip(index + 1).FirstOrDefault(each => each.Navigateable)
-                                          ?? _flatList.FirstOrDefault(each => each.Navigateable);
-                            }
-
-                            break;
-                        }
-
-                        // Debug.Log($"{current} -> {currentFocus}");
-                        prevList.Add(current);
-                    }
-                }
-
-                if (CurrentFocus == null)
-                {
-                    toFocus = isUp
-                        ? _flatList.LastOrDefault(each => each.Navigateable)
-                        : _flatList.FirstOrDefault(each => each.Navigateable);
-                }
-
-                if (toFocus != null)
-                {
-                    CurrentFocus = toFocus;
-
-                    // Debug.Log($"currentFocus={_currentFocus}");
-
-                    foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
-                    {
-                        treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
-                    }
-
-                    // ScrollToElementEvent.Invoke(CurrentFocus);
-                    treeContainer.ScrollTo(CurrentFocus);
-                }
-            }, TrickleDown.TrickleDown);
+            RegisterCallback<NavigationMoveEvent>(OnNavigationMove, TrickleDown.TrickleDown);
             RegisterCallback<KeyUpEvent>(e =>
             {
 
@@ -260,26 +159,141 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                     return;
                 }
 
+
+                // KeyCode.Space
                 // ReSharper disable once InvertIf
                 if (e.keyCode is
-                    // KeyCode.Space
                     KeyCode.Return
                     or KeyCode.KeypadEnter
                 )
                 {
-                    switch (CurrentFocus)
-                    {
-                        case TreeRowFoldoutElement foldoutElement:
-                            foldoutElement.value = !foldoutElement.value;
-                            break;
-                        case TreeRowValueElement valueElement:
-                            valueElement.SetValueOn(!valueElement.IsOn);
-                            valueElement.OnClickedEvent.Invoke(valueElement.IsOn, false);
-                            break;
-                    }
+                    OnEnterKey();
                 }
 
             });
+        }
+
+        public void OnNavigationMove(NavigationMoveEvent e)
+        {
+            // Debug.Log(e.direction);
+            bool isUp;
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (e.direction)
+            {
+                case NavigationMoveEvent.Direction.Up:
+                    isUp = true;
+                    break;
+                case NavigationMoveEvent.Direction.Down:
+                    isUp = false;
+                    break;
+                case NavigationMoveEvent.Direction.Left:
+                {
+                    switch (CurrentFocus)
+                    {
+                        case TreeRowFoldoutElement { value: true } foldoutElement:
+                            foldoutElement.value = false;
+                            break;
+                        case { Parent: not null }:
+                        {
+                            CurrentFocus = CurrentFocus.Parent;
+                            // Debug.Log($"currentFocus={_currentFocus}");
+                            foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
+                            {
+                                treeRowAbsElement.SetNavigateHighlight(CurrentFocus == treeRowAbsElement);
+                            }
+
+                            break;
+                        }
+                    }
+
+                    return;
+                }
+                case NavigationMoveEvent.Direction.Right:
+                {
+                    if (CurrentFocus is TreeRowFoldoutElement { value: false } foldoutElement)
+                    {
+                        foldoutElement.value = true;
+                    }
+                    return;
+                }
+                default:
+                    return;
+            }
+
+            TreeRowAbsElement toFocus = null;
+            if (CurrentFocus != null)
+            {
+                List<TreeRowAbsElement> prevList = new List<TreeRowAbsElement>(_flatList.Count);
+                for (int index = 0; index < _flatList.Count; index++)
+                {
+                    TreeRowAbsElement current = _flatList[index];
+                    if (current == CurrentFocus)
+                    {
+                        if (isUp)
+                        {
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (prevList.Count > 0)
+                            {
+                                // Debug.Log(prevList.Count);
+                                // Debug.Log($"pres: {string.Join(", ", prevList)}");
+                                toFocus = prevList.LastOrDefault(each => each.Navigateable);
+                            }
+                            else
+                            {
+                                toFocus = _flatList.LastOrDefault(each => each.Navigateable);
+                            }
+
+                            // Debug.Log($"up to {toFocus}");
+                        }
+                        else
+                        {
+                            toFocus = _flatList.Skip(index + 1).FirstOrDefault(each => each.Navigateable)
+                                      ?? _flatList.FirstOrDefault(each => each.Navigateable);
+                        }
+
+                        break;
+                    }
+
+                    // Debug.Log($"{current} -> {currentFocus}");
+                    prevList.Add(current);
+                }
+            }
+
+            if (CurrentFocus == null)
+            {
+                toFocus = isUp
+                    ? _flatList.LastOrDefault(each => each.Navigateable)
+                    : _flatList.FirstOrDefault(each => each.Navigateable);
+            }
+
+            if (toFocus != null)
+            {
+                CurrentFocus = toFocus;
+
+                // Debug.Log($"currentFocus={_currentFocus}");
+
+                foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
+                {
+                    treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
+                }
+
+                // ScrollToElementEvent.Invoke(CurrentFocus);
+                _scrollView.ScrollTo(CurrentFocus);
+            }
+        }
+
+        public void OnEnterKey()
+        {
+            switch (CurrentFocus)
+            {
+                case TreeRowFoldoutElement foldoutElement:
+                    foldoutElement.value = !foldoutElement.value;
+                    break;
+                case TreeRowValueElement valueElement:
+                    valueElement.SetValueOn(!valueElement.IsOn);
+                    valueElement.OnClickedEvent.Invoke(valueElement.IsOn, false);
+                    break;
+            }
         }
 
         private void AttachToPanelEventReCalcScroll(AttachToPanelEvent evt) => ReCalcScroll();
@@ -432,7 +446,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
         public void SetSearch(string search)
         {
-            _toolbarSearchField.value = search;
+            ToolbarSearchField.value = search;
         }
     }
 }

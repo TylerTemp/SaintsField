@@ -8,6 +8,7 @@ using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.WaitableUtils;
+using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -52,7 +53,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfoWithDropdown(IDropdown dropdownListValue, SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, MemberInfo field, object parentObj)
+        private static AdvancedDropdownMetaInfo GetMetaInfoWithDropdown(IDropdown dropdownListValue, SerializedProperty property, IPathedDropdownAttribute advancedDropdownAttribute, MemberInfo field, object parentObj)
         {
             if(dropdownListValue == null)
             {
@@ -118,32 +119,32 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             };
         }
 
-        public static void GetMetaInfoAsync(Util.ITicker ticker, Action<AdvancedDropdownMetaInfo> callback, SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, MemberInfo field, object parentObj, bool isImGui)
+        public static void GetMetaInfoAsync(Util.ITicker ticker, Action<AdvancedDropdownMetaInfo> callback, SerializedProperty property, IPathedDropdownAttribute pathedDropdown, MemberInfo field, object parentObj, bool isImGui)
         {
-            string funcName = advancedDropdownAttribute.FuncName;
+            string funcName = pathedDropdown.FuncName;
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
+            if (pathedDropdown.PathedMode == PathedMode.Options)
             {
                 Dropdown<object> optionsDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
-                foreach (object value in advancedDropdownAttribute.Options)
+                foreach (object value in pathedDropdown.Options)
                 {
                     optionsDropdown.Add(RuntimeUtil.IsNull(value)? "[Null]": value.ToString(), value);
                 }
 
-                callback.Invoke(GetMetaInfoWithDropdown(optionsDropdown, property, advancedDropdownAttribute, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(optionsDropdown, property, pathedDropdown, field, parentObj));
                 return;
             }
 
-            if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
+            if (pathedDropdown.PathedMode == PathedMode.Tuples)
             {
                 Dropdown<object> tuplesDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
-                foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
+                foreach ((string path, object value) in pathedDropdown.Tuples)
                 {
                     tuplesDropdown.Add(path, value);
                 }
 
-                callback.Invoke(GetMetaInfoWithDropdown(tuplesDropdown, property, advancedDropdownAttribute, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(tuplesDropdown, property, pathedDropdown, field, parentObj));
                 return;
             }
 
@@ -166,7 +167,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         {"False", false },
                     };
 
-                    callback.Invoke(GetMetaInfoWithDropdown(boolDropdown, property, advancedDropdownAttribute, field, parentObj));
+                    callback.Invoke(GetMetaInfoWithDropdown(boolDropdown, property, pathedDropdown, field, parentObj));
                     return;
                 }
 
@@ -182,7 +183,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 enumValue.ToString(),
                             }
                             : new HashSet<string>();
-                        if (advancedDropdownAttribute.slashAsSub)
+                        if (pathedDropdown.slashAsSub)
                         {
                             enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue, extraSearches: extraSearches);
                         }
@@ -195,7 +196,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         }
                     }
 
-                    callback.Invoke(GetMetaInfoWithDropdown(enumDropdown, property, advancedDropdownAttribute, field, parentObj));
+                    callback.Invoke(GetMetaInfoWithDropdown(enumDropdown, property, pathedDropdown, field, parentObj));
                     return;
                 }
 
@@ -253,7 +254,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     staticDropdown.Add(new Dropdown<object>(displayName, value));
                 }
 
-                callback.Invoke(GetMetaInfoWithDropdown(staticDropdown, property, advancedDropdownAttribute, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(staticDropdown, property, pathedDropdown, field, parentObj));
                 return;
                 // error = $"{property.displayName}({elementType}) is not a enum";
             }
@@ -326,7 +327,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, advancedDropdownAttribute, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
                             serObj?.Dispose();
                         }
                         else
@@ -410,7 +411,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, advancedDropdownAttribute, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
                             serObj?.Dispose();
                         }
                         else
@@ -482,7 +483,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, advancedDropdownAttribute, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
                             serObj?.Dispose();
                         }
                         else
@@ -505,7 +506,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             if (obj is IDropdown getOfDropdownListValue)
             {
                 getOfDropdownListValue.SelfCompact();
-                callback.Invoke(GetMetaInfoWithDropdown(getOfDropdownListValue, property, advancedDropdownAttribute, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(getOfDropdownListValue, property, pathedDropdown, field, parentObj));
                 return;
             }
 
@@ -513,7 +514,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             {
                 Debug.LogWarning($"{obj.GetType()} is deprecated. Use `Dropdown<>` instead");
                 Dropdown<object> menuDropdown = ConvertDeprecatedMenuDropdown(md, isImGui);
-                callback.Invoke(GetMetaInfoWithDropdown(menuDropdown, property, advancedDropdownAttribute, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(menuDropdown, property, pathedDropdown, field, parentObj));
                 return;
             }
 
@@ -522,7 +523,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 Dropdown<object> list = new Dropdown<object>(isImGui? "Pick an item": "");
                 foreach (object each in ieObj)
                 {
-                    if (advancedDropdownAttribute.slashAsSub)
+                    if (pathedDropdown.slashAsSub)
                     {
                         list.Add($"{each}", each);
                     }
@@ -532,7 +533,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }
                 }
 
-                callback.Invoke(GetMetaInfoWithDropdown(list, property, advancedDropdownAttribute, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(list, property, pathedDropdown, field, parentObj));
                 return;
             }
 
@@ -562,7 +563,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, advancedDropdownAttribute, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
                             serObj?.Dispose();
                         }
                         else
@@ -632,17 +633,52 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             //     existsValues.Remove(curValue);
             // }
 
-            return ("", ReWrapUniqueList(dropdownListValue, eUnique, existsValues, curValue));
+            return ("", ReWrapUniqueList(dropdownListValue, eUnique, existsValues, true, curValue));
         }
 
-        public static AdvancedDropdownMetaInfo GetMetaInfoShowInInspector(Type elementType, PathedDropdownAttribute advancedDropdownAttribute, object v, object parentObj, bool isImGui, bool flat=false)
+        public static (string error, IDropdown dropdownList) GetUniqueListForArray(
+            IDropdown dropdownListValue, EUnique eUnique, SerializedProperty arrayProperty, MemberInfo info,
+            object parent)
+        {
+            if (eUnique == EUnique.None)
+            {
+                return ("", dropdownListValue);
+            }
+
+            if (!arrayProperty.isArray)
+            {
+                return ($"{arrayProperty.propertyPath} is not an array or list", null);
+            }
+
+            List<object> existsValues = new List<object>();
+            for (int index = 0; index < arrayProperty.arraySize; index++)
+            {
+                SerializedProperty element = arrayProperty.GetArrayElementAtIndex(index);
+                (string elementError, int _, object elementValue) = Util.GetValue(element, info, parent);
+                if (elementError != "")
+                {
+                    return (elementError, null);
+                }
+
+                if (elementValue is IWrapProp wrapProp)
+                {
+                    elementValue = Util.GetWrapValue(wrapProp);
+                }
+
+                existsValues.Add(elementValue);
+            }
+
+            return ("", ReWrapUniqueList(dropdownListValue, eUnique, existsValues, false, null));
+        }
+
+        public static AdvancedDropdownMetaInfo GetMetaInfoShowInInspector(Type elementType, IPathedDropdownAttribute advancedDropdownAttribute, object v, object parentObj, bool isImGui, bool flat=false)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
             string error;
             IDropdown dropdownListValue = null;
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
+            if (advancedDropdownAttribute.PathedMode == PathedMode.Options)
             {
                 Dropdown<object> optionsDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
                 foreach (object value in advancedDropdownAttribute.Options)
@@ -653,7 +689,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 error = "";
                 dropdownListValue = optionsDropdown;
             }
-            else if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
+            else if (advancedDropdownAttribute.PathedMode == PathedMode.Tuples)
             {
                 Dropdown<object> tuplesDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
                 foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
@@ -915,15 +951,18 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return ($"Target `{callback}` not found", null);
         }
 
-        private static Dropdown<object> ReWrapUniqueList(IDropdown dropdownListValue, EUnique eUnique, List<object> existsValues, object curValue)
+        private static Dropdown<object> ReWrapUniqueList(IDropdown dropdownListValue, EUnique eUnique,
+            IReadOnlyList<object> existsValues, bool preserveCurrentValue, object curValue)
         {
             Dropdown<object> dropdownList = new Dropdown<object>(dropdownListValue.displayName, dropdownListValue.disabled, dropdownListValue.icon);
-            IReadOnlyList<Dropdown<object>> children = ReWrapUniqueChildren(dropdownListValue.children, eUnique, existsValues, curValue);
+            IReadOnlyList<Dropdown<object>> children = ReWrapUniqueChildren(dropdownListValue.children, eUnique,
+                existsValues, preserveCurrentValue, curValue);
             dropdownList.SetChildren(children.ToList());
             return dropdownList;
         }
 
-        private static IReadOnlyList<Dropdown<object>> ReWrapUniqueChildren(IReadOnlyList<IDropdown> children, EUnique eUnique, IReadOnlyList<object> existsValues, object curValue)
+        private static IReadOnlyList<Dropdown<object>> ReWrapUniqueChildren(IReadOnlyList<IDropdown> children,
+            EUnique eUnique, IReadOnlyList<object> existsValues, bool preserveCurrentValue, object curValue)
         {
             List<Dropdown<object>> newChildren = new List<Dropdown<object>>();
             foreach (IDropdown originChild in children)
@@ -934,7 +973,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
                 else if (originChild.ChildCount() > 0)  // has sub child
                 {
-                    IReadOnlyList<Dropdown<object>> subChildren = ReWrapUniqueChildren(originChild.children, eUnique, existsValues, curValue);
+                    IReadOnlyList<Dropdown<object>> subChildren = ReWrapUniqueChildren(originChild.children, eUnique,
+                        existsValues, preserveCurrentValue, curValue);
                     if (subChildren.Any(each => !each.isSeparator))
                     {
                         bool isDisabled = originChild.disabled ||
@@ -968,7 +1008,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }
                     else if (eUnique == EUnique.Remove)
                     {
-                        if (Util.GetIsEqual(originChild.value, curValue))
+                        if (preserveCurrentValue && Util.GetIsEqual(originChild.value, curValue))
                         {
                             newChildren.Add(new Dropdown<object>(
                                 originChild.displayName,

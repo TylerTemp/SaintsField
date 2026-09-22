@@ -1,0 +1,18 @@
+.inputWrapper {
+    flex-grow: 1;
+}
+
+.inputContainer {
+    min-height: 16px;
+    flex-grow: 1;
+    flex-direction: row;
+
+    flex-wrap: wrap;
+}
+
+.tickerTextElement {
+    flex-shrink: 0;
+    min-width: 40px;
+    margin: 0;
+    padding: 0;
+}

@@ -9,29 +9,21 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public abstract class PathedDropdownAttribute: PropertyAttribute, ISaintsAttribute
+    public abstract class PathedDropdownAttribute: PropertyAttribute, ISaintsAttribute, IPathedDropdownAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
         public string GroupBy => "__LABEL_FIELD__";
 
-        public readonly string FuncName;
+        public string FuncName { get; set; }
 
-        public EUnique EUnique;
+        public EUnique EUnique { get; set; }
+        public virtual PathedMode PathedMode => PathedMode.Default;
 
-        public enum Mode
-        {
-            Default,
-            Options,
-            Tuples,
-        }
-
-        public virtual Mode BehaveMode => Mode.Default;
-
-        public IReadOnlyList<object> Options;
-        public IReadOnlyList<(string path, object value)> Tuples;
+        public IReadOnlyList<object> Options { get; set; }
+        public IReadOnlyList<(string path, object value)> Tuples { get; set; }
 
         // ReSharper disable once InconsistentNaming
-        public bool slashAsSub;
+        public bool slashAsSub { get; set; }
 
         protected PathedDropdownAttribute(string funcName = null, EUnique unique = EUnique.None, bool slashAsSub=true)
         {

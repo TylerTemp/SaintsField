@@ -44,25 +44,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             _treeDropdownElement = new SaintsTreeDropdownElement(_metaInfo, _allowUnSelect);
 
             _treeDropdownElement.OnClickedEvent.AddListener(OnClicked);
-            // _treeDropdownElement.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
-            // editorWindow.rootVisualElement.Add(_treeDropdownElement);
-
-            // ScrollView scrollView = new ScrollView();
-            // scrollView.Add(_treeDropdownElement);
-
-            // _treeDropdownElement.ScrollToElementEvent.AddListener(scrollView.ScrollTo);
-
-            // scrollView.RegisterCallback<AttachToPanelEvent>(_ =>
-            // {
-            //     scrollView.schedule.Execute(() =>
-            //     {
-            //         if (_treeDropdownElement.CurrentFocus != null)
-            //         {
-            //             scrollView.ScrollTo(_treeDropdownElement.CurrentFocus);
-            //         }
-            //         // The delay is required for functional
-            //     }).StartingIn(100);
-            // });
 
             editorWindow.rootVisualElement.Add(_treeDropdownElement);
         }

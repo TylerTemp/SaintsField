@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/UIToolkitElements/TickerTextField/TickerTextFieldStyle.uss?fileID=7433441132597879392&amp;guid=048f5d7c55a6b5147aeaad957cf27f46&amp;type=3#TickerTextFieldStyle"/>
+    <ui:TextField name="textField" class="textField"/>
+    <ui:Button name="closeButton" class="closeButton ghostButton"/>
+    <ui:VisualElement name="statusIndicatorContainer" class="statusIndicatorContainer" style="flex-grow: 1;">
+        <SaintsField.Editor.UIToolkitElements.StatusIndicatorElement name="statusIndicatorElement"/>
+    </ui:VisualElement>
+</ui:UXML>

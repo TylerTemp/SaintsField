@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Diagnostics;
+using SaintsField.Interfaces;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
@@ -7,7 +8,7 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class OptionsValueButtonsAttribute: ValueButtonsAttribute
     {
-        public override Mode BehaveMode => Mode.Options;
+        public override PathedMode PathedMode => PathedMode.Options;
 
         public OptionsValueButtonsAttribute(params object[] options)
         {

@@ -11,6 +11,7 @@ using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonCustomContextMenuFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.ChipListRenderer;
 using SaintsField.Editor.Playa.Renderer.DecoratorRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
@@ -32,6 +33,7 @@ using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Pool;
+using ChipsAttributeRenderer = SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsAttributeRenderer;
 #if SAINTSFIELD_DEBUG
 using Unity.Profiling;
 #endif
@@ -1124,6 +1126,15 @@ namespace SaintsField.Editor
                                 if (!hasSerializedTarget)
                                 {
                                     attributeRenderer = new ListDrawerSettingsRenderer(serializedObject,
+                                        fieldWithInfo);
+                                    hasSerializedTarget = true;
+                                }
+                                break;
+                            case ChipsAttribute chipListAttribute:
+                                targetAnchor = true;
+                                if (!hasSerializedTarget)
+                                {
+                                    attributeRenderer = new ChipsAttributeRenderer(chipListAttribute, serializedObject,
                                         fieldWithInfo);
                                     hasSerializedTarget = true;
                                 }
