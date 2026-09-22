@@ -16,7 +16,7 @@ namespace SaintsField.Editor.UIToolkitElements
 #endif
 
         private static VisualTreeAsset _treeRowTemplate;
-        private readonly VisualElement _loading;
+        public readonly VisualElement Loading;
         private readonly VisualElement _ok;
         private readonly VisualElement _error;
         private readonly VisualElement _pause;
@@ -29,19 +29,19 @@ namespace SaintsField.Editor.UIToolkitElements
             _treeRowTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/StatusIndicator/StatusIndicator.uxml");
             TemplateContainer root = _treeRowTemplate.CloneTree();
             root.pickingMode = PickingMode.Ignore;
-            _loading = root.Q<VisualElement>("Loading");
+            Loading = root.Q<VisualElement>("Loading");
             _ok = root.Q<VisualElement>("OK");
             _error = root.Q<VisualElement>("Error");
             _pause = root.Q<VisualElement>("Pause");
             _warning = root.Q<VisualElement>("Warning");
             _progressBar = root.Q<VisualElement>("ProgressBar");
 
-            _pendingTasks[_loading] = new List<IVisualElementScheduledItem>();
+            _pendingTasks[Loading] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_ok] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_error] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_pause] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_warning] = new List<IVisualElementScheduledItem>();
-            _displayStatus[_loading] = false;
+            _displayStatus[Loading] = false;
             _displayStatus[_ok] = false;
             _displayStatus[_error] = false;
             _displayStatus[_pause] = false;
@@ -51,8 +51,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
             UIToolkitUtils.OnAttachToPanelOnceWithEnsure(this, () =>
             {
-                UIToolkitUtils.HelpKeepRotate(_loading);
-                schedule.Execute(() => UIToolkitUtils.TriggerRotate(_loading)).StartingIn(200);
+                UIToolkitUtils.HelpKeepRotate(Loading);
+                schedule.Execute(() => UIToolkitUtils.TriggerRotate(Loading)).StartingIn(200);
             });
         }
 
@@ -60,7 +60,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public void EnsureLoading(bool needLoading, float progress)
         {
-            if (_displayStatus[_loading] == needLoading)
+            if (_displayStatus[Loading] == needLoading)
             {
                 if (needLoading && progress >= 0)
                 {
@@ -74,7 +74,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 return;
             }
 
-            _displayStatus[_loading] = needLoading;
+            _displayStatus[Loading] = needLoading;
             // Debug.Log($"set to {needLoading}");
             if(needLoading)
             {
@@ -82,7 +82,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 EnsureHide(_error);
                 EnsureHide(_pause);
                 EnsureHide(_warning);
-                PlayShow(_loading);
+                PlayShow(Loading);
                 if (progress >= 0)
                 {
                     _progressBar.style.width = Length.Percent(progress * 100);
@@ -90,14 +90,14 @@ namespace SaintsField.Editor.UIToolkitElements
             }
             else
             {
-                EnsureHide(_loading);
+                EnsureHide(Loading);
                 _progressBar.style.width = 0;
             }
         }
 
         public void PlayLoading()
         {
-            bool curDisplaying = _displayStatus[_loading];
+            bool curDisplaying = _displayStatus[Loading];
 
             EnsureHide(_ok);
             EnsureHide(_error);
@@ -107,21 +107,21 @@ namespace SaintsField.Editor.UIToolkitElements
             if(curDisplaying)
             {
                 // Debug.Log("play loading hide current");
-                EnsureHide(_loading);
-                _pendingTasks[_loading].Add(schedule.Execute(() => PlayShow(_loading)).StartingIn(100));
+                EnsureHide(Loading);
+                _pendingTasks[Loading].Add(schedule.Execute(() => PlayShow(Loading)).StartingIn(100));
             }
             else
             {
                 // Debug.Log("play loading now");
-                PlayShow(_loading);
+                PlayShow(Loading);
             }
 
-            _displayStatus[_loading] = true;
+            _displayStatus[Loading] = true;
         }
 
         public void PlayOk()
         {
-            EnsureHide(_loading);
+            EnsureHide(Loading);
             EnsureHide(_error);
             EnsureHide(_pause);
             EnsureHide(_warning);
@@ -145,7 +145,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public void PlayError()
         {
-            EnsureHide(_loading);
+            EnsureHide(Loading);
             EnsureHide(_ok);
             EnsureHide(_pause);
             EnsureHide(_warning);
@@ -169,7 +169,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public void PlayPause()
         {
-            EnsureHide(_loading);
+            EnsureHide(Loading);
             EnsureHide(_ok);
             EnsureHide(_error);
             EnsureHide(_warning);
@@ -193,7 +193,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public void PlayWarning()
         {
-            EnsureHide(_loading);
+            EnsureHide(Loading);
             EnsureHide(_ok);
             EnsureHide(_error);
             EnsureHide(_pause);

@@ -6,7 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
+namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 {
     public interface IDeletableChipDisplayResolver
     {

@@ -2075,6 +2075,76 @@ private List<MyStruct> FullFeatures = new List<MyStruct>{ /*...*/ };
 
 ![](https://github.com/user-attachments/assets/c5a24f62-60f5-4fd4-8603-f7db9d985907)
 
+#### `Chips` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` and use a UI Toolkit inspector before using
+
+Display an array/list as a row of removable chips. 
+Support search for a value. 
+Drag an chip to reorder it.
+
+Similar to `Dropdown`: string callback that returns a `Dropdown<T>` or an enumerable (support async call of `Task`, `UniTask`, or `IEnumerator`), omit the callback for an enum or a type with static values.
+
+**Arguments**
+
+*   `string callback=null`: callback used to obtain the available values.
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   `bool slashAsSub = true`: should it tread `/` as path seperator in dropdown? This is helpful if you have SaintsField enabled, and has `enum` defined with `InspectorName`, but the `/` does not mean for grouping
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum Equipment
+{
+    Special,
+    
+    [InspectorName("Weapon/Sword")]
+    Sword,
+
+    [InspectorName("Weapon/Bow")]
+    Bow,
+
+    [InspectorName("Armor/Shield")]
+    Shield,
+}
+
+[Chips] public Equipment[] normalList;
+// duplicated options are disabled
+[Chips(EUnique.Disable)] public Equipment[] disableList;
+// duplicated options are removed
+[Chips(EUnique.Remove)] public Equipment[] removeList;
+
+[Chips(nameof(GetTags), slashAsSub = false)]  // callback
+public List<string> tags;
+
+private IEnumerable<string> GetTags() => new[]
+{
+    "Player",
+    "Enemy/Boss",
+    "Environment",
+};
+
+[Chips(nameof(GetEnvAsync))]  // async
+public List<int> envLayer;
+
+private IEnumerator GetEnvAsync()  // you can also use Waitable<Dropdown<int>>/Task<Dropdown<int>>
+{
+    yield return new WaitForSeconds(2);
+
+    yield return new Dropdown<int>()
+    {
+        { "Basic", 1 },
+        { "Advanced/MiniBoss", 2 },
+        { "Advanced/Boss", 2 },
+        { "Final/Boss", 3 },
+    };
+}
+```
+
+[![video](https://github.com/user-attachments/assets/28ba62b9-c996-4bc3-a866-bd9b1b2e4cb4)](https://github.com/user-attachments/assets/35ae998f-548b-4ba4-b495-bc358ef18779)
+
 #### `Table` ####
 
 > [!IMPORTANT]

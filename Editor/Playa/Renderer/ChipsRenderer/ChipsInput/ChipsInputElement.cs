@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
+namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 {
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]
@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
 
         public readonly UnityEvent<bool, string> OnSearchEvent = new UnityEvent<bool, string>();
         public readonly UnityEvent<Exception> OnErrorEvent = new UnityEvent<Exception>();
-        public readonly UnityEvent OnBlurEvent = new UnityEvent();
+        // public readonly UnityEvent OnBlurEvent = new UnityEvent();
         public readonly UnityEvent OnEnterKey = new UnityEvent();
 
         private readonly VisualElement _inputContainer;
@@ -111,7 +111,10 @@ namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
                 }
             }
 
-            _actualInput.TextField.Q("unity-text-input").Focus();
+            _actualInput.TextField.Focus();
+            // _actualInput.TextField.Q("unity-base-field__input").Focus();
+            // _actualInput.TextField.Q("unity-text-input").Focus();
+            // _actualInput.TextField.Q(classes: "unity-text-element").Focus();
         }
 
         private void OnActualInputFocus(FocusEvent evt)
@@ -131,7 +134,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
 
             _debounceSearch?.Pause();
             _debounceSearch = null;
-            OnBlurEvent.Invoke();
+            // OnBlurEvent.Invoke();
         }
 
         public readonly UnityEvent<NavigationMoveEvent> BubbleNavigationMoveEvent =
@@ -608,6 +611,13 @@ namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
         public void StartTrack(Waiter waiter, Action<object> succeedCallback)
         {
             _actualInput.StartTrack(waiter, succeedCallback);
+        }
+
+        // tree will steal the focus; we just focus again...
+        // shitty hack
+        public void InputFocus()
+        {
+            _actualInput.TextField.Focus();
         }
     }
 }

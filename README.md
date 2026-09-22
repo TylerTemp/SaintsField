@@ -111,11 +111,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.29.5**
+**5.30.0**
 
-1.  Add: `[OnInspectorInit]`
-2.  Add: `[OnInspectorDispose]`
-3.  Fix: rich text sub field failed to obtain the value.
+1.  Add: `[Chips]` to edit array/list values as chips
+2.  Fix: Empty `Table` displayed an extra blank container
 
 ## Usage ##
 
@@ -157,6 +156,7 @@ namespace: `SaintsField`
         *   [`ReferencePicker`](https://saintsfield.comes.today/general-attributes/data-editor/referencepicker)
         *   [`SaintsRow`](https://saintsfield.comes.today/general-attributes/data-editor/saintsrow)
         *   [`ListDrawerSettings`](https://saintsfield.comes.today/general-attributes/data-editor/listdrawersettings)
+        *   [`Chips`](https://saintsfield.comes.today/general-attributes/data-editor/chips)
         *   [`Table`](https://saintsfield.comes.today/general-attributes/data-editor/table)
         *   [`ShowInInspector`](https://saintsfield.comes.today/general-attributes/data-editor/showininspector)
     *   Numerical

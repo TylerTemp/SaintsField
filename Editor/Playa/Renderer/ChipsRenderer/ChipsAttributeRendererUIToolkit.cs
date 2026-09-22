@@ -4,12 +4,15 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
-using SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput;
+// using SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput;
+using SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+// using ChipsInputElement = SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput.ChipsInputElement;
+// using OverflowWrapperElement = SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput.OverflowWrapperElement;
 
 namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 {
@@ -170,7 +173,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             _search = searchContent;
 
             UIToolkitUtils.SetHelpBox(_helpBox, "");
-            if (newSearch && _treeDropdownElement == null && !_pendingCreateDropdown)
+            if (_treeDropdownElement == null && !_pendingCreateDropdown)
             {
                 _pendingCreateDropdown = true;
                 PullMetaInfo(true);
@@ -288,6 +291,8 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             _overflowWrapperElement.BringToFront();
             _overflowWrapperElement.Add(_treeDropdownElement);
             _overflowWrapperElement.AnchorTo(_chipsInputField);
+
+            _chipsInputElement.schedule.Execute(() => _chipsInputElement.InputFocus());
 
             if (!string.IsNullOrEmpty(_search))
             {

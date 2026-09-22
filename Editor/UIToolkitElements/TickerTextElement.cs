@@ -40,6 +40,7 @@ namespace SaintsField.Editor.UIToolkitElements
             TextField = this.Q<TextField>("textField");
             _closeButton = this.Q<Button>("closeButton");
             _statusIndicator = this.Q<StatusIndicatorElement>("statusIndicatorElement");
+            _statusIndicator.Loading.style.opacity = 0.5f;
 
             _closeButton.clicked += () =>
             {

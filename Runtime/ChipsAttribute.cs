@@ -22,10 +22,10 @@ namespace SaintsField
             FuncName = callback;
         }
 
-        public ChipsAttribute(EUnique eUnique)
+        public ChipsAttribute(EUnique unique)
         {
             FuncName = null;
-            EUnique = eUnique;
+            EUnique = unique;
         }
 
 

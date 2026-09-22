@@ -2170,9 +2170,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.ChipInputExample
   defaultList: 01000000i
-  enumList: 010000000200000003000000020000000100000000000000i
-  disableList: 01000000000000000200000003000000i
+  normalList: 
+  disableList: 000000000200000001000000i
   removeList: 0100000002000000i
+  tags: []
+  envLayer: 
 --- !u!1 &186268077
 GameObject:
   m_ObjectHideFlags: 0

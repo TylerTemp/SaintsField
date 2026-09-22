@@ -1,8 +1,9 @@
 # Changelog
 
-## WIP ##
+## 5.30.0 ##
 
-1.  Fix: Empty `Table` displayed an extra blank container
+1.  Add: `[Chips]` to edit array/list values as chips
+2.  Fix: Empty `Table` displayed an extra blank container
 
 ## 5.29.5 ##
 

@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
+namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 {
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]

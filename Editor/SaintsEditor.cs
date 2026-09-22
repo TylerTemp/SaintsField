@@ -11,7 +11,7 @@ using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonCustomContextMenuFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
-using SaintsField.Editor.Playa.Renderer.ChipListRenderer;
+// using SaintsField.Editor.Playa.Renderer.ChipListRenderer;
 using SaintsField.Editor.Playa.Renderer.DecoratorRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
