@@ -58,8 +58,22 @@ namespace SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput
             _actualInput = _inputContainer.Q<TickerTextElement>("tickerTextElement");
             _actualInput.TextField.RegisterCallback<FocusEvent>(OnActualInputFocus);
             _actualInput.TextField.RegisterCallback<BlurEvent>(OnActualInputBlur);
-            _actualInput.TextField.RegisterCallback<NavigationMoveEvent>(OnActualInputNavigate, CallbackOptions.TrickleDown);
-            _actualInput.TextField.RegisterCallback<KeyDownEvent>(OnActualInputKeyDown, CallbackOptions.TrickleDown);
+
+            _actualInput.TextField.RegisterCallback<NavigationMoveEvent>(OnActualInputNavigate,
+#if UNITY_6000_0_OR_NEWER
+                CallbackOptions
+#else
+                TrickleDown
+#endif
+                    .TrickleDown);
+            _actualInput.TextField.RegisterCallback<KeyDownEvent>(OnActualInputKeyDown,
+#if UNITY_6000_0_OR_NEWER
+                CallbackOptions
+#else
+                TrickleDown
+#endif
+                    .TrickleDown);
+
             _actualInput.TextField.RegisterCallback<KeyUpEvent>(e =>
             {
                 if (e.keyCode is
