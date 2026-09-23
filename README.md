@@ -111,14 +111,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.1**
+**WIP**
 
-1.  Fix: `LabelText(null)` not work in some cases
-2.  Fix: `[Chips]` did not work with `LabelText`
-3.  Fix: Out of screen issue if `[Chips]` option list is very long
-4.  Fix: `Chip` element line warpping overflow when text is long and space is insufficient
-5.  Fix: Missed `[Chips]` right click context menu; Missed blue bar for prefab edited; did not support drag'n'drop
-6.  Add: `[Chips]` now supports `icon`, `color` if the options are `Dropdown<T>`
+Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload
 
 ## Usage ##
 
@@ -173,7 +168,8 @@ namespace: `SaintsField`
         *   [`AnimatorParam`](https://saintsfield.comes.today/general-attributes/animation/animatorparam)
         *   [`AnimatorState`](https://saintsfield.comes.today/general-attributes/animation/animatorstate)
         *   [`CurveRange`](https://saintsfield.comes.today/general-attributes/animation/curverange)
-    *   [Auto Getter](https://saintsfield.comes.today/general-attributes/auto-getter)
+    *   Auto Getter
+        *   [Overview](https://saintsfield.comes.today/general-attributes/auto-getter/overview)
         *   [`GetComponent`](https://saintsfield.comes.today/general-attributes/auto-getter/getcomponent)
         *   [`GetComponentInChildren`/`GetInChildren`](https://saintsfield.comes.today/general-attributes/auto-getter/getcomponentinchildrengetinchildren)
         *   [`GetComponentInParent` / `GetComponentInParents`](https://saintsfield.comes.today/general-attributes/auto-getter/getcomponentinparent--getcomponentinparents)

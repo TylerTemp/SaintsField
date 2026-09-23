@@ -3056,7 +3056,9 @@ private AnimationCurve ShowCurveRange([CurveRange(EColor.YellowNice)] AnimationC
 
 ### Auto Getter ###
 
-Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+#### Overview ####
+
+You can change the default behavior of these attributes using `Tools` - `Saints Field` - `Edit Config...`
 
 #### `GetComponent` ####
 
