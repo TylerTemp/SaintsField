@@ -23,7 +23,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
             Shield,
         }
 
-        [LayoutStart("x", ELayout.CollapseBox)]
+        // [LayoutStart("x", ELayout.CollapseBox)]
 
         [ListDrawerSettings(numberOfItemsPerPage: 2)]
         public Equipment[] defaultList;
@@ -86,7 +86,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
             return GetComponentsInChildren<Component>(true);
         }
 
-        [LayoutEnd]
+        // [LayoutEnd]
 
         // icon
         [Chips(nameof(GetIcons))]
@@ -96,7 +96,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
         {
             return new Dropdown<int>
             {
-                { "Search", 1, false, "search.png", Color.brown },
+                { "Search", 1, false, "search.png", Color.cyan },
                 { "Play", 2, true, "play.png" },
                 { "Star", 3, false, "star.png", EColor.Gold.GetColor() },
                 { "Pencil", 4, false, "pencil.png" },
