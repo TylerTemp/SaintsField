@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.DropdownBase;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
 // using SaintsField.Editor.Playa.Renderer.ChipListRenderer.ChipsInput;
 using SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -18,12 +21,12 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 {
     public partial class ChipsAttributeRenderer: IDeletableChipDisplayResolver
     {
-        private class ChipsInputField : BaseField<UnityEngine.Object>
-        {
-            public ChipsInputField(string label, VisualElement visualInput) : base(label, visualInput)
-            {
-            }
-        }
+        // private class ChipsInputField : BaseField<UnityEngine.Object>
+        // {
+        //     public ChipsInputField(string label, VisualElement visualInput) : base(label, visualInput)
+        //     {
+        //     }
+        // }
 
         protected override bool AllowGuiColor => true;
         public override void OnDestroyUIToolkit()
@@ -32,32 +35,79 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             _overflowWrapperElement?.RemoveFromHierarchy();
         }
 
-        private ChipsInputField _chipsInputField;
+        private EmptyPrefabOverrideField _chipsInputField;
         private ChipsInputElement _chipsInputElement;
         private HelpBox _helpBox;
         private OverflowWrapperElement _overflowWrapperElement;
         private VisualElement _overlayHost;
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot, VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             VisualElement root = new VisualElement();
+            SerializedProperty property = FieldWithInfo.SerializedProperty;
+            Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                                           FieldWithInfo.PropertyInfo.PropertyType);
 
             _chipsInputElement = new ChipsInputElement();
-            _chipsInputField = new ChipsInputField(GetFriendlyName(FieldWithInfo), _chipsInputElement);
+            _chipsInputField = new EmptyPrefabOverrideField(GetFriendlyName(FieldWithInfo), _chipsInputElement, FieldWithInfo.SerializedProperty);
+            _chipsInputField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
+            UIToolkitUtils.AddContextualMenuManipulator(_chipsInputField, FieldWithInfo.SerializedProperty, () => {});
+            _chipsInputField.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                evt.menu.AppendAction("Clear", _ =>
+                {
+                    FieldWithInfo.SerializedProperty.arraySize = 0;
+                    FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                });
+            }));
+            UIToolkitUtils.AddContextualMenuReset(_chipsInputField, FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+
             if (InAnyHorizontalLayout)
             {
                 _chipsInputField.style.flexDirection = FlexDirection.Column;
             }
             else
             {
-                _chipsInputField.AddToClassList(ChipsInputField.alignedFieldUssClassName);
+                _chipsInputField.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
             }
 
             root.Add(_chipsInputField);
-            // chipElement.BindProperty(FieldWithInfo.SerializedProperty);
-
-            SerializedProperty property = FieldWithInfo.SerializedProperty;
             _chipsInputElement.BindProp(property);
+
+            void Search(string text) => UIToolkitUtils.SetDisplayStyle(root,
+                Util.UnityDefaultSimpleSearch(property.displayName, text)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None);
+            OnSearchFieldUIToolkit.AddListener(Search);
+            root.RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                OnSearchFieldUIToolkit.RemoveListener(Search);
+                OnSearchFieldUIToolkit.AddListener(Search);
+            });
+            root.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+
+            _chipsInputField.RegisterCallback<DragEnterEvent>(_ => SetDragVisualMode(elementType));
+            _chipsInputField.RegisterCallback<DragLeaveEvent>(_ =>
+                DragAndDrop.visualMode = DragAndDropVisualMode.None);
+            _chipsInputField.RegisterCallback<DragUpdatedEvent>(_ => SetDragVisualMode(elementType));
+            _chipsInputField.RegisterCallback<DragPerformEvent>(evt =>
+            {
+                if (!DropUIToolkit(elementType, property))
+                {
+                    return;
+                }
+
+                property.serializedObject.ApplyModifiedProperties();
+                OnArraySizeChanged(property);
+                evt.StopPropagation();
+            });
+
+            void SetDragVisualMode(Type dropElementType)
+            {
+                DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences, dropElementType).Any()
+                    ? DragAndDropVisualMode.Copy
+                    : DragAndDropVisualMode.Rejected;
+            }
 
             #region Array Size
             SerializedProperty arraySize = property.FindPropertyRelative("Array.size");
@@ -123,7 +173,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             {
                 Debug.Assert(root.panel != null);
 
-                VisualElement overlayHost = inspectorRoot;
+                VisualElement overlayHost = root;
                 while (overlayHost.parent != null && overlayHost.parent != root.panel.visualTree)
                 {
                     overlayHost = overlayHost.parent;
@@ -243,7 +293,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
                 return;
             }
 
-            var (uniqueError, uniqueDropdown) = AdvancedDropdownAttributeDrawer.GetUniqueListForArray(
+            (string uniqueError, IDropdown uniqueDropdown) = AdvancedDropdownAttributeDrawer.GetUniqueListForArray(
                 metaInfo.DropdownListValue,
                 _attribute.EUnique,
                 arrayProperty,
@@ -263,26 +313,28 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
             _treeDropdownElement.OnClickedEvent.AddListener((value, _, _) =>
             {
-                SerializedProperty arrayProperty = FieldWithInfo.SerializedProperty;
-                if (!SerializedUtils.IsOk(arrayProperty))
+                SerializedProperty arrProp = FieldWithInfo.SerializedProperty;
+                if (!SerializedUtils.IsOk(arrProp))
                 {
                     CloseDropdown();
                     return;
                 }
 
-                int newIndex = Mathf.Clamp(_chipsInputElement.GetInputIndex(), 0, arrayProperty.arraySize);
-                int appendedIndex = arrayProperty.arraySize;
-                arrayProperty.arraySize++;
+                int newIndex = Mathf.Clamp(_chipsInputElement.GetInputIndex(), 0, arrProp.arraySize);
+                int appendedIndex = arrProp.arraySize;
+                arrProp.arraySize++;
                 if (newIndex != appendedIndex)
                 {
-                    arrayProperty.MoveArrayElement(appendedIndex, newIndex);
+                    arrProp.MoveArrayElement(appendedIndex, newIndex);
                 }
-                SerializedProperty elementProperty = arrayProperty.GetArrayElementAtIndex(newIndex);
+                SerializedProperty elementProperty = arrProp.GetArrayElementAtIndex(newIndex);
                 Util.SignPropertyValue(elementProperty,
                     (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo,
                     FieldWithInfo.Targets[0], value);
                 _addElementShift = true;
-                arrayProperty.serializedObject.ApplyModifiedProperties();
+                arrProp.serializedObject.ApplyModifiedProperties();
+                // _chipsInputElement.InputFocus();
+                // _chipsInputField.schedule.Execute(() => CloseDropdown());
                 CloseDropdown();
             });
 
@@ -328,20 +380,38 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             }
         }
 
-        public string GetDisplay(object value)
+        public (string nameWithPath, string icon, Color? color) GetDisplay(object value)
         {
             if (!_metaInfo.HasValue || _metaInfo.Value.Error != "" || _metaInfo.Value.DropdownListValue == null)
             {
-                return $"{value}";
+                return ($"{value}", null, null);
             }
 
             (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStacks, string display) =
                 AdvancedDropdownUtil.GetSelected(value, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
                     _metaInfo.Value.DropdownListValue);
 
-            return selectStacks.Count == 0
-                ? $"{value}"
-                : string.Join("/", selectStacks.Skip(1).Select(each => each.Display).Append(display));
+            if (selectStacks.Count == 0)
+            {
+                return ($"{value}", null, null);
+            }
+
+            IDropdown selected = _metaInfo.Value.DropdownListValue;
+            foreach (AdvancedDropdownAttributeDrawer.SelectStack selectStack in selectStacks)
+            {
+                selected = selected.children[selectStack.Index];
+            }
+
+            // if (!string.IsNullOrEmpty(selected.icon))
+            // {
+            //     Debug.Log(selected.icon);
+            // }
+
+            return (
+                string.Join("/", selectStacks.Skip(1).Select(each => each.Display).Append(display)),
+                selected.icon,
+                selected.color
+            );
         }
     }
 }

@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private class UserDataPayload
         {
+            public bool Init;
             public string XML;
             // public Label Label;
             // public string FriendlyName;
@@ -241,8 +242,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 string xml = preCheckResult.RichLabelXml;
                 // Debug.Log(xml);
                 UserDataPayload userDataPayload = (UserDataPayload) _container.userData;
-                if (xml != userDataPayload.XML || (xml ?? "").Contains("<field"))
+                if (!userDataPayload.Init || xml != userDataPayload.XML || (xml ?? "").Contains("<field"))
                 {
+                    userDataPayload.Init = true;
+
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                     if (userDataPayload.RichTextDrawer == null)
                     {
@@ -257,7 +260,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             _container.Q<VisualElement>(className: SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
                             ?? _container;
                         UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer,
-                            RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
+                            string.IsNullOrEmpty(xml)
+                                ? null
+                                : RichTextDrawer.ParseRichXmlWithProvider(xml, this),
+                            userDataPayload.RichTextDrawer);
                     }
                     else
                     {
@@ -274,7 +280,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             }
                         }
 
-                        UIToolkitUtils.SetLabelChildren(_imGuiFallbackLabel, RichTextDrawer.ParseRichXmlWithProvider(xml, this),  userDataPayload.RichTextDrawer);
+                        UIToolkitUtils.SetLabelChildren(_imGuiFallbackLabel,
+                            string.IsNullOrEmpty(xml)
+                                ? null
+                                : RichTextDrawer.ParseRichXmlWithProvider(xml, this),
+                            userDataPayload.RichTextDrawer);
                     }
                 }
             }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.30.1 ##
+
+1.  Fix: `LabelText(null)` not work in some cases
+2.  Fix: `[Chips]` did not work with `LabelText`
+3.  Fix: Out of screen issue if `[Chips]` option list is very long
+4.  Fix: `Chip` element line warpping overflow when text is long and space is insufficient
+5.  Fix: Missed `[Chips]` right click context menu; Missed blue bar for prefab edited; did not support drag'n'drop
+6.  Add: `[Chips]` now supports `icon`, `color` if the options are `Dropdown<T>`
+
 ## 5.30.0 ##
 
 1.  Add: `[Chips]` to edit array/list values as chips

@@ -37,17 +37,34 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
         public void AnchorTo(VisualElement element)
         {
-            if (element == null || parent == null)
+            const float dropdownHeight = 300f;
+
+            if (element == null || parent == null || element.panel == null || panel != element.panel)
             {
                 return;
             }
 
             Rect anchorBound = element.worldBound;
-            Vector2 localPosition = parent.WorldToLocal(new Vector2(anchorBound.xMin, anchorBound.yMax));
+            Rect viewportBound = element.panel.visualTree.worldBound;
+            float spaceBelow = viewportBound.yMax - anchorBound.yMax - 10;  // add a little gap
+            bool placeBelow = spaceBelow >= dropdownHeight;
+            Vector2 localPosition = parent.WorldToLocal(new Vector2(
+                anchorBound.xMin,
+                placeBelow ? anchorBound.yMax : anchorBound.yMin - dropdownHeight));
+            Rect localAnchorBound = parent.WorldToLocal(anchorBound);
 
             style.left = localPosition.x;
             style.top = localPosition.y;
-            style.width = anchorBound.width;
+            style.width = localAnchorBound.width;
+            style.maxHeight = placeBelow ? spaceBelow : dropdownHeight;
+            if (placeBelow)
+            {
+                style.height = StyleKeyword.Auto;
+            }
+            else
+            {
+                style.height = dropdownHeight;
+            }
         }
     }
 }

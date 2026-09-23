@@ -28,6 +28,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> subResult, string display) = GetSelected(curValue, curStacks.Append(new AdvancedDropdownAttributeDrawer.SelectStack
                     {
                         Display = dropdownPage.displayName,
+                        Icon = dropdownPage.icon,
                         Index = index,
                     }).ToArray(), item);
                     if (subResult.Count > 0)
@@ -41,6 +42,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 IEnumerable<AdvancedDropdownAttributeDrawer.SelectStack> thisLoopResult = curStacks.Append(new AdvancedDropdownAttributeDrawer.SelectStack
                 {
                     Display = dropdownPage.displayName,
+                    Icon = dropdownPage.icon,
                     Index = index,
                 });
 

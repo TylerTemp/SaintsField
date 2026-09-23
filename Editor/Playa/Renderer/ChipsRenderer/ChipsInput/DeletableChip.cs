@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 {
     public interface IDeletableChipDisplayResolver
     {
-        string GetDisplay(object value);
+        (string nameWithPath, string icon, Color? color) GetDisplay(object value);
     }
 
     public class DeletableChip: DualButtonChip
@@ -28,7 +28,23 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
                             5;
 
             Button1.style.display = DisplayStyle.None;
+            Button1.pickingMode = PickingMode.Ignore;
+            Button1.style.backgroundColor = new Color(1, 1, 1, 0.2f);
             Button2.clicked += OnDeleteButtonClicked;
+        }
+
+        public override void SetColor(Color color)
+        {
+            base.SetColor(color);
+            Color iconColor = color;
+            iconColor.a = 0.2f;
+            Button1.style.backgroundColor = iconColor;
+        }
+
+        public override void UnsetColor()
+        {
+            base.UnsetColor();
+            Button1.style.backgroundColor = new Color(1, 1, 1, 0.2f);
         }
 
         private SerializedProperty _arrayProp;
@@ -76,11 +92,28 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
                 }
                 else
                 {
-                    string display = _displayResolver.GetDisplay(result);
+                    (string display, string icon, Color? color) = _displayResolver.GetDisplay(result);
                     UIToolkitUtils.SetLabel(Label,
                         RichTextDrawer.ParseRichXmlWithProvider(display,
                             new RichTextDrawer.EmptyRichTextTagProvider()),
                         _richTextDrawer);
+                    if (string.IsNullOrEmpty(icon))
+                    {
+                        UIToolkitUtils.SetDisplayStyle(Button1, DisplayStyle.None);
+                    }
+                    else
+                    {
+                        UIToolkitUtils.SetDisplayStyle(Button1, DisplayStyle.Flex);
+                        Button1.style.backgroundImage = Util.LoadResource<Texture2D>(icon);
+                        if (color == null)
+                        {
+                            UnsetColor();
+                        }
+                        else
+                        {
+                            SetColor(color.Value);
+                        }
+                    }
                 }
             }
             else

@@ -1,9 +1,54 @@
-#chip-label {
-    cursor: move-arrow;
+.chipRoot {
+    min-height: 22px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-radius: 10px;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px;
+    flex-shrink: 0;
+    background-color: rgb(91, 91, 91);
+    margin: 1px;
 }
 
-#chip-label:disabled {
+.chipLabel {
+    cursor: move-arrow;
+    flex-grow: 0;
+    -unity-text-align: middle-left;
+    padding: 0;
+    margin: 1px 3px 1px 1px;
+    color: rgb(233, 233, 233);
+    flex-direction: row;
+}
+
+.chipLabel:disabled {
     cursor: arrow;
+}
+
+.chipButton {
+    width: 14px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-radius: 95px;
+    height: 14px;
+    padding: 6px;
+    -unity-background-image-tint-color: rgb(202, 202, 202);
+    margin-right: 2px;
+    margin-left: 2px;
+    background-size: contain;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.chipButton:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.chipButton:active {
+    background-color: rgba(0, 0, 0, 0.18);
 }
 
 .chip-button-close {

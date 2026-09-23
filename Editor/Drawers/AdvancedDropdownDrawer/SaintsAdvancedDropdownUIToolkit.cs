@@ -267,6 +267,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 ? new []{new AdvancedDropdownAttributeDrawer.SelectStack
                 {
                     Display = _metaInfo.DropdownListValue.displayName,
+                    Icon = _metaInfo.DropdownListValue.icon,
                     Index = -1,
                 }}
                 : _metaInfo.SelectStacks);
@@ -503,6 +504,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 {
                                     Index = 0,
                                     Display = pathStack.Target.children.First(each => !each.isSeparator).displayName,
+                                    Icon = pathStack.Target.children.First(each => !each.isSeparator).icon,
                                 }).ToArray());
                             // _setValue(stackDisplay, value);
                             // editorWindow.Close();
@@ -577,6 +579,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 AdvancedDropdownAttributeDrawer.SelectStack thisStack = new AdvancedDropdownAttributeDrawer.SelectStack
                 {
                     Display = child.displayName,
+                    Icon = child.icon,
                     Index = index,
                 };
                 AdvancedDropdownAttributeDrawer.SelectStack[] stackNew = stackAccs.Append(thisStack).ToArray();
@@ -819,11 +822,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         new AdvancedDropdownAttributeDrawer.SelectStack
                         {
                             Display = curPage.Display,
+                            Icon = curPage.Icon,
                             Index = index,
                         },
                         new AdvancedDropdownAttributeDrawer.SelectStack
                         {
                             Display = dropdownItem.displayName,
+                            Icon = dropdownItem.icon,
                             Index = -1,
                         },
                     });

@@ -29,8 +29,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 SerializedListUtils.CreateExtraSearch(property, elementType, FieldWithInfo.Targets[0], settings.ExtraSearch),
                 () => configuredLimits?.Invoke() ?? _sizeLimits);
 
-            void Search(string text) => UIToolkitUtils.SetDisplayStyle(_element,
-                Util.UnityDefaultSimpleSearch(property.displayName, text) ? DisplayStyle.Flex : DisplayStyle.None);
             OnSearchFieldUIToolkit.AddListener(Search);
             _element.RegisterCallback<AttachToPanelEvent>(_ =>
             {
@@ -39,6 +37,9 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             });
             _element.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
             return (_element, false);
+
+            void Search(string text) => UIToolkitUtils.SetDisplayStyle(_element,
+                Util.UnityDefaultSimpleSearch(property.displayName, text) ? DisplayStyle.Flex : DisplayStyle.None);
         }
 
         private VisualElement CreateListItem(SerializedProperty prop, PropertyAttribute[] allAttributes, int index)

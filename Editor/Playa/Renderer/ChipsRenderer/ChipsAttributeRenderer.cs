@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 {
-    public partial class ChipsAttributeRenderer: AbsRenderer
+    public partial class ChipsAttributeRenderer: SerializedFieldBaseRenderer
     {
         private readonly ChipsAttribute _attribute;
 
@@ -13,8 +13,5 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             _attribute = chipsAttribute;
         }
 
-        public override void OnSearchField(string searchString)
-        {
-        }
     }
 }

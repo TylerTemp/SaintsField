@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SaintsField.DropdownBase
 {
@@ -11,6 +12,7 @@ namespace SaintsField.DropdownBase
         IReadOnlyList<IDropdown> children { get; }
         bool disabled { get; }
         string icon { get; }
+        Color? color { get; }
         bool isSeparator { get; }
 
         int ChildCount();

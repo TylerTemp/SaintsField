@@ -30,11 +30,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // ReSharper disable InconsistentNaming
             public int Index;
             public string Display;
+            public string Icon;
             // public object Value;
             // ReSharper enable InconsistentNaming
             public bool Equals(SelectStack other)
             {
-                return Index == other.Index && Display == other.Display;
+                return Index == other.Index && Display == other.Display && Icon == other.Icon;
             }
 
             public override bool Equals(object obj)
@@ -44,7 +45,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             public override int GetHashCode()
             {
-                return Util.CombineHashCode(Index, Display);
+                return Util.CombineHashCode(Index, Display, Icon);
             }
 
             public override string ToString()
@@ -995,6 +996,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             originChild.value,
                             originChild.disabled,
                             originChild.icon,
+                            originChild.color,
                             originChild.isSeparator));
                     }
                     else if (eUnique == EUnique.Disable)
@@ -1004,6 +1006,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             originChild.value,
                             true,
                             originChild.icon,
+                            originChild.color,
                             originChild.isSeparator));
                     }
                     else if (eUnique == EUnique.Remove)
@@ -1015,6 +1018,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 originChild.value,
                                 true,
                                 originChild.icon,
+                                originChild.color,
                                 originChild.isSeparator));
                         }
                     }

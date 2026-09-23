@@ -23,6 +23,7 @@ namespace SaintsField
 
         public bool disabled { get; }
         public string icon { get; }
+        public Color? color { get; }
         public bool isSeparator { get; }
 
         public void SetChildren(List<Dropdown<T>> newChildren) => _typeChildren = newChildren;
@@ -35,10 +36,11 @@ namespace SaintsField
             _typeChildren = new List<Dropdown<T>>();
             disabled = false;
             icon = null;
+            color = null;
             isSeparator = false;
         }
 
-        public Dropdown(string displayName, bool disabled = false, string icon = null)
+        public Dropdown(string displayName, bool disabled = false, string icon = null, Color? color = null)
         {
             this.displayName = displayName;
             absolutePathFragments = new List<string> { displayName };
@@ -46,10 +48,11 @@ namespace SaintsField
             _typeChildren = new List<Dropdown<T>>();
             this.disabled = disabled;
             this.icon = icon;
+            this.color = color;
             isSeparator = false;
         }
 
-        public Dropdown(string displayName, T value, bool disabled = false, string icon = null, bool isSeparator = false)
+        public Dropdown(string displayName, T value, bool disabled = false, string icon = null, Color? color = null, bool isSeparator = false)
         {
             this.displayName = displayName;
             absolutePathFragments = new List<string> { displayName };
@@ -57,10 +60,11 @@ namespace SaintsField
             _typeChildren = new List<Dropdown<T>>();
             this.disabled = disabled;
             this.icon = icon;
+            this.color = color;
             this.isSeparator = isSeparator;
         }
 
-        public Dropdown(string displayName, IEnumerable<Dropdown<T>> children, bool disabled = false, string icon = null,
+        public Dropdown(string displayName, IEnumerable<Dropdown<T>> children, bool disabled = false, string icon = null, Color? color = null,
             bool isSeparator = false)
         {
             this.displayName = displayName;
@@ -69,6 +73,7 @@ namespace SaintsField
             _typeChildren = children.ToList();
             this.disabled = disabled;
             this.icon = icon;
+            this.color = color;
             this.isSeparator = isSeparator;
         }
 
@@ -79,9 +84,9 @@ namespace SaintsField
         }
 
         // this will parse "/"
-        public void Add(string displayNames, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
+        public void Add(string displayNames, T value, bool disabled = false, string icon = null, Color? color = null, ICollection<string> extraSearches=null)
         {
-            AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon, extraSearches);
+            AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon, color, extraSearches);
         }
 
         // this add a separator
@@ -103,14 +108,14 @@ namespace SaintsField
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public static void AddByNames(Dropdown<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
+        public static void AddByNames(Dropdown<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, Color? color=null, ICollection<string> extraSearches=null)
         {
             int curCount = nameQuery.Count;
             string curName = curCount == 0 ? "": nameQuery.Dequeue();
             int leftCount = nameQuery.Count;
             if (leftCount == 0)
             {
-                container.Add(curName == ""? Separator(): new Dropdown<T>(curName, value, disabled, icon)
+                container.Add(curName == ""? Separator(): new Dropdown<T>(curName, value, disabled, icon, color)
                 {
                     ExtraSearches = extraSearches ?? new HashSet<string>(),
                 });
@@ -129,7 +134,7 @@ namespace SaintsField
                 container.Add(targetChild);
             }
             // ReSharper disable once TailRecursiveCall
-            AddByNames(targetChild, nameQuery, value, disabled, icon);
+            AddByNames(targetChild, nameQuery, value, disabled, icon, color);
         }
 
         public void AddSeparator()
@@ -143,7 +148,7 @@ namespace SaintsField
         public int SepCount() => _typeChildren.Count(each => each.isSeparator);
 
         public static Dropdown<T> Separator() =>
-            new Dropdown<T>("", (T)default, false, null, true);
+            new Dropdown<T>("", (T)default, false, null, null, true);
 
         // public static (string, object, bool, string, bool) Item(string name, T item) => (name, item, false, null, false);
         //

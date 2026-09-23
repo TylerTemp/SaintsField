@@ -2145,6 +2145,48 @@ private IEnumerator GetEnvAsync()  // you can also use Waitable<Dropdown<int>>/T
 
 [![video](https://github.com/user-attachments/assets/28ba62b9-c996-4bc3-a866-bd9b1b2e4cb4)](https://github.com/user-attachments/assets/35ae998f-548b-4ba4-b495-bc358ef18779)
 
+You can set icon and color if using `Dropdown<T>`
+
+```csharp
+using SaintsField;
+
+[Chips(nameof(GetIcons))]
+public List<int> withIcons;
+
+private Dropdown<int> GetIcons()
+{
+    return new Dropdown<int>
+    {
+        { "Search", 1, false, "search.png", Color.brown },
+        { "Play", 2, true, "play.png" },  // disable
+        { "Star", 3, false, "star.png", EColor.Gold.GetColor() },
+        { "Pencil", 4, false, "pencil.png" },
+    };
+}
+```
+
+![](https://github.com/user-attachments/assets/cab9e2c1-0566-4af3-8c8c-e648f4949b53)
+
+You can combine `[AboveText]` and `[LabelText(null)]` to make a full-line input, which will looks much like a standard chip picker
+
+```csharp
+using SaintsField;
+
+[AboveText("<label/>")]
+[LabelText(null)]
+[Chips(nameof(GetLongList))]
+public List<string> longList;
+```
+
+![](https://github.com/user-attachments/assets/d4a92a2e-3c63-463f-9e2a-d0ed38771b16)
+
+You can drag to re-order just like Unity's default list.
+Use left-right arrow in input to change where you want to insert a new item.
+Use `backspace` to delete the front item.
+Use up-down arrow to select, and `enter` to pick the item from the popup.
+
+[![video](https://github.com/user-attachments/assets/445aca48-b3bb-419f-aa09-339ac0ebbd90)](https://github.com/user-attachments/assets/69b8e22e-6e8c-41cc-bc50-7be0a88e8f83)
+
 #### `Table` ####
 
 > [!IMPORTANT]
