@@ -6,9 +6,9 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 {
     public class ValueButtonsRow: AbsValueButtonsRow<ValueButton>
     {
-        protected override ValueButton MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+        protected override ValueButton MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete)
         {
-            ValueButton result =  new ValueButton(chunks);
+            ValueButton result = new ValueButton(chunks, obsolete);
             result.SetLabelCenter();
             return result;
         }

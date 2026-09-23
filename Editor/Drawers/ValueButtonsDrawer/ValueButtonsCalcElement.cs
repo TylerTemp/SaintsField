@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
     {
         protected override AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
-            return new ValueButton(chunks);
+            return new ValueButton(chunks, false);
         }
     }
 }

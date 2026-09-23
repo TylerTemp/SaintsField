@@ -134,7 +134,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
 
                             Dropdown<object> enumDropdown = new Dropdown<object>("");
-                            foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(targetType))
+                            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(targetType))
                             {
                                 // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
                                 HashSet<string> extraSearches = enumRichLabel == enumLabel
@@ -162,6 +162,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         new ValueButtonRawInfo(
                                             RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                                             each.disabled,
+                                            false,
                                             each.value))
                                     .ToArray()
                             );
@@ -286,7 +287,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                     new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                                 };
                             }
-                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
+                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Obsolete, enumValueInfo.Value));
                         }
 
                         EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
@@ -473,7 +474,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
 
                             Dropdown<object> enumDropdown = new Dropdown<object>("");
-                            foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(targetType))
+                            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(targetType))
                             {
                                 // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
                                 HashSet<string> extraSearches = enumRichLabel == enumLabel
@@ -501,6 +502,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         new ValueButtonRawInfo(
                                             RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                                             each.disabled,
+                                            false,
                                             each.value))
                                     .ToArray()
                             );
@@ -625,7 +627,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                     new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                                 };
                             }
-                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
+                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Obsolete, enumValueInfo.Value));
                         }
 
                         EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));

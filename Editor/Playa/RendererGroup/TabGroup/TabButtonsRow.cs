@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
 {
     public class TabButtonsRow: AbsValueButtonsRow<TabButton>
     {
-        protected override TabButton MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+        protected override TabButton MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete)
         {
             TabButton result =  new TabButton(chunks);
             result.SetLabelCenter();

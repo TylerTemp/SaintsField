@@ -80,11 +80,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             }
 
             List<DrawInfo.EnumValueInfo> enumValues = new List<DrawInfo.EnumValueInfo>();
-            (object enumValue, string enumLabel, string enumRichLabel)[] everyEnumValues = Util.GetEnumValues(fieldType).ToArray();
+            Util.EnumValueInfo[] everyEnumValues = Util.GetEnumValues(fieldType).ToArray();
             bool isULong = fieldType.GetEnumUnderlyingType() == typeof(ulong);
             long longValue = 0;
             ulong uLongValue = 0;
-            foreach ((object enumValue, string _, string _) in everyEnumValues)
+            foreach ((object enumValue, string _, string _, bool _) in everyEnumValues)
             {
                 if (isULong)
                 {
@@ -96,7 +96,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 }
             }
 
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in everyEnumValues)
+            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in everyEnumValues)
             {
                 if (isULong)
                 {

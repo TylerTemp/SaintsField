@@ -552,24 +552,48 @@ namespace SaintsField.Editor.Utils
             return false;
         }
 
-        public static (bool found, string value) GetRichLabelFromEnum(Type enumType, object enumValue)
+        public readonly struct EnumFieldInfo
+        {
+            public readonly bool HasRichLabel;
+            public readonly string Name;
+            public readonly bool IsObsolete;
+
+            public EnumFieldInfo(bool hasRichLabel, string name, bool isObsolete)
+            {
+                HasRichLabel = hasRichLabel;
+                Name = name;
+                IsObsolete = isObsolete;
+            }
+        }
+
+        public static EnumFieldInfo GetFieldInfoFromEnum(Type enumType, object enumValue)
         {
             string enumFieldName = Enum.GetName(enumType, enumValue);
             FieldInfo fieldInfo = enumType.GetField(enumFieldName);
-            PropertyAttribute[] attributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(fieldInfo);
+            Attribute[] attributes = ReflectCache.GetCustomAttributes<Attribute>(fieldInfo);
+            bool hasRichLabel = false;
+            string name = enumFieldName;
+            bool isObsolete = false;
 
-            foreach (PropertyAttribute attribute in attributes)
+            foreach (Attribute attribute in attributes)
             {
                 switch (attribute)
                 {
-                    case FieldLabelTextAttribute r:
-                        return (true, r.RichTextXml);
-                    case InspectorNameAttribute i:
-                        return (true, i.displayName);
+                    case ObsoleteAttribute:
+                        isObsolete = true;
+                        break;
+                    case FieldLabelTextAttribute r when !hasRichLabel:
+                        hasRichLabel = true;
+                        name = r.RichTextXml;
+                        break;
+                    case InspectorNameAttribute i when !hasRichLabel:
+                        hasRichLabel = true;
+                        name = i.displayName;
+                        break;
                 }
             }
 
-            return (false, enumFieldName);
+            return new EnumFieldInfo(hasRichLabel, name, isObsolete);
         }
 
         public static IEnumerable<Type> GetGenBaseTypes(Type type)

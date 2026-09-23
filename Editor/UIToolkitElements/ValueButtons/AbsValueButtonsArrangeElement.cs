@@ -354,18 +354,28 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                 prefixWidths[index + 1] = prefixWidths[index] + buttonWidths[index];
             }
 
-            float[,] costs = new float[rowCount + 1, buttonCount + 1];
-            int[,] previousBreaks = new int[rowCount + 1, buttonCount + 1];
+            float[][] costs = new float[rowCount + 1][];
+            for (int index = 0; index < rowCount + 1; index++)
+            {
+                costs[index] = new float[buttonCount + 1];
+            }
+
+            int[][] previousBreaks = new int[rowCount + 1][];
+            for (int index = 0; index < rowCount + 1; index++)
+            {
+                previousBreaks[index] = new int[buttonCount + 1];
+            }
+
             for (int rowIndex = 0; rowIndex <= rowCount; rowIndex++)
             {
                 for (int buttonIndex = 0; buttonIndex <= buttonCount; buttonIndex++)
                 {
-                    costs[rowIndex, buttonIndex] = float.PositiveInfinity;
-                    previousBreaks[rowIndex, buttonIndex] = -1;
+                    costs[rowIndex][buttonIndex] = float.PositiveInfinity;
+                    previousBreaks[rowIndex][buttonIndex] = -1;
                 }
             }
 
-            costs[0, 0] = 0;
+            costs[0][0] = 0;
             for (int rowIndex = 1; rowIndex <= rowCount; rowIndex++)
             {
                 float rowWidth = rowIndex == 1 ? _selfWidth : _subWidth;
@@ -373,7 +383,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                 {
                     for (int previousBreak = rowIndex - 1; previousBreak < buttonIndex; previousBreak++)
                     {
-                        if (float.IsPositiveInfinity(costs[rowIndex - 1, previousBreak]))
+                        if (float.IsPositiveInfinity(costs[rowIndex - 1][previousBreak]))
                         {
                             continue;
                         }
@@ -386,19 +396,19 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                         }
 
                         float unusedWidth = Mathf.Max(0, rowWidth - segmentWidth);
-                        float candidateCost = costs[rowIndex - 1, previousBreak] + unusedWidth * unusedWidth;
-                        if (candidateCost >= costs[rowIndex, buttonIndex])
+                        float candidateCost = costs[rowIndex - 1][previousBreak] + unusedWidth * unusedWidth;
+                        if (candidateCost >= costs[rowIndex][buttonIndex])
                         {
                             continue;
                         }
 
-                        costs[rowIndex, buttonIndex] = candidateCost;
-                        previousBreaks[rowIndex, buttonIndex] = previousBreak;
+                        costs[rowIndex][buttonIndex] = candidateCost;
+                        previousBreaks[rowIndex][buttonIndex] = previousBreak;
                     }
                 }
             }
 
-            if (previousBreaks[rowCount, buttonCount] < 0)
+            if (previousBreaks[rowCount][buttonCount] < 0)
             {
                 return greedyRows;
             }
@@ -407,7 +417,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             breaks[rowCount] = buttonCount;
             for (int rowIndex = rowCount; rowIndex > 0; rowIndex--)
             {
-                breaks[rowIndex - 1] = previousBreaks[rowIndex, breaks[rowIndex]];
+                breaks[rowIndex - 1] = previousBreaks[rowIndex][breaks[rowIndex]];
             }
 
             List<List<ValueButtonRawInfo>> balancedRows = new List<List<ValueButtonRawInfo>>(rowCount);

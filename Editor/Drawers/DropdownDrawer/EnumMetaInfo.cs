@@ -11,13 +11,15 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             public readonly object Value;
             public readonly string Label;
             public readonly string OriginalLabel;
+            public readonly bool Obsolete;
 
-            public EnumValueInfo(object value, string label, string originalLabel)
+            public EnumValueInfo(object value, string label, string originalLabel, bool obsolete)
             {
                 HasValue = true;
                 Value = value;
                 Label = label;
                 OriginalLabel = originalLabel;
+                Obsolete = obsolete;
             }
 
             public override string ToString()

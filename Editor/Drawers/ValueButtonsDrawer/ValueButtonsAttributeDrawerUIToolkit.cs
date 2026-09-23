@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 {
-    public partial class ValueButtonsAttributeDrawer: SaintsPropertyDrawer
+    public partial class ValueButtonsAttributeDrawer
     {
         public static string NameField(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Field";
         public static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Arrange";
@@ -257,6 +257,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                                     new ValueButtonRawInfo(
                                         RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                                         each.disabled,
+                                        false,
                                         each.value))
                                 .ToArray()
                         );

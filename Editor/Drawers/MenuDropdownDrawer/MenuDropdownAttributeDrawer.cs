@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Drawers.MenuDropdownDrawer
                     MenuDropdown<object> enumDropdown = new MenuDropdown<object>();
                     foreach (object enumValue in enumValues)
                     {
-                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(enumType, enumValue).value, enumValue);
+                        enumDropdown.Add(ReflectUtils.GetFieldInfoFromEnum(enumType, enumValue).Name, enumValue);
                     }
 
                     error = "";

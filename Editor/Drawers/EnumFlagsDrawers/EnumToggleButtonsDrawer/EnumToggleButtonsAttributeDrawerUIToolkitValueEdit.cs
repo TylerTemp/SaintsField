@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                         };
                     }
-                    rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
+                    rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Obsolete, enumValueInfo.Value));
                 }
                 FlagButtonsArrangeElement.UpdateButtons(
                     rawInfos

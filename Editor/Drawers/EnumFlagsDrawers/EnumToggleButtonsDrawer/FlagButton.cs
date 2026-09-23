@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
     {
         private readonly bool _isULong;
 
-        public FlagButton(bool isULong, IReadOnlyList<RichTextDrawer.RichTextChunk> chunks) : base(chunks)
+        public FlagButton(bool isULong, IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete) : base(chunks, obsolete)
         {
             _isULong = isULong;
         }

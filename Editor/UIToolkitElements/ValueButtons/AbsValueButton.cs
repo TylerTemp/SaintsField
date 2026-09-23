@@ -19,12 +19,16 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             set
             {
                 _value = value;
-                tooltip = $"{value}";
+                tooltip = _obsolete? $"{value} <color=red>(Obsolete)</color>": $"{value}";
             }
         }
 
-        protected AbsValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+        private bool _obsolete;
+
+        protected AbsValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete)
         {
+            _obsolete = obsolete;
+
             Chunks = chunks;
             style.marginLeft = 0;
             style.marginRight = 0;
@@ -49,12 +53,12 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             _label.style.justifyContent = Justify.Center;
         }
 
-        public void ResetChunks(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+        public void ResetChunks(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete)
         {
+            _obsolete = obsolete;
             Chunks = chunks;
             _label.Clear();
             DrawChunks();
-
         }
 
         public void RefreshCurValue(object curValue, bool isFirst, bool isLast)
@@ -73,7 +77,18 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         {
             const float gray = 0.15f;
             const float grayBorder = 0.45f;
-            style.backgroundColor = new Color(gray, gray, gray, 1f);
+            if (_obsolete)
+            {
+                Color obsColor = EColor.OrangeRed.GetColor();
+                obsColor.a = 0.6f;
+                style.backgroundColor = obsColor;
+                style.color = EColor.Gray.GetColor();
+            }
+            else
+            {
+                style.backgroundColor = new Color(gray, gray, gray, 1f);
+                style.color = StyleKeyword.Null;
+            }
             Color borderColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
             style.borderTopColor = style.borderBottomColor = borderColor;
 
@@ -99,7 +114,18 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
         protected virtual void SetOffStyle(bool isFirst, bool isLast)
         {
-            style.backgroundColor = StyleKeyword.Null;
+            if (_obsolete)
+            {
+                Color obsColor = EColor.Olive.GetColor();
+                obsColor.a = 0.16f;
+                style.backgroundColor = obsColor;
+                style.color = EColor.Gray.GetColor();
+            }
+            else
+            {
+                style.backgroundColor = StyleKeyword.Null;
+                style.color = StyleKeyword.Null;
+            }
             style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
 
             if (isFirst)

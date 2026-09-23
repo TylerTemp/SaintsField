@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
 {
     public class TabButton: AbsValueButton
     {
-        public TabButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks): base(chunks)
+        public TabButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks): base(chunks, false)
         {
         }
 

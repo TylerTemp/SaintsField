@@ -57,13 +57,13 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 {
                     renderLabels.Add(_metaInfo.NothingValue.HasValue
                         ? _metaInfo.NothingValue
-                        : new EnumMetaInfo.EnumValueInfo(zeroBit, "<b>Nothing</b>", "Nothing"));
+                        : new EnumMetaInfo.EnumValueInfo(zeroBit, "<b>Nothing</b>", "Nothing", false));
                 }
                 else if (EnumFlagsUtil.IsOnObject(newEnum, _metaInfo.EverythingBit, isULong))
                 {
                     renderLabels.Add(_metaInfo.EverythingValue.HasValue
                         ? _metaInfo.EverythingValue
-                        : new EnumMetaInfo.EnumValueInfo(zeroBit, "<b>Everything</b>", "Everything"));
+                        : new EnumMetaInfo.EnumValueInfo(zeroBit, "<b>Everything</b>", "Everything", false));
                 }
                 else
                 {
@@ -157,7 +157,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         }
 
         private static EnumMetaInfo.EnumValueInfo InvalidValueInfo(T v) =>
-            new EnumMetaInfo.EnumValueInfo(v, $"<color=red>?</color> {v}", "Invalid value");
+            new EnumMetaInfo.EnumValueInfo(v, $"<color=red>?</color> {v}", "Invalid value", false);
 
         public T value
         {

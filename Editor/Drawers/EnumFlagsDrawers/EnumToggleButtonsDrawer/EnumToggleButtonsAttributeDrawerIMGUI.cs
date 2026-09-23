@@ -100,6 +100,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 .Select(each => new ValueButtonRawInfo(
                     RichTextDrawer.ParseRichXmlWithProvider(each.Label, richTextTagProvider).ToArray(),
                     false,
+                    each.Obsolete,
                     each.Value))
                 .ToArray();
         }

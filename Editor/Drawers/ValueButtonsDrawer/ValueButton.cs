@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 {
     public class ValueButton: AbsValueButton
     {
-        public ValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks): base(chunks)
+        public ValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete): base(chunks, obsolete)
         {
         }
 

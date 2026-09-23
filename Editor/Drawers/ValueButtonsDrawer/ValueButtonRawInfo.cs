@@ -10,11 +10,13 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         public readonly IReadOnlyList<RichTextDrawer.RichTextChunk> DisplayChunks;
         public readonly object Value;
         public readonly bool Disabled;
+        public readonly bool Obsolete;
 
-        public ValueButtonRawInfo(IReadOnlyList<RichTextDrawer.RichTextChunk> displayChunks, bool disabled, object value)
+        public ValueButtonRawInfo(IReadOnlyList<RichTextDrawer.RichTextChunk> displayChunks, bool disabled, bool obsolete, object value)
         {
             DisplayChunks = displayChunks;
             Disabled = disabled;
+            Obsolete = obsolete;
             Value = value;
         }
 

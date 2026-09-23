@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             long longValue = 0;
             ulong uLongValue = 0;
 
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(fieldType))
+            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(fieldType))
             {
                 DrawInfo.EnumValueInfo info = new DrawInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel);
                 if (isFlags)

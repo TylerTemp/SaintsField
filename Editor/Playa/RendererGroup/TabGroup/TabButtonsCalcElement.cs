@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
     {
         protected override AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
-            return new ValueButton(chunks);
+            return new ValueButton(chunks, false);
         }
     }
 }

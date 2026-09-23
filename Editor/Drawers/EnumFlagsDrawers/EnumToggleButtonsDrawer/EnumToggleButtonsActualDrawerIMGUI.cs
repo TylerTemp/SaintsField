@@ -349,7 +349,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     : valueProperty.longValue);
 
             Dropdown<object> enumDropdown = new Dropdown<object>("");
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(metaInfo.EnumType))
+            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(metaInfo.EnumType))
             {
                 HashSet<string> extraSearches = enumRichLabel == enumLabel
                     ? new HashSet<string>

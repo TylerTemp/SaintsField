@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             {
                 IReadOnlyList<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
                     info.displayName, emptyRichTextTagProvider).ToArray();
-                rawInfos.Add(new ValueButtonRawInfo(chunks, false, info.value));
+                rawInfos.Add(new ValueButtonRawInfo(chunks, false, false, info.value));
             }
             wrapper.ValueButtonsArrangeElement.UpdateButtons(
                 rawInfos

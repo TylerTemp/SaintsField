@@ -118,16 +118,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     each =>
                     {
                         string normalName = Enum.GetName(enumType, each);
-                        (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(enumType, each);
-                        if (found)
+                        ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(enumType, each);
+                        string richName = enumFieldInfo.Name;
+                        if (enumFieldInfo.HasRichLabel)
                         {
                             richName = EnumLabelRegex.Replace(richName, normalName ?? "");
                         }
                         return new EnumDisplayInfo
                         {
                             Name = normalName,
-                            HasRichName = found,
-                            RichName = found? richName: null,
+                            HasRichName = enumFieldInfo.HasRichLabel,
+                            RichName = enumFieldInfo.HasRichLabel? richName: null,
                         };
                     }
                 );
@@ -272,9 +273,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             long longValue = 0;
             ulong uLongValue = 0;
 
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(enumType))
+            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(enumType))
             {
-                EnumMetaInfo.EnumValueInfo info = new EnumMetaInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel, enumLabel);
+                EnumMetaInfo.EnumValueInfo info = new EnumMetaInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel, enumLabel, obsolete);
                 if (isFlags)
                 {
                     if (isULong)

@@ -96,6 +96,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
                         new ValueButtonRawInfo(
                             RichTextDrawer.ParseRichXmlWithProvider(each, new RichTextDrawer.EmptyRichTextTagProvider()).ToArray(),
                             false,
+                            false,
                             each))
                     .ToArray()
             );

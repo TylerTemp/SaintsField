@@ -175,7 +175,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 if(elementType.IsEnum)
                 {
                     Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
-                    foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
+                    foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(elementType))
                     {
                         // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
                         HashSet<string> extraSearches = enumRichLabel == enumLabel
@@ -717,7 +717,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 else if(elementType.IsEnum)
                 {
                     Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
-                    foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
+                    foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(elementType))
                     {
                         if (flat)
                         {

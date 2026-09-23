@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
             object curValue = GetSerializedActualEnumObject(metaInfo, valueProperty, isULong);
             Dropdown<object> enumDropdown = new Dropdown<object>("");
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(metaInfo.EnumType))
+            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(metaInfo.EnumType))
             {
                 HashSet<string> extraSearches = enumRichLabel == enumLabel
                     ? new HashSet<string>
@@ -273,7 +273,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             }
 
             object currentEnum = GetSerializedActualEnumObject(metaInfo, valueProperty, isULong);
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(metaInfo.EnumType))
+            foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(metaInfo.EnumType))
             {
                 if (Util.GetIsEqual(currentEnum, enumValue))
                 {

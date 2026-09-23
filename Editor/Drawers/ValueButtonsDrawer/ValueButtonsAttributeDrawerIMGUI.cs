@@ -131,6 +131,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 .Select(each => new ValueButtonRawInfo(
                     RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                     each.disabled,
+                    false,
                     each.value))
                 .ToArray();
         }

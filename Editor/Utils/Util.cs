@@ -2903,21 +2903,45 @@ namespace SaintsField.Editor.Utils
 
         private static readonly Regex EnumLabelRegex = new Regex(@"<label\s*/?>", RegexOptions.Compiled);
 
-        public static IEnumerable<(object enumValue, string enumLabel, string enumRichLabel)> GetEnumValues(Type elementType)
+        public readonly struct EnumValueInfo
+        {
+            public readonly object EnumValue;
+            public readonly string EnumLabel;
+            public readonly string EnumRichLabel;
+            public readonly bool Obsolete;
+
+            public EnumValueInfo(object enumValue, string enumLabel, string enumRichLabel, bool obsolete)
+            {
+                EnumValue = enumValue;
+                EnumLabel = enumLabel;
+                EnumRichLabel = enumRichLabel;
+                Obsolete = obsolete;
+            }
+
+            public void Deconstruct(out object enumValue, out string enumLabel, out string enumRichLabel, out bool obsolete)
+            {
+                enumValue = EnumValue;
+                enumLabel = EnumLabel;
+                enumRichLabel = EnumRichLabel;
+                obsolete = Obsolete;
+            }
+        }
+
+        public static IEnumerable<EnumValueInfo> GetEnumValues(Type elementType)
         {
             Array enumValues = Enum.GetValues(elementType);
             foreach (object enumValue in enumValues)
             {
-                (bool found, string value) = ReflectUtils.GetRichLabelFromEnum(elementType, enumValue);
+                ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(elementType, enumValue);
                 string useLabel = null;
-                if (found)
+                if (enumFieldInfo.HasRichLabel)
                 {
-                    useLabel = EnumLabelRegex.Replace(value, enumValue.ToString());
+                    useLabel = EnumLabelRegex.Replace(enumFieldInfo.Name, enumValue.ToString());
                 }
 
                 // Debug.Log($"Found: {enumValue}");
 
-                yield return (enumValue, value, useLabel);
+                yield return new EnumValueInfo(enumValue, enumFieldInfo.Name, useLabel, enumFieldInfo.IsObsolete);
             }
         }
 

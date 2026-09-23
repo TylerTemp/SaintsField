@@ -123,6 +123,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         {
             EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
             bool noFold = enumToggleButtonsAttribute.NoFold;
+            EObsolete obsolete = enumToggleButtonsAttribute.Obsolete;
 
             Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0
                 ? ReflectUtils.GetElementType(info.FieldType)
@@ -171,6 +172,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
             {
+                if (enumValueInfo.Obsolete && obsolete == EObsolete.Remove)
+                {
+                    continue;
+                }
+
                 IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
                 if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
                 {
@@ -184,7 +190,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     };
                 }
                 // Debug.Log($"Add {enumValueInfo.Value}");
-                rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
+                bool disable = enumValueInfo.Obsolete && obsolete == EObsolete.Disable;
+                rawInfos.Add(new ValueButtonRawInfo(chunks, disable, enumValueInfo.Obsolete, enumValueInfo.Value));
             }
 
             EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));

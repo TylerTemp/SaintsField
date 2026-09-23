@@ -20,7 +20,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         // public IReadOnlyList<OptionButtonRawInfo> Buttons { get; private set; } = Array.Empty<OptionButtonRawInfo>();
         private readonly List<T> _buttons = new List<T>();
 
-        protected abstract T MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks);
+        protected abstract T MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks, bool obsolete);
 
         public void ResetWithButtons(IEnumerable<ValueButtonRawInfo> buttons)
         {
@@ -31,11 +31,11 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                 if (_buttons.Count > processIndex)
                 {
                     targetButton = _buttons[processIndex];
-                    targetButton.ResetChunks(info.DisplayChunks);
+                    targetButton.ResetChunks(info.DisplayChunks, info.Obsolete);
                 }
                 else
                 {
-                    T newBtn = MakeValueButton(info.DisplayChunks);
+                    T newBtn = MakeValueButton(info.DisplayChunks, info.Obsolete);
                     newBtn.style.flexGrow = 1;
                     newBtn.style.flexShrink = 0;
                     newBtn.Value = info.Value;
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                     //     },
                     //     Value = info.Value,
                     // };
-                    newBtn.SetEnabled(!info.Disabled);
+                    // newBtn.SetEnabled(!info.Disabled);
                     Add(newBtn);
                     _buttons.Add(newBtn);
                     newBtn.clicked += () => OnButtonClicked.Invoke(newBtn.Value);
