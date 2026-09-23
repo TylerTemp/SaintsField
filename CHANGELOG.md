@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload
+
 ## 5.30.1 ##
 
 1.  Fix: `LabelText(null)` not work in some cases

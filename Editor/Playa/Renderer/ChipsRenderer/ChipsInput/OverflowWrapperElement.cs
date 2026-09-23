@@ -25,7 +25,20 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
             style.backgroundColor = new StyleColor(EditorGUIUtility.isProSkin
                 ? new Color32(56, 56, 56, 255)
                 : new Color32(194, 194, 194, 255));
-            style.color = EditorStyles.label.normal.textColor;
+            Color textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
+            try
+            {
+                GUIStyle labelStyle = EditorStyles.label;
+                if (labelStyle?.normal != null)
+                {
+                    textColor = labelStyle.normal.textColor;
+                }
+            }
+            catch (System.NullReferenceException)
+            {
+                // EditorStyles can be uninitialized while the inspector is rebuilt after a domain reload.
+            }
+            style.color = textColor;
             style.borderTopWidth = 1;
             style.borderBottomWidth = 1;
             style.borderLeftWidth = 1;
