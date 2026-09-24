@@ -32,6 +32,7 @@ using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer.EditUnityEvent;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.UIToolkitElements.CharacterDrawer;
@@ -47,6 +48,7 @@ using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -2139,6 +2141,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             #endregion
 
+            #region UnityEvent
+
+            if (value is UnityEventBase unityEventBase)
+            {
+                return (UIToolkitEditUnityEvent.UIToolkitValueEdit(
+                    oldElement,
+                    label,
+                    valueType,
+                    unityEventBase,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes), false);
+            }
+
+            #endregion
 
             #region com.unity.mathematics
 

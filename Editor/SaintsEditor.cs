@@ -1113,6 +1113,10 @@ namespace SaintsField.Editor
                     case SaintsRenderType.SerializedField:
                         switch (attribute)
                         {
+                            case ShowInInspectorAttribute _:
+                                AddRendererWithMetadata(renderers, playaAttribute,
+                                    new ShowInInspectorFieldRenderer(serializedObject, fieldWithInfo));
+                                continue;
                             case TableAttribute _:
                                 targetAnchor = true;
                                 if (!hasSerializedTarget)
