@@ -33,7 +33,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             float inputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(width, label);
             bool showSubRows = enumToggleButtonsAttribute.NoFold || property.isExpanded;
             ValueButtonsAttributeDrawer.ImGuiButtonLayout layout = GetSerializedActualButtonLayout(metaInfo,
-                valueProperty, isULong, inputWidth, inputWidth, !showSubRows, cache, richTextTagProvider);
+                valueProperty, isULong, inputWidth, inputWidth, !showSubRows, cache, richTextTagProvider,
+                enumToggleButtonsAttribute.Obsolete);
 
             return EditorGUIUtility.singleLineHeight +
                    ValueButtonsAttributeDrawer.UtilGetBelowHeight(width, showSubRows, "", layout);
@@ -76,14 +77,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
         private ValueButtonsAttributeDrawer.ImGuiButtonLayout GetSerializedActualButtonLayout(EnumMetaInfo metaInfo,
             SerializedProperty valueProperty, bool isULong, float mainWidth, float subWidth, bool greedy,
-            ImGuiInfo cache, IRichTextTagProvider richTextTagProvider)
+            ImGuiInfo cache, IRichTextTagProvider richTextTagProvider, EObsolete obsolete)
         {
             ValueButtonRawInfo[] rawInfos;
             float useMainWidth = mainWidth;
 
             if (metaInfo.IsFlags)
             {
-                rawInfos = GetFlagRawInfos(metaInfo, richTextTagProvider);
+                rawInfos = GetFlagRawInfos(metaInfo, richTextTagProvider, obsolete);
                 bool showFullToggles = !greedy;
                 float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
                 useMainWidth = Mathf.Max(1f, mainWidth - fullToggleWidth);
@@ -91,7 +92,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             else
             {
                 AdvancedDropdownMetaInfo dropdownMetaInfo = GetSerializedActualNonFlagsMeta(metaInfo, valueProperty,
-                    isULong);
+                    isULong, obsolete);
                 rawInfos = ValueButtonsAttributeDrawer.UtilMakeButtonRawInfos(dropdownMetaInfo, richTextTagProvider);
             }
 
@@ -104,7 +105,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             bool isULong, ImGuiInfo cache, IRichTextTagProvider richTextTagProvider, Action<object> onValueChanged)
         {
             AdvancedDropdownMetaInfo dropdownMetaInfo = GetSerializedActualNonFlagsMeta(metaInfo, valueProperty,
-                isULong);
+                isULong, enumToggleButtonsAttribute.Obsolete);
             ValueButtonRawInfo[] rawInfos = ValueButtonsAttributeDrawer.UtilMakeButtonRawInfos(dropdownMetaInfo,
                 richTextTagProvider);
             bool showSubRows = enumToggleButtonsAttribute.NoFold || property.isExpanded;
@@ -143,7 +144,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             SerializedProperty valueProperty, EnumMetaInfo metaInfo, EnumToggleButtonsAttribute enumToggleButtonsAttribute,
             bool isULong, ImGuiInfo cache, IRichTextTagProvider richTextTagProvider, Action<object> onValueChanged)
         {
-            ValueButtonRawInfo[] rawInfos = GetFlagRawInfos(metaInfo, richTextTagProvider);
+            ValueButtonRawInfo[] rawInfos = GetFlagRawInfos(metaInfo, richTextTagProvider,
+                enumToggleButtonsAttribute.Obsolete);
             bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
             float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
 
@@ -337,7 +339,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         }
 
         private static AdvancedDropdownMetaInfo GetSerializedActualNonFlagsMeta(EnumMetaInfo metaInfo,
-            SerializedProperty valueProperty, bool isULong)
+            SerializedProperty valueProperty, bool isULong, EObsolete eObsolete)
         {
             object curValue = Enum.ToObject(metaInfo.EnumType,
                 isULong
@@ -351,13 +353,19 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             Dropdown<object> enumDropdown = new Dropdown<object>("");
             foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(metaInfo.EnumType))
             {
+                if (obsolete && eObsolete == EObsolete.Remove)
+                {
+                    continue;
+                }
+
                 HashSet<string> extraSearches = enumRichLabel == enumLabel
                     ? new HashSet<string>
                     {
                         enumValue.ToString(),
                     }
                     : new HashSet<string>();
-                enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue, extraSearches: extraSearches);
+                enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue,
+                    obsolete && eObsolete == EObsolete.Disable, extraSearches: extraSearches);
             }
 
             return new AdvancedDropdownMetaInfo

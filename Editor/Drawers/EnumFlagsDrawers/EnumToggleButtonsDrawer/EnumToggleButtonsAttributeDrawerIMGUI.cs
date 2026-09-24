@@ -95,12 +95,13 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         }
 
         private static ValueButtonRawInfo[] GetFlagRawInfos(EnumMetaInfo metaInfo,
-            IRichTextTagProvider richTextTagProvider)
+            IRichTextTagProvider richTextTagProvider, EObsolete obsolete = EObsolete.Remove)
         {
             return metaInfo.EnumValues
+                .Where(each => !each.Obsolete || obsolete != EObsolete.Remove)
                 .Select(each => new ValueButtonRawInfo(
                     RichTextDrawer.ParseRichXmlWithProvider(each.Label, richTextTagProvider).ToArray(),
-                    false,
+                    each.Obsolete && obsolete == EObsolete.Disable,
                     each.Obsolete,
                     each.Value))
                 .ToArray();
@@ -242,7 +243,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             flagsCache.Error = "";
 
             EnumMetaInfo metaInfoFlags = EnumFlagsUtil.GetEnumMetaInfo(flagsMetaInfo.EnumType);
-            ValueButtonRawInfo[] flagRawInfos = GetFlagRawInfos(metaInfoFlags, this);
+            ValueButtonRawInfo[] flagRawInfos = GetFlagRawInfos(metaInfoFlags, this,
+                enumToggleButtonsAttribute.Obsolete);
 
             Rect flagsFieldRect = EditorGUI.PrefixLabel(position, label);
             Rect flagsLabelRect = new Rect(position)
@@ -327,7 +329,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             flagsCache.Error = "";
 
             EnumMetaInfo metaInfoFlags = EnumFlagsUtil.GetEnumMetaInfo(flagsMetaInfo.EnumType);
-            ValueButtonRawInfo[] rawInfosFlags = GetFlagRawInfos(metaInfoFlags, this);
+            ValueButtonRawInfo[] rawInfosFlags = GetFlagRawInfos(metaInfoFlags, this,
+                enumToggleButtonsAttribute.Obsolete);
             float flagsInputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(width, label);
             bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
             float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
@@ -375,7 +378,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             flagsCache.Error = "";
 
             EnumMetaInfo metaInfoFlags = EnumFlagsUtil.GetEnumMetaInfo(flagsMetaInfo.EnumType);
-            ValueButtonRawInfo[] rawInfosFlags = GetFlagRawInfos(metaInfoFlags, this);
+            ValueButtonRawInfo[] rawInfosFlags = GetFlagRawInfos(metaInfoFlags, this,
+                enumToggleButtonsAttribute.Obsolete);
             float flagsInputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(position.width, label);
             bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
             float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);

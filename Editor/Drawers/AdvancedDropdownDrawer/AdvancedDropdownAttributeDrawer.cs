@@ -688,7 +688,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return ("", ReWrapUniqueList(dropdownListValue, eUnique, existsValues, false, null));
         }
 
-        public static AdvancedDropdownMetaInfo GetMetaInfoShowInInspector(Type elementType, IPathedDropdownAttribute advancedDropdownAttribute, object v, object parentObj, bool isImGui, bool flat=false)
+        public static AdvancedDropdownMetaInfo GetMetaInfoShowInInspector(Type elementType,
+            IPathedDropdownAttribute advancedDropdownAttribute, object v, object parentObj, bool isImGui,
+            bool flat=false, EObsolete eObsolete = EObsolete.Remove)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
@@ -735,14 +737,21 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
                     foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(elementType))
                     {
+                        if (obsolete && eObsolete == EObsolete.Remove)
+                        {
+                            continue;
+                        }
+
                         Dropdown<object> enumValueDropdown;
                         if (flat)
                         {
-                            enumValueDropdown = new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue);
+                            bool disabled = obsolete && eObsolete == EObsolete.Disable;
+                            enumValueDropdown = new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue, disabled);
                             enumDropdown.Add(enumValueDropdown);
                         }
                         else {
-                            enumValueDropdown = enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
+                            enumValueDropdown = enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue,
+                                obsolete && eObsolete == EObsolete.Disable);
                         }
                         enumValueDropdown.obsolete = obsolete;
                     }

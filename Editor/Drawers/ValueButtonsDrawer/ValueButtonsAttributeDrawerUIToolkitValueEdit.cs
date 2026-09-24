@@ -97,7 +97,8 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             Type underType = valueTypeOrNull ?? value.GetType();
 
-            AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfoShowInInspector(underType, valueButtonsAttribute, value, targets[0], false, true);
+            AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfoShowInInspector(
+                underType, valueButtonsAttribute, value, targets[0], false, true, valueButtonsAttribute.Obsolete);
 
             List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
 
@@ -107,7 +108,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             {
                 IReadOnlyList<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
                     info.displayName, emptyRichTextTagProvider).ToArray();
-                rawInfos.Add(new ValueButtonRawInfo(chunks, false, false, info.value));
+                rawInfos.Add(new ValueButtonRawInfo(chunks, info.disabled, info.obsolete, info.value));
             }
             wrapper.ValueButtonsArrangeElement.UpdateButtons(
                 rawInfos
