@@ -27,6 +27,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
         public VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, object parent, IRichTextTagProvider richTextTagProvider)
         {
+            EObsolete obsoleteMode = ((EnumToggleButtonsAttribute)enumToggle).Obsolete;
             Type targetType = ReflectUtils.SaintsSerializedActualGetType(saintsSerializedActual, parent);
             if (targetType == null)
             {
@@ -136,6 +137,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             Dropdown<object> enumDropdown = new Dropdown<object>("");
                             foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(targetType))
                             {
+                                if (obsolete && obsoleteMode == EObsolete.Remove)
+                                {
+                                    continue;
+                                }
+
                                 // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
                                 HashSet<string> extraSearches = enumRichLabel == enumLabel
                                     ? new HashSet<string>
@@ -143,9 +149,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         enumValue.ToString(),
                                     }
                                     : new HashSet<string>();
-                                enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue)
+                                enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue,
+                                    obsolete && obsoleteMode == EObsolete.Disable)
                                 {
                                     ExtraSearches = extraSearches,
+                                    obsolete = obsolete,
                                 });
                             }
 
@@ -162,7 +170,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         new ValueButtonRawInfo(
                                             RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                                             each.disabled,
-                                            false,
+                                            each.obsolete,
                                             each.value))
                                     .ToArray()
                             );
@@ -275,6 +283,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                         foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
                         {
+                            if (enumValueInfo.Obsolete && obsoleteMode == EObsolete.Remove)
+                            {
+                                continue;
+                            }
+
                             IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
                             if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
                             {
@@ -287,7 +300,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                     new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                                 };
                             }
-                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Obsolete, enumValueInfo.Value));
+                            rawInfos.Add(new ValueButtonRawInfo(chunks,
+                                enumValueInfo.Obsolete && obsoleteMode == EObsolete.Disable,
+                                enumValueInfo.Obsolete, enumValueInfo.Value));
                         }
 
                         EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
@@ -476,6 +491,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             Dropdown<object> enumDropdown = new Dropdown<object>("");
                             foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(targetType))
                             {
+                                if (obsolete && obsoleteMode == EObsolete.Remove)
+                                {
+                                    continue;
+                                }
+
                                 // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
                                 HashSet<string> extraSearches = enumRichLabel == enumLabel
                                     ? new HashSet<string>
@@ -483,9 +503,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         enumValue.ToString(),
                                     }
                                     : new HashSet<string>();
-                                enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue)
+                                enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue,
+                                    obsolete && obsoleteMode == EObsolete.Disable)
                                 {
                                     ExtraSearches = extraSearches,
+                                    obsolete = obsolete,
                                 });
                             }
 
@@ -502,7 +524,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         new ValueButtonRawInfo(
                                             RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                                             each.disabled,
-                                            false,
+                                            each.obsolete,
                                             each.value))
                                     .ToArray()
                             );
@@ -615,6 +637,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                         foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
                         {
+                            if (enumValueInfo.Obsolete && obsoleteMode == EObsolete.Remove)
+                            {
+                                continue;
+                            }
+
                             IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
                             if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
                             {
@@ -627,7 +654,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                     new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                                 };
                             }
-                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Obsolete, enumValueInfo.Value));
+                            rawInfos.Add(new ValueButtonRawInfo(chunks,
+                                enumValueInfo.Obsolete && obsoleteMode == EObsolete.Disable,
+                                enumValueInfo.Obsolete, enumValueInfo.Value));
                         }
 
                         EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));

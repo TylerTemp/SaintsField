@@ -1838,7 +1838,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                             return (ValueButtonsAttributeDrawer.UIToolkitValueEditEnum(
                                 oldElement,
-                                new ValueButtonsAttribute(),
+                                new ValueButtonsAttribute(obsolete: enumToggleButtonsAttribute.Obsolete),
                                 label,
                                 value,
                                 enumType,

@@ -31,7 +31,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             public object Value;
 
-            public UIToolkitWrapper(EnumMetaInfo metaInfo, string label, bool labelGrayColor, bool inHorizontalLayout, Action<object> setterOrNull)
+            public UIToolkitWrapper(EnumMetaInfo metaInfo, EObsolete obsoleteMode, string label, bool labelGrayColor,
+                bool inHorizontalLayout, Action<object> setterOrNull)
             {
                 MetaInfo = metaInfo;
 
@@ -100,6 +101,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 RichTextDrawer.EmptyRichTextTagProvider emptyRichTextTagProvider = new RichTextDrawer.EmptyRichTextTagProvider();
                 foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
                 {
+                    if (enumValueInfo.Obsolete && obsoleteMode == EObsolete.Remove)
+                    {
+                        continue;
+                    }
+
                     IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
                     if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
                     {
@@ -112,7 +118,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                         };
                     }
-                    rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Obsolete, enumValueInfo.Value));
+                    rawInfos.Add(new ValueButtonRawInfo(chunks,
+                        enumValueInfo.Obsolete && obsoleteMode == EObsolete.Disable,
+                        enumValueInfo.Obsolete, enumValueInfo.Value));
                 }
                 FlagButtonsArrangeElement.UpdateButtons(
                     rawInfos
@@ -129,7 +137,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             }
 
             EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(enumType);
-            UIToolkitWrapper wrapper = new UIToolkitWrapper(metaInfo, label, labelGrayColor, inHorizontalLayout, setterOrNull);
+            UIToolkitWrapper wrapper = new UIToolkitWrapper(metaInfo, enumToggleButtonsAttribute.Obsolete, label,
+                labelGrayColor, inHorizontalLayout, setterOrNull);
             Debug.Assert(metaInfo.IsFlags);
 
             FlagButtonFullToggleGroupElement
