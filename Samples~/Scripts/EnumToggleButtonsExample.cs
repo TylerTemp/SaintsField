@@ -93,10 +93,12 @@ namespace SaintsField.Samples.Scripts
 
         [EnumToggleButtons, FieldDefaultExpand] public EnumLabelField labelField;
 
-        [FieldSeparator("Unity new added")]
-
-        [EnumButtons] public EnumExpand unityEnumE;
-        [EnumButtons] public BitMask unityFlagsE;
+// #if UNITY_6000_1_OR_NEWER
+//         [FieldSeparator("Unity new added")]
+//
+//         [EnumButtons] public EnumExpand unityEnumE;
+//         [EnumButtons] public BitMask unityFlagsE;
+// #endif
 
         [Serializable]
         public enum EnumWithObsolete
@@ -115,8 +117,10 @@ namespace SaintsField.Samples.Scripts
             [Obsolete("Example of Obsolete")]
             ObsoletedOption = 1 << 2,
         }
+#if UNITY_6000_1_OR_NEWER
         [EnumButtons] public EnumWithObsolete unityEnumExc;
         [EnumButtons(includeObsolete: true)] public EnumWithObsolete unityEnumInc;
+#endif
 
         [FieldSeparator("SaintsField Obsolete processing")]
 
@@ -130,5 +134,64 @@ namespace SaintsField.Samples.Scripts
         [ValueButtons] public EnumWithObsolete valueButtonsEnumExc;
         [ValueButtons(EObsolete.Include)] public EnumWithObsolete valueButtonsEnumInc;
         [ValueButtons(EObsolete.Disable)] public EnumWithObsolete valueButtonsEnumDis;
+
+        // Both orders reproduce value-to-name ambiguity on different enum implementations.
+        // Current and Legacy share a value, but only Legacy is obsolete.
+        [Serializable]
+        public enum AliasCurrentFirst
+        {
+            [InspectorName("<color=green><label/></color>")]
+            Current = 1,
+            [Obsolete("Use Current instead")]
+            [InspectorName("<color=orange><label/></color>")]
+            Legacy = 1,
+            Other = 2,
+        }
+
+        [Serializable]
+        public enum AliasLegacyFirst
+        {
+            [Obsolete("Use Current instead")]
+            [InspectorName("<color=orange><label/></color>")]
+            Legacy = 1,
+            [InspectorName("<color=green><label/></color>")]
+            Current = 1,
+            Other = 2,
+        }
+
+        // Remove: Current remains selectable. Disable: only Legacy is disabled.
+        // Include: Current and Legacy retain their own names and colors.
+        // Older code may hide/disable both aliases or repeat one alias's label.
+        [FieldSeparator("Same-value aliases: Current declared first")]
+        [EnumToggleButtons] public AliasCurrentFirst aliasCurrentFirstRemove = AliasCurrentFirst.Current;
+        [EnumToggleButtons(EObsolete.Disable)] public AliasCurrentFirst aliasCurrentFirstDisable = AliasCurrentFirst.Current;
+        [EnumToggleButtons(EObsolete.Include)] public AliasCurrentFirst aliasCurrentFirstInclude = AliasCurrentFirst.Current;
+
+        [FieldSeparator("Same-value aliases: Legacy declared first")]
+        [ValueButtons] public AliasLegacyFirst aliasLegacyFirstRemove = AliasLegacyFirst.Current;
+        [ValueButtons(EObsolete.Disable)] public AliasLegacyFirst aliasLegacyFirstDisable = AliasLegacyFirst.Current;
+        [ValueButtons(EObsolete.Include)] public AliasLegacyFirst aliasLegacyFirstInclude = AliasLegacyFirst.Current;
+
+        // The menu should contain both distinct alias labels, even though their values match.
+        [MenuDropdown] public AliasCurrentFirst aliasMenu = AliasCurrentFirst.Current;
+
+        [Serializable, Flags]
+        public enum FlagsWithAliases
+        {
+            None = 0,
+            [Obsolete("Use Current instead")]
+            [InspectorName("<color=orange><label/></color>")]
+            Legacy = 1,
+            [InspectorName("<color=green><label/></color>")]
+            Current = 1,
+            Other = 2,
+        }
+
+        // Older EnumFlagsUtil.GetMetaInfo throws on the duplicate dictionary key (1).
+        // Inspecting these fields should succeed; only Legacy is hidden/disabled.
+        [FieldSeparator("Flags with same-value aliases")]
+        [EnumToggleButtons] public FlagsWithAliases aliasFlagsRemove = FlagsWithAliases.Current;
+        [EnumToggleButtons(EObsolete.Disable)] public FlagsWithAliases aliasFlagsDisable = FlagsWithAliases.Current;
+        [EnumToggleButtons(EObsolete.Include)] public FlagsWithAliases aliasFlagsInclude = FlagsWithAliases.Current;
     }
 }

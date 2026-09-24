@@ -77,11 +77,10 @@ namespace SaintsField.Editor.Drawers.MenuDropdownDrawer
                 Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
                 if(enumType.IsEnum)
                 {
-                    Array enumValues = Enum.GetValues(enumType);
                     MenuDropdown<object> enumDropdown = new MenuDropdown<object>();
-                    foreach (object enumValue in enumValues)
+                    foreach (FieldInfo enumField in ReflectUtils.GetEnumFields(enumType))
                     {
-                        enumDropdown.Add(ReflectUtils.GetFieldInfoFromEnum(enumType, enumValue).Name, enumValue);
+                        enumDropdown.Add(ReflectUtils.GetFieldInfoFromEnum(enumField).Name, enumField.GetValue(null));
                     }
 
                     error = "";

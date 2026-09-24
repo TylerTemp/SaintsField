@@ -110,28 +110,37 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
             bool hasFlags = enumType.GetCustomAttributes(typeof(FlagsAttribute), true).Length > 0;
 
-            Dictionary<long, EnumDisplayInfo> allIntToName = Enum
-                .GetValues(enumType)
-                .Cast<object>()
-                .ToDictionary(
-                    Convert.ToInt64,
-                    each =>
-                    {
-                        string normalName = Enum.GetName(enumType, each);
-                        ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(enumType, each);
-                        string richName = enumFieldInfo.Name;
-                        if (enumFieldInfo.HasRichLabel)
-                        {
-                            richName = EnumLabelRegex.Replace(richName, normalName ?? "");
-                        }
-                        return new EnumDisplayInfo
-                        {
-                            Name = normalName,
-                            HasRichName = enumFieldInfo.HasRichLabel,
-                            RichName = enumFieldInfo.HasRichLabel? richName: null,
-                        };
-                    }
-                );
+            Dictionary<long, EnumDisplayInfo> allIntToName = new Dictionary<long, EnumDisplayInfo>();
+            HashSet<long> obsoleteValues = new HashSet<long>();
+            foreach (FieldInfo enumField in ReflectUtils.GetEnumFields(enumType))
+            {
+                long enumValue = Convert.ToInt64(enumField.GetValue(null));
+                ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(enumField);
+                // A mask has one label per value; prefer a non-obsolete alias when available.
+                if (allIntToName.ContainsKey(enumValue) &&
+                    (!obsoleteValues.Contains(enumValue) || enumFieldInfo.IsObsolete))
+                {
+                    continue;
+                }
+
+                string richName = enumFieldInfo.HasRichLabel
+                    ? EnumLabelRegex.Replace(enumFieldInfo.Name, enumField.Name)
+                    : null;
+                allIntToName[enumValue] = new EnumDisplayInfo
+                {
+                    Name = enumField.Name,
+                    HasRichName = enumFieldInfo.HasRichLabel,
+                    RichName = richName,
+                };
+                if (enumFieldInfo.IsObsolete)
+                {
+                    obsoleteValues.Add(enumValue);
+                }
+                else
+                {
+                    obsoleteValues.Remove(enumValue);
+                }
+            }
 
             long allCheckedInt = allIntToName.Keys.Aggregate(0L, (acc, value) => acc | value);
             Dictionary<long, EnumDisplayInfo> bitValueToName = allIntToName

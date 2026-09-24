@@ -2929,14 +2929,14 @@ namespace SaintsField.Editor.Utils
 
         public static IEnumerable<EnumValueInfo> GetEnumValues(Type elementType)
         {
-            Array enumValues = Enum.GetValues(elementType);
-            foreach (object enumValue in enumValues)
+            foreach (FieldInfo field in ReflectUtils.GetEnumFields(elementType))
             {
-                ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(elementType, enumValue);
+                object enumValue = field.GetValue(null);
+                ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(field);
                 string useLabel = null;
                 if (enumFieldInfo.HasRichLabel)
                 {
-                    useLabel = EnumLabelRegex.Replace(enumFieldInfo.Name, enumValue.ToString());
+                    useLabel = EnumLabelRegex.Replace(enumFieldInfo.Name, field.Name);
                 }
 
                 // Debug.Log($"Found: {enumValue}");

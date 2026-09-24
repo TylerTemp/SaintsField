@@ -18660,6 +18660,27 @@ MonoBehaviour:
   enumNormal: 0
   enumExpand: 0
   labelField: 0
+  unityEnumExc: 0
+  unityEnumInc: 0
+  sFlagExc: -1
+  sFlagInc: 3
+  sFlagDis: 1
+  sEnumExc: 0
+  sEnumInc: 1
+  sEnumDis: 1
+  valueButtonsEnumExc: 0
+  valueButtonsEnumInc: 0
+  valueButtonsEnumDis: 0
+  aliasCurrentFirstRemove: 1
+  aliasCurrentFirstDisable: 1
+  aliasCurrentFirstInclude: 1
+  aliasLegacyFirstRemove: 1
+  aliasLegacyFirstDisable: 1
+  aliasLegacyFirstInclude: 1
+  aliasMenu: 1
+  aliasFlagsRemove: 2
+  aliasFlagsDisable: 1
+  aliasFlagsInclude: 1
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0

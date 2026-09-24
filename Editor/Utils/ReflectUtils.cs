@@ -566,13 +566,21 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static EnumFieldInfo GetFieldInfoFromEnum(Type enumType, object enumValue)
+        public static IEnumerable<FieldInfo> GetEnumFields(Type enumType)
         {
-            string enumFieldName = Enum.GetName(enumType, enumValue);
-            FieldInfo fieldInfo = enumType.GetField(enumFieldName);
+            bool isULong = Enum.GetUnderlyingType(enumType) == typeof(ulong);
+            // Match Enum.GetValues' unsigned ordering without losing alias field identities.
+            return enumType.GetFields(BindingFlags.Public | BindingFlags.Static)
+                .OrderBy(field => isULong
+                    ? (ulong)field.GetRawConstantValue()
+                    : unchecked((ulong)Convert.ToInt64(field.GetRawConstantValue())));
+        }
+
+        public static EnumFieldInfo GetFieldInfoFromEnum(FieldInfo fieldInfo)
+        {
             Attribute[] attributes = ReflectCache.GetCustomAttributes<Attribute>(fieldInfo);
             bool hasRichLabel = false;
-            string name = enumFieldName;
+            string name = fieldInfo.Name;
             bool isObsolete = false;
 
             foreach (Attribute attribute in attributes)
