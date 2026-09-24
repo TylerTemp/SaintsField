@@ -80,7 +80,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             if (_obsolete)
             {
                 Color obsColor = EColor.OrangeRed.GetColor();
-                obsColor.a = 0.6f;
+                obsColor.a = enabledSelf? 0.6f: 0.2f;
                 style.backgroundColor = obsColor;
                 style.color = EColor.Gray.GetColor();
             }
