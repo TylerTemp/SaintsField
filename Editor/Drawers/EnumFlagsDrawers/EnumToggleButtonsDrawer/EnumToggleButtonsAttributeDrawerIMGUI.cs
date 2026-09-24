@@ -87,7 +87,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     useCache.MetaInfo = metaInfo;
                     useCache.Error = metaInfo.Error;
                     useCache.RawInfos = ValueButtonsAttributeDrawer.UtilMakeButtonRawInfos(metaInfo, this);
-                }, property, enumToggleButtonsAttribute, info, parent, true);
+                }, property, enumToggleButtonsAttribute, info, parent, true,
+                    enumToggleButtonsAttribute.Obsolete);
             }
 
             return (cache.MetaInfo, cache, cache.RawInfos);

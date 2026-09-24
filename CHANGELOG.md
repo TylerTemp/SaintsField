@@ -1,8 +1,9 @@
 # Changelog
 
-## WIP ##
+## 5.30.2 ##
 
-Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload
+1.  Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload
+2.  Add: `[ValueButtons]` and `[EnumToggleButtons]` now support `EObsolete` to remove, disable, or include obsolete enum values
 
 ## 5.30.1 ##
 

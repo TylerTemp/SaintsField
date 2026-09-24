@@ -132,7 +132,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             bool isFlags = Attribute.IsDefined(rawType, typeof(FlagsAttribute));
             if (!isFlags)
             {
-                ValueButtonsAttributeDrawer.UtilOnAwakeUIToolkit(noFold, this, property, saintsAttribute, container,
+                ValueButtonsAttributeDrawer.UtilOnAwakeUIToolkit(noFold, obsolete, this, property, saintsAttribute, container,
                     onValueChangedCallback, info, parent);
                 return;
             }

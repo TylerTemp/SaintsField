@@ -11,6 +11,7 @@ namespace SaintsField.DropdownBase
         object value { get; }
         IReadOnlyList<IDropdown> children { get; }
         bool disabled { get; }
+        bool obsolete { get; set; }
         string icon { get; }
         Color? color { get; }
         bool isSeparator { get; }

@@ -5571,6 +5571,10 @@ Parameters:
 
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   `bool noFold=false`: when `True`, always expand the buttons
+*   `EObsolete obsolete=EObsolete.Remove`: when using on an enum, controls how values marked with `[Obsolete]` are displayed:
+    *   `EObsolete.Remove`: hide obsolete values
+    *   `EObsolete.Disable`: show obsolete values as disabled buttons
+    *   `EObsolete.Include`: show obsolete values as selectable buttons
 *   Allow Multiple: No
 
 Use property/field/function as options
@@ -5637,6 +5641,24 @@ public enum EnumOpt
 ```
 
 ![](https://github.com/user-attachments/assets/83eefee7-5d0a-4c88-84d7-95a97c56f860)
+
+Obsolete enum values are removed by default. Use `EObsolete.Disable` or `EObsolete.Include` to keep them visible:
+
+```csharp
+[Serializable]
+public enum EnumWithObsolete
+{
+    Default,
+    [Obsolete("Use Default instead")]
+    Legacy,
+}
+
+[ValueButtons] public EnumWithObsolete withoutObsolete;
+[ValueButtons(EObsolete.Disable)] public EnumWithObsolete disabledObsolete;
+[ValueButtons(EObsolete.Include)] public EnumWithObsolete includedObsolete;
+```
+
+![](https://github.com/user-attachments/assets/dc8c8fe5-49c4-4a9e-b59f-8317e617fab6)
 
 Using on a bool to toggle `True`/`False`
 
@@ -5766,6 +5788,10 @@ Note: Use `DefaultExpand` if you want it to be expanded by default.
 **Parameters**:
 
 *   `bool noFold=false`: when `True`, always expand the buttons
+*   `EObsolete obsolete=EObsolete.Remove`: controls how values marked with `[Obsolete]` are displayed:
+    *   `EObsolete.Remove`: hide obsolete values
+    *   `EObsolete.Disable`: show obsolete values as disabled buttons
+    *   `EObsolete.Include`: show obsolete values as selectable buttons
 
 ```csharp
 using SaintsField;
@@ -5799,6 +5825,18 @@ public enum EnumNormal  // normal enum, not flags
 [EnumToggleButtons] public EnumNormal myEnumNormal;
 
 [Serializable]
+public enum EnumWithObsolete
+{
+    Default,
+    [Obsolete("Use Default instead")]
+    Legacy,
+}
+
+[EnumToggleButtons] public EnumWithObsolete withoutObsolete;
+[EnumToggleButtons(EObsolete.Disable)] public EnumWithObsolete disabledObsolete;
+[EnumToggleButtons(EObsolete.Include)] public EnumWithObsolete includedObsolete;
+
+[Serializable]
 public enum EnumExpand
 {
     Value1,
@@ -5817,6 +5855,10 @@ public enum EnumExpand
 ```
 
 ![image](https://github.com/user-attachments/assets/4e839b76-7228-48bd-ae4f-388a79d2534a)
+
+Obsoleted type will have a different style if included
+
+![](https://github.com/user-attachments/assets/eb2b5675-ea5d-4157-9db3-5b357bd5e122)
 
 You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
 

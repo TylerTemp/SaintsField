@@ -54,7 +54,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfoWithDropdown(IDropdown dropdownListValue, SerializedProperty property, IPathedDropdownAttribute advancedDropdownAttribute, MemberInfo field, object parentObj)
+        private static AdvancedDropdownMetaInfo GetMetaInfoWithDropdown(IDropdown dropdownListValue,
+            SerializedProperty property, IPathedDropdownAttribute advancedDropdownAttribute, MemberInfo field,
+            object parentObj)
         {
             if(dropdownListValue == null)
             {
@@ -120,7 +122,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             };
         }
 
-        public static void GetMetaInfoAsync(Util.ITicker ticker, Action<AdvancedDropdownMetaInfo> callback, SerializedProperty property, IPathedDropdownAttribute pathedDropdown, MemberInfo field, object parentObj, bool isImGui)
+        public static void GetMetaInfoAsync(Util.ITicker ticker, Action<AdvancedDropdownMetaInfo> callback,
+            SerializedProperty property, IPathedDropdownAttribute pathedDropdown, MemberInfo field,
+            object parentObj, bool isImGui, EObsolete eObsolete = EObsolete.Remove)
         {
             string funcName = pathedDropdown.FuncName;
 
@@ -175,8 +179,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 if(elementType.IsEnum)
                 {
                     Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
-                    foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(elementType))
+                    foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in
+                             Util.GetEnumValues(elementType))
                     {
+                        if (obsolete && eObsolete == EObsolete.Remove)
+                        {
+                            continue;
+                        }
+
                         // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
                         HashSet<string> extraSearches = enumRichLabel == enumLabel
                             ? new HashSet<string>
@@ -184,20 +194,26 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 enumValue.ToString(),
                             }
                             : new HashSet<string>();
+                        bool disabled = obsolete && eObsolete == EObsolete.Disable;
+                        Dropdown<object> enumValueDropdown;
                         if (pathedDropdown.slashAsSub)
                         {
-                            enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue, extraSearches: extraSearches);
+                            enumValueDropdown = enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue, disabled,
+                                extraSearches: extraSearches);
                         }
                         else
                         {
-                            enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue)
+                            enumValueDropdown = new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue, disabled)
                             {
                                 ExtraSearches = extraSearches,
-                            });
+                            };
+                            enumDropdown.Add(enumValueDropdown);
                         }
+                        enumValueDropdown.obsolete = obsolete;
                     }
 
-                    callback.Invoke(GetMetaInfoWithDropdown(enumDropdown, property, pathedDropdown, field, parentObj));
+                    callback.Invoke(GetMetaInfoWithDropdown(enumDropdown, property, pathedDropdown, field,
+                        parentObj));
                     return;
                 }
 
@@ -719,13 +735,16 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
                     foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(elementType))
                     {
+                        Dropdown<object> enumValueDropdown;
                         if (flat)
                         {
-                            enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue));
+                            enumValueDropdown = new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue);
+                            enumDropdown.Add(enumValueDropdown);
                         }
                         else {
-                            enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
+                            enumValueDropdown = enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
                         }
+                        enumValueDropdown.obsolete = obsolete;
                     }
 
                     error = "";
@@ -955,7 +974,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private static Dropdown<object> ReWrapUniqueList(IDropdown dropdownListValue, EUnique eUnique,
             IReadOnlyList<object> existsValues, bool preserveCurrentValue, object curValue)
         {
-            Dropdown<object> dropdownList = new Dropdown<object>(dropdownListValue.displayName, dropdownListValue.disabled, dropdownListValue.icon);
+            Dropdown<object> dropdownList = new Dropdown<object>(dropdownListValue.displayName,
+                dropdownListValue.disabled, dropdownListValue.icon)
+            {
+                obsolete = dropdownListValue.obsolete,
+            };
             IReadOnlyList<Dropdown<object>> children = ReWrapUniqueChildren(dropdownListValue.children, eUnique,
                 existsValues, preserveCurrentValue, curValue);
             dropdownList.SetChildren(children.ToList());
@@ -980,7 +1003,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         bool isDisabled = originChild.disabled ||
                                           subChildren.All(each => each.isSeparator || each.disabled);
-                        Dropdown<object> newChild = new Dropdown<object>(originChild.displayName, isDisabled, originChild.icon);
+                        Dropdown<object> newChild = new Dropdown<object>(originChild.displayName, isDisabled,
+                            originChild.icon)
+                        {
+                            obsolete = originChild.obsolete,
+                        };
                         newChild.SetChildren(subChildren.ToList());
                         newChildren.Add(newChild);
                     }
@@ -997,7 +1024,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             originChild.disabled,
                             originChild.icon,
                             originChild.color,
-                            originChild.isSeparator));
+                            originChild.isSeparator)
+                        {
+                            obsolete = originChild.obsolete,
+                        });
                     }
                     else if (eUnique == EUnique.Disable)
                     {
@@ -1007,7 +1037,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             true,
                             originChild.icon,
                             originChild.color,
-                            originChild.isSeparator));
+                            originChild.isSeparator)
+                        {
+                            obsolete = originChild.obsolete,
+                        });
                     }
                     else if (eUnique == EUnique.Remove)
                     {
@@ -1019,7 +1052,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 true,
                                 originChild.icon,
                                 originChild.color,
-                                originChild.isSeparator));
+                                originChild.isSeparator)
+                            {
+                                obsolete = originChild.obsolete,
+                            });
                         }
                     }
                 }

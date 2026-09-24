@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
@@ -140,12 +139,14 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            bool noFold = ((ValueButtonsAttribute)saintsAttribute).NoFold;
-            UtilOnAwakeUIToolkit(noFold, this, property, saintsAttribute, container, onValueChangedCallback,
-                info, parent);
+            ValueButtonsAttribute valueButtonsAttribute = (ValueButtonsAttribute)saintsAttribute;
+            UtilOnAwakeUIToolkit(valueButtonsAttribute.NoFold, valueButtonsAttribute.Obsolete, this, property,
+                saintsAttribute, container, onValueChangedCallback, info, parent);
         }
 
-        public static void UtilOnAwakeUIToolkit(bool noFold, IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, Action<object> onValueChangedCallback, MemberInfo info, object parent)
+        public static void UtilOnAwakeUIToolkit(bool noFold, EObsolete obsolete,
+            IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute,
+            VisualElement container, Action<object> onValueChangedCallback, MemberInfo info, object parent)
         {
             EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
@@ -252,18 +253,11 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                     if(initMetaInfo.Error == "")
                     {
                         valueButtonsArrangeElement.UpdateButtons(
-                            initMetaInfo.DropdownListValue
-                                .Select(each =>
-                                    new ValueButtonRawInfo(
-                                        RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
-                                        each.disabled,
-                                        false,
-                                        each.value))
-                                .ToArray()
+                            UtilMakeButtonRawInfos(initMetaInfo, richTextTagProvider)
                         );
                         RefreshCurValue();
                     }
-                }, property, valueButtonsAttribute, info, parent, false);
+                }, property, valueButtonsAttribute, info, parent, false, obsolete);
             }
         }
     }

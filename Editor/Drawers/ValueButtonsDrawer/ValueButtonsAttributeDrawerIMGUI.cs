@@ -128,11 +128,14 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             }
 
             return metaInfo.DropdownListValue
-                .Select(each => new ValueButtonRawInfo(
-                    RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
-                    each.disabled,
-                    false,
-                    each.value))
+                .Select(each =>
+                {
+                    return new ValueButtonRawInfo(
+                        RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
+                        each.disabled,
+                        each.obsolete,
+                        each.value);
+                })
                 .ToArray();
         }
 
@@ -270,7 +273,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         }
 
         private static AdvancedDropdownMetaInfo UpdateStatus(SerializedProperty property,
-            PathedDropdownAttribute valueButtonsAttribute, MemberInfo info, object parent,
+            ValueButtonsAttribute valueButtonsAttribute, MemberInfo info, object parent,
             IRichTextTagProvider richTextTagProvider, out InfoIMGUI cache, out ValueButtonRawInfo[] rawInfos)
         {
             cache = EnsureKey(property);
@@ -290,7 +293,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                     useCache.MetaInfo = metaInfo;
                     useCache.Error = metaInfo.Error;
                     useCache.RawInfos = UtilMakeButtonRawInfos(metaInfo, richTextTagProvider);
-                }, property, valueButtonsAttribute, info, parent, true);
+                }, property, valueButtonsAttribute, info, parent, true, valueButtonsAttribute.Obsolete);
             }
 
             rawInfos = cache.RawInfos;
@@ -484,7 +487,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index,
             FieldInfo info, object parent)
         {
-            UpdateStatus(property, (PathedDropdownAttribute)saintsAttribute, info, parent, this, out _, out _);
+            UpdateStatus(property, (ValueButtonsAttribute)saintsAttribute, info, parent, this, out _, out _);
             ValueButtonsAttribute valueButtonsAttribute = (ValueButtonsAttribute)saintsAttribute;
             return EnsureKey(property).Error != "" || valueButtonsAttribute.NoFold || property.isExpanded;
         }

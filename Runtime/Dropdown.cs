@@ -22,6 +22,7 @@ namespace SaintsField
             _typeChildren.Select(each => (IDropdown)each).ToList();
 
         public bool disabled { get; }
+        public bool obsolete { get; set; }
         public string icon { get; }
         public Color? color { get; }
         public bool isSeparator { get; }
@@ -84,9 +85,11 @@ namespace SaintsField
         }
 
         // this will parse "/"
-        public void Add(string displayNames, T value, bool disabled = false, string icon = null, Color? color = null, ICollection<string> extraSearches=null)
+        public Dropdown<T> Add(string displayNames, T value, bool disabled = false, string icon = null,
+            Color? color = null, ICollection<string> extraSearches=null)
         {
-            AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon, color, extraSearches);
+            return AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled,
+                icon, color, extraSearches);
         }
 
         // this add a separator
@@ -108,18 +111,21 @@ namespace SaintsField
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public static void AddByNames(Dropdown<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, Color? color=null, ICollection<string> extraSearches=null)
+        public static Dropdown<T> AddByNames(Dropdown<T> container, Queue<string> nameQuery, T value,
+            bool disabled = false, string icon = null, Color? color=null,
+            ICollection<string> extraSearches=null)
         {
             int curCount = nameQuery.Count;
             string curName = curCount == 0 ? "": nameQuery.Dequeue();
             int leftCount = nameQuery.Count;
             if (leftCount == 0)
             {
-                container.Add(curName == ""? Separator(): new Dropdown<T>(curName, value, disabled, icon, color)
+                Dropdown<T> result = curName == ""? Separator(): new Dropdown<T>(curName, value, disabled, icon, color)
                 {
                     ExtraSearches = extraSearches ?? new HashSet<string>(),
-                });
-                return;
+                };
+                container.Add(result);
+                return result;
             }
 
             IDropdown matchedChild = container.children.FirstOrDefault(each => each.displayName == curName);
@@ -134,7 +140,7 @@ namespace SaintsField
                 container.Add(targetChild);
             }
             // ReSharper disable once TailRecursiveCall
-            AddByNames(targetChild, nameQuery, value, disabled, icon, color);
+            return AddByNames(targetChild, nameQuery, value, disabled, icon, color);
         }
 
         public void AddSeparator()
