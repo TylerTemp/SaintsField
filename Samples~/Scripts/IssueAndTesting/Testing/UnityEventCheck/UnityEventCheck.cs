@@ -39,7 +39,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing.UnityEventCheck
             Debug.Log($"Added captured lambda. Capture value={captureValue}.", this);
             return;
 
-            void CapturedLambdaListener() => Debug.Log($"Captured lambda invoked. Captured value={captureValue}, component={GetEntityId()}.", this);
+            void CapturedLambdaListener() => Debug.Log($"Captured lambda invoked. Captured value={captureValue}.", this);
         }
 
         [Button]
@@ -51,7 +51,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing.UnityEventCheck
 
         private void InstanceCallback()
         {
-            Debug.Log($"Instance callback invoked on {name} (instance ID {GetEntityId()}).", this);
+            Debug.Log($"Instance callback invoked on {name}.", this);
         }
 
         private void ParameterizedCallback(int intValue, GameObject go)
