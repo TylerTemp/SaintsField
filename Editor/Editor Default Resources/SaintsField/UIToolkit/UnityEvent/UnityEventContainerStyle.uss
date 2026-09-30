@@ -1,0 +1,69 @@
+.body {
+    min-height: 20px;
+}
+
+.title {
+    padding-left: 0;
+}
+
+.buttons {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: row;
+}
+
+.foldoutButton {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: row;
+    margin: 0;
+    padding-left: 2px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-width: 0;
+    background-color: rgba(1, 1, 1, 0);
+}
+
+.invokeButton {
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/run-code.png?fileID=2800000&guid=5f4fbc9679896434db125563972f9259&type=3#run-code");
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+    border-width: 0;
+    background-color: rgba(1, 1, 1, 0);
+    width: 14px;
+    height: 14px;
+}
+
+.paramsContainer {
+    flex-grow: 1;
+}
+
+.paramsButtons {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+.paramButton {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.okButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/check.png?fileID=2800000&guid=ed18320f902c7d847bc9df6a063170d0&type=3#check");
+    -unity-background-image-tint-color: rgb(50, 205, 50);
+}
+
+.cancelButton {
+    -unity-background-image-tint-color: rgb(255, 69, 0);
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/close-padding.png?fileID=2800000&guid=36dd69db1bf18b64eb0aa0ef5d34280b&type=3#close-padding");
+}
+
+.infoLabel {
+    color: rgb(128, 128, 128);
+}

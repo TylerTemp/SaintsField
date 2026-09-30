@@ -111,11 +111,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.3**
+**5.30.4**
 
-1.  Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload
-2.  Add: `[ValueButtons]` and `[EnumToggleButtons]` now support `EObsolete` to remove, disable, or include obsolete enum values
-3.  Fix: `[EnumToggleButtons]` now can properly handle enum which has the same value
+*   `ShowInInspector` for `UnityEvent` type now can show runtime callbacks (added by `AddLisenter(...)`)
+*   You can remove runtime callbacks with it
+*   You can invoke that `UnityEvent<...>` in inspector. If it requires prameters, you can input it manually
 
 ## Usage ##
 

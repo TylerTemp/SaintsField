@@ -2521,6 +2521,32 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
+**`UnityEvent` Support**
+
+Using on a `UnityEvent` (or a `UnityEvent<...>`) allows you to inspect callbacks added in runtime. (Note: Serialized callback will not show)
+
+This is useful if you want to see what is registered to this event.
+
+```csharp
+using SaintsField.Playa;
+
+[ShowInInspector]
+public UnityEvent _event;  // directly using on a serialized UnityEvent is supported
+
+[ShowInInspector] private UnityEvent showEvent => _event;  // non-serialized type is also fine
+```
+
+[![video](https://github.com/user-attachments/assets/28ad0038-e028-442f-9859-25a0c4b3da3d)](https://github.com/user-attachments/assets/b9a1134b-cad7-4a66-947b-426194238f8d)
+
+If it requires arguments, you can manually input it before invoke:
+
+```csharp
+[ShowInInspector]
+public UnityEvent<int, GameObject> _eventWithParameters;  // you can manually set int, GameObject before invoke in Inspector=
+```
+
+[![video](https://github.com/user-attachments/assets/25847b51-0659-4ff0-8e52-01910a52a80a)](https://github.com/user-attachments/assets/c07083c2-4879-4b58-a363-bfe8d655c652)
+
 **Supported Attributes**: `ShowInInspector` can work together with many attributes, please see each attribute section to know if it's been supported.
 
 ### Numerical ###

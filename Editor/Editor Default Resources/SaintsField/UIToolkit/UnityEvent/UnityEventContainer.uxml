@@ -1,0 +1,27 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/UnityEvent/UnityEventContainerStyle.uss?fileID=7433441132597879392&amp;guid=aa0655e7ea5ba464b918ffeb48266321&amp;type=3#UnityEventContainerStyle"/>
+    <ui:VisualElement name="root" class="unity-event__container">
+        <ui:VisualElement name="title" class="unity-list-view__header title">
+            <ui:VisualElement name="buttons" class="buttons" style="flex-grow: 1;">
+                <ui:Button name="foldoutButton" class="foldoutButton">
+                    <ui:Image/>
+                    <ui:Label name="label" text="Label" class="unity-label"/>
+                    <ui:Label name="params" class="unity-label"/>
+                </ui:Button>
+                <ui:Label text="(Runtime)" name="infoLabel" class="infoLabel"/>
+                <ui:Button name="invokeButton" tooltip="Invoke This Event" class="invokeButton"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="paramsPanel" style="flex-grow: 1;">
+                <ui:VisualElement name="paramsContainer" class="paramsContainer"/>
+                <ui:VisualElement name="paramsButtons" class="paramsButtons">
+                    <ui:Button name="okButton" class="paramButton okButton"/>
+                    <ui:Button name="cancelButton" class="paramButton cancelButton"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="body" class="body unity-collection-view--with-border unity-list-view__scroll-view--with-footer unity-event__list-view-scroll-view">
+            <ui:Label text="No Runtime Call" name="emptyLabel" class="unity-list-view__empty-label"/>
+            <ui:VisualElement name="items"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

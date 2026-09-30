@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.30.4 ##
+
+*   `ShowInInspector` for `UnityEvent` type now can show runtime callbacks (added by `AddLisenter(...)`)
+*   You can remove runtime callbacks with it
+*   You can invoke that `UnityEvent<...>` in inspector. If it requires prameters, you can input it manually
+
 ## 5.30.3 ##
 
 1.  Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload

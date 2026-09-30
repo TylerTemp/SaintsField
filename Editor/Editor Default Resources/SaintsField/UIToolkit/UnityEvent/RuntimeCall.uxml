@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/UnityEvent/RuntimeCallStyle.uss?fileID=7433441132597879392&amp;guid=a4f754c62c0b21e499b27f8720462149&amp;type=3#RuntimeCallStyle"/>
+    <ui:VisualElement name="body" class="body">
+        <ui:VisualElement name="content" class="content"/>
+        <ui:VisualElement name="buttons" class="buttons">
+            <ui:Button name="deleteButton" tooltip="Remove" class="deleteButton button"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:HelpBox name="helpBox" message-type="Error" class="helpBox"/>
+</ui:UXML>

@@ -1,0 +1,57 @@
+:root {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+
+.label {
+    -unity-text-align: middle-left;
+}
+
+.parentContainer {
+    width: 150px;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.parentNameContainer {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding-left: 2px;
+}
+
+.lambda {
+    color: rgb(255, 69, 0);
+    -unity-font-style: bold;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.parentName {
+    flex-grow: 1;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.functionContainer {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding-left: 4px;
+}
+
+.functionName {
+    flex-grow: 1;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.functionParams {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-direction: row;
+}

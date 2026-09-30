@@ -1,0 +1,35 @@
+.body {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.content {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.helpBox {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.buttons {
+    flex-direction: row;
+    flex-grow: 0;
+    flex-shrink: 0;
+    padding-right: 2px;
+}
+
+.button {
+    background-size: 14px 14px;
+    /*-unity-background-scale-mode: scale-to-fit;*/
+    /*-unity-background-scale-mode: length;*/
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.deleteButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/close.png");
+}
