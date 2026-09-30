@@ -111,7 +111,7 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.2**
+**5.30.3**
 
 1.  Fix: `[Chips]` could throw when the inspector rebuilt immediately after a domain reload
 2.  Add: `[ValueButtons]` and `[EnumToggleButtons]` now support `EObsolete` to remove, disable, or include obsolete enum values
