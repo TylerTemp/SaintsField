@@ -56,13 +56,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfoWithDropdown(IDropdown dropdownListValue,
             SerializedProperty property, IPathedDropdownAttribute advancedDropdownAttribute, MemberInfo field,
-            object parentObj)
+            object parentObj, MemberInfo dropdownMemberInfo = null)
         {
             if(dropdownListValue == null)
             {
                 return new AdvancedDropdownMetaInfo
                 {
                     Error = "dropdownList is null",
+                    MemberInfo = dropdownMemberInfo,
                     CurDisplay = "[Error]",
                     CurValues = Array.Empty<object>(),
                     DropdownListValue = null,
@@ -81,6 +82,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 return new AdvancedDropdownMetaInfo
                 {
                     Error = curError,
+                    MemberInfo = dropdownMemberInfo,
                     CurDisplay = "[Error]",
                     CurValues = Array.Empty<object>(),
                     DropdownListValue = null,
@@ -100,6 +102,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 return new AdvancedDropdownMetaInfo
                 {
                     Error = curError,
+                    MemberInfo = dropdownMemberInfo,
                     CurDisplay = "[Error]",
                     CurValues = Array.Empty<object>(),
                     DropdownListValue = null,
@@ -114,7 +117,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return new AdvancedDropdownMetaInfo
             {
                 Error = "",
-                // FieldInfo = field,
+                MemberInfo = dropdownMemberInfo,
                 CurDisplay = display,
                 CurValues = new[]{curValue},
                 DropdownListValue = dropdownListValueUnique,
@@ -124,7 +127,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         public static void GetMetaInfoAsync(Util.ITicker ticker, Action<AdvancedDropdownMetaInfo> callback,
             SerializedProperty property, IPathedDropdownAttribute pathedDropdown, MemberInfo field,
-            object parentObj, bool isImGui, EObsolete eObsolete = EObsolete.Remove)
+            object parentObj, bool isImGui, EObsolete eObsolete = EObsolete.Remove, IReadOnlyList<object> overrideParams=null)
         {
             string funcName = pathedDropdown.FuncName;
 
@@ -276,13 +279,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // error = $"{property.displayName}({elementType}) is not a enum";
             }
 
-            (string getOfError, MemberInfo _, object obj) =
-                Util.GetOf<object>(funcName, null, property, field, parentObj, null);
+            (string getOfError, MemberInfo dropdownMemberInfo, object obj) =
+                Util.GetOf<object>(funcName, null, property, field, parentObj, overrideParams);
             if (getOfError != "")
             {
                 callback.Invoke(new AdvancedDropdownMetaInfo
                 {
                     Error = getOfError,
+                    MemberInfo = dropdownMemberInfo,
                     CurDisplay = "[Error]",
                     CurValues = Array.Empty<object>(),
                     DropdownListValue = null,
@@ -296,6 +300,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 callback.Invoke(new AdvancedDropdownMetaInfo
                 {
                     Error = $"value from {funcName} is null",
+                    MemberInfo = dropdownMemberInfo,
                     CurDisplay = "[Error]",
                     CurValues = Array.Empty<object>(),
                     DropdownListValue = null,
@@ -314,6 +319,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 {
                     callback.Invoke(new AdvancedDropdownMetaInfo
                     {
+                        MemberInfo = dropdownMemberInfo,
                         Error =
                             $"Unsupported type {dropdownTask.GetType()}, requires Task<Dropdown<T>> type for task",
                     });
@@ -344,13 +350,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                             serObj?.Dispose();
                         }
                         else
                         {
                             callback.Invoke(new AdvancedDropdownMetaInfo
                             {
+                                MemberInfo = dropdownMemberInfo,
                                 Error = $"Return value {taskResult} is not a Dropdown<T> type",
                                 CurDisplay = "[Error]",
                                 CurValues = Array.Empty<object>(),
@@ -368,6 +375,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 {
                     callback.Invoke(new AdvancedDropdownMetaInfo
                     {
+                        MemberInfo = dropdownMemberInfo,
                         Error = $"Awaitable is not supported, please use Awaitable<Dropdown<T>>",
                         CurDisplay = "[Error]",
                         CurValues = Array.Empty<object>(),
@@ -395,6 +403,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         callback.Invoke(new AdvancedDropdownMetaInfo
                         {
+                            MemberInfo = dropdownMemberInfo,
                             Error = $"Awaitable<{returnAwaitableValueType.FullName}> is not supported, please use UniTask<Dropdown<T>>",
                             CurDisplay = "[Error]",
                             CurValues = Array.Empty<object>(),
@@ -428,13 +437,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                             serObj?.Dispose();
                         }
                         else
                         {
                             callback.Invoke(new AdvancedDropdownMetaInfo
                             {
+                                MemberInfo = dropdownMemberInfo,
                                 Error = $"Return value {taskResult} is not a Dropdown<T> type",
                                 CurDisplay = "[Error]",
                                 CurValues = Array.Empty<object>(),
@@ -467,6 +477,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         callback.Invoke(new AdvancedDropdownMetaInfo
                         {
+                            MemberInfo = dropdownMemberInfo,
                             Error = $"UniTask<{returnUniTaskValueType.FullName}> is not supported, please use UniTask<Dropdown<T>>",
                             CurDisplay = "[Error]",
                             CurValues = Array.Empty<object>(),
@@ -500,13 +511,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                             serObj?.Dispose();
                         }
                         else
                         {
                             callback.Invoke(new AdvancedDropdownMetaInfo
                             {
+                                MemberInfo = dropdownMemberInfo,
                                 Error = $"Return value {taskResult} is not a Dropdown<T> type",
                                 CurDisplay = "[Error]",
                                 CurValues = Array.Empty<object>(),
@@ -523,7 +535,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             if (obj is IDropdown getOfDropdownListValue)
             {
                 getOfDropdownListValue.SelfCompact();
-                callback.Invoke(GetMetaInfoWithDropdown(getOfDropdownListValue, property, pathedDropdown, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(getOfDropdownListValue, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                 return;
             }
 
@@ -531,7 +543,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             {
                 Debug.LogWarning($"{obj.GetType()} is deprecated. Use `Dropdown<>` instead");
                 Dropdown<object> menuDropdown = ConvertDeprecatedMenuDropdown(md, isImGui);
-                callback.Invoke(GetMetaInfoWithDropdown(menuDropdown, property, pathedDropdown, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(menuDropdown, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                 return;
             }
 
@@ -550,7 +562,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }
                 }
 
-                callback.Invoke(GetMetaInfoWithDropdown(list, property, pathedDropdown, field, parentObj));
+                callback.Invoke(GetMetaInfoWithDropdown(list, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                 return;
             }
 
@@ -580,13 +592,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                                 serObj = new SerializedObject(inspecting);
                                 property = serObj.FindProperty(propPath);
                             }
-                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj));
+                            callback.Invoke(GetMetaInfoWithDropdown(dropdown, property, pathedDropdown, field, parentObj, dropdownMemberInfo));
                             serObj?.Dispose();
                         }
                         else
                         {
                             callback.Invoke(new AdvancedDropdownMetaInfo
                             {
+                                MemberInfo = dropdownMemberInfo,
                                 Error = $"Return value {taskResult} is not a Dropdown<T> type",
                                 CurDisplay = "[Error]",
                                 CurValues = Array.Empty<object>(),
@@ -600,6 +613,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             callback.Invoke(new AdvancedDropdownMetaInfo
             {
+                MemberInfo = dropdownMemberInfo,
                 Error = $"{funcName} return value is not a AdvancedDropdownList",
                 CurDisplay = "[Error]",
                 CurValues = Array.Empty<object>(),
@@ -1123,6 +1137,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         Prefix(stackDisplays, child.displayName),
                         child.displayName,
                         child.icon,
+                        child.color,
                         child.disabled,
                         child.value,
                         child.ExtraSearches);
@@ -1135,15 +1150,17 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             public readonly IReadOnlyList<string> stackDisplays;
             public readonly string display;
             public readonly string icon;
+            public readonly Color? color;
             public readonly bool disabled;
             public readonly object value;
             public readonly ICollection<string> extraSearches;
 
-            public FlattenInfo(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value, ICollection<string> extraSearches)
+            public FlattenInfo(IReadOnlyList<string> stackDisplays, string display, string icon, Color? color, bool disabled, object value, ICollection<string> extraSearches)
             {
                 this.stackDisplays = stackDisplays;
                 this.display = display;
                 this.icon = icon;
+                this.color = color;
                 this.disabled = disabled;
                 this.value = value;
                 this.extraSearches = extraSearches;
@@ -1169,6 +1186,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         new []{root.displayName},
                         root.displayName,
                         root.icon,
+                        root.color,
                         root.disabled,
                         root.value,
                         root.ExtraSearches);

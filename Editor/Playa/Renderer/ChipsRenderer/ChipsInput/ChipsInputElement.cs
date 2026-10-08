@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.WaitableUtils;
@@ -21,6 +22,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
         public readonly UnityEvent<bool, string> OnSearchEvent = new UnityEvent<bool, string>();
         public readonly UnityEvent<Exception> OnErrorEvent = new UnityEvent<Exception>();
+        public readonly UnityEvent OnCancelledEvent = new UnityEvent();
         // public readonly UnityEvent OnBlurEvent = new UnityEvent();
         public readonly UnityEvent OnEnterKey = new UnityEvent();
 
@@ -74,16 +76,6 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 #endif
                     .TrickleDown);
 
-            _actualInput.TextField.RegisterCallback<KeyUpEvent>(e =>
-            {
-                if (e.keyCode is
-                    KeyCode.Return
-                    or KeyCode.KeypadEnter
-                )
-                {
-                    OnEnterKey.Invoke();
-                }
-            });
             _actualInput.TextField.RegisterValueChangedCallback(OnActualInputValueChanged);
 
             RegisterCallback<PointerDownEvent>(OnPointerDown);
@@ -91,6 +83,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
             // HelpBox helpBox = this.Q<HelpBox>("helpBox");
             // helpBox.style.display = DisplayStyle.None;
             _actualInput.OnErrorEvent.AddListener(OnErrorEvent.Invoke);
+            _actualInput.OnCancelledEvent.AddListener(OnCancelledEvent.Invoke);
 
             // _overflowWrapper = this.Q<VisualElement>("overflowWrapper");
             // _overflowWrapper.style.display = DisplayStyle.None;
@@ -202,7 +195,24 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
         private void OnActualInputKeyDown(KeyDownEvent evt)
         {
-            if (!_actualInputFocused || evt.keyCode != KeyCode.Backspace)
+            if (!_actualInputFocused)
+            {
+                return;
+            }
+
+            if (evt.keyCode is KeyCode.Return or KeyCode.KeypadEnter)
+            {
+                OnEnterKey.Invoke();
+#if UNITY_6000_0_OR_NEWER
+                _actualInput.TextField.focusController?.IgnoreEvent(evt);
+#else
+                evt.PreventDefault();
+#endif
+                evt.StopPropagation();
+                return;
+            }
+
+            if (evt.keyCode != KeyCode.Backspace)
             {
                 return;
             }
@@ -215,7 +225,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
             VisualElement inputParent = _actualInput.parent;
             int inputIndex = inputParent?.IndexOf(_actualInput) ?? -1;
-            if (inputIndex <= 0 || inputParent.ElementAt(inputIndex - 1) is not DeletableChip leftChip)
+            if (inputIndex <= 0 || inputParent?.ElementAt(inputIndex - 1) is not DeletableChip leftChip)
             {
                 return;
             }
@@ -254,21 +264,11 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
         public int GetInputIndex()
         {
-            int index = 0;
-            foreach (VisualElement child in _inputContainer.Children())
-            {
-                if (child == _actualInput)
-                {
-                    break;
-                }
-
-                if (child is DeletableChip)
-                {
-                    index++;
-                }
-            }
-
-            return index;
+            return _inputContainer
+                .Children()
+                .TakeWhile(child => child != _actualInput)
+                .OfType<DeletableChip>()
+                .Count();
         }
 
         private string _preSearchContent = "";
@@ -611,6 +611,11 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
         public void StartTrack(Waiter waiter, Action<object> succeedCallback)
         {
             _actualInput.StartTrack(waiter, succeedCallback);
+        }
+
+        public void StopTrack()
+        {
+            _actualInput.StopTrack();
         }
 
         // tree will steal the focus; we just focus again...

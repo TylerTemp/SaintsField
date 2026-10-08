@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.DropdownBase;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
@@ -7,6 +8,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
     {
         // ReSharper disable InconsistentNaming
         public string Error;
+        public MemberInfo MemberInfo;
 
         // public FieldInfo FieldInfo;
 

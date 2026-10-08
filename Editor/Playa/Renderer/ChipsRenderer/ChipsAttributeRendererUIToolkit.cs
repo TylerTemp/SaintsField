@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
                     ? DisplayStyle.Flex
                     : DisplayStyle.None);
             OnSearchFieldUIToolkit.AddListener(Search);
-            root.RegisterCallback<AttachToPanelEvent>(_ =>
+            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(root, () =>
             {
                 OnSearchFieldUIToolkit.RemoveListener(Search);
                 OnSearchFieldUIToolkit.AddListener(Search);
@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
                 }
 
                 property.serializedObject.ApplyModifiedProperties();
-                OnArraySizeChanged(property);
+                UpdateBindChips(property);
                 evt.StopPropagation();
             });
 
@@ -111,8 +111,8 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
             #region Array Size
             SerializedProperty arraySize = property.FindPropertyRelative("Array.size");
-            _chipsInputElement.TrackPropertyValue(arraySize, _ => OnArraySizeChanged(property));
-            OnArraySizeChanged(property);
+            _chipsInputElement.TrackPropertyValue(arraySize, _ => UpdateBindChips(property));
+            UpdateBindChips(property);
             #endregion
 
             // search
@@ -157,8 +157,14 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
                     _pendingCreateDropdown = false;
                 }
             });
+            _chipsInputElement.OnCancelledEvent.AddListener(() =>
+            {
+                _pullingMetaInfo = false;
+                _createDropdownWhenMetaReady = false;
+                _pendingCreateDropdown = false;
+            });
 
-            PullMetaInfo(false);
+            PullMetaInfo("", false);
 
             _overflowWrapperElement = new OverflowWrapperElement
             {
@@ -214,7 +220,6 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
         private string _search;
         private SaintsTreeDropdownElement _treeDropdownElement;
         private bool _addElementShift;
-        private AdvancedDropdownMetaInfo? _metaInfo;
         private bool _pullingMetaInfo;
         private bool _createDropdownWhenMetaReady;
 
@@ -223,10 +228,18 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             _search = searchContent;
 
             UIToolkitUtils.SetHelpBox(_helpBox, "");
+
+            if (_isTypingSearchCallback)
+            {
+                _pendingCreateDropdown = true;
+                PullMetaInfo(searchContent, true);
+                return;
+            }
+
             if (_treeDropdownElement == null && !_pendingCreateDropdown)
             {
                 _pendingCreateDropdown = true;
-                PullMetaInfo(true);
+                PullMetaInfo(searchContent, true);
             }
             else if (!_pendingCreateDropdown && _treeDropdownElement != null)
             {
@@ -238,45 +251,123 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
         }
 
-        private void PullMetaInfo(bool createDropdown)
+        // private bool _isTypingSearchCallbackChecked = false;
+        private bool _isTypingSearchCallback;
+
+        private void PullMetaInfo(string searchString, bool createDropdown)
         {
             _createDropdownWhenMetaReady |= createDropdown;
             if (_pullingMetaInfo)
             {
-                return;
+                if (!_isTypingSearchCallback)
+                {
+                    return;
+                }
+
+                // A typing callback must fetch the latest query, even while the previous one is pending.
+                _chipsInputElement.StopTrack();
             }
 
             _pullingMetaInfo = true;
-            AdvancedDropdownAttributeDrawer.GetMetaInfoAsync(
-                _chipsInputElement,
-                metaInfo =>
-                {
-                    _pullingMetaInfo = false;
-                    bool shouldCreateDropdown = _createDropdownWhenMetaReady;
-                    _createDropdownWhenMetaReady = false;
 
-                    SerializedProperty arrayProperty = FieldWithInfo.SerializedProperty;
-                    if (!SerializedUtils.IsOk(arrayProperty))
+            FetchMetaInfo(new object[] { searchString }, false);
+            return;
+
+            void FetchMetaInfo(IReadOnlyList<object> overrideParams, bool isFallback)
+            {
+                AdvancedDropdownAttributeDrawer.GetMetaInfoAsync(
+                    _chipsInputElement,
+                    metaInfo =>
                     {
-                        _pendingCreateDropdown = false;
-                        return;
-                    }
+                        if (!_isTypingSearchCallback
+                            && !isFallback
+                            && metaInfo is { Error: "", MemberInfo: MethodInfo memberInfo })
+                        {
+                            bool matchedStringParamUsed = false;
+                            bool matchedStringParam = false;
+                            ParameterInfo[] methodParams = memberInfo.GetParameters();
+                            for (int index = 0; index < memberInfo.GetParameters().Length; index++)
+                            {
+                                ParameterInfo parameterInfo = methodParams[index];
+                                bool isStringParam = parameterInfo.ParameterType == typeof(string);
+                                if (parameterInfo.IsOptional)
+                                {
+                                    if (isStringParam)
+                                    {
+                                        if (matchedStringParamUsed)
+                                        {
+                                            matchedStringParam = false;
+                                            break;
+                                        }
 
-                    _metaInfo = metaInfo;
-                    UIToolkitUtils.SetHelpBox(_helpBox, metaInfo.Error);
-                    OnArraySizeChanged(arrayProperty);
+                                        matchedStringParam = true;
+                                    }
+                                }
+                                else
+                                {
+                                    if (isStringParam)
+                                    {
+                                        if (matchedStringParamUsed)
+                                        {
+                                            matchedStringParam = false;
+                                            break;
+                                        }
 
-                    if (shouldCreateDropdown)
-                    {
-                        CreateDropdown(metaInfo);
-                    }
-                },
-                FieldWithInfo.SerializedProperty,
-                _attribute,
-                (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo,
-                FieldWithInfo.Targets[0],
-                false
-            );
+                                        matchedStringParam = true;
+                                        matchedStringParamUsed = true;
+                                    }
+                                    else
+                                    {
+                                        matchedStringParam = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            _isTypingSearchCallback = matchedStringParam;
+                        }
+
+                        if (!isFallback && metaInfo.Error != "")
+                        {
+                            FetchMetaInfo(null, true);
+                            return;
+                        }
+
+                        _pullingMetaInfo = false;
+                        if (_isTypingSearchCallback && _createDropdownWhenMetaReady && searchString != _search)
+                        {
+                            // The input may change before the initial fetch identifies a typing callback.
+                            PullMetaInfo(_search, true);
+                            return;
+                        }
+
+                        bool shouldCreateDropdown = _createDropdownWhenMetaReady;
+                        _createDropdownWhenMetaReady = false;
+
+                        SerializedProperty arrayProperty = FieldWithInfo.SerializedProperty;
+                        if (!SerializedUtils.IsOk(arrayProperty))
+                        {
+                            _pendingCreateDropdown = false;
+                            return;
+                        }
+
+                        CacheDisplayInfo(metaInfo.DropdownListValue);
+                        UIToolkitUtils.SetHelpBox(_helpBox, metaInfo.Error);
+                        UpdateBindChips(arrayProperty);
+
+                        if (shouldCreateDropdown)
+                        {
+                            CreateDropdown(metaInfo);
+                        }
+                    },
+                    FieldWithInfo.SerializedProperty,
+                    _attribute,
+                    (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo,
+                    FieldWithInfo.Targets[0],
+                    false,
+                    overrideParams: overrideParams
+                );
+            }
         }
 
         private void CreateDropdown(AdvancedDropdownMetaInfo metaInfo)
@@ -344,9 +435,12 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             _overflowWrapperElement.Add(_treeDropdownElement);
             _overflowWrapperElement.AnchorTo(_chipsInputField);
 
-            _chipsInputElement.schedule.Execute(() => _chipsInputElement.InputFocus());
+            if (!_isTypingSearchCallback)
+            {
+                _chipsInputElement.schedule.Execute(() => _chipsInputElement.InputFocus());
+            }
 
-            if (!string.IsNullOrEmpty(_search))
+            if (!_isTypingSearchCallback && !string.IsNullOrEmpty(_search))
             {
                 UIToolkitUtils.OnAttachToPanelOnceWithEnsure(_treeDropdownElement, () =>
                 {
@@ -358,7 +452,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             }
         }
 
-        private void OnArraySizeChanged(SerializedProperty arrayProp)
+        private void UpdateBindChips(SerializedProperty arrayProp)
         {
             if (!SerializedUtils.IsOk(arrayProp))
             {
@@ -367,9 +461,11 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
             int newSize = arrayProp.arraySize;
             int index = 0;
+            MemberInfo fieldInfo = (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo;
+            object parent = FieldWithInfo.Targets[0];
             foreach (DeletableChip chip in _chipsInputElement.GetOrCreateChip(newSize))
             {
-                chip.BindProp(arrayProp, index, this);
+                chip.BindProp(arrayProp, index, this, fieldInfo, parent);
                 index++;
             }
 
@@ -380,38 +476,50 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             }
         }
 
+        public readonly struct DisplayInfo
+        {
+            public readonly string NameWithPath;
+            public readonly string Icon;
+            public readonly Color? Color;
+
+            public DisplayInfo(string nameWithPath, string icon, Color? color)
+            {
+                NameWithPath = nameWithPath;
+                Icon = icon;
+                Color = color;
+            }
+        }
+
+        private readonly Dictionary<object, DisplayInfo> _cachedValueToDisplayInfo = new Dictionary<object, DisplayInfo>();
+
+        private void CacheDisplayInfo(IDropdown dropdown)
+        {
+            if (dropdown == null)
+            {
+                return;
+            }
+
+            foreach (AdvancedDropdownAttributeDrawer.FlattenInfo option in AdvancedDropdownAttributeDrawer.Flatten(dropdown))
+            {
+                if (option.value == null)
+                {
+                    continue;
+                }
+
+                _cachedValueToDisplayInfo[option.value] = new DisplayInfo(
+                    string.Join("/", option.stackDisplays),
+                    option.icon,
+                    option.color);
+            }
+        }
+
         public (string nameWithPath, string icon, Color? color) GetDisplay(object value)
         {
-            if (!_metaInfo.HasValue || _metaInfo.Value.Error != "" || _metaInfo.Value.DropdownListValue == null)
+            if (_cachedValueToDisplayInfo.TryGetValue(value, out DisplayInfo displayInfo))
             {
-                return ($"{value}", null, null);
+                return (displayInfo.NameWithPath, displayInfo.Icon, displayInfo.Color);
             }
-
-            (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStacks, string display) =
-                AdvancedDropdownUtil.GetSelected(value, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-                    _metaInfo.Value.DropdownListValue);
-
-            if (selectStacks.Count == 0)
-            {
-                return ($"{value}", null, null);
-            }
-
-            IDropdown selected = _metaInfo.Value.DropdownListValue;
-            foreach (AdvancedDropdownAttributeDrawer.SelectStack selectStack in selectStacks)
-            {
-                selected = selected.children[selectStack.Index];
-            }
-
-            // if (!string.IsNullOrEmpty(selected.icon))
-            // {
-            //     Debug.Log(selected.icon);
-            // }
-
-            return (
-                string.Join("/", selectStacks.Skip(1).Select(each => each.Display).Append(display)),
-                selected.icon,
-                selected.color
-            );
+            return ($"{value}", null, null);
         }
     }
 }

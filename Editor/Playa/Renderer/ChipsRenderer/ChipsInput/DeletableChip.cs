@@ -1,6 +1,7 @@
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -50,14 +51,18 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
         private SerializedProperty _arrayProp;
         private int _index = -1;
         private IDeletableChipDisplayResolver _displayResolver;
+        private MemberInfo _fieldInfo;
+        private object _parent;
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         public void BindProp(SerializedProperty arrayProp, int index,
-            IDeletableChipDisplayResolver displayResolver = null)
+            IDeletableChipDisplayResolver displayResolver = null, MemberInfo fieldInfo = null, object parent = null)
         {
             _arrayProp = arrayProp;
             _index = index;
             _displayResolver = displayResolver;
+            _fieldInfo = fieldInfo;
+            _parent = parent;
 
             SerializedProperty elemProp = arrayProp.GetArrayElementAtIndex(index);
             UIToolkitUtils.Unbind(this);
@@ -67,7 +72,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
         public void Rebind(int index)
         {
-            BindProp(_arrayProp, index, _displayResolver);
+            BindProp(_arrayProp, index, _displayResolver, _fieldInfo, _parent);
         }
 
         public void OnDeleteButtonClicked()
@@ -82,7 +87,8 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
 
         private void OnPropertyValueChanged(SerializedProperty targetProp)
         {
-            (bool ok, object result) = SerializedUtils.GetPropertyValue(targetProp);
+            (string error, int _, object result) = Util.GetValue(targetProp, _fieldInfo, _parent);
+            bool ok = error == "";
             // Debug.Log($"{ok}/{result}");
             if (ok)
             {

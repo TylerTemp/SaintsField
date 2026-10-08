@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.30.5 ##
+
+1.  Fix: `Clips` can not track property changes for serializable class/struct type
+2.  Add: `Chips` now support type searching callback, which gives you experiences like MUI's [AutoComplete](https://mui.com/material-ui/react-autocomplete/#asynchronous-requests) experiences. 
+
 ## 5.30.4 ##
 
 *   `ShowInInspector` for `UnityEvent` type now can show runtime callbacks (added by `AddLisenter(...)`)

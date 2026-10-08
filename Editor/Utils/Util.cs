@@ -1413,9 +1413,9 @@ namespace SaintsField.Editor.Utils
                     if(methodInfo.Name == fieldOrMethod)
                     {
                         foundMethodInfo = methodInfo;
-    #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
                         Debug.Log($"processing {methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(each => $"{each.ParameterType} {each.Name}"))})");
-    #endif
+#endif
 
                         (string error, object returnValue) =
                             InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
@@ -1433,55 +1433,53 @@ namespace SaintsField.Editor.Utils
                 {
                     continue;
                 }
-                else
+
+                if (target != null)  // search nested target inside type
                 {
-                    if (target != null)  // search nested target inside type
+                    Type targetType = target.GetType();
+                    Type accType = targetType;
+                    foreach (string literType in split)
                     {
-                        Type targetType = target.GetType();
-                        Type accType = targetType;
-                        foreach (string literType in split)
+                        accType = accType.GetNestedType(literType, BindingFlags.Public | BindingFlags.NonPublic);
+                        // Debug.Log($"accType={accType} for {literType}");
+                        if (accType == null)
                         {
-                            accType = accType.GetNestedType(literType, BindingFlags.Public | BindingFlags.NonPublic);
-                            // Debug.Log($"accType={accType} for {literType}");
-                            if (accType == null)
-                            {
-                                break;
-                            }
+                            break;
                         }
-
-                        if (accType != null)
-                        {
-                            FieldInfo nestedFieldInfo = type.GetField(fieldOrMethod, bindAttr);
-                            if (nestedFieldInfo != null)
-                            {
-                                object genResult;
-                                try
-                                {
-                                    genResult = nestedFieldInfo.GetValue(null);
-                                }
-                                catch (Exception e)
-                                {
-                                    // _error = e.Message;
-#if SAINTSFIELD_DEBUG
-                                    Debug.LogException(e);
-#endif
-                                    return (e.Message, null, defaultValue);
-                                }
-
-                                (string error, T result) r = ConvertTo(genResult, defaultValue);
-                                if(r.error == "")
-                                {
-                                    return (r.error, foundMethodInfo, r.result);
-                                }
-                            }
-                        }
-
                     }
+
+                    if (accType != null)
+                    {
+                        FieldInfo nestedFieldInfo = type.GetField(fieldOrMethod, bindAttr);
+                        if (nestedFieldInfo != null)
+                        {
+                            object genResult;
+                            try
+                            {
+                                genResult = nestedFieldInfo.GetValue(null);
+                            }
+                            catch (Exception e)
+                            {
+                                // _error = e.Message;
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                                return (e.Message, null, defaultValue);
+                            }
+
+                            (string error, T result) r = ConvertTo(genResult, defaultValue);
+                            if(r.error == "")
+                            {
+                                return (r.error, foundMethodInfo, r.result);
+                            }
+                        }
+                    }
+
+                }
 // #if SAINTSFIELD_DEBUG
 //                     Debug.LogWarning($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}");
 // #endif
 //                     return ($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}", null, defaultValue);
-                }
             }
 
             if (errors.Count == 0)

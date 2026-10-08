@@ -17,6 +17,7 @@ namespace SaintsField.Editor.UIToolkitElements
 #endif
 
         public readonly UnityEvent<Exception> OnErrorEvent = new UnityEvent<Exception>();
+        public readonly UnityEvent OnCancelledEvent = new UnityEvent();
 
         public readonly TextField TextField;
         private readonly Button _closeButton;
@@ -53,6 +54,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
                 ShowCloseButton(false);
                 ResetTrack();
+                OnCancelledEvent.Invoke();
             };
 
             ShowCloseButton(false);
@@ -98,10 +100,10 @@ namespace SaintsField.Editor.UIToolkitElements
                         waiter.CheckCurrentNeedWaiter();
                         return;
                     case Waiter.MoveNextStatus.Completed:
-                        succeedCallback.Invoke(moveNext.ReturnValue);
                         _statusIndicator.EnsureLoading(false, 0);
                         ShowCloseButton(false);
                         ResetTrack();
+                        succeedCallback.Invoke(moveNext.ReturnValue);
                         return;
                     case Waiter.MoveNextStatus.Cancelled:
                     {
@@ -109,6 +111,7 @@ namespace SaintsField.Editor.UIToolkitElements
                         _statusIndicator.EnsureLoading(false, 0);
                         ShowCloseButton(false);
                         ResetTrack();
+                        OnCancelledEvent.Invoke();
                     }
                         return;
                     case Waiter.MoveNextStatus.Faulted:
@@ -121,6 +124,13 @@ namespace SaintsField.Editor.UIToolkitElements
         private void ShowCloseButton(bool show)
         {
             UIToolkitUtils.SetDisplayStyle(_closeButton, show? DisplayStyle.Flex: DisplayStyle.None);
+        }
+
+        public void StopTrack()
+        {
+            _statusIndicator.EnsureLoading(false, 0);
+            ShowCloseButton(false);
+            ResetTrack();
         }
 
         private void ResetTrack()

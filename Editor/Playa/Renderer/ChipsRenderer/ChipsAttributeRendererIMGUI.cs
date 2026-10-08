@@ -271,7 +271,6 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
                     _imguiMetaRequested = false;
                     _imguiMetaReady = true;
                     _imguiMetaInfo = metaInfo;
-                    _metaInfo = metaInfo;
                     _imguiError = metaInfo.Error;
                     if (_imguiOpenDropdownWhenReady)
                     {
