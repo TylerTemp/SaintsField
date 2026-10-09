@@ -146,7 +146,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 return;
             }
 
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
             PrefabUtility.prefabInstanceApplied += OnPrefabInstanceChanged;
             PrefabUtility.prefabInstanceReverting += OnPrefabInstanceChanged;
 #endif
@@ -195,7 +195,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 return;
             }
 
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
             PrefabUtility.prefabInstanceApplied -= OnPrefabInstanceChanged;
             PrefabUtility.prefabInstanceReverting -= OnPrefabInstanceChanged;
 #endif
