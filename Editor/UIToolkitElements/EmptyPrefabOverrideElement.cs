@@ -146,8 +146,10 @@ namespace SaintsField.Editor.UIToolkitElements
                 return;
             }
 
+#if UNITY_2023_1_OR_NEWER
             PrefabUtility.prefabInstanceApplied += OnPrefabInstanceChanged;
             PrefabUtility.prefabInstanceReverting += OnPrefabInstanceChanged;
+#endif
             PrefabUtility.prefabInstanceUpdated += OnPrefabInstanceChanged;
             _callbacksRegistered = true;
         }
@@ -193,8 +195,10 @@ namespace SaintsField.Editor.UIToolkitElements
                 return;
             }
 
+#if UNITY_2023_1_OR_NEWER
             PrefabUtility.prefabInstanceApplied -= OnPrefabInstanceChanged;
             PrefabUtility.prefabInstanceReverting -= OnPrefabInstanceChanged;
+#endif
             PrefabUtility.prefabInstanceUpdated -= OnPrefabInstanceChanged;
             EditorApplication.delayCall -= RefreshAfterPrefabChange;
             _refreshScheduled = false;
