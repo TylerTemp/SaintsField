@@ -238,7 +238,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c439f3d00316d674191ee83a62d5ec32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.ChipInputExample
-  defaultList: 01000000i
   normalList: 
   disableList: 000000000200000001000000i
   removeList: 0100000002000000i
@@ -255,6 +254,8 @@ MonoBehaviour:
   - {fileID: 8374613304299147727}
   - {fileID: 6195835473488881004}
   withIcons: 
+  pickFilmWhileTyping: []
+  pickFilmWhileTypingWait: []
 --- !u!1 &7895244256732718098
 GameObject:
   m_ObjectHideFlags: 0

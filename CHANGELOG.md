@@ -4,6 +4,7 @@
 
 1.  Fix: `Clips` can not track property changes for serializable class/struct type
 2.  Add: `Chips` now support type searching callback, which gives you experiences like MUI's [AutoComplete](https://mui.com/material-ui/react-autocomplete/#asynchronous-requests) experiences. 
+3.  Fix: In some cases (where Unity does not give any API for tracking) the blue bar for prefab modification is not shown/hidden correctly after change/revert
 
 ## 5.30.4 ##
 

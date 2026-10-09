@@ -5021,8 +5021,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 1175289511}
     m_Modifications:
     - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: tags.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: 'tags.Array.data[0]'
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
       propertyPath: longList.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
       propertyPath: withIcons.Array.size
@@ -5047,6 +5055,26 @@ PrefabInstance:
     - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
       propertyPath: 'withIcons.Array.data[3]'
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: pickFilmWhileTyping.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: pickFilmWhileTyping.Array.data[0].year
+      value: 1977
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: pickFilmWhileTyping.Array.data[1].year
+      value: 1957
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: pickFilmWhileTyping.Array.data[0].title
+      value: 'Star Wars: Episode IV - A New Hope'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685892233026495231, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
+      propertyPath: pickFilmWhileTyping.Array.data[1].title
+      value: 12 Angry Men
       objectReference: {fileID: 0}
     - target: {fileID: 5254815604222391555, guid: df6e9be70945ba74fad546ac8fd41d41, type: 3}
       propertyPath: m_Name
@@ -19132,6 +19160,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.UnityEventCheck.UnityEventCheck
   _event:
+    m_PersistentCalls:
+      m_Calls: []
+  _eventWithParameters:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &2103412845

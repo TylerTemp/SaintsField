@@ -31,6 +31,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 
         // [Separator(20)]
 
+        [LayoutStart("x", ELayout.Foldout)]
+
         [Chips] public Equipment[] normalList;
         // duplicated options are disabled
         [Chips(EUnique.Disable)] public Equipment[] disableList;
@@ -144,6 +146,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
             }
         }
 
+        [LayoutEnd]
+
+        // Search as you type
         [Chips(nameof(PickFilmWhileTyping))] public TopFilm[] pickFilmWhileTyping;
 
         private IEnumerable<TopFilm> PickFilmWhileTyping(string search)

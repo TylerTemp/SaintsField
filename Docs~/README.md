@@ -2080,9 +2080,11 @@ private List<MyStruct> FullFeatures = new List<MyStruct>{ /*...*/ };
 > [!IMPORTANT]
 > Enable `SaintsEditor` and use a UI Toolkit inspector before using
 
-Display an array/list as a row of removable chips. 
-Support search for a value. 
-Drag an chip to reorder it.
+*   Display an array/list as a row of removable chips. 
+*   Support search for a value. 
+*   Drag an chip to reorder it.
+*   Support asynchronous requests
+*   Support search as you type
 
 Similar to `Dropdown`: string callback that returns a `Dropdown<T>` or an enumerable (support async call of `Task`, `UniTask`, or `IEnumerator`), omit the callback for an enum or a type with static values.
 
@@ -2186,6 +2188,70 @@ Use `backspace` to delete the front item.
 Use up-down arrow to select, and `enter` to pick the item from the popup.
 
 [![video](https://github.com/user-attachments/assets/445aca48-b3bb-419f-aa09-339ac0ebbd90)](https://github.com/user-attachments/assets/69b8e22e-6e8c-41cc-bc50-7be0a88e8f83)
+
+To make a "search as you type", pass callback with parameters:
+
+```csharp
+private IEnumerable<T> Callback(string search);
+private Dropdown<T> Callback(string search);
+private T[] Callback(string search);
+private List<T> Callback(string search);
+```
+
+If your options are asynchronous (need load from resource/internet etc), use `Task`/`UniTask`/`Awaitable`/`IEnumerator` of `Dropdown<T> value
+
+```csharp
+private async Task<Dropdown<T>> Callback(string search);
+private async UniTask<Dropdown<T>> Callback(string search);
+private async Awaitable<Dropdown<T>> Callback(string search);
+private async IEnumerator<Dropdown<T>> Callback(string search);
+```
+
+Example:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct TopFilm
+{
+    public string title;
+    public int year;
+
+    // Other implemented like IEquatable<TopFilm>
+}
+
+// Search as you type
+[Chips(nameof(PickFilmWhileTyping))] public TopFilm[] pickFilmWhileTyping;
+
+private IEnumerable<TopFilm> PickFilmWhileTyping(string search)
+{
+    string searchLow = search.Trim().ToLower();
+    foreach (TopFilm topFilm in TopFilms)
+    {
+        if (topFilm.title.ToLower().Contains(searchLow))
+        {
+            yield return topFilm;
+        }
+    }
+}
+
+// If your resource need prepare, you can also wait
+[Chips(nameof(PickFilmWhileTypingWait))] public TopFilm[] pickFilmWhileTypingWait;
+
+private async Task<Dropdown<TopFilm>> PickFilmWhileTypingWait(string search)
+{
+    await Task.Delay(2000);  // prepare your resource and wait for the result
+
+    Dropdown<TopFilm> result = new Dropdown<TopFilm>();
+    foreach (TopFilm each in PickFilmWhileTyping(search))
+    {
+        result.Add(each.ToString(), each);
+    }
+
+    return result;
+}
+```
 
 #### `Table` ####
 

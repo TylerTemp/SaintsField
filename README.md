@@ -111,11 +111,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.4**
+**5.30.5**
 
-*   `ShowInInspector` for `UnityEvent` type now can show runtime callbacks (added by `AddLisenter(...)`)
-*   You can remove runtime callbacks with it
-*   You can invoke that `UnityEvent<...>` in inspector. If it requires prameters, you can input it manually
+1.  Fix: `Clips` can not track property changes for serializable class/struct type
+2.  Add: `Chips` now support type searching callback, which gives you experiences like MUI's [AutoComplete](https://mui.com/material-ui/react-autocomplete/#asynchronous-requests) experiences. 
+3.  Fix: In some cases (where Unity does not give any API for tracking) the blue bar for prefab modification is not shown/hidden correctly after change/revert
 
 ## Usage ##
 

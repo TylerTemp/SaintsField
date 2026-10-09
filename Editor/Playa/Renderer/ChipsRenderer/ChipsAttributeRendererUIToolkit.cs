@@ -231,6 +231,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
             if (_isTypingSearchCallback)
             {
+                CloseDropdown();
                 _pendingCreateDropdown = true;
                 PullMetaInfo(searchContent, true);
                 return;
@@ -279,6 +280,13 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
                     _chipsInputElement,
                     metaInfo =>
                     {
+                        SerializedProperty arrayProperty = FieldWithInfo.SerializedProperty;
+                        if (!SerializedUtils.IsOk(arrayProperty))
+                        {
+                            _pendingCreateDropdown = false;
+                            return;
+                        }
+
                         if (!_isTypingSearchCallback
                             && !isFallback
                             && metaInfo is { Error: "", MemberInfo: MethodInfo memberInfo })
@@ -343,13 +351,6 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
                         bool shouldCreateDropdown = _createDropdownWhenMetaReady;
                         _createDropdownWhenMetaReady = false;
-
-                        SerializedProperty arrayProperty = FieldWithInfo.SerializedProperty;
-                        if (!SerializedUtils.IsOk(arrayProperty))
-                        {
-                            _pendingCreateDropdown = false;
-                            return;
-                        }
 
                         CacheDisplayInfo(metaInfo.DropdownListValue);
                         UIToolkitUtils.SetHelpBox(_helpBox, metaInfo.Error);
@@ -491,6 +492,7 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
         }
 
         private readonly Dictionary<object, DisplayInfo> _cachedValueToDisplayInfo = new Dictionary<object, DisplayInfo>();
+        private DisplayInfo? _cachedNullDisplayInfo;
 
         private void CacheDisplayInfo(IDropdown dropdown)
         {
@@ -501,20 +503,29 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
 
             foreach (AdvancedDropdownAttributeDrawer.FlattenInfo option in AdvancedDropdownAttributeDrawer.Flatten(dropdown))
             {
-                if (option.value == null)
-                {
-                    continue;
-                }
-
-                _cachedValueToDisplayInfo[option.value] = new DisplayInfo(
+                DisplayInfo displayInfo = new DisplayInfo(
                     string.Join("/", option.stackDisplays),
                     option.icon,
                     option.color);
+                if (option.value == null)
+                {
+                    _cachedNullDisplayInfo = displayInfo;
+                    continue;
+                }
+
+                _cachedValueToDisplayInfo[option.value] = displayInfo;
             }
         }
 
         public (string nameWithPath, string icon, Color? color) GetDisplay(object value)
         {
+            if (value == null)
+            {
+                return _cachedNullDisplayInfo.HasValue
+                    ? (_cachedNullDisplayInfo.Value.NameWithPath, _cachedNullDisplayInfo.Value.Icon, _cachedNullDisplayInfo.Value.Color)
+                    : ("", null, null);
+            }
+
             if (_cachedValueToDisplayInfo.TryGetValue(value, out DisplayInfo displayInfo))
             {
                 return (displayInfo.NameWithPath, displayInfo.Icon, displayInfo.Color);
