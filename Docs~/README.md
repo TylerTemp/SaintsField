@@ -2253,6 +2253,8 @@ private async Task<Dropdown<TopFilm>> PickFilmWhileTypingWait(string search)
 }
 ```
 
+[![video](https://github.com/user-attachments/assets/17f1c4a8-5557-4ccb-843c-5f63b9819757)](https://github.com/user-attachments/assets/bc0b6383-7c6f-4634-9503-bfb87dfdd9ce)
+
 #### `Table` ####
 
 > [!IMPORTANT]
