@@ -8,8 +8,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 {
     public partial class TableRenderer: SerializedFieldBaseRenderer
     {
-        public TableRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
+        private readonly TableAttribute _attribute;
+
+        public TableRenderer(TableAttribute attribute, SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
+            _attribute = attribute;
         }
 
         internal static bool SaintsFieldInfoShouldDraw(SaintsFieldWithInfo saintsFieldWithInfo)

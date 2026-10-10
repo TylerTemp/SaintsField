@@ -53,8 +53,6 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             // Filled
             _tableContentContainer = new VisualElement();
-            _tableContentContainer.AddToClassList("unity-collection-view--with-border");
-            _tableContentContainer.AddToClassList("unity-list-view__scroll-view--with-footer");
             Add(_tableContentContainer);
 
             this.TrackPropertyValue(fieldWithInfo.SerializedProperty, _ => OnArrayPropertyChanged());

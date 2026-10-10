@@ -1117,11 +1117,11 @@ namespace SaintsField.Editor
                                 AddRendererWithMetadata(renderers, playaAttribute,
                                     new ShowInInspectorFieldRenderer(serializedObject, fieldWithInfo));
                                 continue;
-                            case TableAttribute _:
+                            case TableAttribute tableAttribute:
                                 targetAnchor = true;
                                 if (!hasSerializedTarget)
                                 {
-                                    attributeRenderer = new TableRenderer(serializedObject, fieldWithInfo);
+                                    attributeRenderer = new TableRenderer(tableAttribute, serializedObject, fieldWithInfo);
                                     hasSerializedTarget = true;
                                 }
                                 break;

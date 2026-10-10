@@ -76,18 +76,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         private void FillTableToContainer(VisualElement root, bool defaultCollapse)
         {
             SerializedProperty arrayProp = FieldWithInfo.SerializedProperty;
-            TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().First();
 
-            // Foldout foldout = new Foldout
-            // {
-            //     text = arrayProp.displayName,
-            //     viewDataKey = NameTableContainer(arrayProp),
-            //     style =
-            //     {
-            //
-            //         // marginRight = 54,
-            //     },
-            // };
             CollectionFoldout foldout = new CollectionFoldout(arrayProp.displayName)
             {
                 viewDataKey = NameTableContainer(arrayProp),
@@ -96,70 +85,12 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             UIToolkitUtils.AddContextualMenuManipulator(foldout, arrayProp, () => {});
             root.Add(foldout);
 
-            // VisualElement topRightContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         flexDirection = FlexDirection.Row,
-            //         // width = 50,
-            //         position = Position.Absolute,
-            //         top = 0,
-            //         right = 0,
-            //         height = EditorGUIUtility.singleLineHeight + 2,
-            //         // marginLeft = 0,
-            //         // alignSelf = Align.FlexEnd,
-            //         // marginTop = -18,
-            //     },
-            // };
-            // root.Add(topRightContainer);
-
-            // Button menuButton = new Button
-            // {
-            //     style =
-            //     {
-            //         backgroundImage = Util.LoadResource<Texture2D>("d__Menu"),
-            //     },
-            // };
-            // topRightContainer.Add(menuButton);
-
-            // IntegerField arraySizeField = new IntegerField
-            // {
-            //     isDelayed = true,
-            //     value = arrayProp.arraySize,
-            //     style =
-            //     {
-            //         width = 50,
-            //         // position = Position.Absolute,
-            //         // top = 0,
-            //         // right = 0,
-            //         // marginLeft = 0,
-            //         // alignSelf = Align.FlexEnd,
-            //         // marginTop = -18,
-            //     },
-            // };
-            // topRightContainer.Add(arraySizeField);
-            // root.Add(arraySizeField);
             foldout.ArraySizeField.value = arrayProp.arraySize;
 
             VisualElement foldoutContent = foldout.contentContainer;
             foldoutContent.style.marginLeft = 0;
 
-            // container.Clear();
-
-
-            // _hasSize = FillTable(FieldWithInfo.SerializedProperty, container, elementType, FieldWithInfo.SerializedProperty);
-
-
-            // bool itemIsObject = arrayProp.propertyType == SerializedPropertyType.ObjectReference;
-
-            // (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
-
             _preArraySize = arrayProp.arraySize;
-
-            // if (error != "")
-            // {
-            //     return new HelpBox(error, HelpBoxMessageType.Error);
-            // }
 
             TableContentElement tableContentElement = new TableContentElement(FieldWithInfo);
             foldout.Add(tableContentElement);
@@ -247,7 +178,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             //     text = "+",
             //     name = NameAddButton(property),
             // };
-            if (tableAttribute.HideAddButton)
+            if (_attribute.HideAddButton)
             {
                 // addButton.style.display = DisplayStyle.None;
                 listViewFooterButtons.AddButton.style.display = DisplayStyle.None;
@@ -267,14 +198,14 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             //     text = "-",
             //     name = NameRemoveButton(property),
             // };
-            if (tableAttribute.HideRemoveButton)
+            if (_attribute.HideRemoveButton)
             {
                 // removeButton.style.display = DisplayStyle.None;
                 listViewFooterButtons.RemoveButton.style.display = DisplayStyle.None;
             }
             // toolbar.Add(removeButton);
 
-            if (tableAttribute.HideAddButton && tableAttribute.HideRemoveButton)
+            if (_attribute.HideAddButton && _attribute.HideRemoveButton)
             {
                 foldout.ArraySizeField.SetEnabled(false);
                 // listViewFooter.style.display = DisplayStyle.None;
