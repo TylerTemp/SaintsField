@@ -2274,7 +2274,8 @@ UI Toolkit: `Button`, `ShowInInspector` & `Playa*` will work as expected, and `L
 *   `bool searchable=false`: allow to search the whole table and each columns
 *   `int numberOfItemsPerPage=0`: allow paging
 *   `string extraSearch=null`: a callback to set extra searching
-     bool searchableAll=false, bool searchableCols=true
+*   `bool searchableAll=false`: allow to search the whole table
+*   `bool searchableCols=true`: allow to search each columns
 
 extraSearch callback signatures:
 
