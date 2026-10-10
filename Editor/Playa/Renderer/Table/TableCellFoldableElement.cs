@@ -32,6 +32,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
         public TableCellFoldableElement()
         {
+            style.paddingRight = 4;
             hierarchy.Add(_foldout = new Foldout
             {
                 value = true,

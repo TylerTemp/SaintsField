@@ -10536,6 +10536,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1911033cc43de514ab01726d82045f62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.TablePaging
+  numbers:
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
+  - myInt: 0
+    myString: 
 --- !u!1 &1112836782
 GameObject:
   m_ObjectHideFlags: 0

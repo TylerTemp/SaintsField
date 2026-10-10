@@ -2271,6 +2271,20 @@ UI Toolkit: `Button`, `ShowInInspector` & `Playa*` will work as expected, and `L
 *   `bool hideAddButton=false`: Should the add button be hidden?
 *   `bool hideRemoveButton=false`: Shoule the remove button be hidden?
 *   `bool defaultCollapse=false`: Should all the rows be collapsed by default?
+*   `bool searchable=false`: allow to search the whole table and each columns
+*   `int numberOfItemsPerPage=0`: allow paging
+*   `string extraSearch=null`: a callback to set extra searching
+     bool searchableAll=false, bool searchableCols=true
+
+extraSearch callback signatures:
+
+```csharp
+bool ExtraSearch(T item, IReadOnlyList<ListSearchToken> tokens);
+bool ExtraSearch(int index, IReadOnlyList<ListSearchToken> tokens);
+bool ExtraSearch(T item, int index, IReadOnlyList<ListSearchToken> tokens);
+```
+
+Example:
 
 ```csharp
 using SaintsField;
@@ -2450,6 +2464,28 @@ public class TableHeadersExampleInh : TableHeadersExample
 Results:
 
 ![image](https://github.com/user-attachments/assets/c33a6875-bebd-4998-bfec-97575ac781ec)
+
+You can set paging or manually toggle it in config button
+
+```csharp
+[Table(numberOfItemsPerPage: 5)] public MyStruct[] numbers;
+```
+
+![](https://github.com/user-attachments/assets/8c6b5121-d9fd-4c94-9a25-5508fea91d5a)
+
+`Table` works with `ShowInInspector` and `Button`
+
+```csharp
+[ShowInInspector, Table(numberOfItemsPerPage: 3)]
+private MyStruct[] ShowNumbers;
+
+[Button, Table]  // display returned value as table
+private MyStruct[] LogNumbers([Table(searchable: true, numberOfItemsPerPage: 3)] MyStruct[] rows)  // use table to fill the param
+{
+    Debug.Log(rows == null ? "No rows" : $"Rows: {rows.Length}");
+    return rows;
+}
+```
 
 #### `ShowInInspector` ####
 

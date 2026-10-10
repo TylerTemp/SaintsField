@@ -111,11 +111,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.5**
+**5.30.6**
 
-1.  Fix: `Clips` can not track property changes for serializable class/struct type
-2.  Add: `Chips` now support type searching callback, which gives you experiences like MUI's [AutoComplete](https://mui.com/material-ui/react-autocomplete/#asynchronous-requests) experiences. 
-3.  Fix: In some cases (where Unity does not give any API for tracking) the blue bar for prefab modification is not shown/hidden correctly after change/revert
+1.  Fix: multiple border rendering for `Table`; fix table fields are a bit off-view for some type of field
+2.  Add: `Table` now supports search the whole table or by columns, and supports paging
+3.  Add: `Table` now works with `ShowInInspector` and `Button`
 
 ## Usage ##
 

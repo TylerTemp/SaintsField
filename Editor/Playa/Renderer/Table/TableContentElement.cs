@@ -30,9 +30,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         private int _preArraySize;
         private MultiColumnListView _multiColumnListView;
 
-        public TableContentElement(SaintsFieldWithInfo fieldWithInfo)
+        public TableContentElement(SaintsFieldWithInfo fieldWithInfo, TableAttribute settings)
         {
             _fieldWithInfo = fieldWithInfo;
+            InitializeSearch(settings);
             // Empty
             // _emptyNotice = new HelpBox("Table is empty", HelpBoxMessageType.None);
             _emptyNotice = new VisualElement();
@@ -132,7 +133,9 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 return Array.Empty<int>();
             }
 
-            return _multiColumnListView.selectedIndices;
+            return _multiColumnListView.selectedIndices
+                .Where(each => each >= 0 && each < _asyncSearchItems.ItemIndexToPropertyIndex.Count)
+                .Select(each => _asyncSearchItems.ItemIndexToPropertyIndex[each]).ToArray();
         }
 
         private void OnArrayPropertyChanged()
@@ -148,6 +151,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 _tableContentContainer.style.display = DisplayStyle.None;
                 _tableContentContainer.Clear();
                 _multiColumnListView = null;
+                RefreshSearchingStatus();
                 return;
             }
 
@@ -160,9 +164,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
                 MultiColumnListView multiColumnListView = _multiColumnListView = new MultiColumnListView
                 {
-                    showBoundCollectionSize = true,
+                    showBoundCollectionSize = false,
                     virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                    itemsSource = MakeSource(arrayProp),
+                    itemsSource = new List<int>(_asyncSearchItems.ItemIndexToPropertyIndex),
+                    selectionType = SelectionType.Multiple,
                     reorderable = true,
                     reorderMode = ListViewReorderMode.Animated,
                     showBorder = true,
@@ -188,7 +193,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
                 if (itemIsObject)
                 {
-                    Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>()
+                    Object obj0 = Enumerable.Range(0, arrayProp.arraySize).Select(arrayProp.GetArrayElementAtIndex)
                         .Select(each => each.objectReferenceValue)
                         .FirstOrDefault(each => each);
 
@@ -217,6 +222,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     }
 
                     Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
+                    Dictionary<string, string> memberIdToPropertyName = new Dictionary<string, string>();
                     Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
 
                     using(SerializedObject serializedObject = new SerializedObject(obj0))
@@ -269,6 +275,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             }
                             // Debug.Log($"{columnName}: {saintsFieldWithInfo}");
                             list.Add(saintsFieldInfoName.SaintsFieldWithInfo.MemberId);
+                            if (saintsFieldInfoName.SaintsFieldWithInfo.SerializedProperty != null)
+                            {
+                                memberIdToPropertyName[saintsFieldInfoName.SaintsFieldWithInfo.MemberId] = saintsFieldInfoName.SaintsFieldWithInfo.SerializedProperty.name;
+                            }
                         }
                     }
 
@@ -279,6 +289,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         List<string> memberIds = columnKv.Value;
 
                         string id = string.Join(";", memberIds);
+                        RegisterSearchColumn(id, memberIds.Where(memberIdToPropertyName.ContainsKey).Select(each => memberIdToPropertyName[each]));
 
                         bool thisIsVisible = true;
                         if (columnToDefaultHide.TryGetValue(columnName, out bool hide))
@@ -292,6 +303,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             title = columnName,
                             stretchable = true,
                             visible = thisIsVisible,
+                            makeHeader = () => MakeSearchHeader(id, columnName),
                         };
                         ApplySessionColumnWidth(curColumn);
                         multiColumnListView.columns.Add(curColumn);
@@ -301,30 +313,15 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         curColumn.bindCell = (element, index) =>
                         {
                             TableCellFoldableElement cellElement = (TableCellFoldableElement)element;
-                            string viewKey = $"{SerializedUtils.GetUniqueId(arrayProp)}:{index}";
+                            int propertyIndex = _asyncSearchItems.ItemIndexToPropertyIndex[index];
+                            string viewKey = $"{SerializedUtils.GetUniqueId(arrayProp)}:{propertyIndex}";
                             cellElement.SetViewKey(viewKey);
                             RowData currentRowData = new RowData(multiColumnListView, index);
                             cellElement.userData = currentRowData;
                             cellElement.ToggleDisplay(false);
 
-                            cellElement.RegisterValueChangedCallback(expand =>
-                            {
-                                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                                foreach (TableCellFoldableElement rowCell in multiColumnListView.Query<TableCellFoldableElement>().Build())
-                                {
-                                    RowData checkRowData = (RowData)rowCell.userData;
-                                    if (!ReferenceEquals(checkRowData.Owner, currentRowData.Owner)
-                                        || checkRowData.RowIndex != currentRowData.RowIndex)
-                                    {
-                                        continue;
-                                    }
-
-                                    rowCell.SetValueWithoutNotify(expand.newValue);
-                                }
-                            });
-
                             ScheduleColumnFoldoutRefreshDisplay();
-                            SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
+                            SerializedProperty targetProp = arrayProp.GetArrayElementAtIndex(propertyIndex);
                             targetProp.isExpanded = true;
 
                             Object targetPropValue = targetProp.objectReferenceValue;
@@ -444,6 +441,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         .Where(TableRenderer.SaintsFieldInfoShouldDraw);
 
                     Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
+                    Dictionary<string, string> memberIdToPropertyName = new Dictionary<string, string>();
                     Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
 
                     foreach (SaintsFieldWithInfo saintsFieldWithInfo in firstSaintsFieldWithInfos)
@@ -484,6 +482,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         }
                         // Debug.Log($"{columnName}: {saintsFieldWithInfo}");
                         list.Add(saintsFieldWithInfo.MemberId);
+                        if (saintsFieldWithInfo.SerializedProperty != null)
+                        {
+                            memberIdToPropertyName[saintsFieldWithInfo.MemberId] = saintsFieldWithInfo.SerializedProperty.name;
+                        }
                     }
 
                     // ReSharper disable once UseDeconstruction
@@ -493,6 +495,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         List<string> memberIds = columnKv.Value;
 
                         string id = string.Join(";", memberIds);
+                        RegisterSearchColumn(id, memberIds.Where(memberIdToPropertyName.ContainsKey).Select(each => memberIdToPropertyName[each]));
 
                         bool thisIsVisible = true;
                         if (columnToDefaultHide.TryGetValue(columnName, out bool hide))
@@ -506,6 +509,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             title = columnName,
                             stretchable = true,
                             visible = thisIsVisible,
+                            makeHeader = () => MakeSearchHeader(id, columnName),
                         };
                         ApplySessionColumnWidth(curColumn);
                         multiColumnListView.columns.Add(curColumn);
@@ -515,24 +519,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         {
                             TableCellFoldableElement cellElement = (TableCellFoldableElement)element;
                             RowData currentRowData = new RowData(multiColumnListView, index);
+                            int propertyIndex = _asyncSearchItems.ItemIndexToPropertyIndex[index];
+                            cellElement.SetViewKey($"{SerializedUtils.GetUniqueId(arrayProp)}:{propertyIndex}");
                             cellElement.userData = currentRowData;
                             cellElement.ToggleDisplay(false);
 
-                            cellElement.RegisterValueChangedCallback(expand =>
-                            {
-                                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                                foreach (TableCellFoldableElement rowCell in multiColumnListView.Query<TableCellFoldableElement>().Build())
-                                {
-                                    RowData checkRowData = (RowData)rowCell.userData;
-                                    if (!ReferenceEquals(checkRowData.Owner, currentRowData.Owner)
-                                        || checkRowData.RowIndex != currentRowData.RowIndex)
-                                    {
-                                        continue;
-                                    }
-
-                                    rowCell.SetValueWithoutNotify(expand.newValue);
-                                }
-                            });
                             // UIToolkitUtils.OnAttachToPanelOnce(cellElement, _ =>
                             // {
                             //     cellElement.RegisterValueChangedCallback(expand =>
@@ -543,7 +534,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
                             ScheduleColumnFoldoutRefreshDisplay();
                             // Debug.Log($"id={id}/index={index}");
-                            SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
+                            SerializedProperty targetProp = arrayProp.GetArrayElementAtIndex(propertyIndex);
                             targetProp.isExpanded = true;
 
                             (PropertyAttribute[] _, object thisParentRefreshed) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(targetProp);
@@ -644,12 +635,13 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 //                 Debug.Log($"drag {first}({first}) -> {second}({second}) for {arrayProp.propertyPath}({arrayProp.arraySize})");
 // #endif
 
-                    arrayProp.MoveArrayElement(first, second);
+                    int fromPropIndex = _asyncSearchItems.ItemIndexToPropertyIndex[first];
+                    int toPropIndex = _asyncSearchItems.ItemIndexToPropertyIndex[second];
+                    arrayProp.MoveArrayElement(fromPropIndex, toPropIndex);
                     arrayProp.serializedObject.ApplyModifiedProperties();
-                    multiColumnListView.itemsSource = Enumerable
-                        .Range(0, arrayProp.arraySize)
-                        .Select(arrayProp.GetArrayElementAtIndex)
-                        .ToList();
+                    multiColumnListView.itemsSource = new List<int>(_asyncSearchItems.ItemIndexToPropertyIndex);
+                    multiColumnListView.Rebuild();
+                    RefreshSearchingStatus();
                 };
                 multiColumnListView.RegisterCallback<KeyDownEvent>(evt =>
                 {
@@ -660,8 +652,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 bool copyCommand = ctrl && evt.keyCode == KeyCode.C;
                 if (copyCommand)
                 {
-                    SerializedProperty selected = multiColumnListView.selectedItems
-                        .Cast<SerializedProperty>()
+                    SerializedProperty selected = SelectedIndices()
+                        .Select(arrayProp.GetArrayElementAtIndex)
                         // .Select(each => SerializedUtils.PropertyPathIndex(each.propertyPath))
                         .FirstOrDefault();
                     // Debug.Log(string.Join(", ", selected));
@@ -679,8 +671,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 bool pasteCommand = ctrl && evt.keyCode == KeyCode.V;
                 if (pasteCommand)
                 {
-                    SerializedProperty selected = multiColumnListView.selectedItems
-                        .Cast<SerializedProperty>()
+                    SerializedProperty selected = SelectedIndices()
+                        .Select(arrayProp.GetArrayElementAtIndex)
                         // .Select(each => SerializedUtils.PropertyPathIndex(each.propertyPath))
                         .FirstOrDefault();
                     // Debug.Log(string.Join(", ", selected));
@@ -695,12 +687,14 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     {
                         ClipboardHelper.DoPasteSerializedProperty(selected);
                         selected.serializedObject.ApplyModifiedProperties();
+                        RefreshSearchingStatus();
                     }
                 }
                 });
 
                 _tableContentContainer.Add(multiColumnListView);
                 ScheduleColumnFoldoutRefreshDisplay();
+                RefreshSearchingStatus();
 
                 return;
 
@@ -758,6 +752,22 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 TableCellFoldableElement MakeTableCellFoldableElement()
                 {
                     TableCellFoldableElement itemContainer = new TableCellFoldableElement();
+                    itemContainer.RegisterValueChangedCallback(expand =>
+                    {
+                        if (!(itemContainer.userData is RowData currentRowData))
+                        {
+                            return;
+                        }
+                        foreach (TableCellFoldableElement rowCell in multiColumnListView.Query<TableCellFoldableElement>().Build())
+                        {
+                            if (rowCell.userData is RowData checkRowData &&
+                                ReferenceEquals(checkRowData.Owner, currentRowData.Owner) &&
+                                checkRowData.RowIndex == currentRowData.RowIndex)
+                            {
+                                rowCell.SetValueWithoutNotify(expand.newValue);
+                            }
+                        }
+                    });
 
                     itemContainer.RegisterCallback<AttachToPanelEvent>(_ =>
                     {
@@ -774,7 +784,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             {
                 _preArraySize = newArraySize;
                 // MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>();
-                List<SerializedProperty> source = MakeSource(arrayProp);
+                RefreshSearchingStatus();
+                List<int> source = new List<int>(_asyncSearchItems.ItemIndexToPropertyIndex);
                 // Debug.Log($"Refresh set source to {string.Join(", ", source.Select(each => $"{each.propertyPath}/{each.propertyType}"))}");
                 _multiColumnListView.itemsSource = source;
                 _multiColumnListView.Rebuild();
@@ -788,12 +799,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 //     _multiColumnListView.itemsSource = source;
                 // }).StartingIn(500);
             }
-        }
-
-        private static List<SerializedProperty> MakeSource(SerializedProperty arrayProp)
-        {
-            return Enumerable.Range(0, arrayProp.arraySize)
-                .Select(arrayProp.GetArrayElementAtIndex).ToList();
+            RefreshSearchingStatus();
         }
 
         private static void RefreshColumnFoldoutsDisplay(MultiColumnListView multiColumnListView)
@@ -938,6 +944,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
         public bool HasListView() => _multiColumnListView != null;
 
+        public void Refresh() => OnArrayPropertyChanged();
+
         public void CollapseAll()
         {
             ToggleFoldableAll(false);
@@ -955,6 +963,405 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 cell.value = expand;
             }
         }
+
+        #region Search
+
+        public bool SearchableAll { get; private set; }
+        public bool SearchableCols { get; private set; }
+        public bool DefaultSearch { get; set; } = true;
+        public bool ObjectNestedSearch { get; set; } = true;
+        public bool ExtraSearch { get; set; }
+        public bool HasExtraSearch => _customSearch != null;
+        public int CurPageIndex => _asyncSearchItems.CurPageIndex;
+        public event Action<int, int> PageChanged;
+
+        private ToolbarSearchField _searchField;
+        private readonly Dictionary<string, SearchColumn> _searchColumns = new Dictionary<string, SearchColumn>();
+        private Func<int, IReadOnlyList<ListSearchToken>, bool> _customSearch;
+        private AsyncSearchItems _asyncSearchItems;
+        private int _numberOfItemsPerPage;
+
+        private class SearchColumn
+        {
+            public string[] PropertyNames;
+            public string SearchText = "";
+        }
+
+        // Keep the search state and paging model aligned with SerializedListElement.
+        private class AsyncSearchItems
+        {
+            public bool Started;
+            public bool Finished;
+            public IEnumerator<IReadOnlyList<int>> SourceGenerator;
+            public List<int> FullSources;
+            public double DebounceSearchTime;
+            public List<int> CachedFullSources;
+            public List<int> ItemIndexToPropertyIndex;
+            public int CurPageIndex;
+        }
+
+        private struct PagingInfo
+        {
+            public List<int> IndexesCurPage;
+            public int CurPageIndex;
+            public int PageCount;
+        }
+
+        private void InitializeSearch(TableAttribute settings)
+        {
+            SerializedProperty property = _fieldWithInfo.SerializedProperty;
+            SearchableAll = settings.SearchableAll;
+            SearchableCols = settings.SearchableCols;
+            _numberOfItemsPerPage = Mathf.Max(0, settings.NumberOfItemsPerPage);
+            _customSearch = CreateExtraSearch(property,
+                ReflectUtils.GetElementType(_fieldWithInfo.FieldInfo?.FieldType ?? _fieldWithInfo.PropertyInfo.PropertyType),
+                _fieldWithInfo.Targets[0], RuntimeUtil.ParseCallback(settings.ExtraSearch).content);
+            ExtraSearch = HasExtraSearch;
+            List<int> fullList = Enumerable.Range(0, property.arraySize).ToList();
+            _asyncSearchItems = new AsyncSearchItems
+            {
+                Started = true,
+                Finished = true,
+                FullSources = fullList,
+                CachedFullSources = new List<int>(fullList),
+                ItemIndexToPropertyIndex = new List<int>(fullList),
+                DebounceSearchTime = double.MaxValue,
+            };
+
+            _searchField = MakeSearchField("", SearchableAll, _ =>
+            {
+                _asyncSearchItems.CurPageIndex = 0;
+                RefreshSearchingStatus(true);
+            });
+            Add(_searchField);
+            RegisterCallback<AttachToPanelEvent>(_ => RefreshSearchingStatus());
+            RegisterCallback<DetachFromPanelEvent>(_ => StopSearch());
+            schedule.Execute(AdvanceSearch).Every(1);
+        }
+
+        private ToolbarSearchField MakeSearchField(string text, bool searchable, Action<string> changed)
+        {
+            ToolbarSearchField searchField = new ToolbarSearchField
+            {
+                style =
+                {
+                    display = searchable ? DisplayStyle.Flex : DisplayStyle.None,
+                    marginRight = 3,
+                    width = StyleKeyword.Auto,
+                    minWidth = 0,
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
+            };
+            searchField.SetValueWithoutNotify(text);
+            searchField.RegisterValueChangedCallback(evt => changed(evt.newValue));
+            searchField.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return && !_asyncSearchItems.Started)
+                {
+                    _asyncSearchItems.DebounceSearchTime = 0;
+                }
+            }, TrickleDown.TrickleDown);
+
+            TextField searchTextField = searchField.Q<TextField>();
+            searchTextField.style.position = Position.Relative;
+            Image loadingImage = new Image
+            {
+                name = "saints-table-search-loading",
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+                pickingMode = PickingMode.Ignore,
+                tintColor = EColor.Gray.GetColor(),
+                style =
+                {
+                    position = Position.Absolute,
+                    right = 0,
+                    top = 1,
+                    width = 12,
+                    height = 12,
+                    visibility = Visibility.Hidden,
+                },
+            };
+            searchTextField.Add(loadingImage);
+            UIToolkitUtils.SetKeepRotate(loadingImage);
+            loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage));
+            return searchField;
+        }
+
+        private void RegisterSearchColumn(string id, IEnumerable<string> propertyNames)
+        {
+            if (!_searchColumns.TryGetValue(id, out SearchColumn column))
+            {
+                _searchColumns[id] = column = new SearchColumn();
+            }
+            column.PropertyNames = propertyNames.ToArray();
+        }
+
+        private VisualElement MakeSearchHeader(string id, string columnName)
+        {
+            VisualElement headerContainer = new VisualElement();
+            headerContainer.Add(new Label(columnName)
+            {
+                style = { marginLeft = 3, marginRight = 3 },
+            });
+            SearchColumn column = _searchColumns[id];
+            ToolbarSearchField searchField = MakeSearchField(column.SearchText, SearchableCols, text =>
+            {
+                column.SearchText = text;
+                _asyncSearchItems.CurPageIndex = 0;
+                RefreshSearchingStatus(true);
+            });
+            searchField.SetEnabled(column.PropertyNames.Length > 0);
+            headerContainer.Add(searchField);
+            return headerContainer;
+        }
+
+        public void SetSearchableAll(bool searchable) => SetSearchable(searchable, SearchableCols);
+
+        public void SetSearchableCols(bool searchable) => SetSearchable(SearchableAll, searchable);
+
+        private void SetSearchable(bool searchableAll, bool searchableCols)
+        {
+            SearchableAll = searchableAll;
+            SearchableCols = searchableCols;
+            foreach (SearchColumn column in _searchColumns.Values)
+            {
+                if (!searchableCols)
+                {
+                    column.SearchText = "";
+                }
+            }
+            foreach (ToolbarSearchField field in this.Query<ToolbarSearchField>().Build())
+            {
+                // Nested collections have their own search settings.
+                if (!ReferenceEquals(field, _searchField) && field.GetFirstAncestorOfType<TableCellFoldableElement>() != null)
+                {
+                    continue;
+                }
+                bool searchable = ReferenceEquals(field, _searchField) ? searchableAll : searchableCols;
+                field.style.display = searchable ? DisplayStyle.Flex : DisplayStyle.None;
+                if (!searchable)
+                {
+                    field.SetValueWithoutNotify("");
+                }
+            }
+            _asyncSearchItems.CurPageIndex = 0;
+            RefreshSearchingStatus();
+        }
+
+        public void SetPage(int pageIndex, int numberOfItemsPerPage)
+        {
+            _numberOfItemsPerPage = Mathf.Max(0, numberOfItemsPerPage);
+            LocalUpdatePage(pageIndex);
+        }
+
+        public void RefreshSearchingStatus(bool debounce = false)
+        {
+            StopSearch();
+            SerializedProperty property = _fieldWithInfo.SerializedProperty;
+            if (!SerializedUtils.IsOk(property))
+            {
+                return;
+            }
+            bool hasSearch = (SearchableAll && !string.IsNullOrWhiteSpace(_searchField.value)) ||
+                (SearchableCols && _searchColumns.Values.Any(each => !string.IsNullOrWhiteSpace(each.SearchText)));
+            if (!hasSearch)
+            {
+                List<int> resultIndexes = Enumerable.Range(0, property.arraySize).ToList();
+                _asyncSearchItems.FullSources = resultIndexes;
+                _asyncSearchItems.CachedFullSources = new List<int>(resultIndexes);
+            }
+            else
+            {
+                _asyncSearchItems.DebounceSearchTime = debounce ? EditorApplication.timeSinceStartup + 0.6f : 0;
+                _asyncSearchItems.Started = false;
+                _asyncSearchItems.Finished = false;
+                _asyncSearchItems.FullSources.Clear();
+                _asyncSearchItems.CachedFullSources.RemoveAll(each => each >= property.arraySize);
+                _asyncSearchItems.SourceGenerator = SearchCallbackWithCustom(property).GetEnumerator();
+            }
+            LocalUpdatePage(_asyncSearchItems.CurPageIndex);
+        }
+
+        private IEnumerable<IReadOnlyList<int>> SearchCallbackWithCustom(SerializedProperty arrayProperty)
+        {
+            const int batchLimit = 10;
+            List<int> batch = new List<int>();
+            IReadOnlyList<ListSearchToken> tokens = SerializedUtils.ParseSearch(_searchField.value).ToArray();
+            bool globalSearch = SearchableAll && !string.IsNullOrWhiteSpace(_searchField.value);
+            (string[] PropertyNames, ListSearchToken[] Tokens)[] columns = _searchColumns.Values.Where(each => SearchableCols && !string.IsNullOrWhiteSpace(each.SearchText))
+                .Select(each => (each.PropertyNames, Tokens: SerializedUtils.ParseSearch(each.SearchText).ToArray())).ToArray();
+            for (int index = 0; index < arrayProperty.arraySize; index++)
+            {
+                SerializedProperty item = arrayProperty.GetArrayElementAtIndex(index);
+                bool matches = !globalSearch || (ExtraSearch && _customSearch != null && _customSearch(index, tokens)) ||
+                    (DefaultSearch && tokens.All(token =>
+                        SerializedUtils.SearchProp(item, token.Token, ObjectNestedSearch, new HashSet<object>())));
+                if (matches && columns.Length > 0)
+                {
+                    SerializedObject referencedObject = item.propertyType == SerializedPropertyType.ObjectReference && item.objectReferenceValue
+                        ? new SerializedObject(item.objectReferenceValue)
+                        : null;
+                    try
+                    {
+                        foreach ((string[] PropertyNames, ListSearchToken[] Tokens) column in columns)
+                        {
+                            bool columnMatches = DefaultSearch && column.Tokens.All(token => column.PropertyNames.Any(propName =>
+                            {
+                                SerializedProperty member = item.propertyType == SerializedPropertyType.ObjectReference
+                                    ? referencedObject?.FindProperty(propName)
+                                    : item.FindPropertyRelative(propName);
+                                return member != null && SerializedUtils.SearchProp(member, token.Token, ObjectNestedSearch, new HashSet<object>());
+                            }));
+                            if (!columnMatches && !(ExtraSearch && _customSearch != null && _customSearch(index, column.Tokens)))
+                            {
+                                matches = false;
+                                break;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        referencedObject?.Dispose();
+                    }
+                }
+                if (matches)
+                {
+                    batch.Add(index);
+                }
+                // Yield even when no rows match, so a large scan never runs in one editor update.
+                if ((index + 1) % batchLimit == 0)
+                {
+                    yield return batch.ToArray();
+                    batch.Clear();
+                }
+            }
+            if (batch.Count > 0)
+            {
+                yield return batch;
+            }
+        }
+
+        private void AdvanceSearch()
+        {
+            if (!SerializedUtils.IsOk(_fieldWithInfo.SerializedProperty))
+            {
+                StopSearch();
+                return;
+            }
+            if (!_asyncSearchItems.Started && EditorApplication.timeSinceStartup > _asyncSearchItems.DebounceSearchTime)
+            {
+                _asyncSearchItems.Started = true;
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex);
+            }
+            if (_asyncSearchItems.Started && !_asyncSearchItems.Finished)
+            {
+                if (_asyncSearchItems.SourceGenerator.MoveNext())
+                {
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    _asyncSearchItems.FullSources.AddRange(_asyncSearchItems.SourceGenerator.Current);
+                }
+                else
+                {
+                    _asyncSearchItems.Finished = true;
+                    _asyncSearchItems.SourceGenerator.Dispose();
+                    _asyncSearchItems.SourceGenerator = null;
+                }
+                _asyncSearchItems.CachedFullSources = new List<int>(_asyncSearchItems.FullSources);
+                LocalUpdatePage(_asyncSearchItems.CurPageIndex);
+            }
+            foreach (Image loadingImage in this.Query<Image>(name: "saints-table-search-loading").Build())
+            {
+                loadingImage.style.visibility = _asyncSearchItems.Started && !_asyncSearchItems.Finished
+                    ? Visibility.Visible : Visibility.Hidden;
+            }
+        }
+
+        private void LocalUpdatePage(int newPageIndex)
+        {
+            IReadOnlyList<int> resultIndexes = _asyncSearchItems.Started
+                ? _asyncSearchItems.FullSources : _asyncSearchItems.CachedFullSources;
+            PagingInfo pagingInfo = GetPagingInfo(newPageIndex, resultIndexes, _numberOfItemsPerPage);
+            _asyncSearchItems.ItemIndexToPropertyIndex = new List<int>(pagingInfo.IndexesCurPage);
+            _asyncSearchItems.CurPageIndex = pagingInfo.CurPageIndex;
+            if (_multiColumnListView != null && !_multiColumnListView.itemsSource.Cast<int>().SequenceEqual(pagingInfo.IndexesCurPage))
+            {
+                _multiColumnListView.ClearSelection();
+                _multiColumnListView.itemsSource = pagingInfo.IndexesCurPage;
+                _multiColumnListView.Rebuild();
+            }
+            PageChanged?.Invoke(pagingInfo.CurPageIndex, pagingInfo.PageCount);
+        }
+
+        private static PagingInfo GetPagingInfo(int newPageIndex, IReadOnlyList<int> fullIndexResults, int numberOfItemsPerPage)
+        {
+            int pageCount = numberOfItemsPerPage <= 0 ? 1 : Mathf.Max(1, Mathf.CeilToInt((float)fullIndexResults.Count / numberOfItemsPerPage));
+            int curPageIndex = numberOfItemsPerPage <= 0 ? 0 : Mathf.Clamp(newPageIndex, 0, pageCount - 1);
+            return new PagingInfo
+            {
+                IndexesCurPage = fullIndexResults.Skip(numberOfItemsPerPage <= 0 ? 0 : curPageIndex * numberOfItemsPerPage)
+                    .Take(numberOfItemsPerPage <= 0 ? int.MaxValue : numberOfItemsPerPage).ToList(),
+                CurPageIndex = curPageIndex,
+                PageCount = pageCount,
+            };
+        }
+
+        public void StopSearch()
+        {
+            _asyncSearchItems.SourceGenerator?.Dispose();
+            _asyncSearchItems.SourceGenerator = null;
+            _asyncSearchItems.Started = true;
+            _asyncSearchItems.Finished = true;
+        }
+
+        private static Func<int, IReadOnlyList<ListSearchToken>, bool> CreateExtraSearch(
+            SerializedProperty property, Type elementType, object callbackOwner, string methodName)
+        {
+            if (callbackOwner == null || string.IsNullOrEmpty(methodName))
+            {
+                return null;
+            }
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromType(callbackOwner.GetType()))
+            {
+                foreach (MethodInfo method in type.GetMethods(ReflectUtils.FindTargetBindAttr))
+                {
+                    if (method.Name != methodName || method.ReturnType != typeof(bool))
+                    {
+                        continue;
+                    }
+                    ParameterInfo[] parameters = method.GetParameters();
+                    if (parameters.Length < 2 || parameters.Length > 3 ||
+                        !typeof(IEnumerable<ListSearchToken>).IsAssignableFrom(parameters[parameters.Length - 1].ParameterType))
+                    {
+                        continue;
+                    }
+                    bool valueAndIndex = parameters.Length == 3 && elementType.IsAssignableFrom(parameters[0].ParameterType) &&
+                        parameters[1].ParameterType == typeof(int);
+                    bool valueOnly = parameters.Length == 2 && elementType.IsAssignableFrom(parameters[0].ParameterType);
+                    bool indexOnly = parameters.Length == 2 && !valueOnly && parameters[0].ParameterType == typeof(int);
+                    if (!valueAndIndex && !valueOnly && !indexOnly)
+                    {
+                        continue;
+                    }
+                    return (index, tokens) =>
+                    {
+                        if (indexOnly)
+                        {
+                            return (bool)method.Invoke(callbackOwner, new object[] { index, tokens });
+                        }
+                        SerializedProperty item = property.GetArrayElementAtIndex(index);
+                        (SerializedUtils.FieldOrProp member, object owner) = SerializedUtils.GetFieldInfoAndDirectParent(item);
+                        MemberInfo memberInfo = member.IsField ? member.FieldInfo : member.PropertyInfo;
+                        (string error, int _, object value) = Util.GetValue(item, memberInfo, owner);
+                        return error == "" && (bool)method.Invoke(callbackOwner, valueAndIndex
+                            ? new[] { value, index, tokens } : new[] { value, tokens });
+                    };
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
     }
 }
 #endif

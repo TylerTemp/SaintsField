@@ -36,8 +36,6 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             }
         }
 
-        private bool _hasSize;
-
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             TableAttribute tableAttribute = FieldWithInfo.PlayaAttributes.OfType<TableAttribute>().FirstOrDefault();
@@ -48,13 +46,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 name = NameTableContainer(FieldWithInfo.SerializedProperty),
             };
 
-            // FillTableToContainer(result);
             FillTableToContainer(result, tableAttribute.DefaultCollapse);
 
             OnSearchFieldUIToolkit.AddListener(Search);
             result.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
             result.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
-
 
             return (result, true);
 
@@ -72,6 +68,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         }
 
         private int _preArraySize;
+        private TableContentElement _tableContentElement;
 
         private void FillTableToContainer(VisualElement root, bool defaultCollapse)
         {
@@ -92,13 +89,92 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             _preArraySize = arrayProp.arraySize;
 
-            TableContentElement tableContentElement = new TableContentElement(FieldWithInfo);
+            TableContentElement tableContentElement = _tableContentElement = new TableContentElement(FieldWithInfo, _attribute);
             foldout.Add(tableContentElement);
+
+            ListViewPagerElement pager = new ListViewPagerElement
+            {
+                style = { display = _attribute.NumberOfItemsPerPage > 0 ? DisplayStyle.Flex : DisplayStyle.None },
+            };
+            pager.NumberOfItemsPerPageField.SetValueWithoutNotify(Mathf.Max(0, _attribute.NumberOfItemsPerPage));
+            pager.NumberOfItemsTotalField.SetValueWithoutNotify(arrayProp.arraySize);
+            tableContentElement.PageChanged += (pageIndex, pageCount) =>
+            {
+                pager.PagePreButton.SetEnabled(pageIndex > 0);
+                pager.PageNextButton.SetEnabled(pageIndex < pageCount - 1);
+                pager.PageField.SetValueWithoutNotify(pageIndex + 1);
+                pager.PageLabel.text = $" / {pageCount}";
+            };
+            pager.PagePreButton.clicked += () => tableContentElement.SetPage(tableContentElement.CurPageIndex - 1, pager.NumberOfItemsPerPageField.value);
+            pager.PageNextButton.clicked += () => tableContentElement.SetPage(tableContentElement.CurPageIndex + 1, pager.NumberOfItemsPerPageField.value);
+            pager.PageField.RegisterValueChangedCallback(evt => tableContentElement.SetPage(evt.newValue - 1, pager.NumberOfItemsPerPageField.value));
+            pager.NumberOfItemsPerPageField.RegisterValueChangedCallback(evt =>
+            {
+                int perPage = Mathf.Max(0, evt.newValue);
+                pager.NumberOfItemsPerPageField.SetValueWithoutNotify(perPage);
+                tableContentElement.SetPage(tableContentElement.CurPageIndex, perPage);
+            });
+            tableContentElement.SetPage(0, pager.NumberOfItemsPerPageField.value);
 
             foldout.MenuButton.clicked += () =>
             {
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-                if(tableContentElement.HasListView())
+                bool curPaging = pager.style.display != DisplayStyle.None;
+                genericDropdownMenu.AddItem("Paging", curPaging, () =>
+                {
+                    pager.style.display = curPaging ? DisplayStyle.None : DisplayStyle.Flex;
+                    pager.NumberOfItemsPerPageField.value = curPaging ? 0 : _attribute.NumberOfItemsPerPage > 0
+                        ? _attribute.NumberOfItemsPerPage : Mathf.Max(5, arrayProp.arraySize / 2);
+                });
+
+                genericDropdownMenu.AddSeparator("");
+
+                bool curSearchAll = tableContentElement.SearchableAll;
+                bool curSearchCols = tableContentElement.SearchableCols;
+                genericDropdownMenu.AddItem("Search Table", curSearchAll, () => tableContentElement.SetSearchableAll(!curSearchAll));
+                genericDropdownMenu.AddItem("Search Columns", curSearchCols, () => tableContentElement.SetSearchableCols(!curSearchCols));
+                bool curSearch = curSearchAll || curSearchCols;
+                if (curSearch && tableContentElement.HasExtraSearch)
+                {
+                    genericDropdownMenu.AddItem("Default Search", tableContentElement.DefaultSearch, () =>
+                    {
+                        tableContentElement.DefaultSearch = !tableContentElement.DefaultSearch;
+                        tableContentElement.RefreshSearchingStatus();
+                    });
+                }
+                else
+                {
+                    genericDropdownMenu.AddDisabledItem("Default Search", tableContentElement.DefaultSearch);
+                }
+                if (curSearch)
+                {
+                    genericDropdownMenu.AddItem("Object Search", tableContentElement.ObjectNestedSearch, () =>
+                    {
+                        tableContentElement.ObjectNestedSearch = !tableContentElement.ObjectNestedSearch;
+                        tableContentElement.RefreshSearchingStatus();
+                    });
+                }
+                else
+                {
+                    genericDropdownMenu.AddDisabledItem("Object Search", tableContentElement.ObjectNestedSearch);
+                }
+                if (tableContentElement.HasExtraSearch)
+                {
+                    if (curSearch)
+                    {
+                        genericDropdownMenu.AddItem("Extra Search", tableContentElement.ExtraSearch, () =>
+                        {
+                            tableContentElement.ExtraSearch = !tableContentElement.ExtraSearch;
+                            tableContentElement.RefreshSearchingStatus();
+                        });
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem("Extra Search", tableContentElement.ExtraSearch);
+                    }
+                }
+                genericDropdownMenu.AddSeparator("");
+                if (tableContentElement.HasListView())
                 {
                     genericDropdownMenu.AddItem("Collapse All", false, tableContentElement.CollapseAll);
                     genericDropdownMenu.AddItem("Expand All", false, tableContentElement.ExpandAll);
@@ -122,7 +198,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 );
             };
 
-            if(defaultCollapse)
+            if (defaultCollapse)
             {
                 UIToolkitUtils.OnAttachToPanelOnceWithEnsure(foldout, () =>
                 {
@@ -136,20 +212,20 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 });
             }
 
-            foldout.ArraySizeField.RegisterValueChangedCallback(evt =>
+            foldout.ArraySizeField.RegisterValueChangedCallback(evt => Resize(evt.newValue));
+            pager.NumberOfItemsTotalField.RegisterValueChangedCallback(evt => Resize(evt.newValue));
+
+            VisualElement footer = new VisualElement
             {
-                int newValue = evt.newValue;
-                int oldValue = arrayProp.arraySize;
-                int changedValue = ChangeArraySize(newValue, arrayProp);
-                if (changedValue == oldValue)
+                style =
                 {
-                    return;
-                }
+                    flexDirection = FlexDirection.Row,
+                    justifyContent = Justify.FlexEnd,
+                },
+            };
+            foldout.Add(footer);
 
-                _preArraySize = newValue;
-            });
-
-            // controls.Add(arraySizeField);
+            footer.Add(pager);
 
             ListViewFooterButtonsElement listViewFooterButtons = new ListViewFooterButtonsElement
             {
@@ -162,62 +238,40 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     name = NameRemoveButton(arrayProp),
                 },
             };
+            footer.Add(listViewFooterButtons);
+
             listViewFooterButtons.AddButton.clicked += () =>
             {
                 int oldValue = arrayProp.arraySize;
-                ChangeArraySize(oldValue + 1, arrayProp);
+                Resize(oldValue + 1);
+                tableContentElement.SetPage(int.MaxValue, pager.NumberOfItemsPerPageField.value);
             };
 
-            // Toolbar toolbar = new Toolbar();
-            // ToolbarButton addButton = new ToolbarButton(() =>
-            // {
-            //     int oldValue = arrayProp.arraySize;
-            //     ChangeArraySize(oldValue + 1, arrayProp);
-            // })
-            // {
-            //     text = "+",
-            //     name = NameAddButton(property),
-            // };
             if (_attribute.HideAddButton)
             {
-                // addButton.style.display = DisplayStyle.None;
                 listViewFooterButtons.AddButton.style.display = DisplayStyle.None;
             }
-            // toolbar.Add(addButton);
 
             listViewFooterButtons.RemoveButton.clicked += () =>
             {
                 DeleteArrayElement(arrayProp, tableContentElement.SelectedIndices());
+                foldout.ArraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
+                pager.NumberOfItemsTotalField.SetValueWithoutNotify(arrayProp.arraySize);
+                _preArraySize = arrayProp.arraySize;
+                tableContentElement.Refresh();
             };
 
-            // ToolbarButton removeButton = new ToolbarButton(() =>
-            // {
-            //     DeleteArrayElement(arrayProp, multiColumnListView.selectedIndices);
-            // })
-            // {
-            //     text = "-",
-            //     name = NameRemoveButton(property),
-            // };
             if (_attribute.HideRemoveButton)
             {
-                // removeButton.style.display = DisplayStyle.None;
                 listViewFooterButtons.RemoveButton.style.display = DisplayStyle.None;
             }
-            // toolbar.Add(removeButton);
 
             if (_attribute.HideAddButton && _attribute.HideRemoveButton)
             {
                 foldout.ArraySizeField.SetEnabled(false);
-                // listViewFooter.style.display = DisplayStyle.None;
+                pager.NumberOfItemsTotalField.SetEnabled(false);
                 listViewFooterButtons.ButtonsContainer.style.display = DisplayStyle.None;
             }
-
-            // controls.Add(toolbar);
-
-            // root.Add(toolbar);
-
-
-
 
             root.TrackPropertyValue(arrayProp, _ =>
             {
@@ -226,20 +280,30 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 {
                     _preArraySize = arrayProp.arraySize;
                     foldout.ArraySizeField.SetValueWithoutNotify(arrayProp.arraySize);
+                    pager.NumberOfItemsTotalField.SetValueWithoutNotify(arrayProp.arraySize);
                 }
             });
+            return;
 
-            // bool focused = false;
-            // multiColumnListView.RegisterCallback<FocusOutEvent>(_ => focused = false);
-            // multiColumnListView.RegisterCallback<FocusInEvent>(_ => focused = true);
+            void Resize(int newValue)
+            {
+                int oldValue = arrayProp.arraySize;
+                int changedValue = ChangeArraySize(newValue, arrayProp);
+                foldout.ArraySizeField.SetValueWithoutNotify(changedValue);
+                pager.NumberOfItemsTotalField.SetValueWithoutNotify(changedValue);
+                if (changedValue == oldValue)
+                {
+                    return;
+                }
 
-// #endif
-
-            foldout.Add(listViewFooterButtons);
+                _preArraySize = changedValue;
+                tableContentElement.Refresh();
+            }
         }
 
         public override void OnDestroyUIToolkit()
         {
+            _tableContentElement?.StopSearch();
         }
     }
 }

@@ -63,7 +63,12 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             foreach (int index in indexes)
             {
+                int oldSize = arrayProp.arraySize;
                 arrayProp.DeleteArrayElementAtIndex(index);
+                if (arrayProp.arraySize == oldSize)
+                {
+                    arrayProp.DeleteArrayElementAtIndex(index);
+                }
             }
 
             arrayProp.serializedObject.ApplyModifiedProperties();

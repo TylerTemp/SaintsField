@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.30.6 ##
+
+1.  Fix: multiple border rendering for `Table`; fix table fields are a bit off-view for some type of field
+2.  Add: `Table` now supports search the whole table or by columns, and supports paging
+3.  Add: `Table` now works with `ShowInInspector` and `Button`
+
 ## 5.30.5 ##
 
 1.  Fix: `Clips` can not track property changes for serializable class/struct type

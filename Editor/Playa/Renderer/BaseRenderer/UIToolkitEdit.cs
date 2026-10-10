@@ -34,6 +34,7 @@ using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer.EditUnityEvent;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
+using SaintsField.Editor.Playa.Renderer.Table;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.UIToolkitElements.CharacterDrawer;
 using SaintsField.Editor.UIToolkitElements.EditWrapper;
@@ -87,6 +88,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 switch (attribute)
                 {
+                    case TableAttribute when value is IEnumerable || (value == null && typeof(IEnumerable).IsAssignableFrom(valueType)):
+                        return (TableRenderer.UIToolkitValueEdit(oldElement, label, valueType, value,
+                            (value as IEnumerable)?.Cast<object>().ToArray() ?? Array.Empty<object>(), beforeSet, setterOrNull, labelGrayColor,
+                            inHorizontalLayout, allAttributes, targets, richTextTagProvider, foldoutViewKey), false);
                     case ValueButtonsAttribute valueButtonsAttribute:
                     {
                         return (ValueButtonsAttributeDrawer.UIToolkitValueEdit(

@@ -50,6 +50,11 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public override VisualElement contentContainer { get; }
 
+        public void SetText(string text)
+        {
+            _foldout.text = text;
+        }
+
         // ReSharper disable once InconsistentNaming
         public new string viewDataKey
         {

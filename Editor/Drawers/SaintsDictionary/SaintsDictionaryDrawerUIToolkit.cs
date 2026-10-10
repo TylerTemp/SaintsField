@@ -651,11 +651,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     {
                         style =
                         {
-                            marginRight = 3,
                             display = saintsDictionaryAttribute?.Searchable ?? true
                                 ? DisplayStyle.Flex
                                 : DisplayStyle.None,
-                            width = Length.Percent(97f),
+                            marginRight = 3,
+                            width = StyleKeyword.None,
+                            minWidth = StyleKeyword.None,
+                            flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
 
@@ -817,11 +820,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     {
                         style =
                         {
-                            marginRight = 3,
                             display = saintsDictionaryAttribute?.Searchable ?? true
                                 ? DisplayStyle.Flex
                                 : DisplayStyle.None,
-                            width = Length.Percent(97f),
+                            marginRight = 3,
+                            width = StyleKeyword.None,
+                            minWidth = StyleKeyword.None,
+                            flexGrow = 1,
+                            flexShrink = 1,
                         },
                     };
 
