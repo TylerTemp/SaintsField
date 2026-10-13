@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
 
@@ -251,7 +251,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         // private bool _objectNestedSearch = true;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             bool objectNestedSearch = true;
             bool defaultSearch = true;

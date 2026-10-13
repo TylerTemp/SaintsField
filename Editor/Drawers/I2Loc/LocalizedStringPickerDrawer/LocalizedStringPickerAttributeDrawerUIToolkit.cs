@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         // private SaintsTreeDropdownUIToolkit _dropdownUICache;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button selectorButton = container.Q<Button>(NameSelectorButton(property));
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));

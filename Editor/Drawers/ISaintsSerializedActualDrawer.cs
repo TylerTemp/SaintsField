@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers
     public interface ISaintsSerializedActualDrawer
     {
         void OnAwakeActualDrawer(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent);
     }
 }

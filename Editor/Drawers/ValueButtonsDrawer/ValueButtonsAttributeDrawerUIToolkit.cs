@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             VisualElement field = UtilCreateFieldUIToolKit(GetPreferredLabel(property), property);
             if (!string.IsNullOrEmpty(property.tooltip))
@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent) =>
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent) =>
             UtilCreateBelowUIToolkit(property);
 
         public static VisualElement UtilCreateBelowUIToolkit(SerializedProperty property)
@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             ValueButtonsAttribute valueButtonsAttribute = (ValueButtonsAttribute)saintsAttribute;

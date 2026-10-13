@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
         private bool _curPicking;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));
             button.styleSheets.Add(GetStyle());

@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
@@ -112,14 +112,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         }
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property);
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
             bool noFold = enumToggleButtonsAttribute.NoFold;

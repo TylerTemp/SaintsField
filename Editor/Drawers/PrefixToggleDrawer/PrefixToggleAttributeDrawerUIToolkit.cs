@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.PrefixToggleDrawer
         private static string NameToggleError(SerializedProperty property, int index) => $"{SerializedUtils.GetUniqueId(property)}_{index}__PrefixToggle_HelpBox";
 
         protected override VisualElement CreatePreFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             // skip list element as myIs.xxx.xxx.Array.data[INDEX]
             if (SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0)
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.PrefixToggleDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers.PrefixToggleDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             // Debug.Log(property.propertyPath);
 

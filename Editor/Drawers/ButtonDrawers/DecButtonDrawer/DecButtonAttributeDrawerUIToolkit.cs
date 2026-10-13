@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             FancyButton fancyButton = container.Q<FancyButton>(NameButton(property, index));
             ButtonRenderer.ButtonUserData buttonUserData = (ButtonRenderer.ButtonUserData)fancyButton.userData;
@@ -268,7 +268,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             if (!SerializedUtils.IsOk(property))

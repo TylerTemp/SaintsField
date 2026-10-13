@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
         // private LabelInfo _labelInfoUIToolkit;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;

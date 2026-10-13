@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             SceneReferenceField field = new SceneReferenceField(GetPreferredLabel(property))
             {
@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             return new SceneHelpBox();
         }
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         private bool _listeningToSceneList;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SceneReferenceField field = container.Q<SceneReferenceField>();
             SceneHelpBox helpBox = container.Q<SceneHelpBox>();

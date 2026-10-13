@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -150,7 +150,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
         private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;

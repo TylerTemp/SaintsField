@@ -296,7 +296,12 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
             Debug.Log($"CreateCellElement {serializedProperty.propertyPath} info={info.Name} allCustomAttributes={string.Join<Attribute>(", ", allCustomAttributes)}/injectedAttributes={string.Join(", ", injectedAttributes)}");
 #endif
-            List<Attribute> allAttributes = allCustomAttributes.Concat(injectedAttributes).ToList();
+            Attribute[] wrapperAttributes = allCustomAttributes
+                .Where(each => each is not PropertyAttribute && each is not InjectAttributeBase)
+                .ToArray();
+            List<Attribute> allAttributes = allCustomAttributes
+                .Where(each => each is PropertyAttribute || each is InjectAttributeBase)
+                .Concat(injectedAttributes).ToList();
             // List<Attribute> allAttributes = new List<Attribute>(allCustomAttributes);
             // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();
             // foreach (InjectAttributeBase injectAttributeBase in injectedAttributes)
@@ -414,7 +419,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     else
                     {
                         (Attribute attrOrNull, Type drawerType) =
-                            SaintsPropertyDrawer.GetFallbackDrawerType(wrapInfo, serializedBaseProperty, allCustomAttributes);
+                            SaintsPropertyDrawer.GetFallbackDrawerType(wrapInfo, serializedBaseProperty, allAttributes);
                         // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                         useAttribute = attrOrNull;
                         useDrawerType = drawerType;
@@ -443,14 +448,13 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 #endif
 
             SaintsCellRenderer renderer = null;
-            IPlayaAttribute[] playaAttributes = allCustomAttributes.OfType<IPlayaAttribute>().ToArray();
+            IPlayaAttribute[] playaAttributes = wrapperAttributes.OfType<IPlayaAttribute>().ToArray();
             if (playaAttributes.Length > 0)
             {
                 SaintsFieldWithInfo saintsContainerInfo = new SaintsFieldWithInfo
                 {
                     ClassStructType = null,
-                    // This will be empty for e.g. SaintsArray because it has filtered out
-                    PlayaAttributes = allCustomAttributes.OfType<IPlayaAttribute>().ToArray(),
+                    PlayaAttributes = playaAttributes,
                     // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
                     TargetParent = null,
                     TargetMemberInfo = null,
@@ -458,9 +462,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     Targets = new[]{parent},
 
                     RenderType = SaintsRenderType.SerializedField,
-                    SerializedProperty = serializedProperty,
-                    MemberId = info.Name,
-                    FieldInfo = info,
+                    SerializedProperty = serializedBaseProperty,
+                    MemberId = serializedBaseProperty.propertyPath,
+                    FieldInfo = wrapInfo,
                     InherentDepth = 0,
                     // Order = order,
                     // serializable = true,
@@ -472,6 +476,21 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     serializedProperty.serializedObject,
                     saintsContainerInfo
                 );
+            }
+
+            VisualElement WrapElement(VisualElement field)
+            {
+                if (renderer != null)
+                {
+                    return renderer.GetElementAndInit(field);
+                }
+                if (wrapperAttributes.Length == 0)
+                {
+                    return field;
+                }
+                VisualElement wrapper = new VisualElement();
+                wrapper.Add(field);
+                return wrapper;
             }
 
             if (useDrawerType == null)
@@ -494,7 +513,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 );
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
-                return merged;
+                return WrapElement(merged);
             }
 
             // Nah... This didn't handle for mis-ordered case
@@ -548,8 +567,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 r.Bind(serializedProperty.serializedObject);
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
-                VisualElement mergedFinal = renderer == null ? merged : renderer.GetElementAndInit(merged);
-                return mergedFinal;
+                return WrapElement(merged);
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
@@ -565,7 +583,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 },
             };
             result.Bind(serializedBaseProperty.serializedObject);
-            return result;
+            return WrapElement(result);
         }
 #endif
         public static (FieldInfo, SerializedProperty) GetCellInfo(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, bool hasSerializeReference)

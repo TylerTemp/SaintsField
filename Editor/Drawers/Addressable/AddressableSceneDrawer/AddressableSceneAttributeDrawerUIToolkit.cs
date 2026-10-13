@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         // private static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__AddressableScene_SelectorButton";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container1,
             FieldInfo info, object parent)
         {
             AddressableSceneField field = new AddressableSceneField(GetPreferredLabel(property), (AddressableSceneAttribute) saintsAttribute)
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             AddressableSceneAttribute addressableSceneAttribute = (AddressableSceneAttribute)saintsAttribute;

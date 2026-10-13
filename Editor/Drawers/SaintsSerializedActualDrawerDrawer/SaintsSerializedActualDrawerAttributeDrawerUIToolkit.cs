@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
         private ISaintsSerializedActualDrawer _actualDrawer;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             string label = GetPreferredLabel(property);
             if (!string.IsNullOrEmpty(label) && label.EndsWith(Util.SaintsSerializedLabelSuffix))
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             _actualDrawer?.OnAwakeActualDrawer(property, saintsAttribute, index, allAttributes, container,

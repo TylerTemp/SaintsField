@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
     [CustomPropertyDrawer(typeof(BelowButtonAttribute), true)]
     public partial class BelowButtonAttributeDrawer: DecButtonAttributeDrawer
     {
-        protected override IReadOnlyList<DecButtonShowIfAttribute> GetCurrentShowHide(IReadOnlyList<PropertyAttribute> attributes, ISaintsAttribute currentAttribute)
+        protected override IReadOnlyList<DecButtonShowIfAttribute> GetCurrentShowHide(IReadOnlyList<Attribute> attributes, ISaintsAttribute currentAttribute)
         {
             List<DecButtonShowIfAttribute> showControlAttributes = new List<DecButtonShowIfAttribute>(attributes.Count);
 
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
             return Array.Empty<DecButtonShowIfAttribute>();
         }
 
-        protected override IReadOnlyList<DecButtonDisableIfAttribute> GetCurrentDisableEnable(IReadOnlyList<PropertyAttribute> attributes, ISaintsAttribute currentAttribute)
+        protected override IReadOnlyList<DecButtonDisableIfAttribute> GetCurrentDisableEnable(IReadOnlyList<Attribute> attributes, ISaintsAttribute currentAttribute)
         {
             List<DecButtonDisableIfAttribute> disableControlAttributes = new List<DecButtonDisableIfAttribute>(attributes.Count);
 

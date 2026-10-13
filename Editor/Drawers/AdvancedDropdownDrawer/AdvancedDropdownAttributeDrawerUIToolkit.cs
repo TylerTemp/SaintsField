@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container,
             FieldInfo info,
             object parent)
@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         // }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.FancyButtonField dropdownButton = container.Q<UIToolkitUtils.FancyButtonField>(NameButton(property));
@@ -158,7 +158,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             UIToolkitUtils.FancyButtonField dropdownButton = container.Q<UIToolkitUtils.FancyButtonField>(NameButton(property));

@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             InterfaceFieldInfo fInfo = GetInterfaceFieldInfo(property, info);
             if (fInfo.Error != "")

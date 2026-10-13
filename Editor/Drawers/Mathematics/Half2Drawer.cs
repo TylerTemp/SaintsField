@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.Mathematics
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             MultiHalfsField field = new MultiHalfsField(GetPreferredLabel(property), 2)
             {
@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.Mathematics
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             MultiHalfsField field = container.Q<MultiHalfsField>(name: FieldName(property));
             field.RegisterValueChangedCallback(evt =>

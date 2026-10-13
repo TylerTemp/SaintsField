@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
         // }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             (bool isReadable, string error, SerializedProperty _) =
                 GetWwiseObjectReferenceProperty(property, info);

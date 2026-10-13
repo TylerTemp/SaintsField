@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__TypeReference_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdown =
                 UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
         private readonly Dictionary<Assembly, Type[]> _cachedAssembliesTypes = new Dictionary<Assembly, Type[]>();
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdown = container.Q<UIToolkitUtils.DropdownButtonField>(NameTypeReferenceField(property));
             UIToolkitUtils.AddContextualMenuManipulator(dropdown.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));

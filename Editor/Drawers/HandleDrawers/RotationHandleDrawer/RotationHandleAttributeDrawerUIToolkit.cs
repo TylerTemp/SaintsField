@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
         private static string NameRotationHandleHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_RotationHandle_HelpBox";
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameRotationHandleHelpBox(property, index));
@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChanged, FieldInfo info)
         {
             HelpBox helpBox = container.Q<HelpBox>(name: NameRotationHandleHelpBox(property, index));

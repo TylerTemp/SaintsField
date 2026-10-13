@@ -71,7 +71,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             string useLabel = GetEventLabel(property, GetPreferredLabel(property));
             SaintsEventView field = new SaintsEventView(useLabel)
@@ -87,7 +87,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SaintsEventView saintsEventView = container.Q<SaintsEventView>(NameSaintsEventView(property));
 

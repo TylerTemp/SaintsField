@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.InputReadOnlyDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.InputReadOnlyDrawer
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info)
         {
             IReadOnlyList<VisualElement> visibilityElements =

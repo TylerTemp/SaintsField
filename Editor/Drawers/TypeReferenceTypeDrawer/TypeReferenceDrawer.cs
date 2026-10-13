@@ -413,9 +413,9 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             return error == "" ? SetValue(context, curType) : new TypeReference();
         }
 
-        private static TypeReferenceAttribute GetTypeReferenceAttribute(IEnumerable<PropertyAttribute> allAttributes)
+        private static TypeReferenceAttribute GetTypeReferenceAttribute(IEnumerable<Attribute> allAttributes)
         {
-            foreach (PropertyAttribute attr in allAttributes)
+            foreach (Attribute attr in allAttributes)
             {
                 if(attr is TypeReferenceAttribute typeReferenceAttribute)
                 {

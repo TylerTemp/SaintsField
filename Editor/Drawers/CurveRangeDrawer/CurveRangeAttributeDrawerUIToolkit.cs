@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
         private static string NameCurveField(SerializedProperty property) => $"{property.propertyPath}__CurveRange";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
             CurveRangeAttribute curveRangeAttribute = (CurveRangeAttribute)saintsAttribute;
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             container.Q<CustomCurveField>(NameCurveField(property)).TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.animationCurveValue));

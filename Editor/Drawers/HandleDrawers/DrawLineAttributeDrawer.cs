@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle;
@@ -27,7 +28,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             return _icon;
         }
 
-        protected override IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<PropertyAttribute> allAttributes)
+        protected override IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<Attribute> allAttributes)
         {
             switch (oneDirectionBaseAttribute)
             {

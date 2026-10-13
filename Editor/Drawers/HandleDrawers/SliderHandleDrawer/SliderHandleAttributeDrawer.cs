@@ -376,7 +376,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
         }
 
         private static SliderHandleInfo CreateSliderHandleInfo(SliderHandleAttribute sliderHandleAttribute,
-            SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+            SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             return new SliderHandleInfo
             {

@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             string label = GetPreferredLabel(property);
@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SaintsArray2DRFoldout root = container.Q<SaintsArray2DRFoldout>(NameRoot(property));

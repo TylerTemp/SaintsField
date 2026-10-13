@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
@@ -178,7 +178,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;

@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)

@@ -1,3 +1,4 @@
+using System;
 #if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using System.Reflection;
@@ -15,7 +16,7 @@ namespace Samples.Scripts.SaintsEditor.Issues.Issue377.Editor
     public class BVCCusomEditor: SaintsRowAttributeDrawer
     {
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             VisualElement resultElement = new VisualElement();
             VisualElement core = base.CreateFieldUIToolKit(property, saintsAttribute, allAttributes, container, info, parent);

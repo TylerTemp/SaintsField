@@ -12305,6 +12305,24 @@ MonoBehaviour:
       wrapType: 4
     _saintsSerializedVersion: 2
     _wrapType: 4
+  saintsInsideArray:
+  - _saintsList:
+    - value: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        intValues: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 0
+    _wrapType: 4
   references:
     version: 2
     RefIds:

@@ -180,7 +180,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         }
 
         public void OnAwakeActualDrawer(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SaintsInterfaceWatchField field = container.Q<SaintsInterfaceWatchField>(NameField(property));
             field.OnValueChangedEvent.AddListener(v => onValueChangedCallback(v));

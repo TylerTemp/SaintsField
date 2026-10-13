@@ -259,7 +259,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             }
         }
 
-        private static PrimitiveBoundsHandleInfo CreatePrimitiveBoundsHandleInfo(PrimitiveBoundsHandleAttribute primitiveBoundsHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+        private static PrimitiveBoundsHandleInfo CreatePrimitiveBoundsHandleInfo(PrimitiveBoundsHandleAttribute primitiveBoundsHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             return new PrimitiveBoundsHandleInfo
             {

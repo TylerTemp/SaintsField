@@ -1,3 +1,4 @@
+using System;
 #if SAINTSFIELD_SAINTSDRAW && !SAINTSFIELD_SAINTSDRAW_DISABLE
 
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             return _icon;
         }
 
-        protected override IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<PropertyAttribute> allAttributes)
+        protected override IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<Attribute> allAttributes)
         {
             return allAttributes.OfType<SaintsArrowShowIfAttribute>().ToArray();
         }

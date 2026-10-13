@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
         private WireDiscInfo _wireDiscInfo;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             VisualElement child = new VisualElement
@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             HelpBox helpBox = container.Q<HelpBox>(name: NameDrawWireDiscHelpBox(property, index));

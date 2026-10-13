@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
         // private Animator _cachedAnimator = null;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement;
@@ -115,7 +115,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));

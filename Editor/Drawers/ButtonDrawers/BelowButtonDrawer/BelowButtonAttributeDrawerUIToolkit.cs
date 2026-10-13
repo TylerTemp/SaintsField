@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
     public partial class BelowButtonAttributeDrawer
     {
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             VisualElement btn = DrawUIToolkit(property, saintsAttribute, index);

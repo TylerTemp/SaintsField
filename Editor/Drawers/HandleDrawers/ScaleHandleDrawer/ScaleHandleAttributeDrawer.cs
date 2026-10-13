@@ -289,7 +289,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
 
         private static ScaleHandleInfo CreateScaleHandleInfo(ScaleHandleAttribute scaleHandleAttribute,
             SerializedProperty serializedProperty, int index, Action<object> onValueChangedCallback,
-            MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+            MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             return new ScaleHandleInfo
             {

@@ -1,3 +1,4 @@
+using System;
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             ResizableTextAreaAttribute resizableTextAreaAttribute = saintsAttribute as ResizableTextAreaAttribute

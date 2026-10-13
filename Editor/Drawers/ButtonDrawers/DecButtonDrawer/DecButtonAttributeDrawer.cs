@@ -104,13 +104,13 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
 
         protected abstract IReadOnlyList<DecButtonShowIfAttribute> GetCurrentShowHide(
-            IReadOnlyList<PropertyAttribute> attributes, ISaintsAttribute currentAttribute);
+            IReadOnlyList<Attribute> attributes, ISaintsAttribute currentAttribute);
 
         protected abstract IReadOnlyList<DecButtonDisableIfAttribute> GetCurrentDisableEnable(
-            IReadOnlyList<PropertyAttribute> attributes, ISaintsAttribute currentAttribute);
+            IReadOnlyList<Attribute> attributes, ISaintsAttribute currentAttribute);
 
         private (string error, bool show, object reParent) GetShowResult(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info)
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, FieldInfo info)
         {
             IReadOnlyList<DecButtonShowIfAttribute> showIf = GetCurrentShowHide(
                 allAttributes,
@@ -127,7 +127,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         }
 
         private (string error, bool disable, object reParent) GetDisableResult(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, FieldInfo info,
             object parent)
         {
             IReadOnlyList<DecButtonDisableIfAttribute> disableIf = GetCurrentDisableEnable(

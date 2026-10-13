@@ -1,3 +1,4 @@
+using System;
 #if UNITY_2021_3_OR_NEWER
 
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
         protected override bool UseCreateFieldUIToolKit => false;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             UnitState state = GetState((AdaptAttribute)saintsAttribute);

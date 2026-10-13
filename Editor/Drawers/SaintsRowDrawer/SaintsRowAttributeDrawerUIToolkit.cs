@@ -194,7 +194,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             SaintsRowAttribute saintsRowAttribute = saintsAttribute as SaintsRowAttribute;
 

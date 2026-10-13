@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         private static string NameFoldoutField(SerializedProperty property) => $"{property.propertyPath}__ReferencePicker";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             try
             {
@@ -108,7 +108,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 
         }
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.AddContextualMenuManipulator(container.Q<FoldoutField>(name: NameFoldoutField(property)), property, () => {});

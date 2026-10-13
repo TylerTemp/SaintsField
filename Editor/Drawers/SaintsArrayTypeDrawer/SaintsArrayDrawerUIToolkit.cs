@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
         }
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             SaintsArrayAttribute saintsArrayAttribute = saintsAttribute as SaintsArrayAttribute ?? new SaintsArrayAttribute(searchable: false, numberOfItemsPerPage: 0);
 
@@ -137,6 +137,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
                 showBoundCollectionSize = false,
                 showFoldoutHeader = false,
+                showBorder = true,
                 headerTitle = GetPreferredLabel(property),
                 showAddRemoveFooter = true,
                 reorderMode = ListViewReorderMode.Animated,
@@ -254,7 +255,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
         private AsyncSearchItems _asyncSearchItems;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SaintsArrayAttribute saintsArrayAttribute = saintsAttribute as SaintsArrayAttribute;
 
@@ -471,8 +472,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             // IReadOnlyList<Attribute> r = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
             // Debug.Log($"sa info = {info.Name}");
             bool hasSerializeReference = false;
-            // List<InjectAttributeBase> injectAttributes1 = new List<InjectAttributeBase>();
-            List<Attribute> injectCreatedAttributes1 = new List<Attribute>();
+            List<IPlayaAttribute> injectCreatedAttributes1 = new List<IPlayaAttribute>();
 
             List<InjectAttributeBase> injectAttributes2 = new List<InjectAttributeBase>();
             List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
@@ -518,20 +518,13 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 if (less1DepthInject.Depth == 0)
                 {
                     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
-                    if(injectedAttribute != null)
+                    if(injectedAttribute is IPlayaAttribute playaAttribute && injectedAttribute is not InjectAttributeBase)
                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                         Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={injectedAttribute}");
 #endif
-                        injectCreatedAttributes1.Add(injectedAttribute);
+                        injectCreatedAttributes1.Add(playaAttribute);
                     }
-                }
-                else if (less1DepthInject.Depth > 0)
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                    Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={less1DepthInject}");
-#endif
-                    injectCreatedAttributes1.Add(less1DepthInject);
                 }
             }
 
@@ -546,20 +539,10 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 elementProp.isExpanded = true;
                 element.Clear();
 
-                // (FieldInfo actualInfo, SerializedProperty actualProp) = SaintsWrapUtils.GetCellInfo(
-                //     valueWrapType,
-                //     wrapField,
-                //     wrapType,
-                //     elementProp,
-                //     hasSerializeReference
-                // );
-                //
-                // Debug.Log($"SaintsArray rendering {elementProp.propertyPath}({elementProp.displayName}) injectAttributes={string.Join(",", injectCreatedAttributes)}");
-                //
                 SaintsFieldWithInfo saintsContainerInfo = new SaintsFieldWithInfo
                 {
                     ClassStructType = null,
-                    PlayaAttributes = injectCreatedAttributes1.OfType<IPlayaAttribute>().ToArray(),
+                    PlayaAttributes = injectCreatedAttributes1.ToArray(),
                     // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
                     TargetParent = null,
                     TargetMemberInfo = null,
@@ -574,22 +557,6 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     // Order = order,
                     // serializable = true,
                 };
-                //
-                // IReadOnlyList<SaintsEditor.RendererGroupInfo> chainedGroups = SaintsEditor.ChainSaintsFieldWithInfo(
-                //     new[]{saintsInfo}, elementProp.serializedObject, this);
-                //
-                // IEnumerable<ISaintsRenderer> saintsRenderers = chainedGroups
-                //     .Select(SaintsEditor.MakeRendererForGroupIfNeed);
-                //
-                // foreach (ISaintsRenderer saintsRenderer in saintsRenderers)
-                // {
-                //     // Debug.Log($"renderer={saintsRenderer}");
-                //     VisualElement ve = saintsRenderer.CreateVisualElement(root);
-                //     if(ve != null)
-                //     {
-                //         element.Add(ve);
-                //     }
-                // }
 
                 // element.Add(wrapContainer);
 

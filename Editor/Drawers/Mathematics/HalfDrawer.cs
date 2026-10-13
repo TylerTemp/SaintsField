@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.Mathematics
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             SerializedProperty prop = property.FindPropertyRelative(nameof(half.value));
             MathematicsHalfUShortField field = new MathematicsHalfUShortField(GetPreferredLabel(property))
@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.Mathematics
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             MathematicsHalfUShortField field = container.Q<MathematicsHalfUShortField>(name: FieldName(property));
             field.RegisterValueChangedCallback(evt => onValueChangedCallback.Invoke(new half { value = (ushort)evt.newValue }));

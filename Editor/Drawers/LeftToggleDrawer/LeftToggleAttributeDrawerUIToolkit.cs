@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.LeftToggleDrawer
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             // string label = GetPreferredLabel(property);
@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.LeftToggleDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             container.Q<LeftToggleField>(NameLeftToggle(property)).RegisterValueChangedCallback(evt =>

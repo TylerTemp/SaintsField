@@ -344,7 +344,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
             return Quaternion.Inverse(info.SpaceTransform.rotation) * worldRotation;
         }
 
-        private static RotationHandleInfo CreateRotationHandleInfo(RotationHandleAttribute rotationHandleAttribute, SerializedProperty serializedProperty, int index, Action<object> onValueChangedCallback, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+        private static RotationHandleInfo CreateRotationHandleInfo(RotationHandleAttribute rotationHandleAttribute, SerializedProperty serializedProperty, int index, Action<object> onValueChangedCallback, MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             return new RotationHandleInfo
             {

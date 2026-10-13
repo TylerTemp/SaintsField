@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__PropRange_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
             Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0
@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             switch (property.propertyType)
@@ -311,7 +311,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));

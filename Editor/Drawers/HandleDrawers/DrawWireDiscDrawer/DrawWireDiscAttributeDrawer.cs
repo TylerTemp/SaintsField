@@ -270,7 +270,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             wireDiscInfo.Error = "";
         }
 
-        private static WireDiscInfo CreateWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+        private static WireDiscInfo CreateWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             WireDiscInfo wireDiscInfo = new WireDiscInfo
             {

@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             public string Id;
         }
 
-        private static SphereInfo CreateSphereInfo(SphereHandleCapAttribute sphereHandleCapAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+        private static SphereInfo CreateSphereInfo(SphereHandleCapAttribute sphereHandleCapAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             return new SphereInfo
             {

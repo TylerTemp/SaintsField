@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         {
             VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldProperty(
                 prop,
-                allAttributes,
+                allAttributes.Where(each => each is not IPlayaAttribute).ToArray(),
                 ReflectUtils.GetElementType(FieldWithInfo.FieldInfo.FieldType),
                 $"Element {index}",
                 FieldWithInfo.FieldInfo,

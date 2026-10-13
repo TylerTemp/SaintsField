@@ -233,7 +233,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             radiusHandleInfo.Center = center + Vector3.Scale(positionOffset, scale);
         }
 
-        private static RadiusHandleInfo CreateRadiusHandleInfo(RadiusHandleAttribute radiusHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<PropertyAttribute> allAttributes)
+        private static RadiusHandleInfo CreateRadiusHandleInfo(RadiusHandleAttribute radiusHandleAttribute, SerializedProperty serializedProperty, int index, MemberInfo memberInfo, object parent, IReadOnlyList<Attribute> allAttributes)
         {
             return new RadiusHandleInfo
             {

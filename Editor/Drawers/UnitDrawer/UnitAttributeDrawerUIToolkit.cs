@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
             $"{property.propertyPath}_{index}__UnitButton";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
             UnitAttribute unitAttribute = (UnitAttribute)saintsAttribute;
@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             UnitState state = GetState((UnitAttribute)saintsAttribute);
@@ -257,7 +257,7 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             VisualElement field = container.Q<VisualElement>(NameUnitField(property));

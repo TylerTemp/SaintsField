@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
             SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property), adaptAttribute);
@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SaintsDecimalField field = container.Q<SaintsDecimalField>();
             // int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);

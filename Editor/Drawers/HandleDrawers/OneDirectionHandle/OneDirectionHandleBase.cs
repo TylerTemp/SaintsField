@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
         protected abstract Texture2D GetIcon();
 
-        protected virtual IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<PropertyAttribute> allAttributes)
+        protected virtual IReadOnlyList<HandleShowIfAttribute> GetShowHideAttributes(OneDirectionBaseAttribute oneDirectionBaseAttribute, IReadOnlyList<Attribute> allAttributes)
         {
             return Array.Empty<HandleShowIfAttribute>();
         }

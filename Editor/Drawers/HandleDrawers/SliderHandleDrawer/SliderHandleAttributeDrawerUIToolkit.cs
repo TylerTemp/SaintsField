@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
             $"{property.propertyPath}_{index}_SliderHandle_HelpBox";
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameSliderHandleHelpBox(property, index));
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChanged, FieldInfo info)
         {
             HelpBox helpBox = container.Q<HelpBox>(name: NameSliderHandleHelpBox(property, index));

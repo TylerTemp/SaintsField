@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
     public partial class RateAttributeDrawer
     {
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             RateField r = new RateField(GetPreferredLabel(property), (RateAttribute)saintsAttribute)
                 {
@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             RateField field = container.Q<RateField>();
             UIToolkitUtils.AddContextualMenuManipulator(

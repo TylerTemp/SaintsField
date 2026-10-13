@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             InHorizontalLayout = true;
 
@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
         }
 
         private VisualElement CreateElement(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             Type elementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                 ? ReflectUtils.GetElementType(info.FieldType)

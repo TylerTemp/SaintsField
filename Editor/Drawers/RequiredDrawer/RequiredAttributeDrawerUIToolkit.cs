@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             if (allAttributes.Any(each => each is RequiredIfAttribute))
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             if (allAttributes.Any(each => each is RequiredIfAttribute))

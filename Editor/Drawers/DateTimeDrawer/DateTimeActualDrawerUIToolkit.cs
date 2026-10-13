@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         }
 
         public void OnAwakeActualDrawer(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SerializedProperty prop = property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
             container.TrackPropertyValue(prop, _ => onValueChangedCallback.Invoke(new DateTime(prop.longValue)));

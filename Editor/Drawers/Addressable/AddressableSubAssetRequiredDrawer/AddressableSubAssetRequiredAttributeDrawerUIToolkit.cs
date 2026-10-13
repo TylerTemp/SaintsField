@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDraw
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             (string error, string _) = ValidateProperty(property);
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDraw
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SerializedProperty prop = property.FindPropertyRelative(MSubObjectName);
             if (prop == null)

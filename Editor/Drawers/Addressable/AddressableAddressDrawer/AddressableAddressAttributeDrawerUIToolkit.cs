@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             $"{property.propertyPath}__AddressableAddress_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container1,
             FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)

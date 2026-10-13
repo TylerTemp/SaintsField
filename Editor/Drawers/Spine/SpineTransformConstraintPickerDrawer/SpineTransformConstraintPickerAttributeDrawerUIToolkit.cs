@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SpineEvent_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
             {

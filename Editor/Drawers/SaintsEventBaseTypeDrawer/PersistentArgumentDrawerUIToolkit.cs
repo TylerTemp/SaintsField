@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         private static VisualTreeAsset _containerTree;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             if (_containerTree == null)
             {
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<Attribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Label label = container.Q<Label>("persistent-argument-label");
 

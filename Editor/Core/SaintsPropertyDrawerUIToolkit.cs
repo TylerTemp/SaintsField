@@ -90,11 +90,11 @@ namespace SaintsField.Editor.Core
             (Attribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<Attribute>(property);
             _thisPropertyType = parent.GetType();
             // Debug.Log($"getting {property.propertyPath}: {string.Join<PropertyAttribute>(", ", allAttributesRaw)}");
-            IReadOnlyList<PropertyAttribute> allAttributes;
+            IReadOnlyList<Attribute> allAttributes;
             if (_saintsSubRenderer)
             {
                 // Debug.Log($"SaintsSubRenderer={attribute}");
-                List<PropertyAttribute> attrs = (OverrideAttributes ?? allAttributesRaw).Where(each => each is not ISaintsAttribute).OfType<PropertyAttribute>().ToList();
+                List<Attribute> attrs = (OverrideAttributes ?? allAttributesRaw).Where(each => each is not ISaintsAttribute).ToList();
                 if (attribute != null && !attrs.Contains(attribute))
                 {
                     attrs.Add(attribute);
@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Core
             }
             else
             {
-                allAttributes = (OverrideAttributes ?? allAttributesRaw).OfType<PropertyAttribute>().ToList();
+                allAttributes = OverrideAttributes ?? allAttributesRaw;
             }
 
             // Debug.Log(string.Join<PropertyAttribute>(", ", allAttributes));
@@ -673,7 +673,7 @@ namespace SaintsField.Editor.Core
         // {
         //     _saintsPropertyInfoInjects.Add(func);
         // }
-        protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
+        protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<Attribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
 
@@ -970,7 +970,7 @@ namespace SaintsField.Editor.Core
 
         private void OnAwakeUiToolKitInternal(SerializedProperty property, VisualElement containerElement,
             object parent, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers,
-            IReadOnlyList<PropertyAttribute> allAttributes, bool manuallyWatch)
+            IReadOnlyList<Attribute> allAttributes, bool manuallyWatch)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute?.GetType().Name))}");
@@ -1403,7 +1403,7 @@ namespace SaintsField.Editor.Core
         }
 
         private void OnAwakeReady(SerializedProperty property, VisualElement containerElement,
-            object parent,  Action<object> onValueChangedCallback, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, IReadOnlyList<PropertyAttribute> allAttributes)
+            object parent,  Action<object> onValueChangedCallback, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, IReadOnlyList<Attribute> allAttributes)
         {
 
             // Debug.Log("OnAwakeReady");
@@ -1452,7 +1452,7 @@ namespace SaintsField.Editor.Core
         }
 
         private static void OnUpdateUiToolKitInternal(SerializedProperty property,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
             IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers,
@@ -1659,7 +1659,7 @@ namespace SaintsField.Editor.Core
         #region Callbacks
 
         protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return null;
@@ -1667,7 +1667,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual VisualElement CreatePreFieldUIToolkit(
             SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<Attribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return null;
@@ -1686,7 +1686,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
             throw new NotImplementedException("Please override this for your Saints Property Drawer!");
@@ -1708,7 +1708,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
         }
@@ -1721,7 +1721,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
         }

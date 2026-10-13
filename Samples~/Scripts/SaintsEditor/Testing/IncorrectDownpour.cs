@@ -20,10 +20,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         // [ValueAttribute(typeof(LabelTextAttribute), "OK!")] public SaintsArray<Scriptable[]> arrayInsideSaintsContentLabel;
         // [ValueAttribute(typeof(LabelTextAttribute), new object[]{null})]
 
-        [ValueAttribute(2, typeof(FieldLabelTextAttribute), "LABEL!")]
-        public SaintsArray<Scriptable[]> arrayInsideSaints;
+        // [ValueAttribute(1, typeof(LabelTextAttribute), "LABEL1")]
+        // [ValueAttribute(2, typeof(LabelTextAttribute), "LABEL2")]
+        // [ValueAttribute(2, typeof(FieldLabelTextAttribute), "FIELDLABEL2")]
+        // public SaintsArray<Scriptable[]> arrayInsideSaints;
 
-        // [ValueAttribute(2, typeof(FieldLabelTextAttribute), "LABEL!")]
-        // public SaintsArray<Scriptable>[] saintsInsideArray;
+        [ValueAttribute(1, typeof(LabelTextAttribute), "LABEL1")]
+        [ValueAttribute(1, typeof(FieldLabelTextAttribute), "FIELDLABEL1")]
+        public SaintsArray<Scriptable>[] saintsInsideArray;
     }
 }
