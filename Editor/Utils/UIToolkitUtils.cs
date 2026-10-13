@@ -580,6 +580,7 @@ namespace SaintsField.Editor.Utils
             {
                 // saintsPropertyDrawer.AppendSaintsAttributeDrawer = appendSaintsAttributeDrawer;
                 saintsPropertyDrawer.InHorizontalLayout = inHorizontalLayout;
+                saintsPropertyDrawer.OverrideAttributes = allAttributes;
             }
 
 
@@ -827,7 +828,12 @@ namespace SaintsField.Editor.Utils
 
                             VisualElement result = CreateOrUpdateFieldProperty(
                                 itemProp,
-                                allAttributes.Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute).ToArray(),
+                                allAttributes
+                                    .Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute)
+                                    .Select(each => each is InjectAttributeBase injectAttribute
+                                        ? new ValueAttributeAttribute(injectAttribute.Depth - 1, injectAttribute.Decorator, injectAttribute.Parameters)
+                                        : each)
+                                    .ToArray(),
                                 ReflectUtils.GetElementType(rawType),
                                 itemProp.displayName,
                                 fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, richTextTagProvider, null, false, parent);

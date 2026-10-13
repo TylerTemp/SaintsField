@@ -476,14 +476,11 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
             List<InjectAttributeBase> injectAttributes2 = new List<InjectAttributeBase>();
             List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
-            // int injectDelta = insideArray ? 2 : 1;
-            InjectAttributeBase[] refreshedAllAttributes = ReflectCache.GetCustomAttributes<InjectAttributeBase>(info);
+            InjectAttributeBase[] refreshedAllAttributes = allAttributes.OfType<InjectAttributeBase>().ToArray();
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
             Debug.Log($"SaintsArray {property.propertyPath} injected={string.Join<InjectAttributeBase>(", ", refreshedAllAttributes)}, insideArray={insideArray}");
 #endif
-            int insideArrayOffset = insideArray ? 1 : 0;
-
             foreach (InjectAttributeBase injectAttribute in refreshedAllAttributes)
             {
                 if (injectAttribute.Decorator == typeof(SerializeReference))
@@ -494,9 +491,9 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
                 // Debug.Log($"saints array {injectAttribute.Depth}/{injectAttribute.Decorator}/{injectAttribute.Parameters?.Length}");
 
-                ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 1 - insideArrayOffset, injectAttribute.Decorator,
+                ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 1, injectAttribute.Decorator,
                     injectAttribute.Parameters);
-                ValueAttributeAttribute less2DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 2 - insideArrayOffset, injectAttribute.Decorator,
+                ValueAttributeAttribute less2DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 2, injectAttribute.Decorator,
                     injectAttribute.Parameters);
                 if (less2DepthInject.Depth > 0)
                 {
