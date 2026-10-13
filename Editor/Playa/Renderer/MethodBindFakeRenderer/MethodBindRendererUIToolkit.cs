@@ -128,7 +128,20 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
         private void RefreshElement()
         {
-            Object targetObj = _serializedObject.targetObject;
+            Object targetObj;
+            try
+            {
+                targetObj = _serializedObject.targetObject;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
+            catch (ObjectDisposedException)
+            {
+                return;
+            }
+
             (string error, bool _, Object unityEventContainerObject, UnityEventBase _, object _, UnityEventCallState unityEventCallState, bool hasValue, Type valueType, object value) =
                 FindAlreadyAddedCallback(_methodBindAttribute, FieldWithInfo.MethodInfo, targetObj, FieldWithInfo.Targets[0]);
 

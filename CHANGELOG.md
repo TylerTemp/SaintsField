@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: error shown for `OnEvent`/`OnButton` when selecting away
+
 ## 5.30.6 ##
 
 1.  Fix: multiple border rendering for `Table`; fix table fields are a bit off-view for some type of field
