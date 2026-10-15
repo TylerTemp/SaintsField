@@ -94,24 +94,24 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         private static (string error, bool show) UpdateInfoBoxShow(HelpBox helpBox,
             InfoBoxUserData infoBoxUserData)
         {
-            (string showError, MemberInfo _, object showResult) = Util.GetOf<object>(
+            GetOfResult<object> showResult = Util.GetOf<object>(
                 infoBoxUserData.InfoBoxAttribute.ShowCallback,
                 true,
                 infoBoxUserData.FieldWithInfo.SerializedProperty,
                 infoBoxUserData.FieldWithInfo.FieldInfo ?? (MemberInfo)infoBoxUserData.FieldWithInfo.PropertyInfo ?? infoBoxUserData.FieldWithInfo.MethodInfo,
                 infoBoxUserData.FieldWithInfo.Targets[0],
                 Array.Empty<object>());
-            if (showError != "")
+            if (!showResult.EmptyPathResult && showResult.Error != "")
             {
-                infoBoxUserData.XmlContent = showError;
+                infoBoxUserData.XmlContent = showResult.Error;
                 infoBoxUserData.MessageType = EMessageType.Error;
 
-                helpBox.text = showError;
+                helpBox.text = showResult.Error;
                 helpBox.style.display = DisplayStyle.Flex;
-                return (showError, true);
+                return (showResult.Error, true);
             }
 
-            bool willShow = ReflectUtils.Truly(showResult);
+            bool willShow = !showResult.EmptyPathResult && ReflectUtils.Truly(showResult.Result);
             helpBox.style.display = willShow ? DisplayStyle.Flex : DisplayStyle.None;
             if (!willShow)
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -50,9 +50,9 @@ namespace SaintsField
         private void ParseArguments(Type compType, bool excludeSelf)
         {
             string compFilter = GetComponentFilter(compType);
-            string sepFilter = compFilter == ""? "": $"/{compFilter}";
+            string sepFilter = compFilter;
 
-            IEnumerable<string> andXPaths = (excludeSelf? new[]{"//parent::"}: new[]{"//parent-or-self::"})
+            IEnumerable<string> andXPaths = (excludeSelf? new[]{"//parent::"}: new[]{"gameObject::"})
                 .Select(each => $"{each}{sepFilter}");
 
             XPathInfoAndList = andXPaths.Select(ePath =>

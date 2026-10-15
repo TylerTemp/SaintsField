@@ -390,10 +390,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            (string error, MemberInfo _, object result) result = Util.GetOf<object>(by, null, fieldWithInfo.SerializedProperty,
+            var result = Util.GetOf<object>(by, null, fieldWithInfo.SerializedProperty,
                 (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, target, null);
             // Debug.Log(r);
-            return (result.error, result.result);
+            return (result.Error, result.Result);
         }
 
         public void OnDestroy()
@@ -703,12 +703,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             {
                                 string revName = tagName["field.".Length..];
 
-                                (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName,
+                                var getOfValue = Util.GetOf<object>(revName,
                                     null,
                                     FieldWithInfo.SerializedProperty,
                                     FieldWithInfo.FieldInfo, result.value, null);
 
-                                result = (getOfValue.error, result.index, getOfValue.result);
+                                result = (getOfValue.Error, result.index, getOfValue.Result);
                             }
                         }
                     }
@@ -749,18 +749,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         string revName = tagName["field.".Length..];
 
-                        (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
+                        var getOfValue = Util.GetOf<object>(revName, null,
                             null,
                             memberInfo, value, null);
-                        if (!string.IsNullOrEmpty(getOfValue.error))
+                        if (!string.IsNullOrEmpty(getOfValue.Error))
                         {
 #if SAINTSFIELD_DEBUG
-                            Debug.LogWarning(getOfValue.error);
+                            Debug.LogWarning(getOfValue.Error);
 #endif
                             return "";
                         }
 
-                        value = getOfValue.result;
+                        value = getOfValue.Result;
                     }
 
                     return RichTextDrawer.TagStringFormatter(value, tagValue);
@@ -790,18 +790,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         string revName = tagName["field.".Length..];
 
-                        (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
+                        var getOfValue = Util.GetOf<object>(revName, null,
                             null,
                             memberInfo, value, null);
-                        if (!string.IsNullOrEmpty(getOfValue.error))
+                        if (!string.IsNullOrEmpty(getOfValue.Error))
                         {
 #if SAINTSFIELD_DEBUG
-                            Debug.LogWarning(getOfValue.error);
+                            Debug.LogWarning(getOfValue.Error);
 #endif
                             return "";
                         }
 
-                        value = getOfValue.result;
+                        value = getOfValue.Result;
                     }
 
                     return RichTextDrawer.TagStringFormatter(value, tagValue);

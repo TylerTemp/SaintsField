@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -130,14 +130,17 @@ namespace SaintsField
 
         protected static string GetComponentFilter(Type compType)
         {
-            if (compType == null)
-            {
-                return "";
-            }
+            return GetComponentFilter(compType, false);
+        }
 
-            string nameSpace = compType.Namespace;
-            string typeName = compType.Name;
-            return $"[@{{GetComponents({nameSpace}.{typeName})}}]";
+        protected static string GetComponentFilter(Type compType, bool keepTarget)
+        {
+            if (keepTarget)
+            {
+                return compType == null ? "" : $"[@get-components({compType.FullName})]";
+            }
+            // With no explicit type, the drawer fills in the destination's component type.
+            return $"/@get-components({compType?.FullName})";
         }
     }
 }

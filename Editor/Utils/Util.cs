@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using SaintsField.Condition;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils.WaitableUtils;
@@ -797,206 +798,57 @@ namespace SaintsField.Editor.Utils
         //         : ("", ReflectUtils.Truly(value));
         // }
 
-        public static (string error, MemberInfo memberInfo, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
+        public static GetOfResult<T> GetOf<T>(string by, T defaultValue, SerializedProperty property,
+            MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             if (by.StartsWith(":"))
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target, overrideParams);
+                var staticResult = GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target, overrideParams);
+                return new GetOfResult<T>(staticResult.error, staticResult.memberInfo, staticResult.result, false);
             }
 
             if (target == null)
             {
-                return ("Target is null", null, defaultValue);
+                return new GetOfResult<T>("Target is null", null, defaultValue, false);
             }
 
-            return by.Contains(".")
-                ? AccGetOf(by, defaultValue, property, target, overrideParams)
-                : FlatGetOf(by, defaultValue, property, memberInfo, target, overrideParams);
-        }
-
-        private static (string error, MemberInfo memberInfo, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
-            object parent, IReadOnlyList<object> overrideParams)
-        {
-            string accBy = by;
-            // SerializedProperty accProperty = property;
-            object accParent = parent;
-            if (by.StartsWith("../"))
+            IReadOnlyList<PathResolver.Node> nodes = GetByXPathAttributeDrawer.ResolvePath(by, property, memberInfo, target);
+            foreach (PathResolver.Node node in nodes)
             {
-                string error;
-                (error, accBy, accParent) = UpwardWalk(by, property, parent);
-                if (error != "")
-                {
-                    return (error, null, defaultValue);
-                }
-            }
-
-            // Don't use this: the memberInfo need to change
-            // if (!accBy.Contains("."))
-            // {
-            //     return FlatGetOf(accBy, defaultValue, property, memberInfo, accParent);
-            // }
-
-            // Debug.Log($"looking for {accBy} in {accParent}");
-
-            // MemberInfo accMemberInfo = memberInfo;
-            (string error, MemberInfo memberInfo, T result) thisResult = ("No Attributes", null, defaultValue);
-
-            foreach (string attrName in accBy.Split(SerializedUtils.DotSplitSeparator))
-            {
-                MemberInfo accMemberInfo = null;
-                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
-                {
-                    MemberInfo[] members = type.GetMember(attrName,
-                        BindingFlags.Public | BindingFlags.NonPublic |
-                        BindingFlags.Instance | BindingFlags.Static |
-                        BindingFlags.FlattenHierarchy);
-                    if (members.Length <= 0)
-                    {
-                        continue;
-                    }
-                    accMemberInfo = members[0];
-                    break;
-                }
-
-                thisResult = FlatGetOf(attrName, defaultValue, property, accMemberInfo, accParent, overrideParams);
-                // Debug.Log($"{attrName} = {thisResult.result}({thisResult.error})");
-                if (thisResult.error != "")
-                {
-                    return thisResult;
-                }
-                accParent = thisResult.result;
-            }
-            return thisResult;
-
-        }
-
-        public static (string error, MemberInfo memberInfo, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
-        {
-            if (by.StartsWith(":"))
-            {
-                // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target, overrideParams);
-            }
-
-            if (target == null)
-            {
-                return ("Target is null", null, defaultValue);
-            }
-
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
-            {
-                ReflectUtils.GetPropType getPropType;
-                MemberInfo fieldOrMethodInfo;
                 try
                 {
-                    (getPropType, fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
-                }
-                catch (AmbiguousMatchException)
-                {
-                    List<MethodInfo> methodInfos = new List<MethodInfo>();
-                    foreach (MethodInfo methodInfo in type.GetMethods(ReflectUtils.FindTargetBindAttr))
+                    object value = node.Resource;
+                    if (value is MethodInfo method)
                     {
-                        if (methodInfo.Name == by)
+                        (string error, object returned) = InvokeMethodInfo(method, defaultValue, property, memberInfo,
+                            node.Container?.Resource, overrideParams, target, false);
+                        if (error != "")
                         {
-                            methodInfos.Add(methodInfo);
-                            (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
-                            if (methodError == "")
-                            {
-                                (string error, T result) methodConvert = ConvertTo(methodReturnValue, defaultValue);
-                                return (methodConvert.error, methodInfo, methodConvert.result);
-                            }
+                            continue;
                         }
+                        node.Container?.WriteBack();
+                        value = returned;
                     }
-                    return (
-                        $"All method failed to match the signature: {string.Join("; ", methodInfos.Select(eachMethod => $"({string.Join(", ", eachMethod.GetParameters().Select(each => $"{each.ParameterType} {each.Name}{(each.HasDefaultValue? $"={each.DefaultValue}": "")}"))}) => {eachMethod.ReturnParameter}"))}",
-                        null,
-                        defaultValue);
+                    (string error, T result) converted = ConvertTo(value, defaultValue);
+                    if (converted.error == "")
+                    {
+                        return new GetOfResult<T>("", node.Member, converted.result, false);
+                    }
                 }
-
-                object genResult;
-                switch (getPropType)
+                catch (Exception)
                 {
-                    case ReflectUtils.GetPropType.NotFound:
-                        continue;
-
-                    case ReflectUtils.GetPropType.Property:
-                        genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                        break;
-                    case ReflectUtils.GetPropType.Field:
-                    {
-                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
-                        genResult = fInfo.GetValue(target);
-                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
-                    }
-                        break;
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-
-                        (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
-                        if (methodError != "")
-                        {
-                            return (methodError, methodInfo, defaultValue);
-                        }
-
-                        genResult = methodReturnValue;
-
-                        break;
-                    }
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                    // Try the next result when this branch cannot satisfy the callback's return type.
                 }
-
-                // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
-                (string error, T result) r = ConvertTo(genResult, defaultValue);
-                return (r.error, fieldOrMethodInfo, r.result);
             }
-
-            return ($"No field or method named `{by}` found on `{target}`", null, defaultValue);
+            return new GetOfResult<T>($"No matching callback result for `{by}`", null, defaultValue, nodes.Count == 0);
         }
 
-        // this can not walk out of the
-        // ReSharper disable once UnusedParameter.Local
-        private static (string error, string by, object parent) UpwardWalk(string by, SerializedProperty property, object parent)
+        public static GetOfResult<T> FlatGetOf<T>(string by, T defaultValue,
+            SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
-            Debug.Assert(by.StartsWith("../"));
-            string[] split = by.Split("../");
-
-            int splitCount = split.Length;
-
-            int upWalkCount = splitCount - 1;
-            string leftBy = split[splitCount - 1];
-
-            string originPath = property.propertyPath;
-            string[] propPaths = originPath.Split(SerializedUtils.DotSplitSeparator);
-            (bool arrayTrim, string[] propPathSegments) = SerializedUtils.TrimEndArray(propPaths);
-            if (arrayTrim)
-            {
-                propPaths = propPathSegments;
-            }
-
-            IReadOnlyList<(SerializedUtils.FieldOrProp fieldOrProp, object parent)> walkable = SerializedUtils.GetFieldInfoAndParentListByPathSegments(property.serializedObject.targetObject, propPaths);
-            if (walkable.Count < upWalkCount - 1)  // skip self
-            {
-                return (
-                    $"Can not walk upward for {upWalkCount} steps when only {walkable.Count} parents found: {string.Join(", ", walkable.Select(each => each.parent))}",
-                    null, null);
-            }
-
-            (SerializedUtils.FieldOrProp _, object walkParent) = walkable[upWalkCount];
-
-            // Debug.Log($"upWalkCount-1={upWalkCount-1}");
-            // foreach ((SerializedUtils.FieldOrProp fieldOrProp, object fieldParent)  in walkable)
-            // {
-            //     Debug.Log($"{fieldOrProp}, {fieldParent}");
-            // }
-
-            // return (leftBy parent);
-
-            return ("", leftBy, walkParent);
+            return GetOf(by, defaultValue, property, memberInfo, target, overrideParams);
         }
-
         private static (string error, T result) ConvertTo<T>(object genResult, T defaultValue)
         {
             T finalResult;
@@ -1022,8 +874,10 @@ namespace SaintsField.Editor.Utils
                     }
                     catch (InvalidCastException e)
                     {
+#if SAINTSFIELD_DEBUG
                         Debug.LogException(e);
                         Debug.LogError($"{genResult} -> {typeof(T)}");
+#endif
                         return (e.Message, defaultValue);
                     }
                 }
@@ -1036,8 +890,10 @@ namespace SaintsField.Editor.Utils
                 }
                 catch (InvalidCastException e)
                 {
+#if SAINTSFIELD_DEBUG
                     Debug.LogError($"Failed to convert {genResult} to type {typeof(T)}");
                     Debug.LogException(e);
+#endif
                     return (e.Message, defaultValue);
                 }
             }
@@ -1045,7 +901,7 @@ namespace SaintsField.Editor.Utils
             return ("", finalResult);
         }
 
-        private static (string error, object returnValue) InvokeMethodInfo(MethodInfo methodInfo, object defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
+        private static (string error, object returnValue) InvokeMethodInfo(MethodInfo methodInfo, object defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams, object argumentTarget = null, bool writeBack = true)
         {
             IReadOnlyList<object> baseParams;
 
@@ -1057,7 +913,7 @@ namespace SaintsField.Editor.Utils
                 }
                 else
                 {
-                    (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
+                    (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, argumentTarget ?? target);
                     if (error != "")
                     {
                         return (error, defaultValue);
@@ -1087,7 +943,7 @@ namespace SaintsField.Editor.Utils
             }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_GET_OF
-            Debug.Log($"#Util# arrayIndex={arrayIndex}, rawValue={rawValue}, curValue={curValue}, fill={string.Join(",", passParams)}");
+            Debug.Log($"#Util# receiver={target}, fill={string.Join(",", passParams)}");
 #endif
 
             object genResult;
@@ -1097,18 +953,21 @@ namespace SaintsField.Editor.Utils
             }
             catch (TargetInvocationException e)
             {
+#if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
-                Debug.Assert(e.InnerException != null);
-                return (e.InnerException.Message, defaultValue);
+#endif
+                return (e.InnerException?.Message ?? e.Message, defaultValue);
             }
             catch (Exception e)
             {
                 // _error = e.Message;
+#if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
+#endif
                 return (e.Message, defaultValue);
             }
 
-            if (property != null && target != null)
+            if (writeBack && property != null && target != null)
             {
                 Type targetType = target.GetType();
                 // Debug.Log(targetType);
@@ -2069,18 +1928,25 @@ namespace SaintsField.Editor.Utils
                     //     // Debug.Log($"rewrite parent {refreshedParent}");
                     //     useParent = refreshedParent;
                     // }
-                    (string error, MemberInfo _, object getResult) = GetOf<object>(conditionStringTarget, null, property, info, target, null);
+                    GetOfResult<object> conditionResult = GetOf<object>(conditionStringTarget, null, property, info, target, null);
+
+                    if (conditionResult.EmptyPathResult)
+                    {
+                        // A missing path match is false before condition negation.
+                        callbackBoolResults.Add(conditionInfo.Reverse);
+                        continue;
+                    }
 
                     // Debug.Log(
                     //     $"getting {conditionStringTarget} of target {conditionInfo.Target} on parent {target} on ser {property.serializedObject.targetObject} = {getResult}, error={error}");
 
-                    if (error != "")
+                    if (conditionResult.Error != "")
                     {
-                        errors.Add(error);
+                        errors.Add(conditionResult.Error);
                         continue;
                     }
 
-                    result = getResult;
+                    result = conditionResult.Result;
                 }
 
                 object value = conditionInfo.Value;
@@ -2095,15 +1961,20 @@ namespace SaintsField.Editor.Utils
                     }
                     else
                     {
-                        (string errorValue, MemberInfo _, object callbackResult) =
+                        GetOfResult<object> valueResult =
                             GetOf<object>((string)value, null, property, info, target, null);
-                        if (errorValue != "")
+                        if (valueResult.EmptyPathResult)
                         {
-                            errors.Add(errorValue);
+                            callbackBoolResults.Add(conditionInfo.Reverse);
+                            continue;
+                        }
+                        if (valueResult.Error != "")
+                        {
+                            errors.Add(valueResult.Error);
                             continue;
                         }
 
-                        value = callbackResult;
+                        value = valueResult.Result;
                     }
                 }
 

@@ -119,12 +119,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 string currentSkinName;
                 if (spineAttachmentPickerAttribute.SkinTargetIsCallback)
                 {
-                    (string error, MemberInfo _, string result) skinFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SkinTarget, null, property, info, parent, null);
-                    if (skinFilter.error != "")
+                    var skinFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SkinTarget, null, property, info, parent, null);
+                    if (skinFilter.Error != "")
                     {
-                        return new SpineAttachmentUtils.AttachmentsResult(skinFilter.error, null, null);
+                        return new SpineAttachmentUtils.AttachmentsResult(skinFilter.Error, null, null);
                     }
-                    currentSkinName = skinFilter.result;
+                    currentSkinName = skinFilter.Result;
                 }
                 else
                 {
@@ -153,12 +153,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             string currentSlotName;
             if (spineAttachmentPickerAttribute.SlotTargetIsCallback)
             {
-                (string error, MemberInfo _, string result) slotFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SlotTarget, null, property, info, parent, null);
-                if (slotFilter.error != "")
+                var slotFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SlotTarget, null, property, info, parent, null);
+                if (slotFilter.Error != "")
                 {
-                    return new SpineAttachmentUtils.AttachmentsResult(slotFilter.error, null, null);
+                    return new SpineAttachmentUtils.AttachmentsResult(slotFilter.Error, null, null);
                 }
-                currentSlotName = slotFilter.result;
+                currentSlotName = slotFilter.Result;
             }
             else
             {

@@ -5,15 +5,16 @@ using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 {
     public class SaintsObjectPickerWindowIMGUI: EditorWindow
     {
-        public bool ConfigAllowScene;
-        public bool ConfigAllowAssets = true;
-        public string ErrorMessage = "";
+        [FormerlySerializedAs("ConfigAllowScene")] public bool configAllowScene;
+        [FormerlySerializedAs("ConfigAllowAssets")] public bool configAllowAssets = true;
+        [FormerlySerializedAs("ErrorMessage")] public string errorMessage = "";
         public Func<ItemInfo, Object, bool> IsEqualCallback;
         public Action<ItemInfo> OnSelectCallback;
         public Func<ItemInfo, bool> FetchAllSceneObjectFilterCallback;
@@ -21,10 +22,10 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
         public Func<IEnumerable<ItemInfo>> FetchAllSceneObjectCallback;
         public Func<IEnumerable<ItemInfo>> FetchAllAssetsCallback;
 
-        protected virtual bool AllowScene => ConfigAllowScene;
-        protected virtual bool AllowAssets => ConfigAllowAssets;
+        protected virtual bool AllowScene => configAllowScene;
+        protected virtual bool AllowAssets => configAllowAssets;
 
-        protected virtual string Error => ErrorMessage;
+        protected virtual string Error => errorMessage;
 
         private class GUIBackgroundScoop : IDisposable
         {

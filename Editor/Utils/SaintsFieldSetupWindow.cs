@@ -155,7 +155,7 @@ namespace SaintsField.Editor.Utils
         #region Unity Serialization
 
 
-        private (EMessageType, string) InstallUnitySerializationStatus = (EMessageType.None, "");
+        private (EMessageType, string) _installUnitySerializationStatus = (EMessageType.None, "");
 
 
         [Separator(10)]
@@ -172,7 +172,7 @@ namespace SaintsField.Editor.Utils
             + " in this project", 5, 5)]
         [Separator(5)]
 
-        [InfoBox("$" + nameof(InstallUnitySerializationStatus))]
+        [InfoBox("$" + nameof(_installUnitySerializationStatus))]
 
         // [InfoBox("Loading, please wait...", show: nameof(_loadingUnitySerialization))]
 
@@ -185,23 +185,23 @@ namespace SaintsField.Editor.Utils
         private IEnumerator InstallUnitySerialization()
         {
             const string packageName = "com.unity.serialization";
-            AddRequest _addRequest = Client.Add(packageName);
+            AddRequest addRequest = Client.Add(packageName);
             int counter = 0;
             bool wait = true;
             while (wait)
             {
                 counter = (counter + 1) % 4;
-                switch (_addRequest.Status)
+                switch (addRequest.Status)
                 {
                     case StatusCode.InProgress:
-                        InstallUnitySerializationStatus = (EMessageType.Warning, $"Installing {packageName}, please wait{new string('.', counter)}");
+                        _installUnitySerializationStatus = (EMessageType.Warning, $"Installing {packageName}, please wait{new string('.', counter)}");
                         break;
                     case StatusCode.Success:
-                        InstallUnitySerializationStatus = (EMessageType.Info, $"{packageName} Installed");
+                        _installUnitySerializationStatus = (EMessageType.Info, $"{packageName} Installed");
                         wait = false;
                         break;
                     case StatusCode.Failure:
-                        InstallUnitySerializationStatus = (EMessageType.Error, $"{packageName} install failed: {_addRequest.Error.message}");
+                        _installUnitySerializationStatus = (EMessageType.Error, $"{packageName} install failed: {addRequest.Error.message}");
                         wait = false;
                         break;
                     default:
@@ -229,14 +229,14 @@ namespace SaintsField.Editor.Utils
                 switch (removeRequest.Status)
                 {
                     case StatusCode.InProgress:
-                        InstallUnitySerializationStatus = (EMessageType.Warning, $"Uninstalling {packageName}, please wait{new string('.', counter)}");
+                        _installUnitySerializationStatus = (EMessageType.Warning, $"Uninstalling {packageName}, please wait{new string('.', counter)}");
                         break;
                     case StatusCode.Success:
-                        InstallUnitySerializationStatus = (EMessageType.Info, $"{packageName} Uninstalled");
+                        _installUnitySerializationStatus = (EMessageType.Info, $"{packageName} Uninstalled");
                         wait = false;
                         break;
                     case StatusCode.Failure:
-                        InstallUnitySerializationStatus = (EMessageType.Error, $"{packageName} uninstall failed: {removeRequest.Error.message}");
+                        _installUnitySerializationStatus = (EMessageType.Error, $"{packageName} uninstall failed: {removeRequest.Error.message}");
                         wait = false;
                         break;
                     default:

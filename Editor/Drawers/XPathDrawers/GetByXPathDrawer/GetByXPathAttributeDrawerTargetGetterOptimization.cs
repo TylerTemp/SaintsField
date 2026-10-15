@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.SaintsXPathParser.Optimization;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -63,6 +62,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 {
                     // Debug.Log($"return go {go}");
                     return ("", true, new[] { comp.gameObject });
+                }
+                if (property.serializedObject.targetObject is GameObject gameObject)
+                {
+                    return ("", true, new[] { gameObject });
                 }
                 return ("", false, Array.Empty<object>());
             }

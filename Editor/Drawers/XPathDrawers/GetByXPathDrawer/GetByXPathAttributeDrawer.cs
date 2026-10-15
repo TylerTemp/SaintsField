@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
-using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -64,21 +63,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static (bool hasRoot, GameObject prefabRoot) GetPrefabRoot()
         {
-#if UNITY_2021_3_OR_NEWER
-            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            // ReSharper disable once InvertIf
-            if(prefabStage != null)
-            {
-                GameObject prefabRoot = prefabStage.prefabContentsRoot;
-                if (prefabRoot != null)
-                {
-                    return (true, prefabRoot);
-                }
-            }
-#endif
-            return (false, null);
+            return PathResolver.GetPrefabRoot();
         }
-
         private static bool PrefabCanSignCheck(Object signToObj, object signFrom)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
@@ -152,6 +138,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             if (expectInterface == null)
+            {
+                return (true, result);
+            }
+
+            if (expectInterface.IsInstanceOfType(result))
             {
                 return (true, result);
             }

@@ -111,11 +111,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.6**
+**WIP**
 
-1.  Fix: multiple border rendering for `Table`; fix table fields are a bit off-view for some type of field
-2.  Add: `Table` now supports search the whole table or by columns, and supports paging
-3.  Add: `Table` now works with `ShowInInspector` and `Button`
+1.  Fix: error shown for `OnEvent`/`OnButton` when selecting away
 
 ## Usage ##
 
@@ -339,10 +337,11 @@ namespace: `SaintsField`
     *   [`EMode`](https://saintsfield.comes.today/misc/emode)
     *   [Callback](https://saintsfield.comes.today/misc/callback)
     *   [Downpour System](https://saintsfield.comes.today/misc/downpour-system)
-    *   [Syntax for Show/Hide/Enable/Disable/Required-If](https://saintsfield.comes.today/misc/syntax-for-showhideenabledisablerequired-if)
     *   Saints XPath-like Syntax
-        *   [XPath](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/xpath)
-        *   [`EXP`](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/exp)
+        *   [Overview](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/overview)
+        *   [Auto Getter](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/auto-getter)
+        *   [Callback](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/callback)
+    *   [Syntax for Show/Hide/Enable/Disable/Required-If](https://saintsfield.comes.today/misc/syntax-for-showhideenabledisablerequired-if)
     *   [Add a Macro](https://saintsfield.comes.today/misc/add-a-macro)
     *   [Auto Validator](https://saintsfield.comes.today/misc/auto-validator)
     *   [Use With Other Drawers](https://saintsfield.comes.today/misc/use-with-other-drawers)

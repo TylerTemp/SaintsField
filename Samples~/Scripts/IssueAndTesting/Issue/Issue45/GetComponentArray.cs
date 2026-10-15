@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
             return dummy? $"{dummy.comment}": "NULL";
         }
 
-        [GetByXPath("@{GetComponents(Dummy)}"), EndText("$" + nameof(DummyNumber))] public Dummy[] getComponentArrayXPath;
+        [GetByXPath("@{GetComponents(Dummy)}[*]"), EndText("$" + nameof(DummyNumber))] public Dummy[] getComponentArrayXPath;
         [Button]
         private void DebugButton()
         {

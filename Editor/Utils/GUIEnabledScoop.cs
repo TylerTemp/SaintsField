@@ -5,17 +5,17 @@ namespace SaintsField.Editor.Utils
 {
     public readonly struct GUIEnabledScoop: IDisposable
     {
-        private readonly bool defaultValue;
+        private readonly bool _defaultValue;
 
         public GUIEnabledScoop(bool value)
         {
-            defaultValue = GUI.enabled;
+            _defaultValue = GUI.enabled;
             GUI.enabled = value;
         }
 
         public void Dispose()
         {
-            GUI.enabled = defaultValue;
+            GUI.enabled = _defaultValue;
         }
     }
 }

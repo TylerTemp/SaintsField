@@ -40,17 +40,17 @@ namespace SaintsField.Editor.Utils
 
         public class RichTextHelpBoxScoop : IDisposable
         {
-            private readonly bool Origin;
+            private readonly bool _origin;
 
             public RichTextHelpBoxScoop()
             {
-                Origin = EditorStyles.helpBox.richText;
+                _origin = EditorStyles.helpBox.richText;
                 EditorStyles.helpBox.richText = true;
             }
 
             public void Dispose()
             {
-                EditorStyles.helpBox.richText = Origin;
+                EditorStyles.helpBox.richText = _origin;
             }
         }
         // public static void DrawAt(Rect position, string content, EMessageType messageType) => DrawAt(position, content, messageType.GetMessageType());

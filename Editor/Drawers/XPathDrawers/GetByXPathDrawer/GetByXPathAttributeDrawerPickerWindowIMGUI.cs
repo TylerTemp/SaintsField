@@ -52,8 +52,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             SaintsObjectPickerWindowIMGUI pickerWindow =
                 ScriptableObject.CreateInstance<SaintsObjectPickerWindowIMGUI>();
-            pickerWindow.ConfigAllowAssets = true;
-            pickerWindow.ConfigAllowScene = true;
+            pickerWindow.configAllowAssets = true;
+            pickerWindow.configAllowScene = true;
             pickerWindow.titleContent = new GUIContent(
                 $"Select {expectedType}" + (interfaceType == null ? "" : $"({interfaceType})"));
             pickerWindow.FetchAllAssetsCallback = () => assetItems;
@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             pickerWindow.IsEqualCallback = (itemInfo, target) => ReferenceEquals(itemInfo.Object, target);
             pickerWindow.OnSelectCallback = itemInfo =>
             {
-                pickerWindow.ErrorMessage = "";
+                pickerWindow.errorMessage = "";
                 onValueChanged.Invoke(itemInfo.Object);
             };
             pickerWindow.SetDefaultActive(curValueObj);

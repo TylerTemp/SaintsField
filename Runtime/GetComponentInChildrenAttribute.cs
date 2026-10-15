@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -50,10 +50,13 @@ namespace SaintsField
         private void ParseArguments(bool includeInactive, Type compType, bool excludeSelf)
         {
             string compFilter = GetComponentFilter(compType);
-            string activeFilter = includeInactive ? "" : "[@{gameObject.activeInHierarchy}]";
+            string activeFilter = includeInactive ? "" : "[@{activeInHierarchy}]";
 
-            IEnumerable<string> andXPaths = (excludeSelf? new[]{"//*"}: new[]{"", "//*"})
-                .Select(each => $"{each}{activeFilter}{compFilter}");
+            // One query selects descendants, optionally including self. The optimizer also runs once.
+            IEnumerable<string> andXPaths = new[]
+            {
+                $"gameObject::{(excludeSelf ? "//*" : "//.")}{activeFilter}{compFilter}",
+            };
 
             XPathInfoAndList = andXPaths.Select(ePath =>
             {

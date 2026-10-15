@@ -695,6 +695,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"{GetType().Name}: fall to SaintsPropertyDrawer={spd}; allAttribute={string.Join(", ", allAttributes)}");
                 spd.InHorizontalLayout = InHorizontalLayout;
+                spd.OverrideAttributes = allAttributes;
                 spd._saintsSubRenderer = true;
             }
 

@@ -15,128 +15,23 @@ namespace SaintsField.SaintsXPathParser
     {
         public static IEnumerable<XPathStep> Parse(string xPath)
         {
-            foreach ((int stepSep, string stepContent) in SplitXPath(xPath))
-            {
-                // Debug.Log($"stepContent={stepContent}");
-                (Axis axis, string leftStepPart) = SplitAxisFromStep(stepContent);
-                // Debug.Log($"leftStepPart={leftStepPart}");
-                (string nodeTestRaw, string attrRaw, string predicatesRaw) = SplitStep(leftStepPart);
-
-                NodeTest nodeTest = ParseNodeTest(nodeTestRaw);
-                XPathAttrBase attr = null;
-                if(!string.IsNullOrEmpty(attrRaw))
-                {
-                    (XPathAttrBase xPathAttrBase, string leftContent) = XPathAttrBase.Parser(attrRaw);
-                    Debug.Assert(leftContent == "", attrRaw);
-                    attr = xPathAttrBase;
-                }
-
-                IReadOnlyList<IReadOnlyList<XPathPredicate>> predicates = string.IsNullOrEmpty(predicatesRaw)
-                    ? Array.Empty<IReadOnlyList<XPathPredicate>>()
-                    : XPathBracketParser
-                        .ParseFilter(predicatesRaw)
-                        .Select(each => each
-                            .Select(item => new XPathPredicate
-                            {
-                                Attr = item.attrBase,
-                                FilterComparer = item.filterComparerBase,
-                            })
-                            .ToArray()
-                        )
-                        .ToArray();
-
-                yield return new XPathStep
-                {
-                    SepCount = stepSep,
-                    NodeTest = nodeTest,
-                    Axis = axis,
-                    Attr = attr,
-                    Predicates = predicates,
-                };
-            }
+            return PathParser.Parse(xPath);
         }
 
-        private static IEnumerable<(int stepSep, string stepContent)> SplitXPath(string xPath)
+        internal static (Axis axis, string leftStepPart) SplitAxisFromStep(string step)
         {
-            StringBuilder stepBuilder = new StringBuilder();
-
-            StringBuilder quote = null;
-            char quoteChar = '\0';
-
-            Queue<char> chars = new Queue<char>(xPath);
-
-            int sepCount = 0;
-            bool hasContent = false;
-
-            while (chars.Count > 0)
+            if (step.StartsWith("gameObject::"))
             {
-                char curChar = chars.Dequeue();
-                if (curChar == '/')
-                {
-                    if (hasContent)  // `content/`
-                    {
-                        yield return (sepCount, stepBuilder.ToString());
-                        sepCount = 1;
-                        hasContent = false;
-                        stepBuilder.Clear();
-                        quote = null;
-                        quoteChar = '\0';
-                    }
-                    else  // continued `/`
-                    {
-                        sepCount += 1;
-                    }
-                }
-                else
-                {
-                    hasContent = true;
-                    if (curChar == '\'' || curChar == '"' && quoteChar == curChar)
-                    {
-                        if(quote == null)  // start quoting
-                        {
-                            quote = new StringBuilder();
-                            quote.Append(curChar);
-                            quoteChar = curChar;
-                            // Debug.Log($"start quote {quoteChar}");
-                        }
-                        else  // end quoting
-                        {
-                            quote.Append(curChar);
-                            string quoteResult = quote.ToString();
-                            // Debug.Log($"end quote {quoteChar}: {quoteResult}");
-                            stepBuilder.Append(quoteResult);
-                            quote = null;
-                            quoteChar = '\0';
-                        }
-                    }
-                    else  // not in any quote
-                    {
-                        if (quote == null)
-                        {
-                            // Debug.Log($"append chunk: {curChar}");
-                            stepBuilder.Append(curChar);
-                        }
-                        else
-                        {
-                            // Debug.Log($"append quote {quoteChar}: {curChar}");
-                            quote.Append(curChar);
-                        }
-                    }
-                }
+                return (Axis.GameObject, step.Substring("gameObject::".Length));
             }
-
-            if (hasContent)
+            if (step.StartsWith("field::"))
             {
-                if (quote != null)
-                {
-                    stepBuilder.Append(quote.ToString());
-                }
-                yield return (sepCount, stepBuilder.ToString());
+                return (Axis.Field, step.Substring("field::".Length));
             }
-        }
-
-        private static (Axis axis, string leftStepPart) SplitAxisFromStep(string step)
-        {
+            if (step.StartsWith("serialized-property::"))
+            {
+                return (Axis.SerializedProperty, step.Substring("serialized-property::".Length));
+            }
             if(step.StartsWith("ancestor::"))
             {
                 return (Axis.Ancestor, step.Substring("ancestor::".Length));
@@ -190,59 +85,16 @@ namespace SaintsField.SaintsXPathParser
             {
                 return (Axis.Asset, step.Substring("asset::".Length));
             }
+            int axisSeparator = step.IndexOf("::", StringComparison.Ordinal);
+            int attributeStart = step.IndexOf('@');
+            if (axisSeparator >= 0 && (attributeStart < 0 || axisSeparator < attributeStart))
+            {
+                throw new ArgumentOutOfRangeException(nameof(step), step, "Unknown path axis");
+            }
             return (Axis.None, step);
         }
 
-        // for parent::nodeTest@attr[predicates], this parse `nodeTest@attr[@attr > 1]` part
-        private static (string nodeTest, string attr, string predicates) SplitStep(string step)
-        {
-            int attrSepIndex = step.IndexOf('@');
-            int bracketSepIndex = step.IndexOf('[');
-            if (bracketSepIndex != -1 && bracketSepIndex < attrSepIndex)
-            {
-                attrSepIndex = -1;
-            }
-
-            string noPredicatesPart = step;
-            string predicates = "";
-            if (bracketSepIndex != -1)
-            {
-                noPredicatesPart = step.Substring(0, bracketSepIndex);
-                predicates = step.Substring(bracketSepIndex);
-            }
-
-            // Debug.Log($"bracketSepIndex={bracketSepIndex}, step={step}, predicates={predicates}");
-
-            string nodeTest = noPredicatesPart;
-            string attr = "";
-
-            // ReSharper disable once InvertIf
-            if (attrSepIndex != -1)
-            {
-                nodeTest = noPredicatesPart.Substring(0, attrSepIndex);
-                attr = noPredicatesPart.Substring(attrSepIndex);
-            }
-
-            // Debug.Log($"parse predicates, attrSepIndex={attrSepIndex}: {step} -> {predicates}");
-
-            return (nodeTest, attr, predicates);
-        }
-
-        private static (string preText, string predicates) SplitPredicates(string text)
-        {
-            int squareQuoteStart = text.IndexOf("[", StringComparison.Ordinal);
-            if (squareQuoteStart == -1)
-            {
-                return (text, "");
-            }
-
-            string preText = text.Substring(0, squareQuoteStart);
-            string predicatesText = text.Substring(squareQuoteStart);
-
-            return (preText, predicatesText);
-        }
-
-        private static NodeTest ParseNodeTest(string axisNameRaw)
+        internal static NodeTest ParseNodeTest(string axisNameRaw)
         {
             switch (axisNameRaw)
             {

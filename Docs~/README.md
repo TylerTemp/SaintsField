@@ -3191,6 +3191,26 @@ private AnimationCurve ShowCurveRange([CurveRange(EColor.YellowNice)] AnimationC
 
 You can change the default behavior of these attributes using `Tools` - `Saints Field` - `Edit Config...`
 
+All accept config `EXP` to change it's behavior independently.
+
+`EXP` is how all the auto getters works, behaviors in the inspector. The values are:
+
+*   `NoInitSign`: do not assign the value if the value is null on firsts rendering.
+*   `NoAutoResignToValue`: do not assign the value to the correct value on the following renderings.
+*   `NoAutoResignToNull`: do not assign the value to null value if the target disappears on the following renderings.
+*   `NoResignButton`: when `NoAutoResign` is on, by default there will be a `reload` button when value is mismatched. Turn this on to hide the `reload` button.
+*   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
+*   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
+*   `KeepOriginalPicker`: UI Toolkit only. By default, when a custom picker is shown, Unity's default picker will hide. This will keep Unity's picker together.
+*   `ForceReOrder`: Force the auto-getters to changes the order the way how the resources are found for list/array. This is useful when you want to get children of way points, as the order is important.
+
+And some shortcut:
+
+*   `NoAutoResign` = `NoAutoResignToValue | NoAutoResignToNull`
+*   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually assign a different value with no buttons and error box.
+*   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
+*   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
+
 #### `GetComponent` ####
 
 Automatically assign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
@@ -3448,7 +3468,7 @@ Showcase:
 [GetByXPath("scene:://[@Tag = MainCamera]")] public Camera mainCamera;
 
 // only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
-[GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]
+[GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab/@{GetComponent(Hero)}[@{isAvaliable}]/@{gameObject}")]
 public GameObject[] heroPrefabs;
 
 // get all prefabs under `Art/Heros` AND `Art/Monsters`
@@ -11104,6 +11124,212 @@ public SaintsArray<Scriptable[]> arrayInsideSaints;
 
 // TODO: complete this doc when the function is ready
 
+### Saints XPath-like Syntax ###
+
+#### Overview ####
+
+This part is how a target is found, a simplified [XML Path Language](https://developer.mozilla.org/en-US/docs/Web/XPath).
+
+basic syntax: `step/step/step...`
+
+for each step: `axis::nodetest[predicate][predicate OR predicate]/othersteps...`
+
+Please note: powerful as the seems, there are many edge cases I have not covered yet. Report an issue if you face any.
+
+**`nodetest`**
+
+`nodetest` is like a path, use `/` to separate, `//` means any descendant
+
+`.` means current object, `..` means parent, `*` means any node.
+
+`nodetest` always starts from the current object.
+
+```csharp
+// `DirectChild` object under this object
+[GetByXPath("/DirectChild")] public GameObject directChild;
+// Search all children that starts with `StartsWith`,
+// under which, search all children ends with `Child`
+// and get all the direct children of that.
+[GetByXPath("//StartsWith*//*Child/*")] public Transform[] searchChildren;
+```
+
+**`axis`**
+
+`axis` redirect the target point
+
+*   `ancestor::`: all parents
+*   `ancestor-or-self::`: the object itself, and all it's parents.
+*   `ancestor-inside-prefab::`: all parents inside this prefab
+*   `ancestor-or-self-inside-prefab::`: the object itself, and all it's parents inside this prefab
+*   `parent::`: parent of the object
+*   `parent-or-self::`: the object itself, and it's parent
+*   `parent-inside-prefab::`: parent inside this prefab
+*   `parent-or-self-inside-prefab::`: this object itself, and it's parent inside this prefab
+*   `scene::`: root of the active scene
+*   `prefab::`: root of the current prefab
+*   `resources::`: `Resources`
+*   `assets::`: root folder `Assets`
+*   `gameObject::`: current GameObject. This will 
+*   `field::`: the decorated field/property's current value (the current element for an array/list element).
+*   `serialized-property::`: the original `SerializedProperty`.
+
+```csharp
+// search all parents that starts with `Sub`
+[GetByXPath("ancestor:://Sub*")] public Transform ancestorStartsWithSub;
+
+// search object itself, and all it's parents, which contains `This`
+[GetByXPath("ancestor-or-self::*This*")] public Transform[] parentsSelfWithThis;
+
+// search current scene that ends with `Camera`
+[GetByXPath("scene:://*Camera")] public Camera[] sceneCameras;
+
+// get the first folder starts with `Issue`, and get all the prefabs
+[GetByXPath("assets:://Issue*/*.prefab")] public GameObject[] prefabs;
+```
+
+**`attribute`**
+
+`attribute` allows you to extract an attribute from a target, starting with a `@` letter. Normally, `{}` means it
+can be directly executed on the target.
+
+*   `@layer`: Get the layer string name
+*   `@{layer}`: Get the layer mask (int)
+*   `@{tag}`: Get the tag value
+*   `@{gameObject}`: Get the `gameObject` (this is the default behavior)
+*   `@{transform}`: Get the `transform`
+*   `@{rectTransform}`: Get the `RectTransform`. This is just a shortcut of`GetComponent(RectTransform)`
+*   `@{activeSelf}`/`@{gameObject.activeSelf}`
+*   `@as(T)`: keep the current target when assignable to the type, including base classes and interfaces; otherwise return no match. 
+
+    e.g. `@{GetMyScriptableObjects()}[*]/@as(MyEnemyConfig)` returns matching scriptableObjects
+*   `@not-as(T)`: reverse of `@as(T)`
+*   Component(s)
+    For component(s), there are 8 forms:
+    *   `@get-components()`: get all components. The results get flatten for multiple tagets
+    *   `@get-components(T)`: get all components of type `T`. The results get flatten for multiple tagets
+    *   `@{GetComponents()}`: get all components. The result is a list for multiple tagets thus you may need `[INDEX]`
+    *   `@{GetComponents(T)}`: get all components of type `T`. The result is a list for multiple tagets thus you may need `[INDEX]`
+    *   `@get-component()`: get first component.
+    *   `@get-component(T)`: get first component of type `T`.
+    *   `@{GetComponent()}`: get first component.
+    *   `@{GetComponent(T)}`: get first component of type `T`.
+
+    Namespace is allowed for `T` like `GetComponent(MyNameSpace.MyScript)`.
+    Base class/interface is allow allowed, but generic class is not supported.
+
+*   `@{CallFunction()}`/`@{FieldOrProperty.CallFunction()}` etc.
+
+    Please note: this is not an actual code executing, and with these limits:
+    1.  Parameters are not supported
+    2.  indexing for array/list is allowed
+    3.  indexing for dictionary only supports `string` key type, and single quote / double quote are the same
+    Thus You can continuously chain the calling like: `@{MyFunction()[-1].someField['key']}`
+
+Because some targets (like `GetComponents`) returns a list/array. However, XPath itself allows multiple targeting filter out.
+So, for `@{...}`, if the result is list/array, the collection will be kept. For example:
+
+```
+Root
+|- GO1 (Component: A)
+|- GO2 (Component: B)
+```
+
+To query `Root/*@{GetComponents()}` will results as `[ [transform, A], [transform, B] ]`
+
+To query `Root/*@get-components()` will results as `[ transform, A, transform, B ]` because `@get-components()` is auto-flatten
+
+And `[*]` can flatten the list/array, thus `@get-components()` is just an alias of `@{GetComponents()}[*]`
+
+Depending on the target, how the plain `NAME` is down-walked is different. For example:
+
+`MyField/NextOne`
+
+If `MyField` is an GameObject, then we will search `NextOne` in it's directly children. Wildcard match like `MyField/*One` is supported
+
+If `MyField` is an object (instance etc), then we will look at it's field/property/method named `NextOne`. Wildcard match like `MyField//NextOne` or `MyField/*One` is not supported.
+
+Example: 
+
+```csharp
+// 1.  search all the children which has `FunctionProvider` script, grab the first result
+// 2.  call `GetTransforms()` as the results
+// 3.  use `[*]` to flatten the list
+// 4.  from the results, get first direct children named "ok"
+[GetByXPath("//*@{GetComponent(FunctionProvider)}/@{GetTransforms()}[*]/ok")] public GameObject[] getObjs;
+
+// FunctionProvider.cs
+public class FunctionProvider : MonoBehaviour
+{
+    // Example of returning some target
+    public Transform[] GetTransforms() => transform.Cast<Transform>().ToArray();
+}
+```
+
+**`filter`**
+
+`filter` check if the results match the expected condition. There are two types of filter:
+
+*   index filter:
+
+    either just use the index: `child*[1]` (second one), `child*[last()]`/`child*[-1]` (last one)
+
+    or compared value: `child*[index() > 3]`
+
+*   value filter: use any `attribute` mentioned above, can work together with `>`, `!=` etc. for comparison. e.g. `[@{someField.activeSelf}][@layer = "UI"]`
+
+using multiple filters means all conditions must be met. Otherwise, use the keyword `OR`: `[@get-component(Collider) OR @get-component(MyScript)]`
+
+```csharp
+// find the first main camera in the scene
+[GetByXPath("scene:://[@{tag} = MainCamera]")] public Camera mainCamera;
+
+// find the prefabs with component "Hero"
+[GetByXPath("assets:://Heros/*.prefab[@GetComponent(Hero)]")] public Camera mainCamera;
+```
+
+#### Auto Getter ####
+
+All auto getter (`GetByXPath` related attributes) uses XPath-like syntax; it by default started at current gameObject
+
+which means 
+
+`Child1/Content`
+
+The `Child1` will be looked from the directly children of current GameObject, and then the `Content` in `Child1`
+
+#### Callback ####
+
+For all callback related parameter like `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `FieldShowIf`, `FieldHideIf`, `FieldEnableIf`, `FieldDisableIf`,
+and the `show` parameter in `InfoBox`, `AboveText` etc.
+
+They use this XPath-like syntax, but the start point is from the current field. 
+
+For example, by using upwalk, `damage` will only be enabled if it's a member (field/propery) of `BuildObject` type (or its subtype)
+
+```csharp
+[Serializable]
+public class BuildingAttackBrain
+{
+    [EnableIf("..@as(BuildObject)")]
+    [InfoBox("Only available in BuildObject type", show: "..@not-as(BuildObject)")]
+    public int damage;
+}
+```
+
+you can also downwalk
+
+```csharp
+[Serializable]
+public struct DownWalkProp
+{
+    public string myContent;
+}
+
+// same as: [AboveText("<field.myContent/>")]
+[AboveText("$field::" + nameof(DownWalkProp.myContent))]
+public DownWalkProp v2;
+```
+
 ### Syntax for Show/Hide/Enable/Disable/Required-If ###
 
 This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
@@ -11112,11 +11338,15 @@ These decorators accept many objects.
 
 **By Default**
 
-Passing many strings, each string is represent either a field, property or a method. SaintsField will check the value accordingly. If it's a method, it'll also receive the field's value and index if it's inside an array/list.
+Passing many strings, each string is represent as a XPath-like target starting from current target. SaintsField will check the value accordingly. If it's a method at last, it'll also receive the field's value and index if it's inside an array/list.
+
+If it resolved nothing matched, it's considered as false.
 
 **Sub Field**
 
 You can use dot (`.`) to obtain a sub-field from a field/property/method. This is useful if your condition is relayed on a sub-field of a field.
+
+For more complex useage, see "Saints XPath-like Syntax" section
 
 ```csharp
 using SaintsField;
@@ -11135,12 +11365,6 @@ public class ToggleSub : MonoBehaviour
 
 [![video](https://github.com/user-attachments/assets/f001fd35-3dc3-469f-b08f-127ab0448984)](https://github.com/user-attachments/assets/082ab6db-f60a-43fa-8d84-42142b1f9398)
 
-
-
-
-
-
-
 **Value Equality**
 
 You can also pass a string, then followed by a value you want to compare with. For example:
@@ -11150,7 +11374,7 @@ using SaintsField;
 
 public int myInt;
 
-[EnableIf(nameof(myInt), 2] public int enableIfEquals2;
+[EnableIf(nameof(myInt), 2)] public int enableIfEquals2;
 ```
 
 This field will only be enabled if the `myInt` is equal to `2`.
@@ -11260,152 +11484,6 @@ public EnumF enumF;
 [EnableIf(nameof(enumF), EnumF.B), LabelText("hasFlag(B)")] public string enumFEnableB;
 [EnableIf(nameof(enumF), EnumF.A | EnumF.B), LabelText("hasFlag(A | B)")] public string enumFEnableAB;
 ```
-
-### Saints XPath-like Syntax ###
-
-#### XPath ####
-
-This part is how a target is found, a simplified [XML Path Language](https://developer.mozilla.org/en-US/docs/Web/XPath).
-
-basic syntax: `step/step/step...`
-
-for each step: `axis::nodetest[predicate][predicate OR predicate]/othersteps...`
-
-Please note: powerful as the seems, there are many edge cases I have not covered yet. Report an issue if you face any.
-
-**`nodetest`**
-
-`nodetest` is like a path, use `/` to separate, `//` means any descendant
-
-`.` means current object, `..` means parent, `*` means any node.
-
-`nodetest` always starts from the current object.
-
-```csharp
-// `DirectChild` object under this object
-[GetByXPath("/DirectChild")] public GameObject directChild;
-// Search all children that starts with `StartsWith`,
-// under which, search all children ends with `Child`
-// and get all the direct children of that.
-[GetByXPath("//StartsWith*//*Child/*")] public Transform[] searchChildren;
-```
-
-**`axis`**
-
-`axis` redirect the target point
-
-*   `ancestor::`: all parents
-*   `ancestor-or-self::`: the object itself, and all it's parents.
-*   `ancestor-inside-prefab::`: all parents inside this prefab
-*   `ancestor-or-self-inside-prefab::`: the object itself, and all it's parents inside this prefab
-*   `parent::`: parent of the object
-*   `parent-or-self::`: the object itself, and it's parent
-*   `parent-inside-prefab::`: parent inside this prefab
-*   `parent-or-self-inside-prefab::`: this object itself, and it's parent inside this prefab
-*   `scene::`: root of the active scene
-*   `prefab::`: root of the current prefab
-*   `resources::`: `Resources`
-*   `assets::`: root folder `Assets`
-
-```csharp
-// search all parents that starts with `Sub`
-[GetByXPath("ancestor:://Sub*")] public Transform ancestorStartsWithSub;
-
-// search object itself, and all it's parents, which contains `This`
-[GetByXPath("ancestor-or-self::*This*")] public Transform[] parentsSelfWithThis;
-
-// search current scene that ends with `Camera`
-[GetByXPath("scene:://*Camera")] public Camera[] sceneCameras;
-
-// get the first folder starts with `Issue`, and get all the prefabs
-[GetByXPath("assets:://Issue*/*.prefab")] public GameObject[] prefabs;
-```
-
-**`attribute`**
-
-`attribute` allows you to extract an attribute from a target, starting with a `@` letter. Normally, `{}` means it
-can be directly executed on the target.
-
-*   `@layer`: Get the layer string name
-*   `@{layer}`: Get the layer mask (int)
-*   `@{tag}`: Get the tag value
-*   `@{gameObject}`: Get the `gameObject` (this is the default behavior)
-*   `@{transform}`: Get the `transform`
-*   `@{rectTransform}`: Get the `RectTransform`. This is just a shortcut of`GetComponent(RectTransform)`
-*   `@{activeSelf}`/`@{gameObject.activeSelf}`
-*   `@{GetComponent(MyScript)}`/`@{GetComponents(MyScript)[2]}` Get a component from the target.
-    You can continuously chain the calling like: `@{GetComponents(MyComponent)[-1].MyFunction().someField['key']}`.
-
-    Please note: this is not an actual code executing, and with these limits:
-
-    1.  Parameters are not supported
-    2.  indexing for array/list is allowed
-    3.  indexing for dictionary only supports `string` key type, and single quote / double quote are the same
-
-    `GetComponent` & `GetComponents` are a special function. You can pass type name. If you have multiple type with the same name,
-    prefix it with some `namespace` is allowed: `GetComponent(MyNameSpace.MyScript)`.
-
-    Base class is allow allowed, but generic class is not supported.
-
-*   `@{GetComponents()}`: Get all components of the target
-*   ~~`@resource-path()`~~
-*   ~~`@asset-path()`~~
-
-```csharp
-// 1.  search all the children which has `FunctionProvider` script, grab the first result
-// 2.  call `GetTransforms()` as the results
-// 3.  from the results, get first direct children named "ok"
-[GetByXPath("//*@{GetComponent(FunctionProvider).GetTransforms()}/ok")] public GameObject[] getObjs;
-
-// FunctionProvider.cs
-public class FunctionProvider : MonoBehaviour
-{
-    // Example of returning some target
-    public Transform[] GetTransforms() => transform.Cast<Transform>().ToArray();
-}
-```
-
-**`filter`**
-
-`filter` check if the results match the expected condition. There are two types of filter:
-
-*   index filter:
-
-    either just use the index: `child*[1]` (second one), `child*[last()]`/`child*[-1]` (last one)
-
-    or compared value: `child*[index() > 3]`
-
-*   value filter: use any `attribute` mentioned above, with `>`, `!=` etc. for comparison. e.g. `[@{gameObject.activeSelf}][@layer = "UI"]`
-
-using multiple filters means all conditions must be met. Otherwise, use the keyword `OR`: `[@{GetComponent(Collider)} OR @{GetComponent(MyScript)}]`
-
-```csharp
-// find the first main camera in the scene
-[GetByXPath("scene:://[@{tag} = MainCamera]")] public Camera mainCamera;
-
-// find the prefabs with component "Hero"
-[GetByXPath("assets:://Heros/*.prefab[@GetComponent(Hero)]")] public Camera mainCamera;
-```
-
-#### `EXP` ####
-
-`EXP` is how all the auto getters works, behaviors in the inspector. The values are:
-
-*   `NoInitSign`: do not assign the value if the value is null on firsts rendering.
-*   `NoAutoResignToValue`: do not assign the value to the correct value on the following renderings.
-*   `NoAutoResignToNull`: do not assign the value to null value if the target disappears on the following renderings.
-*   `NoResignButton`: when `NoAutoResign` is on, by default there will be a `reload` button when value is mismatched. Turn this on to hide the `reload` button.
-*   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
-*   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
-*   `KeepOriginalPicker`: UI Toolkit only. By default, when a custom picker is shown, Unity's default picker will hide. This will keep Unity's picker together.
-*   `ForceReOrder`: Force the auto-getters to changes the order the way how the resources are found for list/array. This is useful when you want to get children of way points, as the order is important.
-
-And some shortcut:
-
-*   `NoAutoResign` = `NoAutoResignToValue | NoAutoResignToNull`
-*   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually assign a different value with no buttons and error box.
-*   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
-*   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
 
 ### Add a Macro ###
 

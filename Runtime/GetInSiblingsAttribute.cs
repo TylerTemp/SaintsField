@@ -20,7 +20,7 @@ namespace SaintsField
         private static string ParseXPath(bool includeInactive, Type compType)
         {
             return "../*"
-                   + (includeInactive ? "" : "[@{gameObject.activeInHierarchy}]")
+                   + (includeInactive ? "" : "[@{activeInHierarchy}]")
                    + GetComponentFilter(compType);
         }
     }

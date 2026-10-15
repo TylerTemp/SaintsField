@@ -1,4 +1,4 @@
-﻿# Saints XPath 开发笔记 #
+# Saints XPath 开发笔记 #
 
 模仿 XPath，只实现部分功能。扩展部分 Unity 特有的
 
@@ -22,7 +22,7 @@ step: `axisname::nodetest[predicate]`
 *   `parent-or-self::`
 *   其它的不支持
 
-基于 Unity 特有的，加上 `::nodetest` 其实有方向指向性，所以用其指向 Unity 特有资源:
+基于 Unity 特有的，加上 `nodetest::` 其实有方向指向性，所以用其指向 Unity 特有资源:
 
 *   `ancestor-inside-prefab::`
 *   `ancestor-or-self-inside-prefab::`
@@ -54,9 +54,14 @@ step: `axisname::nodetest[predicate]`
 *   `@{rectTransform}`: 获得 `RectTransform`。（其实是`GetComponents(RectTransform)[0]`的缩写）
 *   `@{activeSelf}`/`@{gameObject.activeSelf}`（其实是读取对应属性）
 *   `@{enabled}`/`@{GetComponent(MyScript).enabled}`/`@{GetComponents(MyScript).enabled}` （其实是读取对应属性）
-*   `@{GetComponents()}`
+*   `@{GetComponents()}`/`@{GetComponents(MyComponent)}`: 返回一个组件数组，模仿方法调用，不自动展开；使用 `[*]` 显式展开。
+*   `@get-component()`/`@{GetComponent()}`: 返回每个目标的第一个组件（通常为 Transform）。`@get-component(MyComponent)`/`@{GetComponent(MyComponent)}` 返回每个目标的第一个匹配组件；找不到时无匹配。结果是单个组件，不是数组；多个目标的结果正常合并。
+*   `@get-components(MyComponent)`: 直接返回展开的组件结果；不指定类型的 `@get-components()` 返回所有组件。多个目标的结果合并，`@get-components(MyComponent)[1]` 选择合并结果中的第二个组件（从 0 开始）。额外的 `[*]` 正常执行，不会自动移除。
+*   `[@get-components(MyComponent)]`: 判断目标是否存在匹配组件。组件快捷 getter 使用此组件选择器。
 *   `@resource-path()`
 *   `@asset-path()`
+*   `@as(Type)`: 类型匹配（包含基类和接口）时保留原目标，否则无匹配。`@get-components()/@as(UnityEngine.BoxCollider)` 返回匹配组件；null 无匹配。
+*   `@not-as(Type)`: 类型不匹配时保留原目标，否则无匹配。`@get-components()[@not-as(UnityEngine.Transform)]` 排除 Transform；null 保留为 null 结果。类型选择器的无比较条件谓词按是否匹配判断，保留匹配的 false、0 等值。
 *   其它的不支持
 
 **Callback**
@@ -92,3 +97,7 @@ step: `axisname::nodetest[predicate]`
 **predicate**
 
 必须有空格。属性支持的都支持
+
+**其它**
+
+集合不再展开，用`[*]`展开。

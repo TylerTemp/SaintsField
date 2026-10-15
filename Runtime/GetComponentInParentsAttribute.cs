@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -53,9 +53,8 @@ namespace SaintsField
         private void ParseArguments(bool includeInactive, Type compType, bool excludeSelf)
         {
             string compFilter = GetComponentFilter(compType);
-            string activeFilter = includeInactive ? "" : "[@{gameObject.activeInHierarchy}]";
-            string allFilter = $"{activeFilter}{compFilter}";
-            string sepFilter = allFilter == ""? "": $"/{allFilter}";
+            string activeFilter = includeInactive ? "" : "[@{activeInHierarchy}]";
+            string sepFilter = $"{(activeFilter == "" ? "" : "/" + activeFilter)}{compFilter}";
 
             IEnumerable<string> andXPaths = (excludeSelf? new[]{"//ancestor::"}: new[]{"//ancestor-or-self::"})
                 .Select(each => $"{each}{sepFilter}");

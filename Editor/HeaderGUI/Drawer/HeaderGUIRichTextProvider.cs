@@ -73,20 +73,20 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
 
             // ReSharper disable once ReplaceSubstringWithRangeIndexer
             string revName = tagName["field.".Length..];
-            (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
+            var getOfValue = Util.GetOf<object>(revName, null,
                 null,
                 _renderTargetInfo.MemberInfo, result.value, null);
 
             // ReSharper disable once InvertIf
-            if (getOfValue.error != "")
+            if (getOfValue.Error != "")
             {
 #if SAINTSFIELD_DEBUG
-                Debug.LogWarning(getOfValue.error);
+                Debug.LogWarning(getOfValue.Error);
 #endif
                 return rawContent;
             }
 
-            return RichTextDrawer.TagStringFormatter(getOfValue.result, tagValue);
+            return RichTextDrawer.TagStringFormatter(getOfValue.Result, tagValue);
         }
     }
 }

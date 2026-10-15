@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue147
             Debug.Log(prefabSo);
         }
 
-        [GetByXPath(EXP.NoAutoResignToValue, "assets::/SaintsField/Samples//*.prefab@{GetComponent(MCPrefabEntity).subField}")]
+        [GetByXPath(EXP.NoAutoResignToValue, "assets::/SaintsField/Samples//*.prefab@{GetComponent(MCPrefabEntity)}/@{subField}")]
         public MCPrefab_SO prefabOnlyUnderEntity;
     }
 }

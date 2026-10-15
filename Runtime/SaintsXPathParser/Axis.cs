@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 namespace SaintsField.SaintsXPathParser
 {
     // *   `::ancestor`
@@ -26,6 +26,9 @@ namespace SaintsField.SaintsXPathParser
         Prefab,
         Resources,
         Asset,
+        GameObject,
+        Field,
+        SerializedProperty,
     }
 }
 #endif

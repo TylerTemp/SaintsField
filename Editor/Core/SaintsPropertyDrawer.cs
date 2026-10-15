@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -883,20 +883,20 @@ namespace SaintsField.Editor.Core
             {
                 string revName = tagName["field.".Length..];
 
-                (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName,
+                var getOfValue = Util.GetOf<object>(revName,
                     null,
                     _thisProperty,
                     fieldInfo, value, null);
 
-                if (getOfValue.error != "")
+                if (getOfValue.Error != "")
                 {
 #if SAINTSFIELD_DEBUG
-                    Debug.LogWarning(getOfValue.error);
+                    Debug.LogWarning(getOfValue.Error);
 #endif
                     return rawContent;
                 }
 
-                finalValue = getOfValue.result;
+                finalValue = getOfValue.Result;
             }
 
             return RichTextDrawer.TagStringFormatter(finalValue, tagValue);

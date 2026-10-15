@@ -91,6 +91,13 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             }
 
             PropertyDrawer drawer = MakePropertyDrawer(drawerType, info, null, GetPreferredLabel(property));
+            if (drawer is SaintsField.Editor.Core.SaintsPropertyDrawer saintsDrawer)
+            {
+                saintsDrawer.OverrideAttributes = allAttributes
+                    .Where(each => each is not ISaintsAttribute)
+                    .ToArray();
+                saintsDrawer.InHorizontalLayout = InHorizontalLayout;
+            }
 
             VisualElement drawerResult = DrawUsingDrawerInstance(
                 GetPreferredLabel(property),

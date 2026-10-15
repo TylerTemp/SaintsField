@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using SaintsField.SaintsXPathParser.Optimization;
@@ -43,7 +43,7 @@ namespace SaintsField
 
         private void ParseXPath(Type compType)
         {
-            string compFilter = GetComponentFilter(compType);
+            string compFilter = GetComponentFilter(compType, true);
             // string sepFilter = compFilter == ""? "": $"/{compFilter}";
 
             string ePath = $"assets:://*.prefab{compFilter}";

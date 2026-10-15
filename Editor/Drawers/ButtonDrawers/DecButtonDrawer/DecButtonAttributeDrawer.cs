@@ -77,7 +77,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                     }
                 }
 
-                yield return Util.GetOf<object>(callback, null, property, fieldInfo, useParent, null);
+                GetOfResult<object> callbackResult = Util.GetOf<object>(callback, null, property, fieldInfo, useParent, null);
+                yield return (callbackResult.Error, callbackResult.MemberInfo, callbackResult.Result);
                 yield break;
             }
 
@@ -92,7 +93,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
                     // Debug.Log($"Found property {prop.name} in {t.GetType().Name}");
                     (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(prop);
-                    yield return Util.GetOf<object>(callback, null, prop, fieldInfo, parent, null);
+                    GetOfResult<object> callbackResult = Util.GetOf<object>(callback, null, prop, fieldInfo, parent, null);
+                    yield return (callbackResult.Error, callbackResult.MemberInfo, callbackResult.Result);
                     // property = prop;
                 }
                 // (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);

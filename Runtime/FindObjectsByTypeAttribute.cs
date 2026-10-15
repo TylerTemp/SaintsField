@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using SaintsField.SaintsXPathParser.Optimization;
@@ -43,7 +43,7 @@ namespace SaintsField
         private void ParseArguments(Type compType, bool includeInactive)
         {
             string compFilter = GetComponentFilter(compType);
-            string activeFilter = includeInactive ? "" : "[@{gameObject.activeInHierarchy}]";
+            string activeFilter = includeInactive ? "" : "[@{activeInHierarchy}]";
             string allFilter = $"{activeFilter}{compFilter}";
             // string sepFilter = allFilter == ""? "": $"/{allFilter}";
 

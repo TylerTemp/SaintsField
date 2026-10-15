@@ -20,6 +20,7 @@ using SaintsField.Editor.UIToolkitElements.CharacterDrawer;
 using SaintsField.Editor.UIToolkitElements.QuaternionType;
 using SaintsField.Editor.Utils.WaitableUtils;
 using SaintsField.Playa;
+using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEngine;
 using UnityEditor.UIElements;
@@ -809,15 +810,32 @@ namespace SaintsField.Editor.Utils
                         }
 
                         List<IPlayaAttribute> injectedIPlayaAttributes = new List<IPlayaAttribute>();
+                        List<Attribute> elementAttributes = new List<Attribute>();
                         foreach (Attribute attr in allAttributes)
                         {
-                            if(attr is InjectAttributeBase injectAttributeBase && injectAttributeBase.Depth <= 1)
+                            if (attr is InjectAttributeBase injectAttributeBase)
                             {
-                                Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
-                                if(injectedAttribute is IPlayaAttribute ip)
+                                if (injectAttributeBase.Depth > 1)
                                 {
-                                    injectedIPlayaAttributes.Add(ip);
+                                    elementAttributes.Add(new ValueAttributeAttribute(injectAttributeBase.Depth - 1,
+                                        injectAttributeBase.Decorator, injectAttributeBase.Parameters));
                                 }
+                                else
+                                {
+                                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
+                                    if (injectedAttribute is PropertyAttribute propertyAttribute)
+                                    {
+                                        elementAttributes.Add(propertyAttribute);
+                                    }
+                                    else if (injectedAttribute is IPlayaAttribute ip && injectedAttribute is not InjectAttributeBase)
+                                    {
+                                        injectedIPlayaAttributes.Add(ip);
+                                    }
+                                }
+                            }
+                            else if (attr is not IPlayaAttribute)
+                            {
+                                elementAttributes.Add(attr);
                             }
                         }
 
@@ -828,12 +846,7 @@ namespace SaintsField.Editor.Utils
 
                             VisualElement result = CreateOrUpdateFieldProperty(
                                 itemProp,
-                                allAttributes
-                                    .Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute)
-                                    .Select(each => each is InjectAttributeBase injectAttribute
-                                        ? new ValueAttributeAttribute(injectAttribute.Depth - 1, injectAttribute.Decorator, injectAttribute.Parameters)
-                                        : each)
-                                    .ToArray(),
+                                elementAttributes,
                                 ReflectUtils.GetElementType(rawType),
                                 itemProp.displayName,
                                 fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, richTextTagProvider, null, false, parent);
@@ -908,11 +921,11 @@ namespace SaintsField.Editor.Utils
                     {
                         ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
                         ReferencePickerAttributeDrawer referencePickerAttributeDrawer = (ReferencePickerAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label);
-                        referencePickerAttributeDrawer.OverrideAttributes = new PropertyAttribute[]
-                        {
-                            referencePickerAttribute,
-                            new SaintsRowAttribute(),
-                        };
+                        referencePickerAttributeDrawer.OverrideAttributes = allAttributes
+                            .Where(each => each is not ISaintsAttribute)
+                            .Prepend(new SaintsRowAttribute())
+                            .Prepend(referencePickerAttribute)
+                            .ToArray();
                         referencePickerAttributeDrawer.InHorizontalLayout = inHorizontalLayout;
                         return referencePickerAttributeDrawer.CreatePropertyGUI(property);
                     }
@@ -1483,7 +1496,10 @@ namespace SaintsField.Editor.Utils
 
                         FlagsDropdownAttribute flagsDropdownAttribute = new FlagsDropdownAttribute();
                         FlagsDropdownAttributeDrawer flagsDropdownDrawer = (FlagsDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(FlagsDropdownAttributeDrawer), fieldInfo, flagsDropdownAttribute, label);
-                        flagsDropdownDrawer.OverrideAttributes = new[] { flagsDropdownAttribute };
+                        flagsDropdownDrawer.OverrideAttributes = allAttributes
+                            .Where(each => each is not ISaintsAttribute)
+                            .Prepend(flagsDropdownAttribute)
+                            .ToArray();
                         flagsDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
                         return flagsDropdownDrawer.CreatePropertyGUI(property);
                     }
@@ -1496,7 +1512,7 @@ namespace SaintsField.Editor.Utils
                     DropdownAttribute treeDropdownAttribute = new DropdownAttribute();
                     DropdownAttributeDrawer dropdownDrawer = (DropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(DropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
                     dropdownDrawer.OverrideAttributes = allAttributes
-                        .Where(each => each is PropertyAttribute or InjectAttributeBase)
+                        .Where(each => each is not ISaintsAttribute)
                         .Prepend(treeDropdownAttribute)
                         .ToArray();
                     dropdownDrawer.InHorizontalLayout = inHorizontalLayout;
@@ -2878,11 +2894,9 @@ namespace SaintsField.Editor.Utils
 
             SerializedProperty iterator = property.Copy();
             SerializedProperty endProperty = property.GetEndProperty();
-            bool enterChildren = true;
-            while (iterator.NextVisible(enterChildren) &&
+            while (iterator.NextVisible(true) &&
                    !SerializedProperty.EqualContents(iterator, endProperty))
             {
-                enterChildren = true;
                 if (iterator.propertyType == SerializedPropertyType.ManagedReference)
                 {
                     yield return iterator.Copy();

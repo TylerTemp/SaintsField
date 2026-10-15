@@ -1,9 +1,7 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using SaintsField.SaintsXPathParser.XPathFilter;
 using UnityEngine;
 
 namespace SaintsField.SaintsXPathParser.XPathAttribute
@@ -33,11 +31,11 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
             public ExecuteType ExecuteType;
             public string ExecuteString;
 
-            public IReadOnlyList<FilterComparerBase> ExecuteIndexer;
+            public IReadOnlyList<XPathCollectionOperation> CollectionOperations;
 
             public override string ToString()
             {
-                return $"`{ExecuteType}=>{ExecuteString}[{string.Join(" ", ExecuteIndexer)}]`";
+                return $"`{ExecuteType}=>{ExecuteString}[{string.Join("][", CollectionOperations.Select(operation => operation.Content))}]`";
             }
         }
 
@@ -48,145 +46,71 @@ namespace SaintsField.SaintsXPathParser.XPathAttribute
 
         public XPathAttrFakeEval(string evalString)
         {
-            // Debug.Log($"evalString={evalString}");
-            List<ExecuteFragment> executeFragments = new List<ExecuteFragment>();
-
-            Queue<string> evalFragmentQuery = new Queue<string>(evalString.Split('.'));
-            while (evalFragmentQuery.Count > 0)
+            List<ExecuteFragment> fragments = new List<ExecuteFragment>();
+            foreach (string part in PathSyntax.Split(evalString, '.'))
             {
-                string fragmentStr = evalFragmentQuery.Dequeue();
-                bool isGetComponent = fragmentStr.StartsWith("GetComponent(");
-                if (isGetComponent || fragmentStr.StartsWith("GetComponents("))
+                string text = part.Trim();
+                int call = text.IndexOf('(');
+                int bracket = text.IndexOf('[');
+                bool hasCall = call >= 0 && (bracket < 0 || call < bracket);
+                int nameEnd = hasCall ? call : bracket >= 0 ? bracket : text.Length;
+                string name = text.Substring(0, nameEnd);
+                if (name == "")
                 {
-                    // Debug.Log($"fragmentStr={fragmentStr}");
-                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                    string getComponentLeftPart = fragmentStr.Substring(fragmentStr.IndexOf('(') + 1);
-                    while (!getComponentLeftPart.Contains(")"))
-                    {
-                        getComponentLeftPart += "." + evalFragmentQuery.Dequeue();
-                    }
-                    // Debug.Log($"getComponentLeftPart={getComponentLeftPart}");
-
-                    (string getComponentTarget, string leftFragmentStr) = ReadUntilEndBracket(getComponentLeftPart, evalFragmentQuery);
-                    // Debug.Log($"leftFragmentStr={leftFragmentStr}");
-
-                    FilterComparerBase[] leftFilter = leftFragmentStr.StartsWith("[")
-                        ? XPathBracketParser.ParseFilter(leftFragmentStr)
-                            .Select(each => each[0].filterComparerBase)
-                            .ToArray()
-                        : Array.Empty<FilterComparerBase>();
-
-                    if (isGetComponent)
-                    {
-                        Debug.Assert(getComponentTarget != "", fragmentStr);
-                        executeFragments.Add(new ExecuteFragment
-                        {
-                            ExecuteType = ExecuteType.GetComponents,
-                            ExecuteString = getComponentTarget,
-                            ExecuteIndexer = leftFilter.Prepend(new FilterComparerInt(FilterComparer.Equal, 0)).ToArray(),
-                        });
-                    }
-                    else // GetComponents
-                    {
-                        executeFragments.Add(new ExecuteFragment
-                        {
-                            ExecuteType = ExecuteType.GetComponents,
-                            ExecuteString = string.IsNullOrEmpty(getComponentTarget)? null: getComponentTarget,
-                            ExecuteIndexer = leftFilter,
-                        });
-                    }
+                    throw new FormatException($"Missing member name in `{evalString}`");
                 }
-                else
+                string suffix = text.Substring(nameEnd);
+                string typeName = null;
+                ExecuteType executeType = ExecuteType.FieldOrProperty;
+                bool firstComponent = name == "GetComponent";
+                if (hasCall)
                 {
-                    int indexerIndex = fragmentStr.IndexOf('(');
-                    string nameFragment;
-                    string filterFragment;
-                    if (indexerIndex == -1)
+                    int close = PathSyntax.ClosingBracket(text, call);
+                    if (close < 0)
                     {
-                        nameFragment = fragmentStr;
-                        filterFragment = null;
+                        throw new FormatException($"Unclosed method call in `{evalString}`");
+                    }
+                    string args = text.Substring(call + 1, close - call - 1).Trim();
+                    suffix = text.Substring(close + 1);
+                    if (name == "GetComponent" || name == "GetComponents")
+                    {
+                        executeType = ExecuteType.GetComponents;
+                        typeName = args;
                     }
                     else
                     {
-                        nameFragment = fragmentStr.Substring(0, indexerIndex);
-                        filterFragment = fragmentStr.Substring(indexerIndex);
-                    }
-
-                    FilterComparerBase[] leftFilter = filterFragment ==  null
-                        ? Array.Empty<FilterComparerBase>()
-                        : XPathBracketParser.ParseFilter(filterFragment)
-                            .Select(each => each[0].filterComparerBase)
-                            .ToArray();
-
-                    if(nameFragment == "rectComponent")
-                    {
-                        executeFragments.Add(new ExecuteFragment
+                        if (args != "")
                         {
-                            ExecuteType = ExecuteType.GetComponents,
-                            ExecuteString = typeof(RectTransform).FullName,
-                            ExecuteIndexer = leftFilter.Prepend(new FilterComparerInt(FilterComparer.Equal, 0)).ToArray(),
-                        });
-                    }
-                    else if (nameFragment.EndsWith("()"))
-                    {
-                        executeFragments.Add(new ExecuteFragment
-                        {
-                            ExecuteType = ExecuteType.Method,
-                            // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                            ExecuteString = nameFragment.Substring(0, nameFragment.Length - 2),
-                            ExecuteIndexer = leftFilter,
-                        });
-                    }
-                    else
-                    {
-                        executeFragments.Add(new ExecuteFragment
-                        {
-                            ExecuteType = ExecuteType.FieldOrProperty,
-                            ExecuteString = nameFragment,
-                            ExecuteIndexer = leftFilter,
-                        });
+                            throw new NotSupportedException($"Method arguments are not supported in `{evalString}`");
+                        }
+                        executeType = ExecuteType.Method;
                     }
                 }
-            }
-
-            ExecuteFragments = executeFragments;
-        }
-
-        private static (string getComponentTarget, string leftFragmentStr) ReadUntilEndBracket(string getComponentLeftPart, Queue<string> evalFragmentQuery)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            // Debug.Log($"getComponentLeftPart={getComponentLeftPart}");
-            Queue<char> chars = new Queue<char>(getComponentLeftPart);
-            while(chars.Count > 0)
-            {
-                char c = chars.Dequeue();
-                if (c == ')')
+                else if (name == "rectComponent")
                 {
-                    // Debug.Log($"return full chars as we got {c}");
-                    return (stringBuilder.ToString(), new string(chars.ToArray()));
+                    executeType = ExecuteType.GetComponents;
+                    typeName = typeof(RectTransform).FullName;
+                    firstComponent = true;
                 }
 
-                // Debug.Log($"append char {c}");
-
-                stringBuilder.Append(c);
-            }
-
-            while (evalFragmentQuery.Count > 0)
-            {
-                string fragmentStr = evalFragmentQuery.Dequeue();
-                int endBracketIndex = fragmentStr.IndexOf(')');
-                if (endBracketIndex != -1)
+                List<XPathCollectionOperation> operations = new List<XPathCollectionOperation>();
+                if (firstComponent)
                 {
-                    stringBuilder.Append(fragmentStr.Substring(0, endBracketIndex));
-                    return (stringBuilder.ToString(), fragmentStr.Substring(endBracketIndex + 1));
+                    operations.Add(new XPathCollectionOperation("0"));
                 }
-
-                stringBuilder.Append(fragmentStr);
+                foreach (string operation in XPathBracketParser.Parse(suffix, '[', ']'))
+                {
+                    operations.Add(new XPathCollectionOperation(operation));
+                }
+                fragments.Add(new ExecuteFragment
+                {
+                    ExecuteType = executeType,
+                    ExecuteString = executeType == ExecuteType.GetComponents ? typeName : name,
+                    CollectionOperations = operations,
+                });
             }
-
-            throw new ArgumentException($"No end bracket found in `{getComponentLeftPart}` and rest parts");
+            ExecuteFragments = fragments;
         }
-
         public override string ToString()
         {
             return $"@:Eval{{{string.Join(".", ExecuteFragments)}}}:";

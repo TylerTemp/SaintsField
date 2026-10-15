@@ -1,4 +1,5 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,24 +13,23 @@ namespace SaintsField.SaintsXPathParser
     {
         public static IEnumerable<string> Parse(string value, char startWith, char endWith)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            bool inBracket = false;
-            foreach (char c in value)
+            for (int i = 0; i < value.Length; i++)
             {
-                if (c == startWith)
+                if (char.IsWhiteSpace(value[i]))
                 {
-                    inBracket = true;
-                    stringBuilder.Clear();
+                    continue;
                 }
-                else if (c == endWith)
+                if (value[i] != startWith)
                 {
-                    inBracket = false;
-                    yield return stringBuilder.ToString();
+                    throw new FormatException($"Expected `{startWith}` in `{value}`");
                 }
-                else if (inBracket)
+                int end = PathSyntax.ClosingBracket(value, i);
+                if (end < 0)
                 {
-                    stringBuilder.Append(c);
+                    throw new FormatException($"Unclosed `{startWith}` in `{value}`");
                 }
+                yield return value.Substring(i + 1, end - i - 1);
+                i = end;
             }
         }
 
@@ -48,13 +48,28 @@ namespace SaintsField.SaintsXPathParser
                     {
                         orFilters.Add((new XPathAttrIndex(false), new FilterComparerInt(FilterComparer.Equal, num)));
                     }
-                    else if (chunk == "last()")
+                    else if (orFilterRaw == "last()")
                     {
                         orFilters.Add((new XPathAttrIndex(true), new FilterComparerInt(FilterComparer.Equal, -1)));
                     }
                     else
                     {
-                        (XPathAttrBase attrBase, string left) = XPathAttrBase.Parser(chunk);
+                        (XPathAttrBase attrBase, string left) = XPathAttrBase.Parser(orFilterRaw);
+                        List<XPathCollectionOperation> operations = new List<XPathCollectionOperation>();
+                        while (left.StartsWith("["))
+                        {
+                            int end = PathSyntax.ClosingBracket(left, 0);
+                            if (end < 0)
+                            {
+                                throw new FormatException($"Unclosed collection index in `{value}`");
+                            }
+                            operations.Add(new XPathCollectionOperation(left.Substring(1, end - 1)));
+                            left = left.Substring(end + 1).Trim();
+                        }
+                        if (operations.Count > 0)
+                        {
+                            attrBase = new XPathAttrCollection(attrBase, operations);
+                        }
                         orFilters.Add((attrBase, FilterComparerBase.Parser(left)));
                     }
                 }
@@ -65,74 +80,22 @@ namespace SaintsField.SaintsXPathParser
 
         private static IEnumerable<string> SplitOrFilter(string chunk)
         {
-            StringBuilder quote = null;
-            char quoteChar = '\0';
-
-            StringBuilder orChunk = new StringBuilder();
-
-            // Debug.Log($"get string: {chunk}");
-
-            List<char> chars = new List<char>(chunk);
-
-            int i = 0;
-            while (i < chars.Count)
+            List<string> parts = new List<string>();
+            foreach (string token in PathSyntax.Split(chunk, ' '))
             {
-                char curChar = chars[i];
-                // Debug.Log($"get char {i}: {curChar}");
-                if (curChar == '\'' || curChar == '"' && quoteChar == curChar)
+                if (token == "or")
                 {
-                    if(quote == null)  // start quoting
-                    {
-                        quote = new StringBuilder();
-                        quote.Append(curChar);
-                        quoteChar = curChar;
-                        // Debug.Log($"start quote {quoteChar}");
-                    }
-                    else  // end quoting
-                    {
-                        Debug.Assert(quote != null);
-                        // Debug.Log($"end quote {quoteChar}: {curChar}");
-                        quote.Append(curChar);
-                        orChunk.Append(quote.ToString());
-                        quote = null;
-                        quoteChar = '\0';
-                    }
+                    yield return string.Join(" ", parts).Trim();
+                    parts.Clear();
                 }
                 else
                 {
-                    bool curIsEmptySpace = curChar == ' ';
-                    bool has3MoreChars = i + 3 < chars.Count;
-                    if(quote == null && curIsEmptySpace && has3MoreChars && chars[i + 1] == 'o' && chars[i + 2] == 'r' && chars[i + 3] == ' ')
-                    {
-                        string orResult = orChunk.ToString().Trim();
-                        // Debug.Log($"yield or chunk: {orResult}");
-                        yield return orResult;
-                        orChunk.Clear();
-                        i += 3;
-                    }
-                    else
-                    {
-                        if (quote == null)
-                        {
-                            // Debug.Log($"append chunk: {curChar}");
-                            orChunk.Append(curChar);
-                        }
-                        else
-                        {
-                            // Debug.Log($"append quote {quoteChar}: {curChar}");
-                            quote.Append(curChar);
-                        }
-                    }
+                    parts.Add(token);
                 }
-
-                i++;
             }
-
-            string orChunkLeft = orChunk.ToString();
-            if (!string.IsNullOrWhiteSpace(orChunkLeft))
+            if (parts.Count > 0)
             {
-                // Debug.Log($"yield left or chunk: {orChunkLeft}");
-                yield return orChunkLeft;
+                yield return string.Join(" ", parts).Trim();
             }
         }
     }

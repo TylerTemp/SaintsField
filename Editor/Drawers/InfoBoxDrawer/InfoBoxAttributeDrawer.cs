@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 return ("", true);
             }
 
-            (string error, MemberInfo _, object result) = Util.GetOf<object>(
+            GetOfResult<object> result = Util.GetOf<object>(
                 infoboxAttribute.ShowCallback,
                 null,
                 property,
@@ -102,9 +102,14 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 target,
                 null);
 
-            return error != ""
-                ? (error, false)
-                : ("", ReflectUtils.Truly(result));
+            if (result.EmptyPathResult)
+            {
+                return ("", false);
+            }
+
+            return result.Error != ""
+                ? (error: result.Error, false)
+                : ("", ReflectUtils.Truly(result.Result));
         }
     }
 }

@@ -194,8 +194,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
         {
             ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)requireTypeAttribute;
             SaintsObjectPickerWindowIMGUI pickerWindow = ScriptableObject.CreateInstance<SaintsObjectPickerWindowIMGUI>();
-            pickerWindow.ConfigAllowScene = false;
-            pickerWindow.ConfigAllowAssets = true;
+            pickerWindow.configAllowScene = false;
+            pickerWindow.configAllowAssets = true;
             pickerWindow.titleContent = new GUIContent(
                 $"Select {string.Join(", ", resourcePathAttribute.RequiredTypes.Select(each => each.Name))}");
             pickerWindow.IsEqualCallback = IsEqual;
@@ -204,10 +204,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
                 ValidateObject(itemInfo.Object, resourcePathAttribute.EStr, resourcePathAttribute.RequiredTypes) == "";
             pickerWindow.OnSelectCallback = itemInfo =>
             {
-                pickerWindow.ErrorMessage = "";
+                pickerWindow.errorMessage = "";
                 if (ValidateObject(itemInfo.Object, resourcePathAttribute.EStr, resourcePathAttribute.RequiredTypes) != "")
                 {
-                    pickerWindow.ErrorMessage = $"{itemInfo.Label} is invalid";
+                    pickerWindow.errorMessage = $"{itemInfo.Label} is invalid";
                     return;
                 }
 
