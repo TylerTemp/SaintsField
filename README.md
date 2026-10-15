@@ -115,7 +115,8 @@ namespace: `SaintsField`
 
 1.  Fix: error shown for `OnEvent`/`OnButton` when selecting away
 2.  Add: callback for `ShowIf`, `EnableIf`, `LabelText` etc now also use the XPath-like syntax, allowing more complex DSL
-3.  Chore: Improve the Downpour system (still wip)
+3.  Add: `@as(T)` and `@not-as(T)`  for XPath
+4.  Chore: Improve the Downpour system (still wip)
 
 ## Usage ##
 
