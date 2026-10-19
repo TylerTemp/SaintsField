@@ -2869,7 +2869,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1996fb424a713a4b9704f53c99ba0cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue447BuiltinDictFallbacki
-  dictA: []
+  dictA:
+  - key: 1
+    value: 
+  - key: 2
+    value: 
   dictB: []
   dictC: []
   dictD: []

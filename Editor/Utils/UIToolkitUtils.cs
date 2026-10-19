@@ -607,7 +607,13 @@ namespace SaintsField.Editor.Utils
                         r.RemoveFromClassList("unity-base-field__aligned");
                         r.RemoveFromClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
                     }
-                    r.Bind(property.serializedObject);
+#if UNITY_6000_6_OR_NEWER
+                    // DictionaryView loses its callbacks on a second bind. Let the Inspector bind it.
+                    if (r.GetType().FullName != "UnityEngine.UIElements.DictionaryView")
+#endif
+                    {
+                        r.Bind(property.serializedObject);
+                    }
 
                     if (property.propertyType == SerializedPropertyType.ExposedReference &&
                         // useDrawerType.FullName == "ExposedReferencePropertyDrawer" &&
