@@ -111,10 +111,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.8**
+**5.30.9**
 
-1.  Fix: Unity Dictionary Inspector display incorrectly for Unity 6000.0 Serializable Dictionary [#447](http://github.com/TylerTemp/SaintsField/issues/447)
-2.  Fix: `Flags` enum `Everything` didn't use the target type's cap [#446](https://github.com/TylerTemp/SaintsField/issues/446)
+Fix: Unity Dictionary Drawer disallow re-bind and lose response [#447](http://github.com/TylerTemp/SaintsField/issues/447)
 
 ## Usage ##
 

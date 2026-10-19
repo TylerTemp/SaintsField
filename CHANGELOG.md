@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.30.9 ##
+
+Fix: Unity Dictionary Drawer disallow re-bind and lose response [#447](http://github.com/TylerTemp/SaintsField/issues/447)
+
 ## 5.30.8 ##
 
 1.  Fix: Unity Dictionary Inspector display incorrectly for Unity 6000.0 Serializable Dictionary [#447](http://github.com/TylerTemp/SaintsField/issues/447)
