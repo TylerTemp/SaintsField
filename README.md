@@ -111,12 +111,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.7**
+**5.30.8**
 
-1.  Fix: error shown for `OnEvent`/`OnButton` when selecting away
-2.  Add: callback for `ShowIf`, `EnableIf`, `LabelText` etc now also use the XPath-like syntax, allowing more complex DSL
-3.  Add: `@as(T)` and `@not-as(T)`  for XPath
-4.  Chore: Improve the Downpour system (still wip)
+1.  Fix: Unity Dictionary Inspector display incorrectly for Unity 6000.0 Serializable Dictionary [#447](http://github.com/TylerTemp/SaintsField/issues/447)
+2.  Fix: `Flags` enum `Everything` didn't use the target type's cap [#446](https://github.com/TylerTemp/SaintsField/issues/446)
 
 ## Usage ##
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.30.8 ##
+
+1.  Fix: Unity Dictionary Inspector display incorrectly for Unity 6000.0 Serializable Dictionary [#447](http://github.com/TylerTemp/SaintsField/issues/447)
+2.  Fix: `Flags` enum `Everything` didn't use the target type's cap [#446](https://github.com/TylerTemp/SaintsField/issues/446)
+
 ## 5.30.7 ##
 
 1.  Fix: error shown for `OnEvent`/`OnButton` when selecting away
