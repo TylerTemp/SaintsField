@@ -3116,10 +3116,14 @@ namespace SaintsField.Editor.Utils
 
             Type useDrawerType = null;
             Attribute useAttribute = null;
-            bool isArray = property.propertyType == SerializedPropertyType.Generic
-                           && property.isArray;
 
-            if(!isArray)
+            bool isDictionary = ReflectUtils.TypeIsSerializableDictionary6K(fieldInfo.FieldType);
+
+            bool isPureArray = property.propertyType == SerializedPropertyType.Generic
+                           && property.isArray
+                           && !isDictionary;
+
+            if(!isPureArray)
             {
                 ISaintsAttribute saintsAttr = allAttributes
                     .OfType<ISaintsAttribute>()

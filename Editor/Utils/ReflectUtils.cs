@@ -731,5 +731,14 @@ namespace SaintsField.Editor.Utils
         }
 
         public static bool TypeIsStruct(Type type) => type.IsValueType && !type.IsEnum && !type.IsPrimitive;
+        public static bool TypeIsSerializableDictionary6K(Type type) =>
+#if UNITY_6000_6_OR_NEWER
+            ReflectUtils.GetSelfAndBaseTypesFromTypeIter(type)
+            .Any(each => each.IsGenericType &&
+            each.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+#else
+                    false
+#endif
+        ;
     }
 }

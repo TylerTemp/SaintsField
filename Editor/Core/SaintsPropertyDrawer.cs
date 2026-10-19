@@ -653,7 +653,9 @@ namespace SaintsField.Editor.Core
 
             Debug.Assert(fieldType != null, info);
 
-            Type fieldElementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+            bool isDictionary = ReflectUtils.TypeIsSerializableDictionary6K(fieldType);
+
+            Type fieldElementType = (!isDictionary && SerializedUtils.IsArrayOrDirectlyInsideArray(property))
                 ? ReflectUtils.GetElementType(fieldType)
                 : fieldType;
 

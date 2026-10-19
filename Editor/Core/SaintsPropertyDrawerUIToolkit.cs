@@ -681,7 +681,8 @@ namespace SaintsField.Editor.Core
             {
                 // return PropertyFieldFallbackUIToolkit(property);
 
-                Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                Type rawType = !ReflectUtils.TypeIsSerializableDictionary6K(info.FieldType) &&
+                               SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
                 return UIToolkitUtils.CreateOrUpdateFieldRawFallback(property, allAttributes, rawType, passedPreferredLabel,

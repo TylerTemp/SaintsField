@@ -242,6 +242,21 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             );
         }
 
+        private static PropertyDrawer GetDictionaryTypeDrawer(SerializedProperty property, Type rawType,
+            FieldInfo fieldInfo, GUIContent label)
+        {
+            if (!ReflectUtils.TypeIsSerializableDictionary6K(rawType))
+            {
+                return null;
+            }
+
+            (Attribute _, Type drawerType) = SaintsPropertyDrawer.GetFallbackDrawerType(
+                fieldInfo, property, Array.Empty<Attribute>());
+            return drawerType != null && !typeof(SaintsPropertyDrawer).IsAssignableFrom(drawerType)
+                ? SaintsPropertyDrawer.MakePropertyDrawer(drawerType, fieldInfo, null, label.text)
+                : null;
+        }
+
         public static float GetPropertyHeightRawFallback(
             SerializedProperty property,
             IReadOnlyList<Attribute> allAttributes,
@@ -258,6 +273,11 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.ManagedReference:
                 {
                     // Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray} allAttributes={string.Join(", ", allAttributes)}");
+                    PropertyDrawer dictionaryDrawer = GetDictionaryTypeDrawer(property, rawType, fieldInfo, label);
+                    if (dictionaryDrawer != null)
+                    {
+                        return dictionaryDrawer.GetPropertyHeight(property, label);
+                    }
                     if (property.isArray)
                     {
                         return IMGUIList.GetHeight(property, allAttributes, rawType, label, fieldInfo,
@@ -394,6 +414,16 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Generic:
                 case SerializedPropertyType.ManagedReference:
                 {
+                    PropertyDrawer dictionaryDrawer = GetDictionaryTypeDrawer(property, rawType, fieldInfo, label);
+                    if (dictionaryDrawer != null)
+                    {
+                        dictionaryDrawer.OnGUI(position, property, label);
+                        DrawRichText(new Rect(position)
+                        {
+                            height = EditorGUIUtility.singleLineHeight,
+                        }, richTextChunks);
+                        return;
+                    }
                     if (property.isArray)
                     {
                         IMGUIList.DrawField(

@@ -1313,7 +1313,11 @@ namespace SaintsField.Editor.Core
             }
             else  // not attribute drawer, use type drawer
             {
-                Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fInfo.FieldType) : fInfo.FieldType);
+                bool extractElementType = !ReflectUtils.TypeIsSerializableDictionary6K(fInfo.FieldType) &&
+                                          SerializedUtils.IsArrayOrDirectlyInsideArray(property);
+                Type drawerType = FindTypeDrawerNonSaints(extractElementType
+                    ? ReflectUtils.GetElementType(fInfo.FieldType)
+                    : fInfo.FieldType);
                 if (drawerType != null)
                 {
                     // type drawer has no attribute

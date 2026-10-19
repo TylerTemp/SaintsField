@@ -792,8 +792,11 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Generic:
                 case SerializedPropertyType.ManagedReference:
                 {
-                    // Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray} allAttributes={string.Join(", ", allAttributes)}");
-                    if (property.isArray)
+                    Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray} allAttributes={string.Join(", ", allAttributes)}");
+                    bool isDictionary = ReflectUtils.GetSelfAndBaseTypesFromTypeIter(rawType)
+                        .Any(each => each.IsGenericType &&
+                                     each.GetGenericTypeDefinition() == typeof(Dictionary<,>));
+                    if (property.isArray && !isDictionary)
                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                         Debug.Log($"array process {property.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
