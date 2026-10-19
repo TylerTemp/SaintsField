@@ -1859,7 +1859,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                 }
 
-                return (DropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, valueType, value, beforeSet,
+                return (DropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, enumType, value, beforeSet,
                     setterOrNull,
                     labelGrayColor, inHorizontalLayout), false);
             }

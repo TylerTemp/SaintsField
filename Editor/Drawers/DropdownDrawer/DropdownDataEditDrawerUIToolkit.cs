@@ -18,6 +18,9 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         {
             public DrawInfo DrawInfo;
             public object Value;
+            public EnumFlagsMetaInfo? FlagsMeta;
+            public Func<object, bool, IReadOnlyList<object>> SetFlagsValue;
+            public Type EnumType;
         }
 
         public static VisualElement DrawEnumUIToolkit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
@@ -27,10 +30,13 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
             bool isFlags = Attribute.IsDefined(fieldType, typeof(FlagsAttribute));
             string fieldClass = isFlags? "saintsfield-editor-enum-flags-field" : "saintsfield-editor-enum-field";
-            if (oldElement is UIToolkitUtils.DropdownButtonField dropdownButton && dropdownButton.ClassListContains(fieldClass))
+            if (oldElement is UIToolkitUtils.DropdownButtonField dropdownButton && dropdownButton.ClassListContains(fieldClass)
+                && oldElement.userData is DrawPayload oldPayload && oldPayload.EnumType == fieldType)
             {
                 DrawPayload drawPayload = (DrawPayload)oldElement.userData;
-                drawPayload.Value = value;
+                drawPayload.Value = drawPayload.FlagsMeta.HasValue
+                    ? Enum.ToObject(fieldType, EnumFlagsUtil.NormalizeDropdownValue(drawPayload.FlagsMeta.Value, Convert.ToInt64(value)))
+                    : value;
                 // Debug.Log($"update to {value}");
                 DrawEnumUIToolkitUpdateButtonLabel(dropdownButton);
                 return null;
@@ -41,8 +47,14 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             DrawInfo.EnumValueInfo everythingValue = new DrawInfo.EnumValueInfo();
 
             bool isULong = fieldType.GetEnumUnderlyingType() == typeof(ulong);
+            bool useUnityFlagsRules = isFlags && fieldType.GetEnumUnderlyingType() != typeof(long) && !isULong;
+            EnumFlagsMetaInfo flagsMeta = new EnumFlagsMetaInfo
+            {
+                EnumType = fieldType,
+                BitValueToName = new Dictionary<long, EnumFlagsUtil.EnumDisplayInfo>(),
+            };
 
-            long longValue = 0;
+            long longValue = useUnityFlagsRules ? EnumFlagsUtil.GetEverythingValue(fieldType) : 0;
             ulong uLongValue = 0;
 
             foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(fieldType))
@@ -62,7 +74,19 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                     else
                     {
                         long longEnumValue = Convert.ToInt64(enumValue);
-                        longValue |= longEnumValue;
+                        if (useUnityFlagsRules)
+                        {
+                            flagsMeta.BitValueToName[longEnumValue] = new EnumFlagsUtil.EnumDisplayInfo
+                            {
+                                Name = enumLabel,
+                                HasRichName = enumRichLabel != null,
+                                RichName = enumRichLabel,
+                            };
+                        }
+                        else
+                        {
+                            longValue |= longEnumValue;
+                        }
                         if (longEnumValue == 0)
                         {
                             nothingValue = info;
@@ -111,7 +135,11 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             DrawPayload refDrawPayload = new DrawPayload
             {
                 DrawInfo = newInfo,
-                Value = value,
+                Value = useUnityFlagsRules
+                    ? Enum.ToObject(fieldType, EnumFlagsUtil.NormalizeDropdownValue(flagsMeta, Convert.ToInt64(value)))
+                    : value,
+                FlagsMeta = useUnityFlagsRules ? flagsMeta : (EnumFlagsMetaInfo?)null,
+                EnumType = fieldType,
             };
 
             UIToolkitUtils.DropdownButtonField newDropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
@@ -124,6 +152,22 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
             newDropdownButton.AddToClassList(ClassAllowDisable);
             newDropdownButton.AddToClassList(fieldClass);
+
+            if (useUnityFlagsRules && setterOrNull != null)
+            {
+                refDrawPayload.SetFlagsValue = (curItem, on) =>
+                {
+                    beforeSet?.Invoke(refDrawPayload.Value);
+                    long newMask = EnumFlagsUtil.GetDropdownValue(flagsMeta,
+                        Convert.ToInt64(refDrawPayload.Value), Convert.ToInt64(curItem), on);
+                    object newValue = Enum.ToObject(fieldType, newMask);
+                    refDrawPayload.Value = newValue;
+                    setterOrNull(newValue);
+                    DrawEnumUIToolkitUpdateButtonLabel(newDropdownButton);
+                    return EnumFlagsUtil.GetDropdownMetaInfo(newMask, longValue, flagsMeta.BitValueToName)
+                        .CurValues.Select(item => (object)Enum.ToObject(fieldType, (long)item)).ToArray();
+                };
+            }
 
             newDropdownButton.ButtonElement.clicked += () =>
             {
@@ -166,7 +210,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                     }
                     else
                     {
-                        enumDropdown.Add("Everything", newInfo.EverythingBit);
+                        enumDropdown.Add("Everything", Enum.ToObject(fieldType, newInfo.EverythingBit));
                     }
 
                     if (!containsEverythingOrNothing)
@@ -183,7 +227,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                         }
                         if (containsEverythingOrNothing)
                         {
-                            curValues.Add(newInfo.EverythingBit);
+                            curValues.Add(Enum.ToObject(fieldType, newInfo.EverythingBit));
                         }
                     }
 
@@ -194,13 +238,13 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 {
                     // Debug.Log($"Add {enumInfo.Label} {enumInfo.Value}");
                     enumDropdown.Add(enumInfo.Label, enumInfo.Value);
-                    if (!containsEverythingOrNothing)
+                    if (!containsEverythingOrNothing || isFlags)
                     {
                         if (isFlags)
                         {
                             if (isULong)
                             {
-                                if (((ulong)refDrawPayload.Value & (ulong)enumInfo.Value) != 0)
+                                if (((ulong)refDrawPayload.Value & (ulong)enumInfo.Value) == (ulong)enumInfo.Value)
                                 {
                                     curValues.Add(enumInfo.Value);
                                 }
@@ -246,10 +290,14 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                     metaInfo,
                     newDropdownButton.worldBound.width,
                     maxHeight,
-                    false,
+                    isFlags,
                     (curItem, on) =>
                     {
                         // Debug.Log($"curItem={curItem}");
+                        if (refDrawPayload.SetFlagsValue != null)
+                        {
+                            return refDrawPayload.SetFlagsValue(curItem, on);
+                        }
                         beforeSet?.Invoke(refDrawPayload.Value);
                         if(setterOrNull != null)
                         {

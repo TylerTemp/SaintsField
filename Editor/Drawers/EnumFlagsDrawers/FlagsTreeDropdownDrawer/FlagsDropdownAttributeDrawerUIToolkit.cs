@@ -35,7 +35,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
             }
 
             _enumMeta = EnumFlagsUtil.GetMetaInfo(property, info);
-            FlagsDropdownElement intDropdownElement = new FlagsDropdownElement(_enumMeta);
+            EnumFlagsMetaInfo displayMeta = _enumMeta;
+            displayMeta.AllCheckedLong = EnumFlagsUtil.GetEverythingValue(_enumMeta.EnumType);
+            FlagsDropdownElement intDropdownElement = new FlagsDropdownElement(displayMeta);
             intDropdownElement.BindProperty(property);
             IntDropdownField field = new IntDropdownField(GetPreferredLabel(property), intDropdownElement)
             {
@@ -125,14 +127,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
             }));
         }
 
-        private void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        // Unity does not simply use ~0 for everything bit
+        private static void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo enumInfo =  EnumFlagsUtil.GetMetaInfo(property, info);
-            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(EnumFlagsUtil.GetSerializedPropertyEnumValue(enumInfo.EnumType, property), _enumMeta.AllCheckedLong, _enumMeta.BitValueToName);
+            long everything = EnumFlagsUtil.GetEverythingValue(enumInfo.EnumType);
+            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(EnumFlagsUtil.GetSerializedPropertyEnumValue(enumInfo.EnumType, property), everything, enumInfo.BitValueToName);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            long everything = enumInfo.AllCheckedLong;
 
             SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
                 metaInfo,
@@ -142,36 +144,13 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
                 (curItem, on) =>
                 {
                     long selectedValue = (long)curItem;
-                    long newMask;
-                    if (selectedValue == 0)
-                    {
-                        newMask = 0;
-                    }
-                    else if (on)
-                    {
-                        newMask = EnumFlagsUtil.GetSerializedPropertyEnumValue(enumInfo.EnumType, property) | selectedValue;
-                        if ((newMask & everything) == everything)
-                        {
-                            // Debug.Log($"shift to everything!");
-                            newMask = ~0L;
-                        }
-                    }
-                    else
-                    {
-                        long originValue = property.intValue;
-                        if (originValue == ~0L)
-                        {
-                            originValue = everything;
-                        }
-
-                        newMask = EnumFlagsUtil.SetOffBit(originValue, selectedValue);
-                    }
+                    long newMask = EnumFlagsUtil.GetDropdownValue(enumInfo,
+                        EnumFlagsUtil.GetSerializedPropertyEnumValue(enumInfo.EnumType, property), selectedValue, on);
 
                     EnumFlagsUtil.SetSerializedPropertyEnumValue(enumInfo.EnumType, property, newMask);
                     property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback(curItem);
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, Enum.ToObject(enumInfo.EnumType, newMask));
-                    return EnumFlagsUtil.GetDropdownMetaInfo(newMask, _enumMeta.AllCheckedLong, _enumMeta.BitValueToName).CurValues;
+                    onValueChangedCallback(Enum.ToObject(enumInfo.EnumType, newMask));
+                    return EnumFlagsUtil.GetDropdownMetaInfo(newMask, everything, enumInfo.BitValueToName).CurValues;
                 }
             );
 

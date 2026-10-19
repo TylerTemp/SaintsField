@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
             AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(
                 EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property),
-                metaInfo.AllCheckedLong,
+                EnumFlagsUtil.GetEverythingValue(metaInfo.EnumType),
                 metaInfo.BitValueToName);
             cache.Error = dropdownMetaInfo.Error;
             return cache;
@@ -73,7 +73,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
             long currentMask = EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property);
             AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(
                 currentMask,
-                metaInfo.AllCheckedLong,
+                EnumFlagsUtil.GetEverythingValue(metaInfo.EnumType),
                 metaInfo.BitValueToName);
             cache.Error = dropdownMetaInfo.Error;
 
@@ -97,42 +97,18 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
                     (curItem, on) =>
                     {
                         long selectedValue = (long)curItem;
-                        long newMask;
-                        if (selectedValue == 0)
-                        {
-                            newMask = 0;
-                        }
-                        else if (on)
-                        {
-                            newMask = EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property) |
-                                      selectedValue;
-                            if ((newMask & metaInfo.AllCheckedLong) == metaInfo.AllCheckedLong)
-                            {
-                                newMask = ~0L;
-                            }
-                        }
-                        else
-                        {
-                            long originValue = property.intValue;
-                            if (originValue == ~0L)
-                            {
-                                originValue = metaInfo.AllCheckedLong;
-                            }
-
-                            newMask = EnumFlagsUtil.SetOffBit(originValue, selectedValue);
-                        }
+                        long newMask = EnumFlagsUtil.GetDropdownValue(metaInfo,
+                            EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property), selectedValue, on);
 
                         EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, newMask);
                         property.serializedObject.ApplyModifiedProperties();
                         TriggerChangedIMGUI(property, newMask);
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
-                            parent, System.Enum.ToObject(metaInfo.EnumType, newMask));
                         if (ExpandableIMGUIScoop.IsInScoop)
                         {
                             property.serializedObject.ApplyModifiedProperties();
                         }
 
-                        return EnumFlagsUtil.GetDropdownMetaInfo(newMask, metaInfo.AllCheckedLong,
+                        return EnumFlagsUtil.GetDropdownMetaInfo(newMask, EnumFlagsUtil.GetEverythingValue(metaInfo.EnumType),
                             metaInfo.BitValueToName).CurValues;
                     }));
             }

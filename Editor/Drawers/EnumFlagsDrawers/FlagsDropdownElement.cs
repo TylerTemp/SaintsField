@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
@@ -22,6 +23,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             CachedValue = newValue;
             Label.Clear();
             Button.tooltip = "";
+            long mask = _metaInfo.EnumType.GetEnumUnderlyingType() == typeof(uint)
+                ? unchecked((uint)newValue)
+                : newValue;
 
             if (newValue == 0)
             {
@@ -49,11 +53,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 return;
             }
 
-            if((newValue & _metaInfo.AllCheckedLong) == _metaInfo.AllCheckedLong)
+            if((mask & _metaInfo.AllCheckedLong) == _metaInfo.AllCheckedLong)
             {
                 EnumFlagsUtil.EnumDisplayInfo label;
 
-                if (_metaInfo.BitValueToName.TryGetValue(newValue, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
+                if (_metaInfo.BitValueToName.TryGetValue(mask, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
                 {
                     label = new EnumFlagsUtil.EnumDisplayInfo
                     {
@@ -83,17 +87,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 return;
             }
 
-            List<int> selectedNameKeys = new List<int>();
+            List<long> selectedNameKeys = new List<long>();
 
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-            foreach (int key in _metaInfo.BitValueToName.Keys)
+            foreach (long key in _metaInfo.BitValueToName.Keys)
             {
                 if (key == 0)
                 {
                     continue;
                 }
 
-                if ((newValue & key) == key)
+                if ((mask & key) == key)
                 {
                     selectedNameKeys.Add(key);
                 }
@@ -111,10 +115,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             // Up==1,Down==2,Vertical==3,Left==4,Right==8,Horizontal==12,All==15 -> All==15
             for (int i = selectedNameKeys.Count - 1; i >= 0; i--)
             {
-                int key = selectedNameKeys[i];
+                long key = selectedNameKeys[i];
                 for (int j = 0; j < selectedNameKeys.Count; j++)
                 {
-                    int otherKey = selectedNameKeys[j];
+                    long otherKey = selectedNameKeys[j];
                     if (otherKey != key && (otherKey & key) == key)
                     {
                         selectedNameKeys.RemoveAt(i);
@@ -124,7 +128,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             }
 
             int totalCount = selectedNameKeys.Count;
-            foreach ((int keyIndex, int index) in selectedNameKeys.WithIndex())
+            foreach ((long keyIndex, int index) in selectedNameKeys.WithIndex())
             {
                 if (!_metaInfo.BitValueToName.TryGetValue(keyIndex, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
                 {

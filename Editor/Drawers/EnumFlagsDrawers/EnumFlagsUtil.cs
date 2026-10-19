@@ -44,6 +44,45 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return property.intValue;
         }
 
+        public static long GetEverythingValue(Type enumType)
+        {
+            // Convert the UI's all-bits sentinel back to the enum's actual storage type.
+            return Convert.ToInt64(Enum.ToObject(enumType, -1L));
+        }
+
+        public static long GetDropdownValue(EnumFlagsMetaInfo metaInfo, long currentMask, long selectedValue, bool on)
+        {
+            long everything = GetEverythingValue(metaInfo.EnumType);
+            if (selectedValue == 0 || selectedValue == everything)
+            {
+                return selectedValue;
+            }
+
+            currentMask = NormalizeDropdownValue(metaInfo, currentMask);
+            long newMask = on ? currentMask | selectedValue : SetOffBit(currentMask, selectedValue);
+            return NormalizeDropdownValue(metaInfo, newMask);
+        }
+
+        public static long NormalizeDropdownValue(EnumFlagsMetaInfo metaInfo, long value)
+        {
+            long everything = GetEverythingValue(metaInfo.EnumType);
+            long declaredMask = metaInfo.BitValueToName.Keys
+                .Where(value => value != everything)
+                .Aggregate(0L, (mask, value) => mask | value);
+            // BaseMaskField uses the full 32-bit mask when there are at least 32 choices,
+            // including aliases. Count the enum members rather than the deduplicated menu.
+            if (metaInfo.EnumType.GetFields(BindingFlags.Public | BindingFlags.Static)
+                    .Count(field => !field.IsDefined(typeof(ObsoleteAttribute), false)) >= 32)
+            {
+                declaredMask = everything;
+            }
+            if (declaredMask == 0)
+            {
+                return value;
+            }
+            return (value & declaredMask) == declaredMask ? everything : value & declaredMask;
+        }
+
         public static AdvancedDropdownMetaInfo GetDropdownMetaInfo(long curMask, long fullMask, IReadOnlyDictionary<long, EnumDisplayInfo> bitValueToName)
         {
             AdvancedDropdownList<long> dropdownListValue = new AdvancedDropdownList<long>
@@ -352,7 +391,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         public static void SetSerializedPropertyEnumValue(Type enumType, SerializedProperty property, long newMask)
         {
-            if (enumType == typeof(uint))
+            if (enumType.GetEnumUnderlyingType() == typeof(uint))
             {
                 property.uintValue = (uint)newMask;
             }
