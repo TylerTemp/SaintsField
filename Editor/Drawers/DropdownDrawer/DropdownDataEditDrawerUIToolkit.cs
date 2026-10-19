@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             {
                 DrawPayload drawPayload = (DrawPayload)oldElement.userData;
                 drawPayload.Value = drawPayload.FlagsMeta.HasValue
-                    ? Enum.ToObject(fieldType, EnumFlagsUtil.NormalizeDropdownValue(drawPayload.FlagsMeta.Value, Convert.ToInt64(value)))
+                    ? Enum.ToObject(fieldType, EnumFlagsUtil.NormalizeDropdownValue(drawPayload.FlagsMeta.Value, EnumFlagsUtil.GetEnumBits(value)))
                     : value;
                 // Debug.Log($"update to {value}");
                 DrawEnumUIToolkitUpdateButtonLabel(dropdownButton);
@@ -47,51 +47,31 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             DrawInfo.EnumValueInfo everythingValue = new DrawInfo.EnumValueInfo();
 
             bool isULong = fieldType.GetEnumUnderlyingType() == typeof(ulong);
-            bool useUnityFlagsRules = isFlags && fieldType.GetEnumUnderlyingType() != typeof(long) && !isULong;
             EnumFlagsMetaInfo flagsMeta = new EnumFlagsMetaInfo
             {
                 EnumType = fieldType,
                 BitValueToName = new Dictionary<long, EnumFlagsUtil.EnumDisplayInfo>(),
             };
 
-            long longValue = useUnityFlagsRules ? EnumFlagsUtil.GetEverythingValue(fieldType) : 0;
-            ulong uLongValue = 0;
+            long longValue = isFlags ? EnumFlagsUtil.GetEverythingValue(fieldType) : 0;
+            ulong uLongValue = unchecked((ulong)longValue);
 
             foreach ((object enumValue, string enumLabel, string enumRichLabel, bool obsolete) in Util.GetEnumValues(fieldType))
             {
                 DrawInfo.EnumValueInfo info = new DrawInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel);
                 if (isFlags)
                 {
-                    if (isULong)
+                    long enumBits = EnumFlagsUtil.GetEnumBits(enumValue);
+                    flagsMeta.BitValueToName[enumBits] = new EnumFlagsUtil.EnumDisplayInfo
                     {
-                        uLongValue |= (ulong)enumValue;
-                        if ((ulong)enumValue == 0)
-                        {
-                            nothingValue = info;
-                            continue;
-                        }
-                    }
-                    else
+                        Name = enumLabel,
+                        HasRichName = enumRichLabel != null,
+                        RichName = enumRichLabel,
+                    };
+                    if (enumBits == 0)
                     {
-                        long longEnumValue = Convert.ToInt64(enumValue);
-                        if (useUnityFlagsRules)
-                        {
-                            flagsMeta.BitValueToName[longEnumValue] = new EnumFlagsUtil.EnumDisplayInfo
-                            {
-                                Name = enumLabel,
-                                HasRichName = enumRichLabel != null,
-                                RichName = enumRichLabel,
-                            };
-                        }
-                        else
-                        {
-                            longValue |= longEnumValue;
-                        }
-                        if (longEnumValue == 0)
-                        {
-                            nothingValue = info;
-                            continue;
-                        }
+                        nothingValue = info;
+                        continue;
                     }
                 }
                 enumNormalValues.Add(info);
@@ -135,10 +115,10 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             DrawPayload refDrawPayload = new DrawPayload
             {
                 DrawInfo = newInfo,
-                Value = useUnityFlagsRules
-                    ? Enum.ToObject(fieldType, EnumFlagsUtil.NormalizeDropdownValue(flagsMeta, Convert.ToInt64(value)))
+                Value = isFlags
+                    ? Enum.ToObject(fieldType, EnumFlagsUtil.NormalizeDropdownValue(flagsMeta, EnumFlagsUtil.GetEnumBits(value)))
                     : value,
-                FlagsMeta = useUnityFlagsRules ? flagsMeta : (EnumFlagsMetaInfo?)null,
+                FlagsMeta = isFlags ? flagsMeta : (EnumFlagsMetaInfo?)null,
                 EnumType = fieldType,
             };
 
@@ -153,13 +133,13 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             newDropdownButton.AddToClassList(ClassAllowDisable);
             newDropdownButton.AddToClassList(fieldClass);
 
-            if (useUnityFlagsRules && setterOrNull != null)
+            if (isFlags && setterOrNull != null)
             {
                 refDrawPayload.SetFlagsValue = (curItem, on) =>
                 {
                     beforeSet?.Invoke(refDrawPayload.Value);
                     long newMask = EnumFlagsUtil.GetDropdownValue(flagsMeta,
-                        Convert.ToInt64(refDrawPayload.Value), Convert.ToInt64(curItem), on);
+                        EnumFlagsUtil.GetEnumBits(refDrawPayload.Value), EnumFlagsUtil.GetEnumBits(curItem), on);
                     object newValue = Enum.ToObject(fieldType, newMask);
                     refDrawPayload.Value = newValue;
                     setterOrNull(newValue);
@@ -299,82 +279,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                             return refDrawPayload.SetFlagsValue(curItem, on);
                         }
                         beforeSet?.Invoke(refDrawPayload.Value);
-                        if(setterOrNull != null)
-                        {
-                            if (newInfo.IsFlags)
-                            {
-                                if (newInfo.IsULong)
-                                {
-                                    ulong curValue = (ulong)curItem;
-                                    ulong newValue;
-                                    if (curValue == 0)
-                                    {
-                                        newValue = 0UL;
-                                    }
-                                    else if (curValue == (ulong)newInfo.EverythingBit)
-                                    {
-                                        newValue = (ulong)newInfo.EverythingBit;
-                                    }
-                                    else if (on)
-                                    {
-                                        if ((ulong)refDrawPayload.Value == (ulong)refDrawPayload.DrawInfo.EverythingBit)
-                                        {
-                                            newValue = curValue;
-                                        }
-                                        else
-                                        {
-                                            newValue = (ulong)refDrawPayload.Value | curValue;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newValue = EnumFlagsUtil.SetOffBit((ulong)refDrawPayload.Value, curValue);
-                                    }
-                                    refDrawPayload.Value = newValue;
-                                    // Debug.Log($"setterOrNull({newValue})");
-                                    setterOrNull(newValue);
-                                }
-                                else
-                                {
-                                    long curItemLong = Convert.ToInt64(curItem);
-                                    long everythingBit = Convert.ToInt64(newInfo.EverythingBit);
-                                    long refValueLong = Convert.ToInt64(refDrawPayload.Value);
-                                    long newValue;
-                                    if (curItemLong == 0)
-                                    {
-                                        newValue = 0L;
-                                    }
-                                    else if (curItemLong == everythingBit)
-                                    {
-                                        newValue = everythingBit;
-                                    }
-                                    else if (on)
-                                    {
-                                        if (refValueLong == everythingBit)
-                                        {
-                                            newValue = curItemLong;
-                                        }
-                                        else
-                                        {
-                                            newValue = refValueLong | curItemLong;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newValue = EnumFlagsUtil.SetOffBit(refValueLong, curItemLong);
-                                    }
-                                    object newValueAsType = Enum.ToObject(fieldType, newValue);
-                                    refDrawPayload.Value = newValueAsType;
-                                    // Debug.Log($"setterOrNull({newValue})");
-                                    setterOrNull(newValueAsType);
-                                }
-                            }
-                            else
-                            {
-                                // Debug.Log($"setterOrNull({curItem})");
-                                setterOrNull(curItem);
-                            }
-                        }
+                        setterOrNull?.Invoke(curItem);
                         return null;
                     }
                 );

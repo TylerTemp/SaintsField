@@ -47,7 +47,18 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         public static long GetEverythingValue(Type enumType)
         {
             // Convert the UI's all-bits sentinel back to the enum's actual storage type.
-            return Convert.ToInt64(Enum.ToObject(enumType, -1L));
+            return GetEnumBits(Enum.ToObject(enumType, -1L));
+        }
+
+        public static long GetEnumBits(object value)
+        {
+            // A signed long carries all 64 bits, including ulong's high bit, without overflow.
+            if (value is ulong ||
+                value is Enum enumValue && enumValue.GetType().GetEnumUnderlyingType() == typeof(ulong))
+            {
+                return unchecked((long)Convert.ToUInt64(value));
+            }
+            return Convert.ToInt64(value);
         }
 
         public static long GetDropdownValue(EnumFlagsMetaInfo metaInfo, long currentMask, long selectedValue, bool on)
@@ -69,10 +80,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             long declaredMask = metaInfo.BitValueToName.Keys
                 .Where(value => value != everything)
                 .Aggregate(0L, (mask, value) => mask | value);
-            // BaseMaskField uses the full 32-bit mask when there are at least 32 choices,
-            // including aliases. Count the enum members rather than the deduplicated menu.
+            // Extend BaseMaskField's choice-count rule to the 64-bit storage types.
+            Type underlyingType = metaInfo.EnumType.GetEnumUnderlyingType();
+            int maskWidth = underlyingType == typeof(long) || underlyingType == typeof(ulong) ? 64 : 32;
             if (metaInfo.EnumType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                    .Count(field => !field.IsDefined(typeof(ObsoleteAttribute), false)) >= 32)
+                    .Count(field => !field.IsDefined(typeof(ObsoleteAttribute), false)) >= maskWidth)
             {
                 declaredMask = everything;
             }
@@ -80,7 +92,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             {
                 return value;
             }
-            return (value & declaredMask) == declaredMask ? everything : value & declaredMask;
+            return (value & declaredMask) == declaredMask
+                ? everything
+                : value & declaredMask;
         }
 
         public static AdvancedDropdownMetaInfo GetDropdownMetaInfo(long curMask, long fullMask, IReadOnlyDictionary<long, EnumDisplayInfo> bitValueToName)
@@ -153,7 +167,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             HashSet<long> obsoleteValues = new HashSet<long>();
             foreach (FieldInfo enumField in ReflectUtils.GetEnumFields(enumType))
             {
-                long enumValue = Convert.ToInt64(enumField.GetValue(null));
+                long enumValue = GetEnumBits(enumField.GetValue(null));
                 ReflectUtils.EnumFieldInfo enumFieldInfo = ReflectUtils.GetFieldInfoFromEnum(enumField);
                 // A mask has one label per value; prefer a non-obsolete alias when available.
                 if (allIntToName.ContainsKey(enumValue) &&
