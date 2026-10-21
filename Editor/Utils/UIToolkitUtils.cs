@@ -798,7 +798,6 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Generic:
                 case SerializedPropertyType.ManagedReference:
                 {
-                    Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray} allAttributes={string.Join(", ", allAttributes)}");
                     bool isDictionary = ReflectUtils.GetSelfAndBaseTypesFromTypeIter(rawType)
                         .Any(each => each.IsGenericType &&
                                      each.GetGenericTypeDefinition() == typeof(Dictionary<,>));
@@ -839,6 +838,10 @@ namespace SaintsField.Editor.Utils
                                     else if (injectedAttribute is IPlayaAttribute ip && injectedAttribute is not InjectAttributeBase)
                                     {
                                         injectedIPlayaAttributes.Add(ip);
+                                    }
+                                    else if (injectedAttribute != null && injectedAttribute is not InjectAttributeBase)
+                                    {
+                                        elementAttributes.Add(injectedAttribute);
                                     }
                                 }
                             }

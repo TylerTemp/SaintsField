@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.AboveButtonDrawer
         {
             List<DecButtonShowIfAttribute> showControlAttributes = new List<DecButtonShowIfAttribute>(attributes.Count);
 
-            foreach (PropertyAttribute attr in attributes)
+            foreach (Attribute attr in attributes)
             {
                 if (ReferenceEquals(attr, currentAttribute))
                 {
@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.AboveButtonDrawer
         {
             List<DecButtonDisableIfAttribute> disableControlAttributes = new List<DecButtonDisableIfAttribute>(attributes.Count);
 
-            foreach (PropertyAttribute attr in attributes)
+            foreach (Attribute attr in attributes)
             {
                 if (ReferenceEquals(attr, currentAttribute))
                 {

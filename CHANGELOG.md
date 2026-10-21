@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.30.10 ##
+
+1.  Fix: inline buttons throw errors due to 5.30.7 refactory
+2.  Fix: Clean a log line
+
 ## 5.30.9 ##
 
 Fix: Unity Dictionary Drawer disallow re-bind and lose response [#447](http://github.com/TylerTemp/SaintsField/issues/447)

@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
             Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
-            PropertyAttribute[] attributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
+            Attribute[] attributes = ReflectCache.GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo);
             ListDrawerSettingsAttribute settings = GetListDrawerSettingsAttribute();
             Func<(int min, int max)> configuredLimits = SerializedListUtils.CreateSizeLimits(
                 property, FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault(),
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 Util.UnityDefaultSimpleSearch(property.displayName, text) ? DisplayStyle.Flex : DisplayStyle.None);
         }
 
-        private VisualElement CreateListItem(SerializedProperty prop, PropertyAttribute[] allAttributes, int index)
+        private VisualElement CreateListItem(SerializedProperty prop, Attribute[] allAttributes, int index)
         {
             VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldProperty(
                 prop,
