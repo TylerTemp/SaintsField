@@ -845,9 +845,7 @@ namespace SaintsField.Editor.Utils
                                     }
                                 }
                             }
-                            // XPath getters also have a collection-level size helper, but existing
-                            // elements still need their drawer to assign references.
-                            else if (attr is not IPlayaAttribute || attr is GetByXPathAttribute)
+                            else if (attr is not IPlayaAttribute || attr is PropertyAttribute)
                             {
                                 elementAttributes.Add(attr);
                             }
