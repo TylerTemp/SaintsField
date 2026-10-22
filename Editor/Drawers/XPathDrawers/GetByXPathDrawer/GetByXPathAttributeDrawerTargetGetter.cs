@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return CalcXPathValues(andXPathInfoList, expectedType, expectedInterface, property, info, parent);
         }
 
-        private static GetXPathValuesResult CalcXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
+        internal static GetXPathValuesResult CalcXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
         {
             // Debug.Log($"andXPathInfoList Count={andXPathInfoList.Count}");
             bool anyResult = false;
@@ -144,7 +144,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 };
         }
 
-        private static IEnumerable<object> ResolveXPathValues(IEnumerable<XPathStep> xPathSteps,
+        internal static IEnumerable<object> ResolveXPathValues(IEnumerable<XPathStep> xPathSteps,
             OptimizationPayload optimizationPayload, Type expectedType, Type expectedInterface,
             SerializedProperty property, MemberInfo info, object parent)
         {

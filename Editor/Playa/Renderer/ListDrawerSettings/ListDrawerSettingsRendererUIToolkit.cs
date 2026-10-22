@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -46,7 +47,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         {
             VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldProperty(
                 prop,
-                allAttributes.Where(each => each is not IPlayaAttribute).ToArray(),
+                allAttributes.Where(ListItemPropertyFilter).ToArray(),
                 ReflectUtils.GetElementType(FieldWithInfo.FieldInfo.FieldType),
                 $"Element {index}",
                 FieldWithInfo.FieldInfo,
@@ -59,6 +60,16 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 FieldWithInfo.Targets[0]
             );
             return resultField;
+        }
+
+        private static bool ListItemPropertyFilter(Attribute each)
+        {
+            if (each is IPlayaAttribute)
+            {
+                return each is PropertyAttribute;
+            }
+
+            return true;
         }
 
         public override void OnDestroyUIToolkit()

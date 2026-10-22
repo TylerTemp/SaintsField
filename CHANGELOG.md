@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.30.11 ##
+
+1.  Fix: auto getters like `GetByXPath` might returns the wrong target due to the downpour refactory since 5.30.10
+2.  Fix: compile error on Unity 6000.0~6000.2 [#448](https://github.com/TylerTemp/SaintsField/issues/448)
+
 ## 5.30.10 ##
 
 1.  Fix: inline buttons throw errors due to 5.30.7 refactory
