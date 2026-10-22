@@ -1,9 +1,11 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Linq;
+using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -19,13 +21,19 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         {
             SerializedProperty property = FieldWithInfo.SerializedProperty;
             Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
-            Attribute[] attributes = ReflectCache.GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo);
             ListDrawerSettingsAttribute settings = GetListDrawerSettingsAttribute();
             Func<(int min, int max)> configuredLimits = SerializedListUtils.CreateSizeLimits(
                 property, FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault(),
                 FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+
+            Attribute[] elementAttributes = ReflectCache
+                .GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo)
+                .Select(MapElementAttribute)
+                .Where(each => each != null)
+                .ToArray();
+
             _element = new SerializedListElement(property, elementType, property.displayName, settings,
-                (item, index) => CreateListItem(item, attributes, index),
+                (item, index) => CreateListItem(item, elementAttributes, index),
                 SerializedListUtils.CreateExtraSearch(property, elementType, FieldWithInfo.Targets[0], settings.ExtraSearch),
                 () => configuredLimits?.Invoke() ?? _sizeLimits);
 
@@ -40,6 +48,38 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             void Search(string text) => UIToolkitUtils.SetDisplayStyle(_element,
                 Util.UnityDefaultSimpleSearch(property.displayName, text) ? DisplayStyle.Flex : DisplayStyle.None);
+        }
+
+        private static Attribute MapElementAttribute(Attribute attr)
+        {
+            switch (attr)
+            {
+                case PropertyAttribute pa:
+                    return pa;
+                case InjectAttributeBase injectAttribute:
+                {
+                    if (injectAttribute.Depth == 1)
+                    {
+                        Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
+                        if (injectedAttribute is PropertyAttribute injectPa)
+                        {
+                            return injectPa;
+                        }
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning($"{injectAttribute} ignored from injection");
+#endif
+                    }
+                    else if (injectAttribute.Depth > 1)
+                    {
+                        return new ValueAttributeAttribute(injectAttribute.Depth - 1, injectAttribute.Decorator,
+                            injectAttribute.Parameters);
+                    }
+
+                    break;
+                }
+            }
+
+            return null;
         }
 
         private VisualElement CreateListItem(SerializedProperty prop, Attribute[] allAttributes, int index)
