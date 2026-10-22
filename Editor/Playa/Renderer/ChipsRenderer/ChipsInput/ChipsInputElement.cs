@@ -62,19 +62,9 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer.ChipsInput
             _actualInput.TextField.RegisterCallback<BlurEvent>(OnActualInputBlur);
 
             _actualInput.TextField.RegisterCallback<NavigationMoveEvent>(OnActualInputNavigate,
-#if UNITY_6000_0_OR_NEWER
-                CallbackOptions
-#else
-                TrickleDown
-#endif
-                    .TrickleDown);
+                TrickleDown.TrickleDown);
             _actualInput.TextField.RegisterCallback<KeyDownEvent>(OnActualInputKeyDown,
-#if UNITY_6000_0_OR_NEWER
-                CallbackOptions
-#else
-                TrickleDown
-#endif
-                    .TrickleDown);
+                TrickleDown.TrickleDown);
 
             _actualInput.TextField.RegisterValueChangedCallback(OnActualInputValueChanged);
 
