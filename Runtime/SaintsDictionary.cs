@@ -230,26 +230,48 @@ namespace SaintsField
         }
 
 #if UNITY_EDITOR
-        private List<SaintsWrap<TKey>> _editorWatchedKeys = new List<SaintsWrap<TKey>>();
-        private List<SaintsWrap<TValue>> _editorWatchedValues = new List<SaintsWrap<TValue>>();
+        // 这个会导致同一个 wrapper 被监听多次，因为序列化/反序列化后引用不一致
+        // 不过问题不大。多 callback 一下而已。
+        // 后续函数会真正识别其 value 的正确性。这个只是 Editor 用的。不漏才是关键
+        private sealed class WrapperReferenceComparer<T> : IEqualityComparer<SaintsWrap<T>>
+        {
+            public bool Equals(SaintsWrap<T> x, SaintsWrap<T> y)
+            {
+                return ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(SaintsWrap<T> obj)
+            {
+                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
+            }
+        }
+
+        private HashSet<SaintsWrap<TKey>> _editorWatchedKeys =
+            new HashSet<SaintsWrap<TKey>>(new WrapperReferenceComparer<TKey>());
+        private HashSet<SaintsWrap<TValue>> _editorWatchedValues =
+            new HashSet<SaintsWrap<TValue>>(new WrapperReferenceComparer<TValue>());
 #endif
         public void OnAfterDeserialize()
         {
 #if UNITY_EDITOR
-            IEnumerable<SaintsWrap<TKey>> extraKeys = _saintsKeys.Except(_editorWatchedKeys);
-            IEnumerable<SaintsWrap<TValue>> extraValues = _saintsValues.Except(_editorWatchedValues);
-            foreach (SaintsWrap<TKey> keyWrap in extraKeys)
+            foreach (SaintsWrap<TKey> keyWrap in _saintsKeys)
             {
+                if (!_editorWatchedKeys.Add(keyWrap))
+                {
+                    continue;
+                }
                 // Debug.Log($"add key listener");
                 keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
-                _editorWatchedKeys.Add(keyWrap);
             }
 
-            foreach (SaintsWrap<TValue> valueWrap in extraValues)
+            foreach (SaintsWrap<TValue> valueWrap in _saintsValues)
             {
+                if (!_editorWatchedValues.Add(valueWrap))
+                {
+                    continue;
+                }
                 // Debug.Log($"add value listener");
                 valueWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
-                _editorWatchedValues.Add(valueWrap);
             }
 #endif
 
