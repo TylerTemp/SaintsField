@@ -3,7 +3,9 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 {
-    [CreateAssetMenu(menuName = "SaintsField/Issues/Field displayName")]
+#if SAINTSFIELD_DEBUG
+    [CreateAssetMenu(menuName = "SaintsField Debug/Issues/Field displayName")]
+#endif
     public class IssueFieldDisplayNameConfig : SaintsScriptableObject
     {
         public string displayName;
