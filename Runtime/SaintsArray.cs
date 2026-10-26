@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -225,7 +225,8 @@ namespace SaintsField
         }
 
 #if UNITY_EDITOR
-        private List<SaintsWrap<T>> _editorWatchedKeys = new List<SaintsWrap<T>>();
+        private HashSet<SaintsWrap<T>> _editorWatchedKeys =
+            new HashSet<SaintsWrap<T>>(new SaintsWrap<T>.WrapperReferenceComparer());
 #endif
         public void OnAfterDeserialize()
         {
@@ -240,12 +241,14 @@ namespace SaintsField
 // #endif
 
 #if UNITY_EDITOR
-            IEnumerable<SaintsWrap<T>> extraKeys = _saintsList.Except(_editorWatchedKeys);
-            foreach (SaintsWrap<T> keyWrap in extraKeys)
+            foreach (SaintsWrap<T> keyWrap in _saintsList)
             {
+                if (!_editorWatchedKeys.Add(keyWrap))
+                {
+                    continue;
+                }
                 // Debug.Log($"add key listener");
                 keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
-                _editorWatchedKeys.Add(keyWrap);
             }
 #endif
             OnAfterDeserializeProcess();

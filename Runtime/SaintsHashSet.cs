@@ -93,17 +93,20 @@ namespace SaintsField
         }
 
 #if UNITY_EDITOR
-        private HashSet<SaintsWrap<T>> _editorWatchedKeys = new HashSet<SaintsWrap<T>>();
+        private HashSet<SaintsWrap<T>> _editorWatchedKeys =
+            new HashSet<SaintsWrap<T>>(new SaintsWrap<T>.WrapperReferenceComparer());
 #endif
         public void OnAfterDeserialize()
         {
 #if UNITY_EDITOR
-            IEnumerable<SaintsWrap<T>> extraKeys = _saintsList.Except(_editorWatchedKeys);
-            foreach (SaintsWrap<T> keyWrap in extraKeys)
+            foreach (SaintsWrap<T> keyWrap in _saintsList)
             {
+                if (!_editorWatchedKeys.Add(keyWrap))
+                {
+                    continue;
+                }
                 // Debug.Log($"add key listener");
                 keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
-                _editorWatchedKeys.Add(keyWrap);
             }
 #endif
 

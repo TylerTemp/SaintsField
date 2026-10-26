@@ -31,6 +31,23 @@ namespace SaintsField.Utils
         private T _runtimeResult;
 
 #if UNITY_EDITOR
+        // 之前会导致同一个 wrapper 被监听多次，因为序列化/反序列化后引用不一致
+        // 不过问题不大。多 callback 一下而已。
+        // 后续函数会真正识别其 value 的正确性。这个只是 Editor 用的。不漏才是关键
+        // 主要 Unity 序列化接口可能不在 main thread，很多对比用不了
+        public sealed class WrapperReferenceComparer : IEqualityComparer<SaintsWrap<T>>
+        {
+            public bool Equals(SaintsWrap<T> x, SaintsWrap<T> y)
+            {
+                return ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(SaintsWrap<T> obj)
+            {
+                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
+            }
+        }
+
         // ReSharper disable once StaticMemberInGenericType
         public static readonly string EditorPropertyName = nameof(value);
 #endif

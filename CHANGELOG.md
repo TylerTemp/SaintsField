@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: SaintsDictionary/SceneReference/SaintsList/SaintsArray might give an error when deserialize, especially when it's running on non-Unity-main-thread. This error only happens in Editor mode.
+
 ## 5.30.11 ##
 
 1.  Fix: auto getters like `GetByXPath` might returns the wrong target due to the downpour refactory since 5.30.10

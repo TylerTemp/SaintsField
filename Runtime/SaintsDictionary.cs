@@ -230,26 +230,10 @@ namespace SaintsField
         }
 
 #if UNITY_EDITOR
-        // 这个会导致同一个 wrapper 被监听多次，因为序列化/反序列化后引用不一致
-        // 不过问题不大。多 callback 一下而已。
-        // 后续函数会真正识别其 value 的正确性。这个只是 Editor 用的。不漏才是关键
-        private sealed class WrapperReferenceComparer<T> : IEqualityComparer<SaintsWrap<T>>
-        {
-            public bool Equals(SaintsWrap<T> x, SaintsWrap<T> y)
-            {
-                return ReferenceEquals(x, y);
-            }
-
-            public int GetHashCode(SaintsWrap<T> obj)
-            {
-                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
-            }
-        }
-
         private HashSet<SaintsWrap<TKey>> _editorWatchedKeys =
-            new HashSet<SaintsWrap<TKey>>(new WrapperReferenceComparer<TKey>());
+            new HashSet<SaintsWrap<TKey>>(new SaintsWrap<TKey>.WrapperReferenceComparer());
         private HashSet<SaintsWrap<TValue>> _editorWatchedValues =
-            new HashSet<SaintsWrap<TValue>>(new WrapperReferenceComparer<TValue>());
+            new HashSet<SaintsWrap<TValue>>(new SaintsWrap<TValue>.WrapperReferenceComparer());
 #endif
         public void OnAfterDeserialize()
         {

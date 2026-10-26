@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using SaintsField.Utils;
 using UnityEditor;
 #endif
@@ -23,67 +24,82 @@ namespace SaintsField
 
 #if UNITY_EDITOR
 
-        private bool _editorChecked;
+        private readonly struct EditorSceneCache
+        {
+            public readonly bool Enabled;
+            public readonly int Index;
+            public readonly string Path;
+
+            public EditorSceneCache(bool enabled, int index, string path)
+            {
+                Enabled = enabled;
+                Index = index;
+                Path = path;
+            }
+        }
+
+        private static readonly Dictionary<string, EditorSceneCache> EditorScenes = new Dictionary<string, EditorSceneCache>();
+
+        [InitializeOnLoadMethod]
+        private static void EditorInitialize()
+        {
+            EditorRefreshScenes();
+
+            EditorBuildSettings.sceneListChanged -= EditorRefreshScenes;
+            EditorBuildSettings.sceneListChanged += EditorRefreshScenes;
+        }
+
+        private static void EditorRefreshScenes()
+        {
+            int buildIndex = 0;
+
+            foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
+            {
+                EditorScenes[scene.guid.ToString()] = new EditorSceneCache(
+                    scene.enabled,
+                    buildIndex,
+                    RuntimeUtil.TrimScenePath(scene.path, true));
+
+                if(scene.enabled)
+                {
+                    buildIndex += 1;
+                }
+            }
+        }
+
+        // OnBeforeSerialize should not call anything requires Unity main thread
+        // thus we can only use callback + cache... the heck...
         public void OnBeforeSerialize()
         {
-            if (_editorChecked)
-            {
-                return;
-            }
-
             if (string.IsNullOrEmpty(guid))
             {
                 return;
             }
 
-
-            if (!GUID.TryParse(guid, out GUID resultGuid))
+            if (!GUID.TryParse(guid, out GUID _))
             {
-                Debug.LogWarning($"guid {guid} is not valid");
+                Debug.LogWarning($"scene guid {guid} is not valid");
                 return;
             }
 
-            SceneAsset sceneAsset;
-            try
-            {
-#if UNITY_6000_2_OR_NEWER
-                sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(resultGuid);
-#else
-                sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(resultGuid));
-#endif
-            }
-            catch (UnityException)
+            if (!EditorScenes.TryGetValue(guid, out EditorSceneCache cached))  // maybe just early data?
             {
                 return;
             }
 
-            if (sceneAsset == null)
+            if (!cached.Enabled)
             {
-                Debug.LogWarning($"guid {guid} asset is null for SceneReference");
+                Debug.LogWarning($"scene is not enabled: {cached.Path}");
+                // For debug reason, we dont clean the index & path data
                 return;
             }
 
-            _editorChecked = true;
-
-            int searchIndex = 0;
-            foreach (EditorBuildSettingsScene editorScene in EditorBuildSettings.scenes)
+            // ReSharper disable once InvertIf
+            if (index != cached.Index || path != cached.Path)
             {
-                if (!editorScene.enabled)
-                {
-                    continue;
-                }
-
-                if (editorScene.guid == resultGuid)
-                {
-                    index = searchIndex;
-                    path = RuntimeUtil.TrimScenePath(editorScene.path, true);
-                    return;
-                }
-
-                searchIndex += 1;
+                index = cached.Index;
+                path = cached.Path;
             }
-
-            Debug.LogWarning($"scene {AssetDatabase.GetAssetPath(sceneAsset)} not in build list or not enabled");
         }
 
         public void OnAfterDeserialize()
