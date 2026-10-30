@@ -22,19 +22,57 @@ namespace SaintsField.Editor.UIToolkitElements
             _parameterValues = new object[parameters.Length];
             foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
             {
+                // type to guard when user change code and recompile, but unity still remember the old saved value
+                string paramKey = $"{viewKey}[{parameterInfo.Name}:{TypeReference.GetTypeNameAndAssembly(parameterInfo.ParameterType)}]";
+
                 VisualElement paraContainer = new VisualElement();
 
                 hierarchy.Add(paraContainer);
 
                 Type paraType = parameterInfo.ParameterType;
-                object paraValue;
-                if(parameterInfo.HasDefaultValue)
+                object paraValue = null;
+
+                // try restore
+                bool preHasValue = false;
+#if SAINTSFIELD_NEWTONSOFT_JSON
+                string preSavedValue = SessionState.GetString(paramKey, "");
+                if (!string.IsNullOrEmpty(preSavedValue))
                 {
-                    paraValue = parameterInfo.DefaultValue;
+                    try
+                    {
+                        (bool ok, object result) = SerMostJsonUtil.FromTypedJson(paraType, preSavedValue);
+                        if (ok)
+                        {
+                            paraValue = result;
+                            preHasValue = true;
+                        }
+                    }
+#pragma warning disable CS0168 // Variable is declared but never used
+                    catch (Newtonsoft.Json.JsonException e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                    }
+
+                    if (!preHasValue)
+                    {
+                        SessionState.EraseString(paramKey);
+                    }
                 }
-                else
+#endif
+
+                if(!preHasValue)
                 {
-                    paraValue = paraType.IsValueType ? Activator.CreateInstance(paraType) : null;
+                    if (parameterInfo.HasDefaultValue)
+                    {
+                        paraValue = parameterInfo.DefaultValue;
+                    }
+                    else
+                    {
+                        paraValue = paraType.IsValueType ? Activator.CreateInstance(paraType) : null;
+                    }
                 }
                 _parameterValues[index] = paraValue;
 
@@ -58,14 +96,24 @@ namespace SaintsField.Editor.UIToolkitElements
                             _parameterValues[index] = newValue;
                             paraValueChanged = true;
                             value = _parameterValues.ToArray();
-                            // Debug.Log($"param {index} set to {newValue}");
+#if SAINTSFIELD_NEWTONSOFT_JSON
+                            string serJson = SerMostJsonUtil.ToTypedJson(paraType, newValue);
+                            if (string.IsNullOrEmpty(serJson))
+                            {
+                                SessionState.EraseString(paramKey);
+                            }
+                            else
+                            {
+                                SessionState.SetString(paramKey, serJson);
+                            }
+#endif
                         },
                         false,
                         inAnyHorizontalLayout,
                         attributes,
                         targets,
                         richTextTagProvider,
-                        $"{viewKey}[{parameterInfo.Name}]"
+                        paramKey
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)

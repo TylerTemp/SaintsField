@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 return new HelpBox(e.Message, HelpBoxMessageType.Error);
             }
 
-            FoldoutField foldout = new FoldoutField(property, GetPreferredLabel(property))
+            ReferenceFoldoutField referenceFoldout = new ReferenceFoldoutField(property, GetPreferredLabel(property))
             {
                 name = NameFoldoutField(property),
                 viewDataKey = property.propertyPath,
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             };
             if (!string.IsNullOrEmpty(property.tooltip))
             {
-                UIToolkitUtils.DropdownButtonField dropdownButton = foldout.DropdownButton;
+                UIToolkitUtils.DropdownButtonField dropdownButton = referenceFoldout.DropdownButton;
                 if (dropdownButton.labelElement != null)
                 {
                     dropdownButton.labelElement.tooltip = property.tooltip;
@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             object value = property.managedReferenceValue;
             if (value == null)
             {
-                foldout.Add(
+                referenceFoldout.Add(
                     SaintsRowAttributeDrawer.CreateElement(
                         property,
                         GetPreferredLabel(property),
@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                     )
                 );
 
-                return foldout;
+                return referenceFoldout;
             }
 
             Type valueType = value.GetType();
@@ -73,7 +73,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             // Debug.Log(drawer);
             if (drawerType == null)
             {
-                foldout.Add(
+                referenceFoldout.Add(
                     SaintsRowAttributeDrawer.CreateElement(
                         property,
                         GetPreferredLabel(property),
@@ -87,11 +87,11 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                     )
                 );
 
-                return foldout;
+                return referenceFoldout;
             }
 
             PropertyDrawer drawer = MakePropertyDrawer(drawerType, info, null, GetPreferredLabel(property));
-            if (drawer is SaintsField.Editor.Core.SaintsPropertyDrawer saintsDrawer)
+            if (drawer is Core.SaintsPropertyDrawer saintsDrawer)
             {
                 saintsDrawer.OverrideAttributes = allAttributes
                     .Where(each => each is not ISaintsAttribute)
@@ -106,11 +106,11 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 property,
                 info,
                 Array.Empty<SaintsPropertyInfo>(),
-                foldout.contentContainer
+                referenceFoldout.contentContainer
             );
-            foldout.Add(drawerResult);
+            referenceFoldout.Add(drawerResult);
 
-            return foldout;
+            return referenceFoldout;
             // foldout.Add(new InspectorElement(value));
 
         }
@@ -118,7 +118,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             int index, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UIToolkitUtils.AddContextualMenuManipulator(container.Q<FoldoutField>(name: NameFoldoutField(property)), property, () => {});
+            UIToolkitUtils.AddContextualMenuManipulator(container.Q<ReferenceFoldoutField>(name: NameFoldoutField(property)), property, () => {});
         }
     }
 }

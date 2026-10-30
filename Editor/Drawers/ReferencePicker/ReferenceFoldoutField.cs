@@ -9,11 +9,11 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Drawers.ReferencePicker
 {
 
-    public class FoldoutField: FoldoutPrefabOverrideElement
+    public class ReferenceFoldoutField: FoldoutPrefabOverrideElement
     {
         public readonly UIToolkitUtils.DropdownButtonField DropdownButton;
 
-        public FoldoutField(SerializedProperty property, string getPreferredLabel): base(property)
+        public ReferenceFoldoutField(SerializedProperty property, string getPreferredLabel): base(property)
         {
             Toggle toggle = this.Q<Toggle>();
             VisualElement checkMark = toggle.Q<VisualElement>("unity-checkmark");

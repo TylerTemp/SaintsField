@@ -679,23 +679,13 @@ namespace SaintsField.Utils
             throw new ArgumentException($"{content} is not a valid pixel length");
         }
 
-        public static bool IsSubFieldUnitySerializable(Type t)
+        public static bool IsUnityCoreSerializable(Type t)
         {
-            if (t == null)
-            {
-                return false;
-            }
-
             // Check this first for abstract MonoBehaviour/ScriptableObject types
             // UnityEngine.Object (MonoBehaviour, ScriptableObject, Texture, etc.) are serialized as references
             if (typeof(Object).IsAssignableFrom(t) || typeof(AnimationCurve).IsAssignableFrom(t) || typeof(Gradient).IsAssignableFrom(t) || typeof(RectOffset).IsAssignableFrom(t))
             {
                 return true;
-            }
-
-            if (t.IsAbstract || t.IsInterface)
-            {
-                return false;
             }
 
             // Unity built-in structs
@@ -727,6 +717,25 @@ namespace SaintsField.Utils
                 return true;
             }
 
+            return false;
+        }
+
+        public static bool IsSubFieldUnitySerializable(Type t)
+        {
+            if (t == null)
+            {
+                return false;
+            }
+
+            if (IsUnityCoreSerializable(t))
+            {
+                return true;
+            }
+
+            if (t.IsAbstract || t.IsInterface)
+            {
+                return false;
+            }
 
             if (t.IsArray)
             {

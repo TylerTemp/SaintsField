@@ -1,8 +1,9 @@
 # Changelog
 
-## WIP ##
+## 5.31.0 ##
 
-1.  Fix: SaintsDictionary/SceneReference/SaintsList/SaintsArray might give an error when deserialize, especially when it's running on non-Unity-main-thread. This error only happens in Editor mode.
+1.  Add: `Button`/`ShowInInspector`(on function) now save and restore the parameters within the Editor session 
+2.  Fix: SaintsDictionary/SceneReference/SaintsList/SaintsArray might give an error when deserialize, especially when it's running on non-Unity-main-thread. This error only happens in Editor mode.
 
 ## 5.30.11 ##
 
