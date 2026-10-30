@@ -163,12 +163,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355a8622f8ff101479f451f502627650, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myArr3: 000000000000000000000000i
+  myArr3: 000000000000000000000000
   nested:
-    nestedArr3: 000000000000000000000000i
+    nestedArr3: 000000000000000000000000
   nestedArr:
-  - nestedArr3: 000000000000000000000000i
-  - nestedArr3: 000000000000000000000000i
+  - nestedArr3: 000000000000000000000000
+  - nestedArr3: 000000000000000000000000
 --- !u!1 &2118183
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,7 +295,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3625243
 SpriteRenderer:
-  serializedVersion: 3
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -352,7 +352,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
-  m_BlendShapeWeights: []
 --- !u!1 &5531046
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,7 +507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbb25f5f98a9c7d4dad55c56b737de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue320ListWithDec
-  myLis: 0000000000000000i
+  myLis: 0000000000000000
 --- !u!1 &29535001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1569,12 +1568,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enumNormalPure: 10
   enumNormalFall: 3
-  enumNormalPures: 03000000i
-  enumNormalFalls: 06000000i
+  enumNormalPures: 03000000
+  enumNormalFalls: 06000000
   enumFlagsPure: 14
   enumFlagsDec: 7
-  enumFlagsPures: 07000000i
-  enumFlagsDecs: 0c000000i
+  enumFlagsPures: 07000000
+  enumFlagsDecs: 0c000000
 --- !u!1 &126873384
 GameObject:
   m_ObjectHideFlags: 0
@@ -2869,15 +2868,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1996fb424a713a4b9704f53c99ba0cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue447BuiltinDictFallbacki
-  dictA:
-  - key: 1
-    value: 
-  - key: 2
-    value: 
-  dictB: []
-  dictC: []
-  dictD: []
-  dictE: []
 --- !u!1 &282662862
 GameObject:
   m_ObjectHideFlags: 0
@@ -3396,30 +3386,6 @@ MonoBehaviour:
     <VRef>k__BackingField:
       rid: -2
     <IsVRef>k__BackingField: 0
-  saintsEvent:
-    _persistentCalls:
-    - callState: 2
-      methodName: 
-      isStatic: 0
-      target: {fileID: 0}
-      staticType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-      persistentArguments: []
-      returnType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-    - callState: 2
-      methodName: 
-      isStatic: 1
-      target: {fileID: 0}
-      staticType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-      persistentArguments: []
-      returnType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
   serializedActualDrawer:
     propertyType: 5
     longValue: 638000000000000000
@@ -3552,7 +3518,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1115909584}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField,
+          SaintsField.Samples
         m_MethodName: BindFromOtherTarget
         m_Mode: 0
         m_Arguments:
@@ -3746,8 +3713,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
-  m_MaxWidth: -1
-  m_MaxHeight: -1
 --- !u!114 &365508972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3991,7 +3956,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000u
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -4604,7 +4569,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 597080538}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider,
+          SaintsField.Samples
         m_MethodName: BindFromOtherTarget
         m_Mode: 0
         m_Arguments:
@@ -5415,7 +5381,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 597080538}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider,
+          SaintsField.Samples
         m_MethodName: SliderChangedVoid
         m_Mode: 1
         m_Arguments:
@@ -5427,7 +5394,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 597080538}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider,
+          SaintsField.Samples
         m_MethodName: SliderChangedFloat
         m_Mode: 0
         m_Arguments:
@@ -5439,7 +5407,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 597080538}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UISlider,
+          SaintsField.Samples
         m_MethodName: OtherMethodStr
         m_Mode: 5
         m_Arguments:
@@ -5608,7 +5577,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample, today.comes.saintsfield.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickVoid
         m_Mode: 1
         m_Arguments:
@@ -5620,7 +5590,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample, today.comes.saintsfield.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickInt
         m_Mode: 3
         m_Arguments:
@@ -5632,7 +5603,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample, today.comes.saintsfield.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickBool
         m_Mode: 6
         m_Arguments:
@@ -5644,7 +5616,8 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample, today.comes.saintsfield.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickFloat
         m_Mode: 4
         m_Arguments:
@@ -5656,7 +5629,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample, today.comes.saintsfield.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickComp
         m_Mode: 2
         m_Arguments:
@@ -6519,8 +6493,6 @@ MonoBehaviour:
       value: 0
     w:
       value: 0
-  _saintsEvent:
-    _persistentCalls: []
   references:
     version: 2
     RefIds:
@@ -6575,7 +6547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d2e9b4690587054aa5baa09843c542e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ListLabelContext
-  arrInts: 00000000i
+  arrInts: 00000000
   arrIntsLabel: 
 --- !u!1 &729092933
 GameObject:
@@ -7545,7 +7517,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2060639193}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown,
+          SaintsField.Samples
         m_MethodName: BindFromOtherTarget
         m_Mode: 0
         m_Arguments:
@@ -8635,7 +8608,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &930217590
 SpriteRenderer:
-  serializedVersion: 3
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -8692,7 +8665,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
-  m_BlendShapeWeights: []
 --- !u!114 &930217591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9143,8 +9115,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
-  m_MaxWidth: -1
-  m_MaxHeight: -1
 --- !u!114 &960018719
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9388,7 +9358,7 @@ GameObject:
   m_IsActive: 1
 --- !u!212 &975163647
 SpriteRenderer:
-  serializedVersion: 3
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -9445,7 +9415,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
-  m_BlendShapeWeights: []
 --- !u!4 &975163648
 Transform:
   m_ObjectHideFlags: 0
@@ -9522,7 +9491,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1056404281}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
         m_MethodName: OnChildInt
         m_Mode: 3
         m_Arguments:
@@ -9583,7 +9553,8 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 995615333}
-          m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue323, today.comes.saintsfield.Samples
+          m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue323,
+            today.comes.saintsfield.Samples
           m_MethodName: CancelInvoke
           m_Mode: 1
           m_Arguments:
@@ -10086,7 +10057,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1056404281}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
         m_MethodName: OnInt1
         m_Mode: 3
         m_Arguments:
@@ -10098,7 +10070,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1056404281}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
         m_MethodName: OnInt2
         m_Mode: 0
         m_Arguments:
@@ -10113,7 +10086,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1056404281}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
         m_MethodName: OnInt1
         m_Mode: 0
         m_Arguments:
@@ -10449,7 +10423,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1073980064}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.Testing.OnEventBindWalk.OnEventBindWalkMain, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.Testing.OnEventBindWalk.OnEventBindWalkMain,
+          SaintsField.Samples
         m_MethodName: OnLocalize
         m_Mode: 1
         m_Arguments:
@@ -10785,7 +10760,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1115909584}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField,
+          SaintsField.Samples
         m_MethodName: InputFieldEndEdit
         m_Mode: 1
         m_Arguments:
@@ -10803,7 +10779,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1115909584}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField,
+          SaintsField.Samples
         m_MethodName: OtherMethodStr
         m_Mode: 5
         m_Arguments:
@@ -10827,7 +10804,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1115909584}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField,
+          SaintsField.Samples
         m_MethodName: OtherMethodStr
         m_Mode: 5
         m_Arguments:
@@ -10839,7 +10817,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1115909584}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIInputField,
+          SaintsField.Samples
         m_MethodName: OnInputFieldChanged
         m_Mode: 0
         m_Arguments:
@@ -11647,6 +11626,7 @@ Transform:
   - {fileID: 700001002}
   - {fileID: 541229742}
   - {fileID: 2100000002}
+  - {fileID: 2138883810}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -16221,7 +16201,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1708315049
 SpriteRenderer:
-  serializedVersion: 3
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -16278,7 +16258,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
-  m_BlendShapeWeights: []
 --- !u!1 &1714574560
 GameObject:
   m_ObjectHideFlags: 0
@@ -16323,13 +16302,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c11f7c088aedb6a448630c7d4f0d72e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ListDrawRefactory
-  plainArray: 0a000000140000001e00000028000000320000003c000000i
+  plainArray: 0a000000140000001e00000028000000320000003c000000
   plainList:
   - alpha
   - beta
   - gamma
   emptyArray: 
-  rangedArray: 020000000500000008000000i
+  rangedArray: 020000000500000008000000
   objectReferences:
   - {fileID: 1714574560}
   pagedEntries:
@@ -16353,15 +16332,15 @@ MonoBehaviour:
     number: 50
     tags:
     - last-row
-  limitedFallback: 0b00000016000000i
-  limitedExplicit: 0b00000016000000i
+  limitedFallback: 0b00000016000000
+  limitedExplicit: 0b00000016000000
   fixedEmpty: 
   referenceItems:
   - rid: 8619786675366920939
   - rid: 8619786675366920940
   arrayCells:
     _saintsList:
-    - value: 6500000066000000i
+    - value: 6500000066000000
       valueField:
         propertyType: 0
         longValue: 0
@@ -16375,7 +16354,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: c9000000ca000000i
+    - value: c9000000ca000000
       valueField:
         propertyType: 0
         longValue: 0
@@ -16393,7 +16372,7 @@ MonoBehaviour:
     _wrapType: 4
   listCells:
     _saintsList:
-    - value: 2d0100002e010000i
+    - value: 2d0100002e010000
       valueField:
         propertyType: 0
         longValue: 0
@@ -16407,7 +16386,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 9101000092010000i
+    - value: 9101000092010000
       valueField:
         propertyType: 0
         longValue: 0
@@ -16455,7 +16434,7 @@ MonoBehaviour:
       wrapType: 4
     _wrapTypeKey: 4
     _saintsValues:
-    - value: f5010000f6010000i
+    - value: f5010000f6010000
       valueField:
         propertyType: 0
         longValue: 0
@@ -16469,7 +16448,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 590200005a020000i
+    - value: 590200005a020000
       valueField:
         propertyType: 0
         longValue: 0
@@ -16489,7 +16468,7 @@ MonoBehaviour:
   gridCells:
     _saintsList:
     - _saintsList:
-      - value: bd020000be020000i
+      - value: bd020000be020000
         valueField:
           propertyType: 0
           longValue: 0
@@ -16503,7 +16482,7 @@ MonoBehaviour:
         valueArray: []
         valueList: []
         wrapType: 4
-      - value: 2103000022030000i
+      - value: 2103000022030000
         valueField:
           propertyType: 0
           longValue: 0
@@ -16571,7 +16550,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1736933214
 SpriteRenderer:
-  serializedVersion: 3
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -16628,7 +16607,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
-  m_BlendShapeWeights: []
 --- !u!1 &1740190702
 GameObject:
   m_ObjectHideFlags: 0
@@ -16862,9 +16840,9 @@ MonoBehaviour:
     - 
     - 
   nests: []
-  atLeastOne: 00000000i
-  oneToThree: 00000000i
-  oneToThreeWithSettings: 000000000000000000000000i
+  atLeastOne: 00000000
+  oneToThree: 00000000
+  oneToThreeWithSettings: 000000000000000000000000
 --- !u!1 &1779100555
 GameObject:
   m_ObjectHideFlags: 0
@@ -18067,7 +18045,6 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -18791,7 +18768,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2060639193}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown,
+          SaintsField.Samples
         m_MethodName: DropdownChangedVoid
         m_Mode: 1
         m_Arguments:
@@ -18803,7 +18781,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2060639193}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown,
+          SaintsField.Samples
         m_MethodName: DropdownChangedInt
         m_Mode: 0
         m_Arguments:
@@ -18815,7 +18794,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2060639193}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIDropdown,
+          SaintsField.Samples
         m_MethodName: OtherMethodStr
         m_Mode: 5
         m_Arguments:
@@ -19048,7 +19028,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2075574776}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle,
+          SaintsField.Samples
         m_MethodName: ToggleChangedVoid
         m_Mode: 1
         m_Arguments:
@@ -19060,7 +19041,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2075574776}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle,
+          SaintsField.Samples
         m_MethodName: ToggleChangedBool
         m_Mode: 0
         m_Arguments:
@@ -19072,7 +19054,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2075574776}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle,
+          SaintsField.Samples
         m_MethodName: OtherMethodStr
         m_Mode: 5
         m_Arguments:
@@ -19249,7 +19232,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000u
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -19561,7 +19544,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2075574776}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle, SaintsField.Samples
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.UIEvents.UIToggle,
+          SaintsField.Samples
         m_MethodName: BindFromOtherTarget
         m_Mode: 0
         m_Arguments:
@@ -19573,6 +19557,50 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   m_IsOn: 1
+--- !u!1 &2138883809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2138883810}
+  - component: {fileID: 2138883811}
+  m_Layer: 0
+  m_Name: ButtonSer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2138883810
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138883809}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2138883811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138883809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5346b42c4eae79c428545b58f8197411, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.ButtonSer
 --- !u!1 &2142474026
 GameObject:
   m_ObjectHideFlags: 0
