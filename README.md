@@ -111,10 +111,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.30.11**
+**5.31.0**
 
-1.  Fix: auto getters like `GetByXPath` might returns the wrong target due to the downpour refactory since 5.30.10
-2.  Fix: compile error on Unity 6000.0~6000.2 [#448](https://github.com/TylerTemp/SaintsField/issues/448)
+1.  Add: `Button`/`ShowInInspector`(on function) now save and restore the parameters within the Editor session 
+2.  Fix: SaintsDictionary/SceneReference/SaintsList/SaintsArray might give an error when deserialize, especially when it's running on non-Unity-main-thread. This error only happens in Editor mode.
 
 ## Usage ##
 
