@@ -3261,9 +3261,6 @@ MonoBehaviour:
   enumToggleButtonsFlags: 0
   navMeshArea: 0
   navMeshAreaMask: 0
-  addressableAddress: 
-  addressableLabel: 
-  addressableScene: 
   animatorParam: 
   animatorState: 
   inputAxis: 
@@ -3277,14 +3274,6 @@ MonoBehaviour:
     path: 
   shaderKeyword: 
   shaderParam: 
-  spineAttachment: 
-  spineSkin: 
-  spineSlot: 
-  spineBone: 
-  spineEvent: 
-  spinePathConstraint: 
-  spineIkConstraint: 
-  spineTransformConstraint: 
   typeReference:
     _typeNameAndAssembly: 
     _monoScriptGuid: 
@@ -3386,6 +3375,8 @@ MonoBehaviour:
     <VRef>k__BackingField:
       rid: -2
     <IsVRef>k__BackingField: 0
+  saintsEvent:
+    _persistentCalls: []
   serializedActualDrawer:
     propertyType: 5
     longValue: 638000000000000000
@@ -6255,9 +6246,6 @@ MonoBehaviour:
   _enumToggleButtonsFlags: 0
   _navMeshArea: 0
   _navMeshAreaMask: 0
-  _addressableAddress: 
-  _addressableLabel: 
-  _addressableScene: 
   _animatorParam: 
   _animatorState: 
   _inputAxis: 
@@ -6279,14 +6267,6 @@ MonoBehaviour:
   _shaderKeyword: 
   _shaderParamString: 
   _shaderParamInt: 0
-  _spineAttachment: 
-  _spineSkin: 
-  _spineSlot: 
-  _spineBone: 
-  _spineEvent: 
-  _spinePathConstraint: 
-  _spineIkConstraint: 
-  _spineTransformConstraint: 
   _typeReference:
     _typeNameAndAssembly: 
     _monoScriptGuid: 
@@ -6493,6 +6473,8 @@ MonoBehaviour:
       value: 0
     w:
       value: 0
+  _saintsEvent:
+    _persistentCalls: []
   references:
     version: 2
     RefIds:
@@ -7124,6 +7106,7 @@ Transform:
   - {fileID: 1141566744}
   - {fileID: 280422372}
   - {fileID: 1207224930}
+  - {fileID: 1486825275}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &786619284
@@ -14026,6 +14009,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Faller
   upDecStr: 
+--- !u!1 &1486825274
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1486825275}
+  - component: {fileID: 1486825276}
+  m_Layer: 0
+  m_Name: Issue448ShowInInspectorReset
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1486825275
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486825274}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 785898368}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1486825276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486825274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a280a8cf259440b4bb25dbbeef11b650, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestDefaultList
+  tests:
+  - num1: 0
 --- !u!1 &1500193155
 GameObject:
   m_ObjectHideFlags: 0

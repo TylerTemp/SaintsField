@@ -15,10 +15,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             Debug.Log($"Btn Enum: {flag}, Value: {flag}({Convert.ToString((byte)flag, 2)})");
         }
 
+#if SAINTSFIELD_DEBUG
         private void OnValidate()
         {
             Debug.Log($"OnValidate Enum: {flag}, Value: {flag}({Convert.ToString((byte)flag, 2)})");
         }
+#endif
 
         private void Awake()
         {

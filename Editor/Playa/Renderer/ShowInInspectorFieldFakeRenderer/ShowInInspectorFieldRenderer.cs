@@ -35,7 +35,19 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             if (fieldWithInfo.FieldInfo != null)
             {
                 // Debug.Log($"getting {fieldWithInfo.FieldInfo.Name}");
-                return ("", fieldWithInfo.FieldInfo.GetValue(useTarget));
+                object fieldValue;
+                try
+                {
+                    fieldValue = fieldWithInfo.FieldInfo.GetValue(useTarget);
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
+                    return (e.Message, null);
+                }
+                return ("", fieldValue);
             }
 
             if (fieldWithInfo.PropertyInfo.CanRead)
