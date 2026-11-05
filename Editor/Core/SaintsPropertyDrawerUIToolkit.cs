@@ -1497,7 +1497,7 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"container={container}/parent={container.parent}");
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, allAttributes, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
+            container.schedule.Execute(() => OnUpdateUiToolKitInternal(property, allAttributes, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
         }
 
         private static StyleSheet GetNoDecoratorUss()

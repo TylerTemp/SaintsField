@@ -14,13 +14,12 @@ namespace SaintsField.Editor.UIToolkitElements
 {
     public class SerializedListElement : VisualElement
     {
-        public SerializedProperty Property { get; }
+        private readonly SerializedProperty _property;
         public CollectionFoldout Foldout { get; }
-        public ListView ListView { get; }
-        public ListViewFooterButtonsElement FooterButtons { get; }
+        private ListViewFooterButtonsElement FooterButtons { get; }
         private readonly Func<(int min, int max)> _getSizeLimits;
-        private ListView _listView;
-        private Action _refresh;
+        private readonly ListView _listView;
+        private readonly Action _refresh;
 
         public SerializedListElement(SerializedProperty property, Type elementType, string label,
             ListDrawerSettingsAttribute listDrawerSettingsAttribute,
@@ -28,8 +27,8 @@ namespace SaintsField.Editor.UIToolkitElements
             Func<int, IReadOnlyList<ListSearchToken>, bool> customSearch = null,
             Func<(int min, int max)> getSizeLimits = null)
         {
-            Property = property.Copy();
-            property = Property;
+            _property = property.Copy();
+            property = _property;
             _getSizeLimits = getSizeLimits;
             style.flexGrow = 1;
             AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
@@ -124,10 +123,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 CurPageIndex = 0,
             };
 
-            VisualElement MakeItem()
-            {
-                return new VisualElement();
-            }
+
 
             void BindItem(VisualElement element, int index)
             {
@@ -151,46 +147,48 @@ namespace SaintsField.Editor.UIToolkitElements
                 VisualElement resultField = createCell(prop, propIndex);
                 UIToolkitUtils.Unbind(element);
                 element.Clear();
-                if(resultField != null)
+                if (resultField == null)
                 {
-                    element.Add(resultField);
-                    resultField.AddManipulator(new ContextualMenuManipulator(evt =>
-                    {
-                        evt.menu.AppendAction("Copy Element Property Path",
-                            _ => EditorGUIUtility.systemCopyBuffer = prop.propertyPath);
-
-                        if (ClipboardHelper.CanCopySerializedProperty(prop.propertyType))
-                        {
-                            evt.menu.AppendAction("Copy Element", _ => ClipboardHelper.DoCopySerializedProperty(prop));
-                        }
-
-                        (bool hasReflectionPaste, bool hasValuePaste) =
-                            ClipboardHelper.CanPasteSerializedProperty(prop.propertyType);
-
-                        if (hasReflectionPaste)
-                        {
-                            evt.menu.AppendAction("Paste Element", _ =>
-                            {
-                                ClipboardHelper.DoPasteSerializedProperty(prop);
-                                property.serializedObject.ApplyModifiedProperties();
-                            }, hasValuePaste ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-                        }
-
-                        evt.menu.AppendAction("Delete Element", _ =>
-                        {
-                            if (CanRemove())
-                            {
-                                DeleteElement(propIndex);
-                            }
-                            property.serializedObject.ApplyModifiedProperties();
-                        });
-                    }));
+                    return;
                 }
+
+                element.Add(resultField);
+                resultField.AddManipulator(new ContextualMenuManipulator(evt =>
+                {
+                    evt.menu.AppendAction("Copy Element Property Path",
+                        _ => EditorGUIUtility.systemCopyBuffer = prop.propertyPath);
+
+                    if (ClipboardHelper.CanCopySerializedProperty(prop.propertyType))
+                    {
+                        evt.menu.AppendAction("Copy Element", _ => ClipboardHelper.DoCopySerializedProperty(prop));
+                    }
+
+                    (bool hasReflectionPaste, bool hasValuePaste) =
+                        ClipboardHelper.CanPasteSerializedProperty(prop.propertyType);
+
+                    if (hasReflectionPaste)
+                    {
+                        evt.menu.AppendAction("Paste Element", _ =>
+                        {
+                            ClipboardHelper.DoPasteSerializedProperty(prop);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }, hasValuePaste ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
+                    }
+
+                    evt.menu.AppendAction("Delete Element", _ =>
+                    {
+                        if (CanRemove())
+                        {
+                            DeleteElement(propIndex);
+                        }
+                        property.serializedObject.ApplyModifiedProperties();
+                    });
+                }));
             }
 
             _listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
             {
-                makeItem = MakeItem,
+                makeItem = MakeEmptyVisualElement,
                 unbindItem = (element, _) =>
                 {
                     UIToolkitUtils.Unbind(element);
@@ -213,7 +211,6 @@ namespace SaintsField.Editor.UIToolkitElements
                 viewDataKey = property.propertyPath,
             };
             _listView.selectedIndicesChanged += _ => ClearNestedSelectionAndFocusOutsideSelection(_listView);
-            ListView = _listView;
 
             UIToolkitUtils.AddContextualMenuManipulator(root, property, () => {});
             Toggle toggle = root.Q<Toggle>();
@@ -841,46 +838,69 @@ namespace SaintsField.Editor.UIToolkitElements
             Refresh(label);
         }
 
+        private static VisualElement MakeEmptyVisualElement() => new VisualElement();
+
         public bool Matches(SerializedProperty property)
         {
-            return SerializedUtils.IsOk(Property) && Property.serializedObject == property.serializedObject &&
-                   Property.propertyPath == property.propertyPath;
+            return SerializedUtils.IsOk(_property) && _property.serializedObject == property.serializedObject &&
+                   _property.propertyPath == property.propertyPath;
         }
 
         public void Refresh(string label)
         {
-            if (!SerializedUtils.IsOk(Property))
+            if (!SerializedUtils.IsOk(_property))
             {
                 return;
             }
-            Foldout.Q<Foldout>().text = string.IsNullOrEmpty(label) ? Property.displayName : label;
-            Foldout.SetValueWithoutNotify(Property.isExpanded);
+            Foldout.Q<Foldout>().text = string.IsNullOrEmpty(label) ? _property.displayName : label;
+            Foldout.SetValueWithoutNotify(_property.isExpanded);
             _refresh?.Invoke();
         }
 
         public void UpdateSizeLimits()
         {
-            if (FooterButtons != null && SerializedUtils.IsOk(Property))
+            if (!SerializedUtils.IsOk(_property))
             {
-                FooterButtons.AddButton.SetEnabled(CanAdd());
-                FooterButtons.RemoveButton.SetEnabled(CanRemove());
+                return;
+            }
+
+            if (FooterButtons == null && Foldout == null)
+            {
+                return;
+            }
+
+            bool canAdd = CanAdd();
+            bool canRemove = CanRemove();
+            if (FooterButtons != null)
+            {
+                FooterButtons.AddButton.SetEnabled(canAdd);
+                FooterButtons.RemoveButton.SetEnabled(canRemove);
+            }
+
+            if(Foldout != null)
+            {
+                bool shouldEnable = canAdd && canRemove;
+                if(Foldout.ArraySizeField.enabledSelf != shouldEnable)
+                {
+                    Foldout?.ArraySizeField.SetEnabled(shouldEnable);
+                }
             }
         }
 
         private (int min, int max) GetSizeLimits() => _getSizeLimits?.Invoke() ?? (-1, -1);
-        private bool CanAdd() => GetSizeLimits().max < 0 || Property.arraySize < GetSizeLimits().max;
-        private bool CanRemove() => Property.arraySize > Mathf.Max(0, GetSizeLimits().min);
+        private bool CanAdd() => GetSizeLimits().max < 0 || _property.arraySize < GetSizeLimits().max;
+        private bool CanRemove() => _property.arraySize > Mathf.Max(0, GetSizeLimits().min);
 
         private void Resize(int newSize)
         {
-            int oldSize = Property.arraySize;
-            Property.arraySize = newSize;
-            Property.serializedObject.ApplyModifiedProperties();
+            int oldSize = _property.arraySize;
+            _property.arraySize = newSize;
+            _property.serializedObject.ApplyModifiedProperties();
             if (newSize > oldSize)
             {
                 for (int index = oldSize; index < newSize; index++)
                 {
-                    UIToolkitUtils.UnlinkAddedArrayElementManagedReferences(Property, index, new HashSet<int> { index });
+                    UIToolkitUtils.UnlinkAddedArrayElementManagedReferences(_property, index, new HashSet<int> { index });
                 }
             }
             UpdateSizeLimits();
@@ -888,17 +908,17 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private void DeleteElement(int index)
         {
-            int oldSize = Property.arraySize;
-            Property.DeleteArrayElementAtIndex(index);
-            if (Property.arraySize == oldSize)
+            int oldSize = _property.arraySize;
+            _property.DeleteArrayElementAtIndex(index);
+            if (_property.arraySize == oldSize)
             {
-                Property.DeleteArrayElementAtIndex(index);
+                _property.DeleteArrayElementAtIndex(index);
             }
         }
 
         private void NotifyChanged()
         {
-            using (SerializedPropertyChangeEvent evt = SerializedPropertyChangeEvent.GetPooled(Property))
+            using (SerializedPropertyChangeEvent evt = SerializedPropertyChangeEvent.GetPooled(_property))
             {
                 evt.target = this;
                 SendEvent(evt);
@@ -920,18 +940,18 @@ namespace SaintsField.Editor.UIToolkitElements
         private bool Drop(Type elementType)
         {
             int max = GetSizeLimits().max;
-            int available = max < 0 ? int.MaxValue : Mathf.Max(0, max - Property.arraySize);
+            int available = max < 0 ? int.MaxValue : Mathf.Max(0, max - _property.arraySize);
             UnityEngine.Object[] objects = CanDrop(DragAndDrop.objectReferences, elementType).Take(available).ToArray();
             if (objects.Length == 0)
             {
                 return false;
             }
             DragAndDrop.AcceptDrag();
-            int start = Property.arraySize;
-            Property.arraySize += objects.Length;
+            int start = _property.arraySize;
+            _property.arraySize += objects.Length;
             for (int index = 0; index < objects.Length; index++)
             {
-                Property.GetArrayElementAtIndex(start + index).objectReferenceValue = objects[index];
+                _property.GetArrayElementAtIndex(start + index).objectReferenceValue = objects[index];
             }
             return true;
         }
@@ -950,11 +970,10 @@ namespace SaintsField.Editor.UIToolkitElements
             public int CurPageIndex;
         }
 
-        private AsyncSearchItems _asyncSearchItems;
+        private readonly AsyncSearchItems _asyncSearchItems;
 
         private struct PagingInfo
         {
-            public IReadOnlyList<int> IndexesAfterSearch;
             public List<int> IndexesCurPage;
             public int CurPageIndex;
             public int PageCount;
@@ -991,7 +1010,6 @@ namespace SaintsField.Editor.UIToolkitElements
 
             return new PagingInfo
             {
-                IndexesAfterSearch = fullIndexResults,
                 IndexesCurPage = curPageItemIndexes,
                 CurPageIndex = curPageIndex,
                 PageCount = pageCount,
