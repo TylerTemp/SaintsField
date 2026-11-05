@@ -20,6 +20,7 @@ namespace SaintsField.Editor.UIToolkitElements
         private readonly Func<(int min, int max)> _getSizeLimits;
         private readonly ListView _listView;
         private readonly Action _refresh;
+        private readonly IntegerField _numberOfItemsTotalField;
 
         public SerializedListElement(SerializedProperty property, Type elementType, string label,
             ListDrawerSettingsAttribute listDrawerSettingsAttribute,
@@ -288,6 +289,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
             IntegerField numberOfItemsPerPageField = pager.NumberOfItemsPerPageField;
             IntegerField numberOfItemsTotalField = pager.NumberOfItemsTotalField;
+            _numberOfItemsTotalField = numberOfItemsTotalField;
             numberOfItemsPerPageField.SetValueWithoutNotify(Mathf.Max(0, listDrawerSettingsAttribute.NumberOfItemsPerPage));
             numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
             IntegerField numberOfItemsTopRightField = root.ArraySizeField;
@@ -864,13 +866,20 @@ namespace SaintsField.Editor.UIToolkitElements
                 return;
             }
 
-            if (FooterButtons == null && Foldout == null)
+            if (FooterButtons == null
+                && Foldout == null
+                && _numberOfItemsTotalField == null)  // early return to reduce calculation
             {
                 return;
             }
 
             bool canAdd = CanAdd();
             bool canRemove = CanRemove();
+            bool shouldEnable = canAdd || canRemove;
+            if (_numberOfItemsTotalField != null && _numberOfItemsTotalField.enabledSelf != shouldEnable)
+            {
+                _numberOfItemsTotalField.SetEnabled(shouldEnable);
+            }
             if (FooterButtons != null)
             {
                 FooterButtons.AddButton.SetEnabled(canAdd);
@@ -879,7 +888,6 @@ namespace SaintsField.Editor.UIToolkitElements
 
             if(Foldout != null)
             {
-                bool shouldEnable = canAdd && canRemove;
                 if(Foldout.ArraySizeField.enabledSelf != shouldEnable)
                 {
                     Foldout?.ArraySizeField.SetEnabled(shouldEnable);

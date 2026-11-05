@@ -24,6 +24,16 @@
     border-bottom-left-radius: 0;
 }
 
+.left-number-input > IntegerInput {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.right-number-input > IntegerInput {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
 .vertical-center-text {
     align-self: center;
 }
@@ -36,6 +46,8 @@
 
 .input-field {
     min-width: 30px;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 #numberOfItemsPerPageField TextElement {

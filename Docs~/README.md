@@ -4762,17 +4762,13 @@ public class MyInter2: MonoBehaviour, IMyInterface {}
 
 A decorator that limit the size of the array or list.
 
-Note: Because of the limitation of `PropertyDrawer`:
-
-1.  Delete an element will first be deleted, then the array will duplicate the last element.
-2.  UI Toolkit: you might see the UI flicked when you remove an element.
-
 Enable `SaintsEditor` if possible, otherwise:
 
 1.  When the field is 0 length, it'll not be filled to target size.
 2.  You can always change it to 0 size.
+3.  Delete an element will first be deleted, then the array will duplicate the last element
 
-If you have `SaintsEditor` enabled, recommend to use it together with `ListDrawerSettings`, the `+` & `-` will be enabled/disabled accordingly.
+If SaintsEditor is enabled, the add/remove button and size input will be disabled accordingly, thus avoid these issues.
 
 Parameters:
 
