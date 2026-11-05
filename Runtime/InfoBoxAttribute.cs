@@ -9,7 +9,8 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class InfoBoxAttribute: Attribute, IPlayaClassAttribute, IPlayaIMGUIGroupBy
+    // ReSharper disable once RedundantExtendsListEntry
+    public class InfoBoxAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaClassAttribute, IPlayaIMGUIGroupBy
     {
         // public readonly string GroupBy;
         public string GroupBy { get; }

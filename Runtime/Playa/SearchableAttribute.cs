@@ -5,7 +5,9 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct)]
-    public class SearchableAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute
+    [Obsolete("Use SaintsField config to toggle this")]
+    // ReSharper disable once RedundantExtendsListEntry
+    public class SearchableAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaClassAttribute
     {
         public bool EndDecorator => false;
     }

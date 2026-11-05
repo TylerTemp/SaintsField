@@ -7,7 +7,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class CompTextAttribute: Attribute, IPlayaAttribute
+    public class CompTextAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         public readonly string Content;
         public readonly bool IsCallback;

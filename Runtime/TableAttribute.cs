@@ -9,7 +9,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Parameter)]
-    public class TableAttribute: Attribute, IPlayaAttribute
+    public class TableAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public bool HideAddButton;

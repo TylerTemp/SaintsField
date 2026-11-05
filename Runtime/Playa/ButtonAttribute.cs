@@ -12,7 +12,7 @@ namespace SaintsField.Playa
 #endif
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method)]
-    public class ButtonAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute
+    public class ButtonAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaMethodAttribute
     {
         public readonly string Label;
         public readonly bool IsCallback;

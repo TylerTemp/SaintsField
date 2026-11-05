@@ -8,7 +8,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class ChipsAttribute: Attribute, IPlayaAttribute, IPathedDropdownAttribute
+    public class ChipsAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPathedDropdownAttribute
     {
         public string FuncName { get; }
         public EUnique EUnique { get; }

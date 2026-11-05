@@ -8,7 +8,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class LayoutShowIfAttribute: Attribute, IPlayaAttribute, ISaintsLayoutToggle
+    public class LayoutShowIfAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, ISaintsLayoutToggle
     {
         public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
         public EMode EditorMode { get; }

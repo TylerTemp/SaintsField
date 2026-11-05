@@ -54,16 +54,16 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         {
             switch (attr)
             {
-                case PropertyAttribute pa:
-                    return pa;
+                case IPlayaSaintsEditorOnlyAttribute:
+                    return null;
                 case InjectAttributeBase injectAttribute:
                 {
                     if (injectAttribute.Depth == 1)
                     {
                         Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
-                        if (injectedAttribute is PropertyAttribute injectPa)
+                        if (injectedAttribute != null)
                         {
-                            return injectPa;
+                            return injectedAttribute;
                         }
 #if SAINTSFIELD_DEBUG
                         Debug.LogWarning($"{injectAttribute} ignored from injection");
@@ -77,6 +77,9 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
                     break;
                 }
+                case IPlayaDownpourAttribute:
+                case PropertyAttribute:
+                    return attr;
             }
 
             return null;
@@ -103,12 +106,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         private static bool ListItemPropertyFilter(Attribute each)
         {
-            if (each is IPlayaAttribute)
-            {
-                return each is PropertyAttribute;
-            }
-
-            return true;
+            return each is not IPlayaSaintsEditorOnlyAttribute &&
+                   (each is IPlayaDownpourAttribute || each is PropertyAttribute);
         }
 
         public override void OnDestroyUIToolkit()

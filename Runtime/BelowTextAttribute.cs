@@ -8,7 +8,8 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class BelowTextAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute
+    // ReSharper disable once RedundantExtendsListEntry
+    public class BelowTextAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaClassAttribute
     {
         public readonly string Content;
         public readonly bool IsCallback;

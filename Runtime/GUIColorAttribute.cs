@@ -9,7 +9,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
-    public class GUIColorAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
+    public class GUIColorAttribute: PropertyAttribute, ISaintsAttribute, IPlayaDownpourAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";

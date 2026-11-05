@@ -6,7 +6,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Event, AllowMultiple = true)]
-    public class LayoutEndAttribute: Attribute, IPlayaAttribute, ISaintsLayout
+    public class LayoutEndAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, ISaintsLayout
     {
         public string LayoutBy { get; }
         public ELayout Layout => 0;

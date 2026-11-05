@@ -297,10 +297,11 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             Debug.Log($"CreateCellElement {serializedProperty.propertyPath} info={info.Name} allCustomAttributes={string.Join<Attribute>(", ", allCustomAttributes)}/injectedAttributes={string.Join(", ", injectedAttributes)}");
 #endif
             Attribute[] wrapperAttributes = allCustomAttributes
-                .Where(each => each is not PropertyAttribute && each is not InjectAttributeBase)
+                .Where(each => each is IPlayaSaintsEditorOnlyAttribute or IPlayaDownpourAttribute or not PropertyAttribute)
                 .ToArray();
             List<Attribute> allAttributes = allCustomAttributes
-                .Where(each => each is PropertyAttribute || each is InjectAttributeBase)
+                .Where(each => each is not IPlayaSaintsEditorOnlyAttribute &&
+                               each is IPlayaDownpourAttribute or PropertyAttribute)
                 .Concat(injectedAttributes).ToList();
             // List<Attribute> allAttributes = new List<Attribute>(allCustomAttributes);
             // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();

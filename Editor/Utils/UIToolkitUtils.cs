@@ -821,6 +821,10 @@ namespace SaintsField.Editor.Utils
                         List<Attribute> elementAttributes = new List<Attribute>();
                         foreach (Attribute attr in allAttributes)
                         {
+                            if (attr is IPlayaSaintsEditorOnlyAttribute)
+                            {
+                                continue;
+                            }
                             if (attr is InjectAttributeBase injectAttributeBase)
                             {
                                 if (injectAttributeBase.Depth > 1)
@@ -831,21 +835,18 @@ namespace SaintsField.Editor.Utils
                                 else
                                 {
                                     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
-                                    if (injectedAttribute is PropertyAttribute propertyAttribute)
-                                    {
-                                        elementAttributes.Add(propertyAttribute);
-                                    }
-                                    else if (injectedAttribute is IPlayaAttribute ip && injectedAttribute is not InjectAttributeBase)
+                                    if (injectedAttribute is IPlayaAttribute ip and not InjectAttributeBase)
                                     {
                                         injectedIPlayaAttributes.Add(ip);
                                     }
-                                    else if (injectedAttribute != null && injectedAttribute is not InjectAttributeBase)
+                                    if (injectedAttribute is not IPlayaSaintsEditorOnlyAttribute &&
+                                        injectedAttribute is IPlayaDownpourAttribute or PropertyAttribute)
                                     {
                                         elementAttributes.Add(injectedAttribute);
                                     }
                                 }
                             }
-                            else if (attr is not IPlayaAttribute || attr is PropertyAttribute)
+                            else if (attr is IPlayaDownpourAttribute or PropertyAttribute)
                             {
                                 elementAttributes.Add(attr);
                             }

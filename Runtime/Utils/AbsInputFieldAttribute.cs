@@ -6,7 +6,7 @@ using TMPro;
 
 namespace SaintsField.Utils
 {
-    public abstract class AbsInputFieldAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
+    public abstract class AbsInputFieldAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
     {
         public MethodBind MethodBind => MethodBind.ComponentTypeAndName;
 

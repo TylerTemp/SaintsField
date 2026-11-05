@@ -8,7 +8,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class ListDrawerSettingsAttribute: Attribute, IPlayaAttribute
+    public class ListDrawerSettingsAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         public readonly int NumberOfItemsPerPage;
         public readonly bool Searchable;

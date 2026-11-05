@@ -7,7 +7,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class CompInfoBoxAttribute: Attribute, IPlayaAttribute
+    public class CompInfoBoxAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         public readonly string Content;
         public readonly EMessageType MessageType;

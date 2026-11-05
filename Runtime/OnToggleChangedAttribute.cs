@@ -8,7 +8,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class OnToggleChangedAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
+    public class OnToggleChangedAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
     {
         public MethodBind MethodBind => MethodBind.ComponentTypeAndName;
 

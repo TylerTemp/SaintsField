@@ -7,7 +7,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class DefaultExpandAttribute: Attribute, IPlayaAttribute
+    public class DefaultExpandAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
 
     }

@@ -7,7 +7,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method, AllowMultiple = true)]
-    public class CustomContextMenuAttribute: Attribute, IPlayaAttribute
+    public class CustomContextMenuAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         public readonly string FuncName;
         public readonly string MenuName;

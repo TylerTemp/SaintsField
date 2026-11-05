@@ -6,7 +6,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class OnEventAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
+    public class OnEventAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
     {
         public MethodBind MethodBind => MethodBind.UnityEvent;
 

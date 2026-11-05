@@ -11,7 +11,8 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class SeparatorAttribute: Attribute, IPlayaAttribute, ISeparatorAttribute, IPlayaClassAttribute
+    // ReSharper disable once RedundantExtendsListEntry
+    public class SeparatorAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, ISeparatorAttribute, IPlayaClassAttribute
     {
         public string Title { get; }
         public Color Color { get; }

@@ -6,7 +6,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     // [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class TableColumnAttribute: Attribute, IPlayaAttribute
+    public class TableColumnAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         // public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         // public string GroupBy => "__LABEL_FIELD__";

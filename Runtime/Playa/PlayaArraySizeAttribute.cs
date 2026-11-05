@@ -7,7 +7,8 @@ namespace SaintsField.Playa
     [Conditional("UNITY_EDITOR")]
     [Obsolete("Use `ArraySize` instead")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class PlayaArraySizeAttribute: PropertyAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class PlayaArraySizeAttribute: PropertyAttribute, IPlayaSaintsEditorOnlyAttribute, IPlayaArraySizeAttribute
     {
         public readonly int Size;
 

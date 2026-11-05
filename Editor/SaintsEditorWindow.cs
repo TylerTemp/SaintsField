@@ -14,7 +14,7 @@ namespace SaintsField.Editor
         #region Inline Editor
 
         [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
-        public class WindowInlineEditorAttribute : Attribute, IPlayaAttribute
+        public class WindowInlineEditorAttribute : Attribute, IPlayaSaintsEditorOnlyAttribute
         {
             public readonly Type EditorType;
             public WindowInlineEditorAttribute(Type editorType = null)

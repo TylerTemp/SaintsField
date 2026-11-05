@@ -16,7 +16,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
+    public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaDownpourAttribute, IPlayaArraySizeAttribute
     {
         public const EXP DefaultEXP = EXP.None;
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;

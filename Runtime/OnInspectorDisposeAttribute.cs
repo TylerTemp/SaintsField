@@ -6,7 +6,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method)]
-    public class OnInspectorDisposeAttribute: Attribute, IPlayaAttribute
+    public class OnInspectorDisposeAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
     }
 }

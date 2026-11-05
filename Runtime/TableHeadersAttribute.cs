@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class TableHeadersAttribute: PropertyAttribute, IPlayaAttribute
+    public class TableHeadersAttribute: PropertyAttribute, IPlayaSaintsEditorOnlyAttribute
     {
         // public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         // public string GroupBy => "";

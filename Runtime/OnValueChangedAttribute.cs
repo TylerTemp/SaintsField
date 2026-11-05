@@ -10,7 +10,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
-    public class OnValueChangedAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
+    public class OnValueChangedAttribute: PropertyAttribute, ISaintsAttribute, IPlayaDownpourAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";

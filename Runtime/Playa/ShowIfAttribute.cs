@@ -9,7 +9,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class ShowIfAttribute: Attribute, IPlayaAttribute, IVisibilityAttribute
+    public class ShowIfAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute, IVisibilityAttribute
     {
         public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
         public virtual bool IsShow => true;

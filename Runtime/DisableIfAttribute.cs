@@ -9,7 +9,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class DisableIfAttribute: Attribute, IPlayaAttribute
+    public class DisableIfAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
 

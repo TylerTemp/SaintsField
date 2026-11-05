@@ -8,7 +8,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class LabelTextAttribute: Attribute, IPlayaAttribute
+    public class LabelTextAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         // ReSharper disable InconsistentNaming
         public readonly string RichTextXml;

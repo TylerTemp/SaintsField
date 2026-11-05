@@ -111,10 +111,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.31.0**
+**5.31.1**
 
-1.  Add: `Button`/`ShowInInspector`(on function) now save and restore the parameters within the Editor session 
-2.  Fix: SaintsDictionary/SceneReference/SaintsList/SaintsArray might give an error when deserialize, especially when it's running on non-Unity-main-thread. This error only happens in Editor mode.
+1. Fix: script reset might trigger `ShowInInspector` error
+2. Fix: list/array with `ArraySize` which comes with fixed length can now disable the size input
+3. Chore: Split the SaintsEditor attribute for the Downpour system (still wip)
 
 ## Usage ##
 

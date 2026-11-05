@@ -6,7 +6,7 @@ using SaintsField.Playa;
 namespace SaintsField.Utils
 {
     [Conditional("UNITY_EDITOR")]
-    public class SaintsSerializedActualAttribute: Attribute, IPlayaAttribute
+    public class SaintsSerializedActualAttribute: Attribute, IPlayaSaintsEditorOnlyAttribute
     {
         public readonly string Name;
         // public readonly Type ElementType;
