@@ -128,13 +128,8 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
 
             bool hasSerializeReference = false;
             List<InjectAttributeBase> injectAttributes = new List<InjectAttributeBase>();
-            List<Attribute> cellAttributes = ReflectCache.GetCustomAttributes<Attribute>(info)
-                .Where(each => each is not InjectAttributeBase &&
-                               each is not SaintsArrayAttribute &&
-                               each is not SaintsArray2DRAttribute)
-                .ToList();
-            int insideArrayOffset = insideArray ? 1 : 0;
-            foreach (InjectAttributeBase injectAttribute in ReflectCache.GetCustomAttributes<InjectAttributeBase>(info))
+            List<Attribute> cellAttributes = new List<Attribute>();
+            foreach (InjectAttributeBase injectAttribute in allAttributes.OfType<InjectAttributeBase>())
             {
                 if (injectAttribute.Decorator == typeof(SerializeReference))
                 {
@@ -143,7 +138,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 }
 
                 ValueAttributeAttribute cellInjectAttribute = new ValueAttributeAttribute(
-                    injectAttribute.Depth - 3 - insideArrayOffset,
+                    injectAttribute.Depth - 1,
                     injectAttribute.Decorator,
                     injectAttribute.Parameters);
                 if (cellInjectAttribute.Depth > 0)
@@ -152,10 +147,13 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                     continue;
                 }
 
-                Attribute createdAttribute = SaintsWrapUtils.CreateInjectedAttribute(cellInjectAttribute);
-                if (createdAttribute != null)
+                if (cellInjectAttribute.Depth == 0)
                 {
-                    cellAttributes.Add(createdAttribute);
+                    Attribute createdAttribute = SaintsWrapUtils.CreateInjectedAttribute(cellInjectAttribute);
+                    if (createdAttribute != null)
+                    {
+                        cellAttributes.Add(createdAttribute);
+                    }
                 }
             }
 
@@ -453,7 +451,7 @@ namespace SaintsField.Editor.Drawers.SaintsArray2DRTypeDrawer
                 this,
                 this,
                 this,
-                rowParent);
+                rowParent, string.Empty, true);
             element.Add(resultElement);
         }
 

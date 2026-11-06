@@ -22,11 +22,29 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         // [ValueAttribute(1, typeof(LabelTextAttribute), "LABEL1")]
         // [ValueAttribute(2, typeof(LabelTextAttribute), "LABEL2")]
-        // [ValueAttribute(2, typeof(FieldLabelTextAttribute), "FIELDLABEL2")]
+        // // [ValueAttribute(2, typeof(FieldLabelTextAttribute), "FIELDLABEL2")]  // no longer necessary
         // public SaintsArray<Scriptable[]> arrayInsideSaints;
+        //
+        // [ValueAttribute(1, typeof(LabelTextAttribute), "LABEL1")]
+        // [ValueAttribute(2, typeof(LabelTextAttribute), "LABEL2")]
+        // // [ValueAttribute(1, typeof(FieldLabelTextAttribute), "FIELDLABEL1")]
+        // // [ValueAttribute(2, typeof(FieldLabelTextAttribute), "FIELDLABEL2")]  // this will get skip cuz only playa get this level
+        // // [ValueAttribute(3, typeof(FieldLabelTextAttribute), "FIELDLABEL3")]
+        // public SaintsArray<Scriptable>[] saintsInsideArray;
 
-        [ValueAttribute(1, typeof(LabelTextAttribute), "LABEL1")]
-        [ValueAttribute(1, typeof(FieldLabelTextAttribute), "FIELDLABEL1")]
-        public SaintsArray<Scriptable>[] saintsInsideArray;
+        [ValueAttribute(1, typeof(LabelTextAttribute), "Random Pool <index/>")]
+        [ValueAttribute(2, typeof(LabelTextAttribute), "Option <index/>")]
+        [ValueAttribute(2, typeof(ExpandableAttribute))]
+        public SaintsArray<Scriptable>[] exampleExpand;
+
+        [KeyAttribute(typeof(ExpandableAttribute))]
+        [ValueAttribute(2, typeof(ExpandableAttribute))]
+        public SaintsDictionary<Component, Scriptable[]> exampleDict;
+
+        // this does not work yet because of the parent target calling for the parent
+        // [ValueAttribute(2, typeof(InfoBoxAttribute), "$../../" + nameof(GetMessage), true)]
+        // public SaintsArray<int>[] callbackNote;
+        //
+        // private string GetMessage(object obj) => $"obj={obj}";
     }
 }

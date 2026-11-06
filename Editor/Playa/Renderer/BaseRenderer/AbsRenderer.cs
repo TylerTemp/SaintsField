@@ -653,8 +653,41 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         return "";
                     }
 
-                    int propPath = SerializedUtils.PropertyPathIndex(FieldWithInfo.SerializedProperty.propertyPath);
-                    return propPath < 0 ? "" : propPath.ToString();
+                    string propPath = FieldWithInfo.SerializedProperty.propertyPath;
+                    int propPathIndex;
+                    // process this without refection, save some performance
+                    // check saintsarray/list
+                    if (propPath.EndsWith("].value", StringComparison.Ordinal))
+                    {
+                        const int trimEndLength = 7;  // "].value".Length;
+                        string preString = $".{nameof(SaintsArray<object>._saintsList)}.Array.data[";
+                        int prefixIndex = propPath.LastIndexOf(preString, StringComparison.Ordinal);
+                        if (prefixIndex >= 0)
+                        {
+                            int indexStart = prefixIndex + preString.Length;
+                            int indexLength = propPath.Length - trimEndLength - indexStart;
+                            if (indexLength > 0 && int.TryParse(propPath.Substring(indexStart, indexLength),
+                                    System.Globalization.NumberStyles.None,
+                                    System.Globalization.CultureInfo.InvariantCulture, out int saintsIndex))
+                            {
+                                propPathIndex = saintsIndex;
+                            }
+                            else
+                            {
+                                propPathIndex = SerializedUtils.PropertyPathIndex(propPath);
+                            }
+                        }
+                        else
+                        {
+                            propPathIndex = SerializedUtils.PropertyPathIndex(propPath);
+                        }
+                    }
+                    else
+                    {
+                        propPathIndex = SerializedUtils.PropertyPathIndex(propPath);
+                    }
+
+                    return propPathIndex < 0 ? "" : propPathIndex.ToString();
                 }
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.Method:

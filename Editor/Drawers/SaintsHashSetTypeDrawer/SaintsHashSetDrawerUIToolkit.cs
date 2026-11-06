@@ -459,11 +459,9 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     this,
                     this,
                     this,
-                    context.WrapParent
-                );
-                ElementField elementField = new ElementField($"Element {propertyIndex}", resultElement);
-                element.Add(elementField);
-                elementField.TrackPropertyValue(context.WrapProp, _ => RefreshConflict());
+                    context.WrapParent, $"Element {propertyIndex}", this.InHorizontalLayout);
+                element.Add(resultElement);
+                resultElement.TrackPropertyValue(context.WrapProp, _ => RefreshConflict());
                 RefreshConflict();
 
                 void RefreshConflict()
@@ -481,11 +479,11 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     {
                         if (Util.GetIsEqual(otherValue, thisValue))
                         {
-                            elementField.style.backgroundColor = WarningColor;
+                            resultElement.style.backgroundColor = WarningColor;
                             return;
                         }
                     }
-                    elementField.style.backgroundColor = Color.clear;
+                    resultElement.style.backgroundColor = Color.clear;
                 }
             };
 

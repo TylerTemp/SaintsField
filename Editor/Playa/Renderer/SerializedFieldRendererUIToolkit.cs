@@ -13,6 +13,8 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class SerializedFieldRenderer: IMakeRenderer, IDOTweenPlayRecorder
     {
+        internal IReadOnlyList<Attribute> AdditionalAttributes { get; set; } = Array.Empty<Attribute>();
+
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
             string label = null;
@@ -38,6 +40,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 FieldWithInfo.SerializedProperty,
                 ReflectCache
                     .GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo)
+                    .Concat(AdditionalAttributes).ToArray()
                     // .Where(each => each is not ISaintsLayout)
                     // .ToArray()
                 ,

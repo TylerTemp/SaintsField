@@ -472,7 +472,6 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             // IReadOnlyList<Attribute> r = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
             // Debug.Log($"sa info = {info.Name}");
             bool hasSerializeReference = false;
-            List<IPlayaAttribute> injectCreatedAttributes1 = new List<IPlayaAttribute>();
 
             List<InjectAttributeBase> injectAttributes2 = new List<InjectAttributeBase>();
             List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
@@ -489,41 +488,19 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     continue;
                 }
 
-                // Debug.Log($"saints array {injectAttribute.Depth}/{injectAttribute.Decorator}/{injectAttribute.Parameters?.Length}");
-
-                ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 1, injectAttribute.Decorator,
-                    injectAttribute.Parameters);
-                ValueAttributeAttribute less2DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 2, injectAttribute.Decorator,
-                    injectAttribute.Parameters);
-                if (less2DepthInject.Depth > 0)
+                // A SaintsArray element is one logical level; its SaintsWrap storage adds no depth.
+                ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(
+                    injectAttribute.Depth - 1, injectAttribute.Decorator, injectAttribute.Parameters);
+                if (less1DepthInject.Depth > 0)
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                    Debug.Log($"SaintsArray {property.propertyPath} injectAttributes2.Add={less2DepthInject}");
-#endif
-                    injectAttributes2.Add(less2DepthInject);
+                    injectAttributes2.Add(less1DepthInject);
                 }
-                else if(less2DepthInject.Depth == 0)
+                else if (less1DepthInject.Depth == 0)
                 {
-                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(less2DepthInject);
-                    if(injectedAttribute != null)
+                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(less1DepthInject);
+                    if (injectedAttribute != null)
                     {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                        Debug.Log(
-                            $"SaintsArray {property.propertyPath} injectCreatedAttributes2.Create={injectedAttribute}");
-#endif
                         injectCreatedAttributes2.Add(injectedAttribute);
-                    }
-                }
-
-                if (less1DepthInject.Depth == 0)
-                {
-                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
-                    if(injectedAttribute is IPlayaAttribute playaAttribute && injectedAttribute is not InjectAttributeBase)
-                    {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                        Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={injectedAttribute}");
-#endif
-                        injectCreatedAttributes1.Add(playaAttribute);
                     }
                 }
             }
@@ -539,45 +516,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 elementProp.isExpanded = true;
                 element.Clear();
 
-                SaintsFieldWithInfo saintsContainerInfo = new SaintsFieldWithInfo
-                {
-                    ClassStructType = null,
-                    PlayaAttributes = injectCreatedAttributes1.ToArray(),
-                    // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
-                    TargetParent = null,
-                    TargetMemberInfo = null,
-                    TargetMemberIndex = 0,
-                    Targets = new[]{fieldValue},
-
-                    RenderType = SaintsRenderType.SerializedField,
-                    SerializedProperty = elementProp,
-                    MemberId = info.Name,
-                    FieldInfo = info,
-                    InherentDepth = 0,
-                    // Order = order,
-                    // serializable = true,
-                };
-
-                // element.Add(wrapContainer);
-
-                // wrapContainer.Add(resultElement);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                Debug.Log($"create SaintsCellRenderer {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectCreatedAttributes1={string.Join(", ", injectCreatedAttributes1)}");
-#endif
-                SaintsCellRenderer renderer = new SaintsCellRenderer(
-                    elementProp.serializedObject,
-                    saintsContainerInfo
-                );
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                Debug.Log($"create CreateCellElement {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectCreatedAttributes={string.Join(", ", injectCreatedAttributes2)}, injectAttributes={string.Join(", ", injectAttributes2)}");
-#endif
-
-                // note about the downpour:
-                // 1. SaintsArray<T>[], List<SaintsArray<T>>, if there is property attribute,
-                //    it should use Unity's normal workflow, and should NOT be applied down
-                // 2. To applied down, it MUST use ValueAttribute
-                // thus, the downpour attribute should only been passed the injection created attributes.
-                VisualElement resultElementNoLabel =
+                VisualElement resultElement =
                     SaintsWrapUtils.CreateCellElement(
                         valueWrapType,
                         wrapField,
@@ -589,18 +528,11 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                         this,
                         this,
                         this,
-                        wrapParent
-                    );
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                Debug.Log($"create ElementField {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType})");
-#endif
-
-                ElementField wrapContainer = new ElementField($"Element {propIndex}", resultElementNoLabel);
-                wrapContainer.labelElement.AddToClassList(ClassLabelFieldUIToolkit);
-
-                VisualElement elementFinal = renderer.GetElementAndInit(wrapContainer);
-                UIToolkitUtils.AddContextualMenuManipulator(elementFinal, elementProp, () => { });
-                element.Add(elementFinal);
+                        wrapParent,
+                        $"Element {propIndex}",
+                        InHorizontalLayout);
+                UIToolkitUtils.AddContextualMenuManipulator(resultElement, elementProp, () => { });
+                element.Add(resultElement);
             };
 
             pagePreButton.clicked += () =>

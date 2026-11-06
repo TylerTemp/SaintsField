@@ -111,11 +111,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.31.1**
+**5.31.2**
 
-1. Fix: script reset might trigger `ShowInInspector` error
-2. Fix: list/array with `ArraySize` which comes with fixed length can now disable the size input
-3. Chore: Split the SaintsEditor attribute for the Downpour system (still wip)
+1.  Add: Basic ability for downpour system (callback not supported yet)
+2.  Fix: Improve how SaintsList/SaintsArray rendered, remove some nested unnecessary label element
 
 ## Usage ##
 

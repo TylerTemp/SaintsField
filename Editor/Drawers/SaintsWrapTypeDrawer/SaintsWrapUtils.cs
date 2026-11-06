@@ -279,7 +279,17 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
         }
 
 #if UNITY_2021_3_OR_NEWER
-        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes, IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, IRichTextTagProvider richTextTagProvider, object parent)
+        // SaintsDictionary/Table requires no label
+        // SaintsArray/List requires label
+        // Thus the cell itself response for label rendering, according to what is passed in
+
+        // As for downpour, SaintsCellRenderer in this function is response to processing all the playa related code
+        // Thus all case should be processed
+        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType,
+            SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes,
+            IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference,
+            IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder,
+            IRichTextTagProvider richTextTagProvider, object parent, string label, bool inHorizontalLayout)
         {
             SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
             Debug.Assert(wrapTypeProp != null);
@@ -294,33 +304,16 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 
             // Attribute[] allCustomAttributes = ReflectCache.GetCustomAttributes<Attribute>(info);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-            Debug.Log($"CreateCellElement {serializedProperty.propertyPath} info={info.Name} allCustomAttributes={string.Join<Attribute>(", ", allCustomAttributes)}/injectedAttributes={string.Join(", ", injectedAttributes)}");
+            Debug.Log($"CreateCellElement {serializedProperty.propertyPath} info={info.Name} allCustomAttributes={string.Join(", ", allCustomAttributes)}/injectedAttributes={string.Join(", ", injectedAttributes)}");
 #endif
-            Attribute[] wrapperAttributes = allCustomAttributes
-                .Where(each => each is IPlayaSaintsEditorOnlyAttribute or IPlayaDownpourAttribute or not PropertyAttribute)
+            // Consume editor-only attributes here; downpour attributes belong to the property path.
+            IPlayaSaintsEditorOnlyAttribute[] wrapperAttributes = allCustomAttributes
+                .OfType<IPlayaSaintsEditorOnlyAttribute>()
                 .ToArray();
             List<Attribute> allAttributes = allCustomAttributes
                 .Where(each => each is not IPlayaSaintsEditorOnlyAttribute &&
                                each is IPlayaDownpourAttribute or PropertyAttribute)
                 .Concat(injectedAttributes).ToList();
-            // List<Attribute> allAttributes = new List<Attribute>(allCustomAttributes);
-            // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();
-            // foreach (InjectAttributeBase injectAttributeBase in injectedAttributes)
-            // {
-            //     if (injectAttributeBase.Depth == 0)
-            //     {
-            //         Attribute injectedAttribute = CreateInjectedAttribute(injectAttributeBase);
-            //         Debug.Log($"CreateCellElement {serializedProperty.propertyPath} create {injectAttributeBase} => {injectedAttribute}");
-            //         if(injectedAttribute != null)
-            //         {
-            //             allAttributes.Add(injectedAttribute);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         allAttributes.Add(new ValueAttributeAttribute(injectAttributeBase.Depth - 1, injectAttributeBase.Decorator, injectAttributeBase.Parameters));
-            //     }
-            // }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
             Debug.Log($"CreateCellElement {serializedProperty.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
 #endif
@@ -479,21 +472,6 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 );
             }
 
-            VisualElement WrapElement(VisualElement field)
-            {
-                if (renderer != null)
-                {
-                    return renderer.GetElementAndInit(field);
-                }
-                if (wrapperAttributes.Length == 0)
-                {
-                    return field;
-                }
-                VisualElement wrapper = new VisualElement();
-                wrapper.Add(field);
-                return wrapper;
-            }
-
             if (useDrawerType == null)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
@@ -503,9 +481,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     serializedBaseProperty,
                     allAttributes,
                     wrapType,
-                    null,
+                    label,
                     wrapInfo,
-                    true,
+                    inHorizontalLayout,
                     makeRenderer,
                     doTweenPlayRecorder,
                     richTextTagProvider,
@@ -534,12 +512,12 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             // Debug.Log($"{useAttribute}/{useDrawerType}({useDrawerType == typeof(BaseWrapDrawer)}): {serializedProperty.propertyPath}");
 
             PropertyDrawer propertyDrawer = useDrawerType == typeof(BaseWrapDrawer)
-                ? SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, info, null, null)  // baseWrap itself will looking into the wrap
-                : SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, wrapInfo, useAttribute, null);
+                ? SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, info, null, label)  // baseWrap itself will looking into the wrap
+                : SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, wrapInfo, useAttribute, label);
             // Debug.Log(propertyDrawer);
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
-                saintsPropertyDrawer.InHorizontalLayout = true;
+                saintsPropertyDrawer.InHorizontalLayout = inHorizontalLayout;
                 saintsPropertyDrawer.OverrideAttributes = allAttributes;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 // Debug.Log($"{needUseRef}{saintsPropertyDrawer is BaseWrapDrawer}/{saintsPropertyDrawer}");
@@ -576,7 +554,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             // Debug.Log(serializedProperty.propertyPath);
             // Debug.Log(info.FieldType);
             // Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath} using PropertyField");
-            PropertyField result = new PropertyField(serializedBaseProperty, string.Empty)
+            PropertyField result = new PropertyField(serializedBaseProperty, label)
             {
                 style =
                 {
@@ -585,6 +563,21 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             };
             result.Bind(serializedBaseProperty.serializedObject);
             return WrapElement(result);
+
+            VisualElement WrapElement(VisualElement field)
+            {
+                if (renderer != null)
+                {
+                    return renderer.GetElementAndInit(field);
+                }
+                if (wrapperAttributes.Length == 0)
+                {
+                    return field;
+                }
+                VisualElement wrapper = new VisualElement();
+                wrapper.Add(field);
+                return wrapper;
+            }
         }
 #endif
         public static (FieldInfo, SerializedProperty) GetCellInfo(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, bool hasSerializeReference)

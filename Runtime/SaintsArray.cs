@@ -13,7 +13,7 @@ namespace SaintsField
         , IList<T>
         , IReadOnlyList<T>
         , IList
-        , ICollection
+        // , ICollection
         , ICloneable
         , IStructuralComparable
         , IStructuralEquatable

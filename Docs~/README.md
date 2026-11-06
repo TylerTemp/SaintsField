@@ -11105,7 +11105,7 @@ Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet.
 > [!WARNING]
 > In-Development feature. Unstable.
 
-`ValueAttribute` & `KeyAttribute` (for dictionary key only) allows to down-pass an attribute into the nested target for 
+`ValueAttribute` (for SaintsField's nested type) & `KeyAttribute` (for dictionary key only) allows to down-pass an attribute into the nested target for 
 combo data types provided by SaintsField, e.g `SaintsDictionary<>`, `SaintsArray`
 
 Even though `SaintsArray` is used to mimic the behavior of a nested array, it still requires downpour to inject into target
@@ -11114,11 +11114,28 @@ fields.
 For example
 
 ```csharp
-[ValueAttribute(typeof(ExpandableAttribute))]
-public SaintsArray<Scriptable[]> arrayInsideSaints;
+[ValueAttribute(1, typeof(LabelTextAttribute), "Random Pool <index/>")]  // top level label change
+[ValueAttribute(2, typeof(LabelTextAttribute), "Option <index/>")]  // inside level label change
+[ValueAttribute(2, typeof(ExpandableAttribute))]  // item apply [Expandable]
+public SaintsArray<Scriptable>[] exampleExpand;
 ```
 
-// TODO: complete this doc when the function is ready
+![](https://github.com/user-attachments/assets/b6275f1d-2f11-4ab3-9227-551220e94fde)
+
+Dictionary can also downpour
+
+```csharp
+[KeyAttribute(typeof(ExpandableAttribute))]  // [Expandable] to key
+[ValueAttribute(2, typeof(ExpandableAttribute))]  // [Expandable] to value's item (depth=1 to array, 2 to array's item)
+public SaintsDictionary<Component, Scriptable[]> exampleDict;
+```
+
+![](https://github.com/user-attachments/assets/1debd115-41f2-4738-a07e-9b5fa97942b9)
+
+**Callbacks**
+
+Callback in this case usually requires manually upwalk, but the target invoking is still problemic. Please wait when this
+feature is more stable.
 
 ### Saints XPath-like Syntax ###
 

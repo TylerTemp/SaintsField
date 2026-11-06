@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
+using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -19,6 +20,27 @@ namespace SaintsField.Editor.Playa.Renderer.Table
     public class TableContentElement: VisualElement
     {
         private readonly SaintsFieldWithInfo _fieldWithInfo;
+        private readonly List<Attribute> _cellAttributes = new List<Attribute>();
+
+        private SaintsFieldWithInfo WithCellAttributes(SaintsFieldWithInfo info)
+        {
+            info.PlayaAttributes = info.PlayaAttributes
+                .Concat(_cellAttributes.OfType<IPlayaSaintsEditorOnlyAttribute>())
+                .ToArray();
+            return info;
+        }
+
+        private void PassCellAttributes(AbsRenderer renderer)
+        {
+            if (renderer is SerializedFieldRenderer serializedRenderer)
+            {
+                serializedRenderer.AdditionalAttributes = _cellAttributes
+                    .Where(each => each is not IPlayaSaintsEditorOnlyAttribute &&
+                                   each is IPlayaDownpourAttribute or PropertyAttribute)
+                    .ToArray();
+            }
+        }
+
 
         private readonly VisualElement _emptyNotice;
         private readonly VisualElement _tableContentContainer;
@@ -33,6 +55,24 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         public TableContentElement(SaintsFieldWithInfo fieldWithInfo, TableAttribute settings)
         {
             _fieldWithInfo = fieldWithInfo;
+            foreach (InjectAttributeBase injectAttribute in fieldWithInfo.PlayaAttributes.OfType<InjectAttributeBase>())
+            {
+                ValueAttributeAttribute remaining = new ValueAttributeAttribute(
+                    injectAttribute.Depth - 1, injectAttribute.Decorator, injectAttribute.Parameters);
+                if (remaining.Depth > 0)
+                {
+                    _cellAttributes.Add(remaining);
+                }
+                else if (remaining.Depth == 0)
+                {
+                    Attribute created = SaintsWrapUtils.CreateInjectedAttribute(remaining);
+                    if (created != null)
+                    {
+                        _cellAttributes.Add(created);
+                    }
+                }
+            }
+
             InitializeSearch(settings);
             // Empty
             // _emptyNotice = new HelpBox("Table is empty", HelpBoxMessageType.None);
@@ -362,7 +402,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                          .HelperGetSaintsFieldWithInfo(_fieldWithInfo.SerializedProperty.serializedObject, targetPropertyDict, null, null, -1, new[]{targetPropValue})
                                          .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
                             {
-                                allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
+                                allSaintsFieldWithInfos.Add(WithCellAttributes(saintsFieldWithInfo));
                                 if (saintsFieldWithInfo.SerializedProperty != null)
                                 {
                                     serCount += 1;
@@ -393,6 +433,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                                 continue;
                                             }
 
+                                            PassCellAttributes(renderer);
                                             allRenderers.Add(renderer);
                                             renderer.NoLabel = noLabel;
                                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
@@ -560,7 +601,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                          .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
                             {
                                 // Debug.Log($"get {saintsFieldWithInfo}");
-                                allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
+                                allSaintsFieldWithInfos.Add(WithCellAttributes(saintsFieldWithInfo));
                                 if (saintsFieldWithInfo.SerializedProperty != null)
                                 {
                                     serCount += 1;
@@ -589,6 +630,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                                 continue;
                                             }
 
+                                            PassCellAttributes(renderer);
                                             allRenderers.Add(renderer);
                                             renderer.NoLabel = noLabel;
                                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
