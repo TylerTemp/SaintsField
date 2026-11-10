@@ -32,19 +32,18 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         // // [ValueAttribute(3, typeof(FieldLabelTextAttribute), "FIELDLABEL3")]
         // public SaintsArray<Scriptable>[] saintsInsideArray;
 
-        [ValueAttribute(1, typeof(LabelTextAttribute), "Random Pool <index/>")]
-        [ValueAttribute(2, typeof(LabelTextAttribute), "Option <index/>")]
-        [ValueAttribute(2, typeof(ExpandableAttribute))]
-        public SaintsArray<Scriptable>[] exampleExpand;
-
-        [KeyAttribute(typeof(ExpandableAttribute))]
-        [ValueAttribute(2, typeof(ExpandableAttribute))]
-        public SaintsDictionary<Component, Scriptable[]> exampleDict;
-
-        // this does not work yet because of the parent target calling for the parent
-        // [ValueAttribute(2, typeof(InfoBoxAttribute), "$../../" + nameof(GetMessage), true)]
-        // public SaintsArray<int>[] callbackNote;
+        // [ValueAttribute(1, typeof(LabelTextAttribute), "Random Pool <index/>")]
+        // [ValueAttribute(2, typeof(LabelTextAttribute), "Option <index/>")]
+        // [ValueAttribute(2, typeof(ExpandableAttribute))]
+        // public SaintsArray<Scriptable>[] exampleExpand;
         //
-        // private string GetMessage(object obj) => $"obj={obj}";
+        // [KeyAttribute(typeof(ExpandableAttribute))]
+        // [ValueAttribute(2, typeof(ExpandableAttribute))]
+        // public SaintsDictionary<Component, Scriptable[]> exampleDict;
+
+        [ValueAttribute(2, typeof(InfoBoxAttribute), "$../../" + nameof(GetMessage), false)]
+        public SaintsArray<int>[] callbackNote;
+
+        private string GetMessage(object obj) => $"obj={obj}";
     }
 }

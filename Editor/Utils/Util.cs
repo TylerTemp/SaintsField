@@ -13,6 +13,7 @@ using SaintsField.Editor.Utils.WaitableUtils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
+using SaintsField.SaintsXPathParser;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
@@ -813,7 +814,10 @@ namespace SaintsField.Editor.Utils
                 return new GetOfResult<T>("Target is null", null, defaultValue, false);
             }
 
-            IReadOnlyList<PathResolver.Node> nodes = GetByXPathAttributeDrawer.ResolvePath(by, property, memberInfo, target);
+            PathResolver.Context context = PathResolver.CreateContext(property, memberInfo, target);
+            // Resolve from the serialized owner, keeping renderer targets independent of callback ownership.
+            context.Container = context.SerializedContainer ?? context.Container;
+            IReadOnlyList<PathResolver.Node> nodes = PathResolver.Resolve(PathParser.Parse(by, true), context, false);
             foreach (PathResolver.Node node in nodes)
             {
                 try
@@ -822,7 +826,7 @@ namespace SaintsField.Editor.Utils
                     if (value is MethodInfo method)
                     {
                         (string error, object returned) = InvokeMethodInfo(method, defaultValue, property, memberInfo,
-                            node.Container?.Resource, overrideParams, target, false);
+                            node.Container?.Resource, overrideParams, context.SerializedContainer?.Resource ?? target, false);
                         if (error != "")
                         {
                             continue;

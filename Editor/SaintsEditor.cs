@@ -1022,19 +1022,19 @@ namespace SaintsField.Editor
 
         public static IReadOnlyList<SaintsFieldWithRenderer> WrapAroundSaintsRenderer(
             IReadOnlyList<AbsRenderer> targetRenderers, SerializedObject serializedObject,
-            SaintsFieldWithInfo fieldWithInfo)
+            SaintsFieldWithInfo fieldWithInfo, IReadOnlyList<Attribute> attributes = null)
         {
             if (targetRenderers == null)
             {
                 throw new ArgumentNullException(nameof(targetRenderers));
             }
 
-            return MakeRendererGroup(targetRenderers, serializedObject, fieldWithInfo);
+            return MakeRendererGroup(targetRenderers, serializedObject, fieldWithInfo, attributes);
         }
 
         private static IReadOnlyList<SaintsFieldWithRenderer> MakeRendererGroup(
             IReadOnlyList<AbsRenderer> customTargetRenderers, SerializedObject serializedObject,
-            SaintsFieldWithInfo fieldWithInfo)
+            SaintsFieldWithInfo fieldWithInfo, IReadOnlyList<Attribute> attributes = null)
         {
             List<SaintsFieldWithRenderer> renderers = new List<SaintsFieldWithRenderer>();
             List<SaintsFieldWithRenderer> tailRenderers = new List<SaintsFieldWithRenderer>();
@@ -1042,7 +1042,7 @@ namespace SaintsField.Editor
             bool targetInserted = false;
             bool hasSerializedTarget = false;
 
-            foreach (Attribute attribute in GetRendererAttributes(fieldWithInfo))
+            foreach (Attribute attribute in attributes ?? GetRendererAttributes(fieldWithInfo))
             {
                 IPlayaAttribute playaAttribute = attribute as IPlayaAttribute;
                 switch (playaAttribute)

@@ -11,15 +11,23 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.SaintsCell
 {
-    public class SaintsCellRenderer: AbsRenderer
+    public class SaintsCellRenderer: AbsRenderer, IMakeRenderer
     {
-        // private readonly VisualElement _resultElement;
+        private readonly SerializedObject _serializedObject;
 
         public SaintsCellRenderer(
             SerializedObject serializedObject,
             SaintsFieldWithInfo fieldWithInfo)
             : base(serializedObject, fieldWithInfo)
         {
+            _serializedObject = serializedObject;
+        }
+
+        public IEnumerable<IReadOnlyList<SaintsFieldWithRenderer>> MakeRenderer(SerializedObject serializedObject,
+            SaintsFieldWithInfo fieldWithInfo)
+        {
+            yield return SaintsEditor.WrapAroundSaintsRenderer(new AbsRenderer[] { this }, serializedObject,
+                fieldWithInfo, fieldWithInfo.PlayaAttributes.Cast<Attribute>().ToArray());
         }
 
         protected override bool AllowGuiColor => true;
@@ -48,16 +56,35 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot, VisualElement container)
         {
-            throw new NotSupportedException("Should not be called");
-            // return (_resultElement, false);
+            return (CreateFieldElement(_resultElement), false);
         }
 
+        private VisualElement _resultElement;
         private VisualElement _container;
 
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
 
         public VisualElement GetElementAndInit(VisualElement resultElement)
+        {
+            _resultElement = resultElement;
+            VisualElement root = new VisualElement();
+            IReadOnlyList<SaintsEditor.RendererGroupInfo> groups = SaintsEditor.ChainSaintsFieldWithInfo(
+                new[] { FieldWithInfo }, _serializedObject, this);
+            foreach (SaintsEditor.RendererGroupInfo group in groups)
+            {
+                ISaintsRenderer renderer = SaintsEditor.MakeRendererForGroupIfNeed(group);
+                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout;
+                VisualElement element = renderer.CreateVisualElement(root);
+                if (element != null)
+                {
+                    root.Add(element);
+                }
+            }
+            return root;
+        }
+
+        private VisualElement CreateFieldElement(VisualElement resultElement)
         {
             // Debug.Assert(_resultElement != null);
 

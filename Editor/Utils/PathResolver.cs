@@ -69,12 +69,16 @@ namespace SaintsField.Editor.Utils
             public MemberInfo Member;
             public object Target;
             public Node Container;
+            // Actual serialized member owner and its ancestry, independent of Target.
+            // Null when no serialized owner could be resolved.
+            public Node SerializedContainer;
         }
 
 
         public static Context CreateContext(SerializedProperty property, MemberInfo member, object target)
         {
             Node container = new Node { Resource = target };
+            Node serializedContainer = null;
             if (property != null)
             {
                 try
@@ -98,8 +102,18 @@ namespace SaintsField.Editor.Utils
                     }
                     if (current != null)
                     {
-                        container = current;
-                        container.Resource = target;
+                        serializedContainer = current;
+                        // Preserve the existing resolution context without replacing the serialized owner.
+                        container = new Node
+                        {
+                            ResourceType = current.ResourceType,
+                            Resource = target,
+                            FolderPath = current.FolderPath,
+                            Container = current.Container,
+                            Member = current.Member,
+                            Collection = current.Collection,
+                            Index = current.Index,
+                        };
                     }
                 }
                 catch (Exception)
@@ -107,7 +121,14 @@ namespace SaintsField.Editor.Utils
                     // Non-serialized callback targets still support member resolution.
                 }
             }
-            return new Context { Property = property, Member = member, Target = target, Container = container };
+            return new Context
+            {
+                Property = property,
+                Member = member,
+                Target = target,
+                Container = container,
+                SerializedContainer = serializedContainer,
+            };
         }
 
         public static IReadOnlyList<Node> Resolve(IEnumerable<XPathStep> steps, Context context,
