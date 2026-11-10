@@ -111,10 +111,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.31.2**
+**5.31.3**
 
-1.  Add: Basic ability for downpour system (callback not supported yet)
-2.  Fix: Improve how SaintsList/SaintsArray rendered, remove some nested unnecessary label element
+1.  Fix: Callback upwalk/downwalk could get a wrong invoke target and fail
+2.  Fix: Element cell (SaintsDictionary/Array/List etc.) could not process disable style playa attributes
+3.  Fix: Downpour system callback
 
 ## Usage ##
 

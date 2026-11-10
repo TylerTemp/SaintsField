@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.31.3 ##
+
+1.  Fix: Callback upwalk/downwalk could get a wrong invoke target and fail
+2.  Fix: Element cell (SaintsDictionary/Array/List etc.) could not process disable style playa attributes
+3.  Fix: Downpour system callback
+
 ## 5.31.2 ##
 
 1.  Add: Basic ability for downpour system (callback not supported yet)

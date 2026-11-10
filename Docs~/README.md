@@ -11104,6 +11104,9 @@ Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet.
 
 > [!WARNING]
 > In-Development feature. Unstable.
+>
+> Downpour system requires you to have a good understand of the internal implement of the code. It's not suggested to
+> heavily use it
 
 `ValueAttribute` (for SaintsField's nested type) & `KeyAttribute` (for dictionary key only) allows to down-pass an attribute into the nested target for 
 combo data types provided by SaintsField, e.g `SaintsDictionary<>`, `SaintsArray`
@@ -11134,8 +11137,16 @@ public SaintsDictionary<Component, Scriptable[]> exampleDict;
 
 **Callbacks**
 
-Callback in this case usually requires manually upwalk, but the target invoking is still problemic. Please wait when this
-feature is more stable.
+```csharp
+// can not omit `false` because of the constructor of this attribute
+// and yeah, blame microslop's design
+[ValueAttribute(2, typeof(InfoBoxAttribute), "$../../" + nameof(GetMessage), false)]  
+public SaintsArray<int>[] callbackNote;
+
+private string GetMessage(int num) => num >= 0? "": $"Should not be negative: {num}";
+```
+
+![](https://github.com/user-attachments/assets/1f291b16-1af9-4a37-a7e9-ccb755f3f477)
 
 ### Saints XPath-like Syntax ###
 
