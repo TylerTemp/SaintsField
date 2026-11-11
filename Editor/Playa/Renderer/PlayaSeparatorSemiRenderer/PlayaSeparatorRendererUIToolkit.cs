@@ -1,7 +1,9 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
+using System.Text;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SeparatorDrawer;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,6 +11,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 {
     public partial class PlayaSeparatorRenderer
     {
+        private VisualElement _separatorElement;
+        private string _searchableString = "";
         private VisualElement _titleElement;
         private string _richXml;
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
@@ -24,7 +28,21 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
                 SeparatorAttributeDrawer.CreateSeparatorUIToolkit(_playaSeparatorAttribute, "playa-separator-text");
             // _titleElement = ve.Q(name: "playa-separator-text");
             _titleElement = result.title;
+            _separatorElement = result.target;
             return (result.target, _playaSeparatorAttribute.Title != null);
+        }
+
+        private void ApplySearchUIToolkit(string search)
+        {
+            if (_separatorElement == null)
+            {
+                return;
+            }
+
+            bool matches = string.IsNullOrEmpty(search)
+                           || (!string.IsNullOrEmpty(_searchableString)
+                               && Util.UnityDefaultSimpleSearch(_searchableString, search));
+            _separatorElement.style.display = matches ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -49,6 +67,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
             {
                 // Debug.Log($"newRichXml={newRichXml}, _richXml={_richXml}");
                 _richXml = newRichXml;
+                _searchableString = "";
                 // _titleElement.Clear();
                 if (!string.IsNullOrEmpty(newRichXml))
                 {
@@ -56,11 +75,17 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
                     IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
                         newRichXml,
                         this);
-                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(chunks))
+                    StringBuilder searchable = new StringBuilder();
+                    foreach (RichTextDrawer.RichTextChunk chunk in chunks)
                     {
                         // Debug.Log($"title add {rich}");
-                        _titleElement.Add(rich);
+                        if (!chunk.IsIcon)
+                        {
+                            searchable.Append(chunk.Content);
+                        }
+                        _titleElement.Add(_richTextDrawer.DrawChunkUIToolKit(chunk));
                     }
+                    _searchableString = searchable.ToString();
                     _titleElement.style.display = DisplayStyle.Flex;
                 }
                 else

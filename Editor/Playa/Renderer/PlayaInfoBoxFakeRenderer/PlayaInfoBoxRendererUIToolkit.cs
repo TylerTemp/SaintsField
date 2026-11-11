@@ -1,6 +1,8 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
@@ -17,6 +19,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             public InfoBoxAttribute InfoBoxAttribute;
             public SaintsFieldWithInfo FieldWithInfo;
             public RichTextDrawer RichTextDrawer;
+
+            public string SearchableString = "";
+            public bool WillShow;
         }
 
         public override void OnDestroyUIToolkit()
@@ -26,9 +31,30 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {
-            (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute, this);
+            (HelpBox helpBox, bool needUpdate, InfoBoxUserData userData) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute, this);
             helpBox.name = FieldWithInfo.MemberId;
+
+            _onSearchFieldUIToolkit.AddListener(Search);
+            helpBox.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+
             return (helpBox, needUpdate || HasVisibilityOrEnableCondition());
+
+            void Search(string search)
+            {
+                if (!userData.WillShow)
+                {
+                    return;
+                }
+
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(userData.SearchableString, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (helpBox.style.display != display)
+                {
+                    helpBox.style.display = display;
+                }
+            }
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -39,7 +65,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             return result;
         }
 
-        private static (HelpBox helpBox, bool needUpdate) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute infoBoxAttribute, IRichTextTagProvider provider)
+        private static (HelpBox helpBox, bool needUpdate, InfoBoxUserData userData) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute infoBoxAttribute, IRichTextTagProvider provider)
         {
             RichTextDrawer richTextDrawer = new RichTextDrawer();
             InfoBoxUserData infoBoxUserData = new InfoBoxUserData
@@ -70,7 +96,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                               || infoBoxAttribute.IsCallback  // dynamic content
                               || (!string.IsNullOrEmpty(infoBoxAttribute.Content) && infoBoxAttribute.Content.Contains("<field"))  // contains <field/>
                               ;
-            return (helpBox, needUpdate);
+            return (helpBox, needUpdate, infoBoxUserData);
         }
 
         private static void UpdateInfoBox(HelpBox helpBox, IRichTextTagProvider provider)
@@ -85,8 +111,10 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 showHasError = showError != "";
                 willShow = show;
             }
+            // ReSharper disable once InvertIf
             if (!showHasError)
             {
+                infoBoxUserData.WillShow = willShow;
                 UpdateInfoBoxContent(willShow, helpBox, infoBoxUserData, provider);
             }
         }
@@ -192,24 +220,21 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             label.text = "";
             label.style.flexDirection = FlexDirection.Row;
 
-            // if (infoBoxUserData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
-            // {
-            //     ObjectNames.NicifyVariableName(infoBoxUserData.FieldWithInfo.Targets[0].GetType().Name);
-            // }
-            // else
-            // {
-            //     MemberInfo member = GetMemberInfo(infoBoxUserData.FieldWithInfo);
-            //     ObjectNames.NicifyVariableName(member.Name);
-            // }
-
             label.Clear();
-            foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXmlWithProvider(xmlContent, provider))
-                     )
-            {
 
-                label.Add(richTextElement);
+            IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(xmlContent, provider);
+            StringBuilder sb = new StringBuilder();
+            foreach (RichTextDrawer.RichTextChunk chunk in chunks)
+            {
+                if (!chunk.IsIcon)
+                {
+                    sb.Append(chunk.Content);
+                }
+
+                VisualElement element = infoBoxUserData.RichTextDrawer.DrawChunkUIToolKit(chunk);
+                label.Add(element);
             }
+            infoBoxUserData.SearchableString = sb.ToString();
         }
     }
 }

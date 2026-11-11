@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using SaintsField.Editor.Utils;
@@ -832,95 +833,74 @@ namespace SaintsField.Editor.Core
 #if UNITY_2021_3_OR_NEWER
         public IEnumerable<VisualElement> DrawChunksUIToolKit(IEnumerable<RichTextChunk> payloads)
         {
-            foreach(RichTextChunk curChunk in payloads)
+            return payloads.Select(DrawChunkUIToolKit);
+        }
+
+        public VisualElement DrawChunkUIToolKit(RichTextChunk curChunk)
+        {
+            if (!curChunk.IsIcon)
             {
-                // Debug.Log(curChunk);
-                if (!curChunk.IsIcon)
+                return new Label(curChunk.Content)
                 {
-                    yield return new Label(curChunk.Content)
+                    style =
                     {
-                        style =
-                        {
-                            flexShrink = 0,
-                            unityTextAlign = TextAnchor.UpperLeft,
-                            paddingLeft = 0,
-                            paddingRight = 0,
-                            whiteSpace = WhiteSpace.Normal,
-                        },
-                        pickingMode = PickingMode.Ignore,
-                    };
-                }
-                else
+                        flexShrink = 0,
+                        unityTextAlign = TextAnchor.UpperLeft,
+                        paddingLeft = 0,
+                        paddingRight = 0,
+                        whiteSpace = WhiteSpace.Normal,
+                    },
+                    pickingMode = PickingMode.Ignore,
+                };
+            }
+
+            TextureCacheKey cacheKey = new TextureCacheKey
+            {
+                ColorPresent = "",
+                IconPath = curChunk.Content,
+            };
+
+            if (!_textureCacheOrigin.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
+            {
+                texture = Util.LoadResource<Texture2D>(curChunk.Content);
+                if (texture != null && texture.width != 1 && texture.height != 1)
                 {
-                    TextureCacheKey cacheKey = new TextureCacheKey
-                    {
-                        ColorPresent = "",
-                        IconPath = curChunk.Content,
-                    };
-
-                    if (!_textureCacheOrigin.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
-                    {
-                        texture = Util.LoadResource<Texture2D>(curChunk.Content);
-                        if (texture != null && texture.width != 1 && texture.height != 1)
-                        {
-                            _textureCacheOrigin[cacheKey] = texture;
-                        }
-                    }
-
-                    // Image img = new Image
-                    // {
-                    //     image = texture,
-                    //     scaleMode = ScaleMode.ScaleToFit,
-                    //     tintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
-                    //     pickingMode = PickingMode.Ignore,
-                    //     style =
-                    //     {
-                    //         flexShrink = 0,
-                    //         // marginTop = 2,
-                    //         // marginBottom = 2,
-                    //         // paddingLeft = 1,
-                    //         // paddingRight = 1,
-                    //         maxHeight = 15,
-                    //         alignSelf = Align.Center,
-                    //         width = ImageWidth,
-                    //         height = SaintsPropertyDrawer.SingleLineHeight - 2,
-                    //     },
-                    // };
-                    VisualElement img = new VisualElement
-                    {
-                        pickingMode = PickingMode.Ignore,
-                        style =
-                        {
-                            backgroundImage = texture,
-                            unityBackgroundImageTintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
-#if UNITY_2022_2_OR_NEWER
-                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-
-                            flexShrink = 0,
-                            // marginTop = 2,
-                            // marginBottom = 2,
-                            // paddingLeft = 1,
-                            // paddingRight = 1,
-                            maxHeight = 15,
-                            alignSelf = Align.Center,
-                            width = ImageWidth,
-                            height = SaintsPropertyDrawer.SingleLineHeight - 2,
-                        },
-                    };
-                    // img.style.flexShrink = 0;
-
-#if EXT_INSPECTOR_LOG
-                    Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
-#endif
-                    yield return img;
+                    _textureCacheOrigin[cacheKey] = texture;
                 }
             }
+            VisualElement img = new VisualElement
+            {
+                pickingMode = PickingMode.Ignore,
+                style =
+                {
+                    backgroundImage = texture,
+                    unityBackgroundImageTintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+
+                    flexShrink = 0,
+                    // marginTop = 2,
+                    // marginBottom = 2,
+                    // paddingLeft = 1,
+                    // paddingRight = 1,
+                    maxHeight = 15,
+                    alignSelf = Align.Center,
+                    width = ImageWidth,
+                    height = SaintsPropertyDrawer.SingleLineHeight - 2,
+                },
+            };
+            // img.style.flexShrink = 0;
+
+#if EXT_INSPECTOR_LOG
+                Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
+#endif
+            return img;
         }
 #endif
 

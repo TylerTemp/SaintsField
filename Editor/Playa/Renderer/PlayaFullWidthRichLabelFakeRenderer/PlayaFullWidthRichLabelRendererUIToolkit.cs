@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Reflection;
+using System.Text;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
@@ -16,6 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         private class AboveRichLabelUserData
         {
             public string XmlContent;
+            public string SearchableString = "";
 
             public BelowTextAttribute PlayaBelowRichLabelAttribute;
             public SaintsFieldWithInfo FieldWithInfo;
@@ -31,7 +33,24 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
             (VisualElement labelContainer, bool needUpdate) = CreateRichLabelContainer(FieldWithInfo, _playaBelowRichLabelAttribute);
             labelContainer.name = FieldWithInfo.MemberId;
+            _onSearchFieldUIToolkit.AddListener(Search);
+            labelContainer.RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                _onSearchFieldUIToolkit.RemoveListener(Search);
+                _onSearchFieldUIToolkit.AddListener(Search);
+            });
+            labelContainer.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+
             return (labelContainer, needUpdate || HasVisibilityOrEnableCondition());
+
+            void Search(string search)
+            {
+                AboveRichLabelUserData userData = (AboveRichLabelUserData)labelContainer.userData;
+                UIToolkitUtils.SetDisplayStyle(labelContainer,
+                    Util.UnityDefaultSimpleSearch(userData.SearchableString, search)
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None);
+            }
         }
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
@@ -95,6 +114,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 #if SAINTSFIELD_DEBUG
                     Debug.LogError(error);
 #endif
+                    userData.XmlContent = null;
+                    userData.SearchableString = error;
                     container.Clear();
                     container.Add(new HelpBox(error, HelpBoxMessageType.Error));
                     return;
@@ -104,19 +125,19 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             }
 
             // Debug.Log($"{userData.XmlContent} == {xmlContent}: {userData.XmlContent == xmlContent}");
-            if (userData.XmlContent == xmlContent && !xmlContent.Contains("<field"))
+            if (userData.XmlContent == xmlContent && (string.IsNullOrEmpty(xmlContent) || !xmlContent.Contains("<field")))
             {
-                return;
-            }
-
-            bool notShow = string.IsNullOrEmpty(xmlContent);
-            if (notShow)
-            {
-                container.Clear();
                 return;
             }
 
             userData.XmlContent = xmlContent;
+            bool notShow = string.IsNullOrEmpty(xmlContent);
+            if (notShow)
+            {
+                userData.SearchableString = "";
+                container.Clear();
+                return;
+            }
 
             // string useLabel;
             // MemberInfo member;
@@ -134,12 +155,17 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             // Debug.Log($"parse {xmlContent}");
 
             container.Clear();
-            foreach (VisualElement richTextElement in userData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXmlWithProvider(xmlContent, richTextTagProvider))
-                     )
+            StringBuilder searchable = new StringBuilder();
+            foreach (RichTextDrawer.RichTextChunk chunk in
+                     RichTextDrawer.ParseRichXmlWithProvider(xmlContent, richTextTagProvider))
             {
-                container.Add(richTextElement);
+                if (!chunk.IsIcon)
+                {
+                    searchable.Append(chunk.Content);
+                }
+                container.Add(userData.RichTextDrawer.DrawChunkUIToolKit(chunk));
             }
+            userData.SearchableString = searchable.ToString();
         }
     }
 }

@@ -22,6 +22,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 
         public override void OnSearchField(string searchString)
         {
+#if UNITY_2021_3_OR_NEWER
+            ApplySearchUIToolkit(searchString);
+#endif
         }
 
         private (string error, string richXml) GetSeparatorRichXml()

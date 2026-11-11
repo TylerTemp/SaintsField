@@ -2,6 +2,7 @@ using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 {
@@ -16,8 +17,14 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             _playaBelowRichLabelAttribute = playaBelowRichLabelAttribute;
         }
 
+#if UNITY_2021_3_OR_NEWER
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+#endif
         public override void OnSearchField(string searchString)
         {
+#if UNITY_2021_3_OR_NEWER
+            _onSearchFieldUIToolkit.Invoke(searchString);
+#endif
         }
 
         public override string ToString()
