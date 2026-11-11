@@ -114,7 +114,7 @@ namespace: `SaintsField`
 **5.31.3**
 
 1.  Fix: Callback upwalk/downwalk could get a wrong invoke target and fail
-2.  Fix: Element cell (SaintsDictionary/Array/List etc.) could not process disable style playa attributes
+2.  Fix: Element cell (SaintsDictionary/Array/List etc.) could not process displayable style playa attributes
 3.  Fix: Downpour system callback
 
 ## Usage ##
