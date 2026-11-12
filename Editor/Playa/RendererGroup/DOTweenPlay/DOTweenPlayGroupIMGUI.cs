@@ -474,22 +474,11 @@ namespace SaintsField.Editor.Playa.RendererGroup.DOTweenPlay
         {
         }
 
-        public void OnSearchField(string searchString)
-        {
-            _onSearchFieldUIToolkit.Invoke(searchString);
-        }
+
 
         public void SetSerializedProperty(SerializedProperty property)
         {
         }
-
-        // fix for old unity
-        private class OnSearchFieldUIToolkitEvent: UnityEvent<string> {}
-
-        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new OnSearchFieldUIToolkitEvent();
-
-        // private bool _debugCheck;
-
         #endregion
     }
 }

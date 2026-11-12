@@ -80,8 +80,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
     public partial class SaintsRendererGroup
     {
+        private VisualElement _root;
         private HelpBox _helpBox;
         private Dictionary<string, List<VisualElement>> _fieldToVisualElement;
+        private TabToolbar _tabToolbar;
+        private string _selectedTab;
 
         public static readonly Color FancyBgColor = new Color(0.2509804f, 0.2509804f, 0.2509804f);
         private static readonly Color FancyBorderColor = EColor.MidnightAsh.GetColor();
@@ -114,10 +117,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
             bool background = _eLayout.HasFlagFast(ELayout.Background);
             bool isLabelField = _eLayout.HasFlagFast(ELayout.LabelField);
             bool fancy = titleOut && background;
-            VisualElement root;
             if (foldoutTitle && !fancy)
             {
-                root = new Foldout
+                _root = new Foldout
                 {
                     text = " ",
                     // text = _groupPath.Split('/').Last(),
@@ -133,11 +135,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 // MockBaseField mockBaseField = new MockBaseField();
                 // mockBaseField.SetReady();
-                root = new MockBaseField();
+                _root = new MockBaseField();
             }
             else
             {
-                root = new VisualElement
+                _root = new VisualElement
                 {
                     style =
                     {
@@ -150,7 +152,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     },
                 };
             }
-            root.name = $"saints-field-group--{_groupPath}";
+            _root.name = $"saints-field-group--{_groupPath}";
 
             VisualElement titleRow = new VisualElement
             {
@@ -296,7 +298,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 }
                 else
                 {
-                    Foldout foldout = (Foldout)root;
+                    Foldout foldout = (Foldout)_root;
                     Label foldoutLabel = foldout.Q<Toggle>().Q<Label>();
                     UIToolkitUtils.SetLabel(foldoutLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
                     if (_eLayout.HasFlagFast(ELayout.TitleOut))
@@ -324,7 +326,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         });
                     }
 
-                    root = foldout;
+                    _root = foldout;
                 }
             }
 
@@ -370,51 +372,48 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     }
                     visualElements.Add(fieldElement);
                     body.Add(fieldElement);
-
-                    _onSearchFieldUIToolkit.AddListener(renderer.OnSearchField);
-                    fieldElement.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(renderer.OnSearchField));
                 }
             }
 
             bool fancyBox = IsFancyBox(_eLayout);
             if(fancyBox)
             {
-                root.style.backgroundColor = FancyBgColor;
-                root.style.borderTopWidth = 1;
-                root.style.borderLeftWidth = 1;
-                root.style.borderRightWidth = 1;
-                root.style.borderBottomWidth = 1;
-                root.style.borderLeftColor = FancyBorderColor;
-                root.style.borderRightColor = FancyBorderColor;
-                root.style.borderTopColor = FancyBorderColor;
-                root.style.borderBottomColor = FancyBorderColor;
-                // root.style.paddingRight = 2;
+                _root.style.backgroundColor = FancyBgColor;
+                _root.style.borderTopWidth = 1;
+                _root.style.borderLeftWidth = 1;
+                _root.style.borderRightWidth = 1;
+                _root.style.borderBottomWidth = 1;
+                _root.style.borderLeftColor = FancyBorderColor;
+                _root.style.borderRightColor = FancyBorderColor;
+                _root.style.borderTopColor = FancyBorderColor;
+                _root.style.borderBottomColor = FancyBorderColor;
+                // _root.style.paddingRight = 2;
             }
 
             if (isLabelField)
             {
-                ((MockBaseField)root).BulkAdd(body);
+                ((MockBaseField)_root).BulkAdd(body);
             }
             else
             {
-                root.Add(titleRow);
-                root.Add(body);
+                _root.Add(titleRow);
+                _root.Add(body);
             }
 
             float marginTop = _config.MarginTop >= 0 ? _config.MarginTop : 2;
             float marginBottom = _config.MarginBottom >= 0 ? _config.MarginBottom : 0;
 
-            root.style.marginTop = marginTop;
-            root.style.marginBottom = marginBottom;
+            _root.style.marginTop = marginTop;
+            _root.style.marginBottom = marginBottom;
 
             // sub container has some space left
             // if(_groupPath.Contains('/') && _eLayout.HasFlagFast(ELayout.Background) && _eLayout.HasFlagFast(ELayout.Title) && _eLayout.HasFlagFast(ELayout.TitleOut))
             if(_groupPath.Count >= 2 && _eLayout.HasFlagFast(ELayout.Background) && _eLayout.HasFlagFast(ELayout.Title) && _eLayout.HasFlagFast(ELayout.TitleOut))
             {
-                root.style.marginLeft = 4;
+                _root.style.marginLeft = 4;
             }
 
-            // root.RegisterCallback<DetachFromPanelEvent>(_ =>
+            // _root.RegisterCallback<DetachFromPanelEvent>(_ =>
             // {
             //     UnityEngine.Object.DestroyImmediate(dropdownIcon);
             //     UnityEngine.Object.DestroyImmediate(dropdownRightIcon);
@@ -423,7 +422,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if(NeedIndentCheck(_eLayout))
             {
                 // Debug.Log($"Check indent: {_eLayout}");
-                root.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(root));
+                _root.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(_root));
             }
 
             if(_toggleCheckInfos.Count > 0)
@@ -432,13 +431,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (isLabelField)
                 {
-                    checkBodyContainer = ((MockBaseField)root).Body;
+                    checkBodyContainer = ((MockBaseField)_root).Body;
                 }
                 else
                 {
                     checkBodyContainer = body;
                 }
-                root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, root, checkBodyContainer)).Every(150);
+                _root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, _root, checkBodyContainer)).Every(150);
             }
 
             HelpBox helpBox = _helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -450,18 +449,18 @@ namespace SaintsField.Editor.Playa.RendererGroup
             };
             if (isLabelField)
             {
-                ((MockBaseField)root).Body.Add(helpBox);
+                ((MockBaseField)_root).Body.Add(helpBox);
             }
             else
             {
-                root.Add(helpBox);
+                _root.Add(helpBox);
             }
 
-            return root;
+            return _root;
 
             TabToolbar SetupTabToolbar(bool hasExpand)
             {
-                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, hasExpand);
+                TabToolbar tabToolbar = _tabToolbar = new TabToolbar(_orderedKeys, hasExpand);
 
                 tabToolbar.OnValueChangedAddListener(SetDisplayGroups);
                 tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
@@ -473,12 +472,51 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
         }
 
+        private bool _searchMatches = true;
+
+        private bool OnSearchFieldUIToolkit(string searchString)
+        {
+            if (_root == null)
+            {
+                return false;
+            }
+
+            bool isSearching = !string.IsNullOrEmpty(searchString);
+            if (_tabToolbar != null && isSearching)
+            {
+                _tabToolbar.SetEnabled(false);
+            }
+
+            bool result = false;
+            foreach ((string _, ISaintsRenderer renderer)  in _renderers)
+            {
+                if (renderer.OnSearchField(searchString))
+                {
+                    result = true;
+                }
+            }
+
+            if (_tabToolbar != null && !isSearching)
+            {
+                SetDisplayGroupsInternal(_selectedTab);
+            }
+
+            _searchMatches = !isSearching || result;
+            UIToolkitUtils.SetDisplayStyle(_root, _searchMatches ? DisplayStyle.Flex : DisplayStyle.None);
+            return result;
+        }
+
         private void SetDisplayGroups(string tab)
         {
-            // Debug.Log($"cur tab = {tab}");
+            _selectedTab = tab;
+            SetDisplayGroupsInternal(tab);
+        }
+
+        private void SetDisplayGroupsInternal(string tab)
+        {
+            _tabToolbar?.SetEnabled(true);
             foreach((string groupPath, List<VisualElement> visualElements) in _fieldToVisualElement)
             {
-                // Debug.Log($"groupPath={groupPath}");
                 bool display = tab == null || groupPath == tab;
                 visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
             }
@@ -505,6 +543,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 body.SetEnabled(!disable);
             }
 
+            show &= _searchMatches;
             bool currentVisible = root.style.display != DisplayStyle.None;
             if (currentVisible != show)
             {

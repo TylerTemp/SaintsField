@@ -107,23 +107,23 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 SaintsEditorApplicationChanged.OnAnyEvent.AddListener(BindAndCheckElement);
             });
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            _onEventWithErrorElement.RegisterCallback<DetachFromPanelEvent>(_ =>
-            {
-                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(BindAndCheckElement);
-                _onSearchFieldUIToolkit.RemoveListener(Search);
-            });
-
-            return (_onEventWithErrorElement, false);
-
-            void Search(string search)
+            _searchFunc = search =>
             {
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(FieldWithInfo.MethodInfo.Name, search)
                     ? DisplayStyle.Flex
                     : DisplayStyle.None;
 
                 UIToolkitUtils.SetDisplayStyle(_onEventWithErrorElement, display);
-            }
+                return display == DisplayStyle.Flex;
+            };
+            _onEventWithErrorElement.RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(BindAndCheckElement);
+            });
+
+            return (_onEventWithErrorElement, false);
+
+
         }
 
         private void RefreshElement()

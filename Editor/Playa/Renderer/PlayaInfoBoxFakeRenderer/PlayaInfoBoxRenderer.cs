@@ -16,14 +16,16 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             _playaInfoBoxAttribute = playaInfoBoxAttribute;
         }
 
-#if UNITY_2021_3_OR_NEWER
-        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
-#endif
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
 #if UNITY_2021_3_OR_NEWER
-            _onSearchFieldUIToolkit.Invoke(searchString);
+            return OnSearchFieldUIToolkit(searchString);
 #endif
+
+#pragma warning disable CS0162 // Unreachable code detected
+            // ReSharper disable once HeuristicUnreachableCode
+            return false;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public override string ToString()

@@ -27,12 +27,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             string labelName = FieldWithInfo.SerializedProperty.displayName;
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            result.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
-
-            return (result, false);
-
-            void Search(string search)
+            _searchFunc = search =>
             {
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
                     ? DisplayStyle.Flex
@@ -42,7 +37,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     result.style.display = display;
                 }
-            }
+                return display == DisplayStyle.Flex;
+            };
+
+            return (result, false);
+
+
         }
     }
 }

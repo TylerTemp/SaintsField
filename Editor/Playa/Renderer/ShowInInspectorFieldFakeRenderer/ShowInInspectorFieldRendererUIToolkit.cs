@@ -164,8 +164,17 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 $"{FieldWithInfo.Targets[0].GetHashCode()}.{memberInfo.Name}"
             );
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            root.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+            _searchFunc = search =>
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+                if (root.style.display != display)
+                {
+                    root.style.display = display;
+                }
+                return display == DisplayStyle.Flex;
+            };
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -303,16 +312,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
             return (root, true);
 
-            void Search(string search)
-            {
-                DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None;
-                if (root.style.display != display)
-                {
-                    root.style.display = display;
-                }
-            }
+
         }
 
         private string _preRichLabelXml = "";

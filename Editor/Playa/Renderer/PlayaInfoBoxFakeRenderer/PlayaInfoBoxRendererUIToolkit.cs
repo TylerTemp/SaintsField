@@ -28,22 +28,19 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         {
         }
 
+        private Func<string, bool> _searchFunc;
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {
             (HelpBox helpBox, bool needUpdate, InfoBoxUserData userData) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute, this);
             helpBox.name = FieldWithInfo.MemberId;
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            helpBox.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
-
-            return (helpBox, needUpdate || HasVisibilityOrEnableCondition());
-
-            void Search(string search)
+            _searchFunc = search =>
             {
                 if (!userData.WillShow)
                 {
-                    return;
+                    return false;
                 }
 
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(userData.SearchableString, search)
@@ -54,7 +51,13 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 {
                     helpBox.style.display = display;
                 }
-            }
+
+                return display == DisplayStyle.Flex;
+            };
+
+            // _searchFunc = Search;
+
+            return (helpBox, needUpdate || HasVisibilityOrEnableCondition());
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -235,6 +238,11 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 label.Add(element);
             }
             infoBoxUserData.SearchableString = sb.ToString();
+        }
+
+        private bool OnSearchFieldUIToolkit(string searchString)
+        {
+            return _searchFunc?.Invoke(searchString) ?? false;
         }
     }
 }

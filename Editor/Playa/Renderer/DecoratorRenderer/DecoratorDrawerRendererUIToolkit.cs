@@ -16,18 +16,18 @@ namespace SaintsField.Editor.Playa.Renderer.DecoratorRenderer
             VisualElement result = UIToolkitCache.CreateDec(_propertyAttribute, _decoratorDrawerType);
             string labelName = GetFriendlyName(FieldWithInfo);
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            result.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
-
-            return (result, false);
-
-            void Search(string search)
+            _searchFunc = search =>
             {
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
                     ? DisplayStyle.Flex
                     : DisplayStyle.None;
                 UIToolkitUtils.SetDisplayStyle(result, display);
-            }
+                return display == DisplayStyle.Flex;
+            };
+
+            return (result, false);
+
+
         }
 
     }

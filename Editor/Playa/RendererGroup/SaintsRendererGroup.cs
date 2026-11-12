@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Playa.Utils;
@@ -140,14 +140,19 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
         }
 
-#if UNITY_2021_3_OR_NEWER
-        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
-#endif
-        public void OnSearchField(string searchString)
+// #if UNITY_2021_3_OR_NEWER
+//         private System.Func<string, bool> _searchFunc;
+// #endif
+        public bool OnSearchField(string searchString)
         {
 #if UNITY_2021_3_OR_NEWER
-            _onSearchFieldUIToolkit.Invoke(searchString);
+            return OnSearchFieldUIToolkit(searchString);
 #endif
+
+#pragma warning disable CS0162 // Unreachable code detected
+            // ReSharper disable once HeuristicUnreachableCode
+            return false;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public void SetSerializedProperty(SerializedProperty property)

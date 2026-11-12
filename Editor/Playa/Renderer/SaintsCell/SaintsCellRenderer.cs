@@ -32,8 +32,9 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
 
         protected override bool AllowGuiColor => true;
 
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
+            return false;
         }
 
         public override void OnDestroyIMGUI()

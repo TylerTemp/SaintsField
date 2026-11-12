@@ -19,8 +19,9 @@ namespace SaintsField.Editor.Playa.Renderer.OnInspectorDisposeAttributeRenderer
         {
         }
 
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
+            return false;
         }
 
         private void InvokeDispose()

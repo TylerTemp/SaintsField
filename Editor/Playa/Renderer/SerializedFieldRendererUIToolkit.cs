@@ -58,7 +58,9 @@ namespace SaintsField.Editor.Playa.Renderer
             if (r != null)
             {
                 r.style.width = new StyleLength(Length.Percent(100));
-                void Search(string search)
+
+
+                SearchFuncUIToolkit = search =>
                 {
                     string labelName = FieldWithInfo.SerializedProperty.displayName;
 
@@ -66,10 +68,8 @@ namespace SaintsField.Editor.Playa.Renderer
                         ? DisplayStyle.Flex
                         : DisplayStyle.None;
                     UIToolkitUtils.SetDisplayStyle(r, display);
-                }
-
-                OnSearchFieldUIToolkit.AddListener(Search);
-                r.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+                    return display == DisplayStyle.Flex;
+                };
             }
 
             // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}/{r}");

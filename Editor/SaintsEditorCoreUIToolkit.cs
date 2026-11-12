@@ -24,7 +24,7 @@ namespace SaintsField.Editor
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateInspectorGUI()
         {
-            if (!Target)
+            if (Target == null)
             {
                 return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
             }
@@ -107,7 +107,7 @@ namespace SaintsField.Editor
             }
 
             MonoScript monoScript = SaintsEditor.GetMonoScript(Target);
-            if(monoScript && _editorShowMonoScript)
+            if(monoScript != null && _editorShowMonoScript)
             {
                 ObjectField objectField = new ObjectField("Script")
                 {

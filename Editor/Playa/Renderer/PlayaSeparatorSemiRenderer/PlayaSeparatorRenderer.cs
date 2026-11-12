@@ -20,11 +20,16 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
             _colorHex = ColorUtility.ToHtmlStringRGB(_playaSeparatorAttribute.Color);
         }
 
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
 #if UNITY_2021_3_OR_NEWER
-            ApplySearchUIToolkit(searchString);
+            return ApplySearchUIToolkit(searchString);
 #endif
+
+#pragma warning disable CS0162 // Unreachable code detected
+            // ReSharper disable once HeuristicUnreachableCode
+            return false;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         private (string error, string richXml) GetSeparatorRichXml()

@@ -24,8 +24,9 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
             _onValueChangedAttribute = onValueChangedAttribute;
         }
 
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
+            return false;
         }
 
         protected (bool changed, string error) CheckCollectionLengthChanged()

@@ -32,17 +32,18 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
             return (result.target, _playaSeparatorAttribute.Title != null);
         }
 
-        private void ApplySearchUIToolkit(string search)
+        private bool ApplySearchUIToolkit(string search)
         {
             if (_separatorElement == null)
             {
-                return;
+                return false;
             }
 
             bool matches = string.IsNullOrEmpty(search)
                            || (!string.IsNullOrEmpty(_searchableString)
                                && Util.UnityDefaultSimpleSearch(_searchableString, search));
             _separatorElement.style.display = matches ? DisplayStyle.Flex : DisplayStyle.None;
+            return matches;
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

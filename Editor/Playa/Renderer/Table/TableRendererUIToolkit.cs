@@ -48,13 +48,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             FillTableToContainer(result, tableAttribute.DefaultCollapse);
 
-            OnSearchFieldUIToolkit.AddListener(Search);
-            result.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
-            result.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
-
-            return (result, true);
-
-            void Search(string search)
+            SearchFuncUIToolkit = search =>
             {
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(FieldWithInfo.SerializedProperty.displayName, search)
                     ? DisplayStyle.Flex
@@ -64,7 +58,13 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 {
                     result.style.display = display;
                 }
-            }
+                return display == DisplayStyle.Flex;
+            };
+            result.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
+
+            return (result, true);
+
+
         }
 
         private int _preArraySize;

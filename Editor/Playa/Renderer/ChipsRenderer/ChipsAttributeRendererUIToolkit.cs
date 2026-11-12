@@ -74,17 +74,13 @@ namespace SaintsField.Editor.Playa.Renderer.ChipsRenderer
             root.Add(_chipsInputField);
             _chipsInputElement.BindProp(property);
 
-            void Search(string text) => UIToolkitUtils.SetDisplayStyle(root,
-                Util.UnityDefaultSimpleSearch(property.displayName, text)
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None);
-            OnSearchFieldUIToolkit.AddListener(Search);
-            UIToolkitUtils.OnAttachToPanelOnceWithEnsure(root, () =>
+
+            SearchFuncUIToolkit = text =>
             {
-                OnSearchFieldUIToolkit.RemoveListener(Search);
-                OnSearchFieldUIToolkit.AddListener(Search);
-            });
-            root.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+                bool matches = Util.UnityDefaultSimpleSearch(property.displayName, text);
+                UIToolkitUtils.SetDisplayStyle(root, matches ? DisplayStyle.Flex : DisplayStyle.None);
+                return matches;
+            };
 
             _chipsInputField.RegisterCallback<DragEnterEvent>(_ => SetDragVisualMode(elementType));
             _chipsInputField.RegisterCallback<DragLeaveEvent>(_ =>

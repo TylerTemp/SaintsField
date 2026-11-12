@@ -98,13 +98,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 #if UNITY_2021_3_OR_NEWER
-        protected readonly UnityEvent<string> OnSearchFieldUIToolkit = new UnityEvent<string>();
+        protected System.Func<string, bool> SearchFuncUIToolkit;
 #endif
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
 #if UNITY_2021_3_OR_NEWER
-            OnSearchFieldUIToolkit.Invoke(searchString);
+            return SearchFuncUIToolkit?.Invoke(searchString) ?? false;
 #endif
+
+#pragma warning disable CS0162 // Unreachable code detected
+            // ReSharper disable once HeuristicUnreachableCode
+            return false;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
 

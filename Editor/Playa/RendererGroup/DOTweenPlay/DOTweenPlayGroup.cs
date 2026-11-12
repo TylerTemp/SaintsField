@@ -1,4 +1,4 @@
-﻿#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,6 +119,18 @@ namespace SaintsField.Editor.Playa.RendererGroup.DOTweenPlay
             // }
             _doTweenMethods.Add((methodRenderer.FieldWithInfo.MethodInfo, doTweenPlayAttribute));
             _groupPath = groupPath;
+        }
+
+        public bool OnSearchField(string searchString)
+        {
+#if UNITY_2021_3_OR_NEWER
+            return OnSearchFieldUIToolkit(searchString);
+#endif
+
+#pragma warning disable CS0162 // Unreachable code detected
+            // ReSharper disable once HeuristicUnreachableCode
+            return false;
+#pragma warning restore CS0162 // Unreachable code detected
         }
     }
 }

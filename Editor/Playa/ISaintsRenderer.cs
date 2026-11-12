@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Playa
 
         void OnDestroy();
 
-        void OnSearchField(string searchString);
+        bool OnSearchField(string searchString);
 
         void SetSerializedProperty(SerializedProperty property);
 

@@ -33,24 +33,20 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
             (VisualElement labelContainer, bool needUpdate) = CreateRichLabelContainer(FieldWithInfo, _playaBelowRichLabelAttribute);
             labelContainer.name = FieldWithInfo.MemberId;
-            _onSearchFieldUIToolkit.AddListener(Search);
-            labelContainer.RegisterCallback<AttachToPanelEvent>(_ =>
+            _searchFunc = search =>
             {
-                _onSearchFieldUIToolkit.RemoveListener(Search);
-                _onSearchFieldUIToolkit.AddListener(Search);
-            });
-            labelContainer.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+                AboveRichLabelUserData userData = (AboveRichLabelUserData)labelContainer.userData;
+                bool matches = Util.UnityDefaultSimpleSearch(userData.SearchableString, search);
+                UIToolkitUtils.SetDisplayStyle(labelContainer,
+                    matches
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None);
+                return matches;
+            };
 
             return (labelContainer, needUpdate || HasVisibilityOrEnableCondition());
 
-            void Search(string search)
-            {
-                AboveRichLabelUserData userData = (AboveRichLabelUserData)labelContainer.userData;
-                UIToolkitUtils.SetDisplayStyle(labelContainer,
-                    Util.UnityDefaultSimpleSearch(userData.SearchableString, search)
-                        ? DisplayStyle.Flex
-                        : DisplayStyle.None);
-            }
+
         }
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {

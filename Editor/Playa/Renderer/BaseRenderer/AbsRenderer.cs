@@ -404,7 +404,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             OnDestroyUIToolkit();
 #endif
         }
-        public abstract void OnSearchField(string searchString);
+        public abstract bool OnSearchField(string searchString);
 
         protected SerializedProperty _serializedProperty;
 

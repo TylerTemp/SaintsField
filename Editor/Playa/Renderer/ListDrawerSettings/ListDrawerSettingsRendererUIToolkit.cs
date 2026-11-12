@@ -37,17 +37,15 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 SerializedListUtils.CreateExtraSearch(property, elementType, FieldWithInfo.Targets[0], settings.ExtraSearch),
                 () => configuredLimits?.Invoke() ?? _sizeLimits);
 
-            OnSearchFieldUIToolkit.AddListener(Search);
-            _element.RegisterCallback<AttachToPanelEvent>(_ =>
+            SearchFuncUIToolkit = text =>
             {
-                OnSearchFieldUIToolkit.RemoveListener(Search);
-                OnSearchFieldUIToolkit.AddListener(Search);
-            });
-            _element.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+                bool matches = Util.UnityDefaultSimpleSearch(property.displayName, text);
+                UIToolkitUtils.SetDisplayStyle(_element, matches ? DisplayStyle.Flex : DisplayStyle.None);
+                return matches;
+            };
             return (_element, false);
 
-            void Search(string text) => UIToolkitUtils.SetDisplayStyle(_element,
-                Util.UnityDefaultSimpleSearch(property.displayName, text) ? DisplayStyle.Flex : DisplayStyle.None);
+
         }
 
         private static Attribute MapElementAttribute(Attribute attr)

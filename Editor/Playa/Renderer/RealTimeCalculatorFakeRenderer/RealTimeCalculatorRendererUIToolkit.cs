@@ -144,8 +144,18 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 // AlwaysCheckUpdate = isNestedField,
             };
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            root.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+            _searchFunc = search =>
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(GetName(FieldWithInfo), search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (root.style.display != display)
+                {
+                    root.style.display = display;
+                }
+                return display == DisplayStyle.Flex;
+            };
 
             if (hasParameters)
             {
@@ -165,17 +175,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
 
             return (root, true);
 
-            void Search(string search)
-            {
-                DisplayStyle display = Util.UnityDefaultSimpleSearch(GetName(FieldWithInfo), search)
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None;
 
-                if (root.style.display != display)
-                {
-                    root.style.display = display;
-                }
-            }
         }
 
         // private RichTextDrawer _richTextDrawer;

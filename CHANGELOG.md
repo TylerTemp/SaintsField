@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.31.4 ##
+
+1.  Fix: `Above/BelowText`, `[Below]InfoBox` can be searched correctly
+2.  Improve: Layout with title now can hide when no children match the search
+3.  Fix: Searching tabs now will show all tab content, and clean search will HIDE not-selected tab items
+
 ## 5.31.3 ##
 
 1.  Fix: Callback upwalk/downwalk could get a wrong invoke target and fail

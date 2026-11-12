@@ -365,12 +365,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             string methodNameFriendly = ObjectNames.NicifyVariableName(methodInfo.Name);
 
-            _onSearchFieldUIToolkit.AddListener(Search);
-            fancyButton.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
-
-            return (fancyButton, needUpdate);
-
-            void Search(string search)
+            _searchFunc = search =>
             {
                 DisplayStyle display = Util.UnityDefaultSimpleSearch(methodNameFriendly, search)
                     ? DisplayStyle.Flex
@@ -380,7 +375,12 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 {
                     fancyButton.style.display = display;
                 }
-            }
+                return display == DisplayStyle.Flex;
+            };
+
+            return (fancyButton, needUpdate);
+
+
         }
 
         private static VisualElement MakeErrorBox(Exception error)

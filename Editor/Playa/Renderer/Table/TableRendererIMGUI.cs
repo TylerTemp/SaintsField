@@ -349,10 +349,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             _tableIMGUI = null;
         }
 
-        public override void OnSearchField(string searchString)
+        public override bool OnSearchField(string searchString)
         {
-            base.OnSearchField(searchString);
+            bool result = base.OnSearchField(searchString);
             _searchStringIMGUI = searchString ?? "";
+            return result;
         }
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
