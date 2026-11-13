@@ -75,7 +75,7 @@ private string MethodLabel(string[] values)
 }
 ```
 
-![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
+![LablText](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
 
 Example of using `<field />` to display field value/propery value:
 
@@ -215,7 +215,7 @@ using SaintsField.Playa;
 
 [AboveText("<color=gray>This is a class message")]
 [AboveText("$" + nameof(dynamicContent))]
-public class ClassPlayaAboveRichLabelExample : MonoBehaviour
+public class ClassAboveTextExample : MonoBehaviour
 {
     [ResizableTextArea]
     public string dynamicContent;
@@ -267,8 +267,8 @@ Like `AboveText` /  `BelowText`, but it can be applied to an array/list to draw 
 
 Using on a single field, it can show text on field like `AboveText` / `BelowText` does. Useful if you can not enable `SaintsEditor`
 
-*   `string|null richTextXml` Same as `RichLabel`
-*   `bool isCallback=false` Same as `RichLabel`
+*   `string|null richTextXml` Same as `LabelText`
+*   `bool isCallback=false` Same as `LabelText`
 *   `string groupBy = ""` See `GroupBy` section
 *   Allow Multiple: Yes
 
@@ -330,7 +330,7 @@ Like `LabelText`, but it's rendered at the end of the field.
 
 Parameters:
 
-*   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
+*   `string richTextXml` the content of the label, or a property/callback. Supports tags like `LabelText`
 
     If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
 
@@ -1071,13 +1071,13 @@ All of them have the same arguments:
 
 *   `string buttonLabel=null`
 
-    label of the button, support tags like `RichLabel`. `null` means using function name as label.
+    label of the button, support tags like `LabelText`. `null` means using function name as label.
 
     If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
 
 *   `bool isCallback = false`
 
-    a callback or property name for button's label, same as `RichLabel`
+    a callback or property name for button's label, same as `LabelText`
 
 *   `bool hideReturnValue=false`
 
@@ -2321,9 +2321,9 @@ public struct MyStruct
 {
     public int myInt;
 
-    [TableColumn("Value"), AboveRichLabel]
+    [TableColumn("Value"), AboveText]
     public string myString;
-    [TableColumn("Value"), AboveRichLabel]
+    [TableColumn("Value"), AboveText]
     public GameObject myObject;
 }
 
@@ -5287,13 +5287,13 @@ private IEnumerable<Transform> ChildTrans() => transform.Cast<Transform>();
 
 Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
 
-If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+If you add `InspectorName` to the `enum`, the item name will be changed to the `InspectorName` content.
 
 ```csharp
 [Serializable]
 public enum MyEnum
 {
-    [InspectorName("1")]  // RichLabel is optional. Just for you to have more fancy control
+    [InspectorName("1")]  // InspectorName is optional. Just for you to have more fancy control
     First,
     [InspectorName("2")]
     Second,
@@ -5477,7 +5477,7 @@ The look in the UI Toolkit with `slashAsSub: false`:
 
 Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
 
-If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+If you add `InspectorName` to the `enum`, the item name will be changed to the `InspectorName` content.
 
 ```csharp
 [Serializable]
@@ -6005,7 +6005,7 @@ Obsoleted type will have a different style if included
 
 ![](https://github.com/user-attachments/assets/eb2b5675-ea5d-4157-9db3-5b357bd5e122)
 
-You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
+You can use `InspectorName` to change the name of the buttons.
 
 ```csharp
 [Serializable, Flags]
@@ -6962,53 +6962,6 @@ private IEnumerator OnInspectorAsync()
     Debug.Log($"Dispose async done {id}");
 }
 ```
-
-#### `Searchable` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-> [!WARNING]
-> Deprecated. This is now default on and can be controlled by `Tools` - `Saints Field` - `Edit Config...`
-
-> [!NOTE]
-> This is UI Toolkit only
-
-This allows you to search for a field in a `MonoBehavior` (`Component`) or `ScriptableObject`. This is useful is you have a big list of fields.
-
-It will draw a search icon in the header. Once clicked, you can input the field name you want to search.
-
-You can also use `Ctrl` + `F` (`Command` + `F` on macOS) to open the search bar.
-
-Note: this only search the field name. It does not search the nested fields, and it does not check with the `RichLabel`, `PlayaRichLabel`.
-
-```csharp
-using SaintsField.Playa;
-
-[Searchable]
-public class SearchableMono : MonoBehaviour
-{
-    public string myString;
-    public int myInt;
-    [ShowInInspector] private string MyInspectorString => "Non Ser Prop";
-    [ShowInInspector] private string otherInspectorString = "Non Ser Field";
-    public string otherString;
-    public int otherInt;
-
-    [ListDrawerSettings(searchable: true)]
-    public string[] myArray;
-
-    [Serializable]
-    public struct MyStruct
-    {
-        public string MyStructString;
-    }
-
-    [Table] public MyStruct[] myTable;
-}
-```
-
-[![video](https://github.com/user-attachments/assets/b8273285-d24e-441d-9ceb-f277685372f3)](https://github.com/user-attachments/assets/5a6b9aae-481d-4898-9cbe-6634c51cb3e4)
 
 #### `DateTime` ####
 
@@ -11048,56 +11001,6 @@ This only works for decorator draws above or below the field. The above drawer w
 *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
 *   `EMode.PrefabAsset` = `Variant | Regular`
 
-### Callback ###
-
-For decorators that accept a callback, you can usually use `$` to indicate that you want a callback. The callback can be a method, a property, or a field.
-
-Use `\\$` if you do not want it to be a callback. This is useful for decorators like `RichLabel`, `InfoBox` that the displaying string itself starts with `$`.
-
-Using `$:` if the callback is a static/const field. We support the following style:
-
-```csharp
-namespace SaintsField.Samples.Scripts
-{
-    public class StaticCallback : SaintsMonoBehaviour
-    {
-        private static readonly string StaticString = "This is a static string";
-        private const string ConstString = "This is a constant string";
-
-        // using full type name
-        [AboveText("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
-        // using only type name. This is slow and might find the incorrect target.
-        // We'll first search the assembly of this object. If not found, then search all assemblies.
-        [InfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]
-        public int field;
-
-#if UNITY_EDITOR
-        private static Texture2D ImageCallback(string name) =>
-            AssetDatabase.LoadAssetAtPath<Texture2D>(
-                $"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/{name}.png");
-#endif
-
-#if UNITY_EDITOR
-        // use only field/method name. This will only try to search on the current target.
-        [BelowImage("$:" + nameof(ImageCallback), maxWidth: 20)]
-#endif
-        public string imgName;
-
-        [ShowInInspector] private static bool _disableMe = true;
-
-#if UNITY_EDITOR
-        [DisableIf("$:" + nameof(_disableMe))]
-        [RequiredIf("$:" + nameof(_disableMe), false)]
-#endif
-        public string disableIf;
-    }
-}
-```
-
-You can skip the `namespace` part. And if you also skip the `type` part, we'll try to find the callback from the current type first, then search all types in the current assembly, and finally search all types in all assemblies.
-
-Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet. I'm still working on making all APIs consistent.
-
 ### Downpour System ###
 
 > [!WARNING]
@@ -11351,6 +11254,52 @@ public struct DownWalkProp
 [AboveText("$field::" + nameof(DownWalkProp.myContent))]
 public DownWalkProp v2;
 ```
+
+For decorators that accept a callback, you can usually use `$` to indicate that you want a callback. The callback can be a method, a property, or a field.
+
+Use `\\$` if you do not want it to be a callback. This is useful for decorators like `LabelText`, `InfoBox` that the displaying string itself starts with `$`.
+
+Using `$:` if the callback is a static/const field. We support the following style:
+
+```csharp
+namespace SaintsField.Samples.Scripts
+{
+    public class StaticCallback : SaintsMonoBehaviour
+    {
+        private static readonly string StaticString = "This is a static string";
+        private const string ConstString = "This is a constant string";
+
+        // using full type name
+        [AboveText("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
+        // using only type name. This is slow and might find the incorrect target.
+        // We'll first search the assembly of this object. If not found, then search all assemblies.
+        [InfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]
+        public int field;
+
+#if UNITY_EDITOR
+        private static Texture2D ImageCallback(string name) =>
+            AssetDatabase.LoadAssetAtPath<Texture2D>(
+                $"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/{name}.png");
+#endif
+
+#if UNITY_EDITOR
+        // use only field/method name. This will only try to search on the current target.
+        [BelowImage("$:" + nameof(ImageCallback), maxWidth: 20)]
+#endif
+        public string imgName;
+
+        [ShowInInspector] private static bool _disableMe = true;
+
+#if UNITY_EDITOR
+        [DisableIf("$:" + nameof(_disableMe))]
+        [RequiredIf("$:" + nameof(_disableMe), false)]
+#endif
+        public string disableIf;
+    }
+}
+```
+
+You can skip the `namespace` part. And if you also skip the `type` part, we'll try to find the callback from the current type first, then search all types in the current assembly, and finally search all types in all assemblies.
 
 ### Syntax for Show/Hide/Enable/Disable/Required-If ###
 
