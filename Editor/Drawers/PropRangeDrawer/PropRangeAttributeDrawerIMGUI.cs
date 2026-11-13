@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return;
             }
 
-            AdaptAttribute unitAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            UnitAttribute unitAttribute = allAttributes.OfType<UnitAttribute>().FirstOrDefault();
 
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())

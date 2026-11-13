@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.AdaptDrawer;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -91,7 +91,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             };
         }
 
-        public static (string error, int value) GetPreValue(int value, AdaptAttribute unitAttribute)
+        public static (string error, int value) GetPreValue(int value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -99,9 +99,9 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetIntValuePre(value, unitAttribute);
+            return UnitAttributeDrawer.GetIntValuePre(value, unitAttribute);
         }
-        public static (string error, uint value) GetPreValue(uint value, AdaptAttribute unitAttribute)
+        public static (string error, uint value) GetPreValue(uint value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -109,21 +109,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetUIntValuePre(value, unitAttribute);
-        }
-
-        public static (string error, long value) GetPreValue(long value, AdaptAttribute unitAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (unitAttribute == null)
-            {
-                return ("", value);
-            }
-
-            return AdaptAttributeDrawer.GetLongValuePre(value, unitAttribute);
+            return UnitAttributeDrawer.GetUIntValuePre(value, unitAttribute);
         }
 
-        public static (string error, ulong value) GetPreValue(ulong value, AdaptAttribute unitAttribute)
+        public static (string error, long value) GetPreValue(long value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -131,10 +120,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetULongValuePre(value, unitAttribute);
+            return UnitAttributeDrawer.GetLongValuePre(value, unitAttribute);
         }
 
-        public static (string error, double value) GetPreValue(double value, AdaptAttribute unitAttribute)
+        public static (string error, ulong value) GetPreValue(ulong value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -142,20 +131,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetDoubleValuePre(value, unitAttribute);
-        }
-        public static (string error, float value) GetPreValue(float value, AdaptAttribute unitAttribute)
-        {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (unitAttribute == null)
-            {
-                return ("", value);
-            }
-
-            return AdaptAttributeDrawer.GetFloatValuePre(value, unitAttribute);
+            return UnitAttributeDrawer.GetULongValuePre(value, unitAttribute);
         }
 
-        public static (string error, double value) GetPostValue(double value, AdaptAttribute unitAttribute)
+        public static (string error, double value) GetPreValue(double value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -163,9 +142,9 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetDoubleValuePost(value, unitAttribute);
+            return UnitAttributeDrawer.GetDoubleValuePre(value, unitAttribute);
         }
-        public static (string error, float value) GetPostValue(float value, AdaptAttribute unitAttribute)
+        public static (string error, float value) GetPreValue(float value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -173,10 +152,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetFloatValuePost(value, unitAttribute);
+            return UnitAttributeDrawer.GetFloatValuePre(value, unitAttribute);
         }
 
-        public static (string error, int value) GetPostValue(int value, AdaptAttribute unitAttribute)
+        public static (string error, double value) GetPostValue(double value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -184,9 +163,9 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetIntValuePost(value, unitAttribute);
+            return UnitAttributeDrawer.GetDoubleValuePost(value, unitAttribute);
         }
-        public static (string error, long value) GetPostValue(long value, AdaptAttribute unitAttribute)
+        public static (string error, float value) GetPostValue(float value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -194,9 +173,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetLongValuePost(value, unitAttribute);
+            return UnitAttributeDrawer.GetFloatValuePost(value, unitAttribute);
         }
-        public static (string error, ulong value) GetPostValue(ulong value, AdaptAttribute unitAttribute)
+
+        public static (string error, int value) GetPostValue(int value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -204,9 +184,9 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetULongValuePost(value, unitAttribute);
+            return UnitAttributeDrawer.GetIntValuePost(value, unitAttribute);
         }
-        public static (string error, uint value) GetPostValue(uint value, AdaptAttribute unitAttribute)
+        public static (string error, long value) GetPostValue(long value, UnitAttribute unitAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (unitAttribute == null)
@@ -214,7 +194,27 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ("", value);
             }
 
-            return AdaptAttributeDrawer.GetUIntValuePost(value, unitAttribute);
+            return UnitAttributeDrawer.GetLongValuePost(value, unitAttribute);
+        }
+        public static (string error, ulong value) GetPostValue(ulong value, UnitAttribute unitAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (unitAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return UnitAttributeDrawer.GetULongValuePost(value, unitAttribute);
+        }
+        public static (string error, uint value) GetPostValue(uint value, UnitAttribute unitAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (unitAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return UnitAttributeDrawer.GetUIntValuePost(value, unitAttribute);
         }
 
         private static float GetValue(MetaInfo metaInfo, float newValue)

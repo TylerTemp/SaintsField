@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
             }
 
             Type rawType = GetRawType(property, info);
-            return IsSupportedNumberType(rawType)
+            return HasCooperatingDrawer(property, allAttributes) || IsSupportedNumberType(rawType)
                 ? ""
                 : $"Unit does not support {rawType?.Name ?? property.propertyType.ToString()} fields.";
         }

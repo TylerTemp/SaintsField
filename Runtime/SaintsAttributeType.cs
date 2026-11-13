@@ -5,6 +5,7 @@
         Other,
         Label,
         Field,
+        SubField,
         Visibility,
     }
 }

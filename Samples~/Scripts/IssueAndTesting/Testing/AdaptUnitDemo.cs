@@ -50,18 +50,18 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         [Header("Works With Other Drawers")]
         [Tooltip("PropRange bounds and storage use meters; the inspector initially displays centimeters.")]
-        [PropRange(0f, 10f, 0.25f), Adapt(EUnit.Meter, EUnit.Centimeter)]
+        [Unit(EUnit.Meter, EUnit.Centimeter), PropRange(0f, 10f, 0.25f)]
         public float rangedDistanceInMeters = 1.5f;
 
         [Tooltip("MinMaxSlider values are stored as ratios; the inspector initially displays percent.")]
-        [MinMaxSlider(0f, 1f, 0.05f), Adapt(EUnit.Ratio, EUnit.Percent)]
+        [MinMaxSlider(0f, 1f, 0.05f), Unit(EUnit.Ratio, EUnit.Percent)]
         public Vector2 normalizedWindow = new Vector2(0.25f, 0.75f);
 
         [Tooltip("SaintsDecimal is serialized in meters and edited in centimeters.")]
-        [Adapt(EUnit.Meter, EUnit.Centimeter)]
+        [Unit(EUnit.Meter, EUnit.Centimeter)]
         public SaintsDecimal preciseDistanceInMeters = new SaintsDecimal(1.2345m);
 
-        [SaintsSerialized, Adapt(EUnit.Kilogram, EUnit.Pounds)]
+        [SaintsSerialized, Unit(EUnit.Kilogram, EUnit.Pounds)]
         private decimal extendedWeightInKilograms = 3.75m;
     }
 

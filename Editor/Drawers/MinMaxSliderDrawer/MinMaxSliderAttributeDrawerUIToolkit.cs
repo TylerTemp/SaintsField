@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 case SerializedPropertyType.Vector2Int:
                 {
                     // MinMaxSliderElementInt element = new MinMaxSliderElementInt();
-                    MinMaxSliderFieldInt field = new MinMaxSliderFieldInt(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault())
+                    MinMaxSliderFieldInt field = new MinMaxSliderFieldInt(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault())
                     {
                         bindingPath = property.propertyPath,
                     };
@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 }
                 case SerializedPropertyType.Vector2:
                 {
-                    MinMaxSliderFieldFloat field = new MinMaxSliderFieldFloat(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault())
+                    MinMaxSliderFieldFloat field = new MinMaxSliderFieldFloat(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault())
                     {
                         bindingPath = property.propertyPath,
                     };
@@ -405,7 +405,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             // MinMaxSliderElementFloat element = new MinMaxSliderElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
             MinMaxSliderFieldFloat field =
-                new MinMaxSliderFieldFloat(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new MinMaxSliderFieldFloat(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.MinMaxSliderElementFloat.SetConfig(minValue, maxValue, minMaxSliderAttribute.Step);
@@ -445,7 +445,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             // MinMaxSliderElementInt element = new MinMaxSliderElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
             MinMaxSliderFieldInt field =
-                new MinMaxSliderFieldInt(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new MinMaxSliderFieldInt(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.MinMaxSliderElementInt.SetConfig(minValue, maxValue, (int)minMaxSliderAttribute.Step);

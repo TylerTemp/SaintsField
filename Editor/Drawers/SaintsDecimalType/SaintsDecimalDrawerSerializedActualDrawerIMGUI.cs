@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                 return true;
             }
 
-            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            UnitAttribute adaptAttribute = allAttributes.OfType<UnitAttribute>().FirstOrDefault();
             decimal currentValue = GetDecimalValue(propertyInfo);
             decimal displayValue = currentValue;
             if (adaptAttribute != null)

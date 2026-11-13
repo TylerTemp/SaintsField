@@ -1,7 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
-using SaintsField.Editor.Drawers.AdaptDrawer;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
@@ -25,14 +25,14 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         private readonly MinMaxSlider _minMaxSlider;
         private readonly FloatField _maxIntegerField;
 
-        private readonly AdaptAttribute _unitAttribute;
+        private readonly UnitAttribute _unitAttribute;
 
         private static VisualTreeAsset _template;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public MinMaxSliderElementFloat(): this(null){}
 
-        public MinMaxSliderElementFloat(AdaptAttribute unitAttribute)
+        public MinMaxSliderElementFloat(UnitAttribute unitAttribute)
         {
             _template ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/MinMax/MinMaxSliderWithFloat.uxml");
             TemplateContainer root = _template.CloneTree();
@@ -383,7 +383,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 value = evt.newValue;
             });
         }
-        public MinMaxSliderFieldFloat(string label, AdaptAttribute unitAttribute): this(label, new MinMaxSliderElementFloat(unitAttribute))
+        public MinMaxSliderFieldFloat(string label, UnitAttribute unitAttribute): this(label, new MinMaxSliderElementFloat(unitAttribute))
         {
         }
 

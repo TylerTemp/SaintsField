@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         public static VisualElement RenderSerializedActual(string label, SerializedProperty property,
             IReadOnlyList<Attribute> allAttributes, bool inHorizontalLayout)
         {
-            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            UnitAttribute adaptAttribute = allAttributes.OfType<UnitAttribute>().FirstOrDefault();
             SaintsDecimalFieldActual field = new SaintsDecimalFieldActual(label, adaptAttribute);
             if (inHorizontalLayout)
             {

@@ -67,7 +67,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
             float minValue = metaInfo.MinValue;
             float maxValue = metaInfo.MaxValue;
-            AdaptAttribute unitAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            UnitAttribute unitAttribute = allAttributes.OfType<UnitAttribute>().FirstOrDefault();
 
             float labelWidth = label.text == "" ? 0 : EditorGUIUtility.labelWidth;
 

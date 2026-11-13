@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Units;
@@ -28,6 +29,15 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<Attribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
+            foreach (Attribute attr in allAttributes)
+            {
+                if (attr is ISaintsAttribute { AttributeType: SaintsAttributeType.Field } sa)
+                {
+                    throw new Exception(
+                        $"should not call CreateFieldUIToolKit if there is already a SaintsAttributeType.Field {sa}. Please report this issue to developer https://github.com/TylerTemp/SaintsField/issues");
+                }
+            }
+
             UnitAttribute unitAttribute = (UnitAttribute)saintsAttribute;
             UnitState state = GetState(unitAttribute);
             if (!string.IsNullOrEmpty(state.Error))
@@ -108,7 +118,7 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
                 return doubleField;
             }
 
-            return PropertyFieldFallbackUIToolkit(property, label);
+            return UnityFallbackUIToolkit(info, property, allAttributes, container, label, SaintsPropertyDrawers, parent);
         }
 
         private static TField PrepareField<TField, TValue>(TField field, SerializedProperty property)
@@ -243,7 +253,8 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
                 };
             }
 
-            if (property.propertyType != SerializedPropertyType.Integer &&
+            if (!HasCooperatingDrawer(property, allAttributes) &&
+                property.propertyType != SerializedPropertyType.Integer &&
                 property.propertyType != SerializedPropertyType.Float)
             {
                 return new HelpBox($"Unit does not support {property.propertyType} fields.",

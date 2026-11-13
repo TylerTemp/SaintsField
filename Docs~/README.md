@@ -2796,17 +2796,15 @@ public int max;
 
 ![range](https://github.com/TylerTemp/SaintsField/assets/6391063/55f3fc5a-3ee4-4bd8-9b0a-cd016a7a79e7)
 
-**Adapt**
+**Unit**
 
-`Adapt` Changes the unit of how `PropRange` displays. For example,
-`[Adapt(EUnit.Ratio, EUnit.Percent)]` displays percent while serializing the actual ratio.
-
-Adapt shares the same API as `Unit`, except it work with number attributes.
+`Unit` Changes the unit of how `PropRange` displays. For example,
+`[Unit(EUnit.Ratio, EUnit.Percent)]` displays percent while serializing the actual ratio.
 
 ```csharp
 [
     PropRange(0f, 1f, step: 0.05f),
-    Adapt(EUnit.Ratio, EUnit.Percent),
+    Unit(EUnit.Ratio, EUnit.Percent),
     BelowText("$" + nameof(DisplayActualValue)),
 ] public float stepRange;
 
@@ -2889,13 +2887,13 @@ public float DynamicMax { get; private set; }
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
 
-**Adapt**
+**Unit**
 
-`MinMaxSlider` supports `Adapt`, allowing its values to be displayed in a different unit while remaining serialized in the base unit. The slider bounds and step are specified in the base unit.
+`MinMaxSlider` supports `Unit`, allowing its values to be displayed in a different unit while remaining serialized in the base unit. The slider bounds and step are specified in the base unit.
 
 ```csharp
 // Values and slider settings use ratios; the inspector displays percentages.
-[MinMaxSlider(0f, 1f, 0.05f), Adapt(EUnit.Ratio, EUnit.Percent), BelowText("$" + nameof(normalizedWindow))]
+[MinMaxSlider(0f, 1f, 0.05f), Unit(EUnit.Ratio, EUnit.Percent), BelowText("$" + nameof(normalizedWindow))]
 public Vector2 normalizedWindow = new Vector2(0.25f, 0.75f);
 ```
 
@@ -9292,13 +9290,13 @@ decimal add = decimal.One + saintsDecimal;
 
 ![](https://github.com/user-attachments/assets/ffa7dd1a-e048-446f-b079-7f01b42c7aae)
 
-**Adapt**
+**Unit**
 
-`SaintsDecimal` supports `Adapt`, allowing the inspector to edit the value in a different unit without changing the unit used for serialization.
+`SaintsDecimal` supports `Unit`, allowing the inspector to edit the value in a different unit without changing the unit used for serialization.
 
 ```csharp
 // Serialized in meters and displayed in centimeters.
-[Adapt(EUnit.Meter, EUnit.Centimeter)]
+[Unit(EUnit.Meter, EUnit.Centimeter)]
 public SaintsDecimal preciseDistanceInMeters = new SaintsDecimal(1.2345m);
 ```
 
@@ -10666,12 +10664,12 @@ public partial class SerDecimalExample : MonoBehaviour
 
 ![](https://github.com/user-attachments/assets/0f8d6994-5149-441e-b3b0-20a93aa9a421)
 
-**Adapt**
+**Unit**
 
-`Adapt` also works with a `decimal` field drawn through `SaintsSerialized`:
+`Unit` also works with a `decimal` field drawn through `SaintsSerialized`:
 
 ```csharp
-[SaintsSerialized, Adapt(EUnit.Kilogram, EUnit.Pounds)]
+[SaintsSerialized, Unit(EUnit.Kilogram, EUnit.Pounds)]
 private decimal weightInKilograms = 3.75m;
 ```
 

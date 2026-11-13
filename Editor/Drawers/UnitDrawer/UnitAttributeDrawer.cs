@@ -1,5 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Linq;
+using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Units;
 using UnityEditor;
@@ -12,6 +15,10 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
     [CustomPropertyDrawer(typeof(UnitAttribute))]
     public partial class UnitAttributeDrawer: SaintsPropertyDrawer
     {
+        private static bool HasCooperatingDrawer(SerializedProperty property, IEnumerable<Attribute> allAttributes) =>
+            allAttributes.Any(each => each is PropRangeAttribute || each is MinMaxSliderAttribute) ||
+            property.type == nameof(SaintsDecimal) || SaintsDecimalDrawer.IsSerializedActualDecimal(property);
+
         private static readonly ConditionalWeakTable<UnitAttribute, UnitState> States =
             new ConditionalWeakTable<UnitAttribute, UnitState>();
 

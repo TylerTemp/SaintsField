@@ -122,22 +122,75 @@ namespace SaintsField.Editor.Core
 
             List<SaintsPropertyInfo> saintsPropertyDrawers = new List<SaintsPropertyInfo>();
             bool alreadyHasFieldDrawer = false;
+            SaintsPropertyInfo fieldAttributeWithIndex = default;
+            SaintsPropertyInfo subFieldInfo = default;
             foreach ((ISaintsAttribute value, int index) in iSaintsAttributes.WithIndex())
             {
-                if (value.AttributeType == SaintsAttributeType.Field)  // we only want one field drawer
-                {
-                    if (alreadyHasFieldDrawer)
-                    {
-                        continue;
-                    }
-                    alreadyHasFieldDrawer = true;
-                }
-                saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                SaintsPropertyInfo info = new SaintsPropertyInfo
                 {
                     Drawer = GetOrCreateSaintsDrawerByAttr(property, value, saintsPreferredLabel),
                     Attribute = value,
                     Index = index,
-                });
+                };
+
+                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+                switch (value.AttributeType)
+                {
+                    // we only want one field drawer
+                    case SaintsAttributeType.Field:
+                    {
+                        if (alreadyHasFieldDrawer)
+                        {
+                            continue;
+                        }
+                        alreadyHasFieldDrawer = true;
+                        fieldAttributeWithIndex = info;
+                        break;
+                    }
+                    case SaintsAttributeType.SubField:
+                        subFieldInfo = info;
+                        break;
+                }
+                saintsPropertyDrawers.Add(info);
+            }
+
+            // [Unit] SaintsDecimal case
+            // Unit will want to hard draw field, but it's a subfield so it should pass to a type drawer if there is one
+
+            // Unit will not work with non-SaintsField types, so if it's not that type, we dont do anything
+            // and let Unit's default behavior to hijack the type drawer
+            // (which is Unity's default strategy: property drawer overrides type drawer)
+            if (!alreadyHasFieldDrawer && subFieldInfo.Attribute != null)
+            {
+                Type typeDrawerType = GetTypeDrawerType(fieldInfo, property);
+
+                if (typeDrawerType != null &&
+                    typeDrawerType != GetType())
+                {
+                    SaintsPropertyDrawer typeDrawer = MakePropertyDrawer(
+                        typeDrawerType, fieldInfo, null, saintsPreferredLabel)
+                        // ReSharper disable once UsePatternMatching
+                        as SaintsPropertyDrawer;
+
+                    if (typeDrawer is { UseCreateFieldUIToolKit: true })
+                    {
+                        typeDrawer.OverrideAttributes = allAttributes;
+                        typeDrawer.InHorizontalLayout = InHorizontalLayout;
+                        typeDrawer.overrideRichTextChunks = overrideRichTextChunks;
+
+                        return typeDrawer.CreatePropertyGUI(property);
+                    }
+                }
+
+                bool currentIsSubField = attribute is ISaintsAttribute
+                {
+                    AttributeType: SaintsAttributeType.SubField,
+                };
+
+                if (!UseCreateFieldUIToolKit || currentIsSubField)
+                {
+                    fieldAttributeWithIndex = subFieldInfo;
+                }
             }
 
             SaintsPropertyDrawers = saintsPropertyDrawers;
@@ -304,7 +357,6 @@ namespace SaintsField.Editor.Core
 
 
             // for type drawer that is in SaintsField, use this to draw with a fake property attribute
-            SaintsPropertyInfo fieldAttributeWithIndex = SaintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
             if(fieldAttributeWithIndex.Attribute == null)
             {
                 // fieldAttributeWithIndex = CheckSaintsPropertyInfoInject(property, allAttributes, fieldInfo, saintsPropertyDrawers.Count);

@@ -11,9 +11,9 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
     public abstract class SaintsDecimalFieldAbs: BaseField<SaintsDecimal>
     {
         public readonly DecimalTextField DecimalTextField;
-        private readonly AdaptAttribute _adaptAttribute;
+        private readonly UnitAttribute _adaptAttribute;
 
-        private SaintsDecimalFieldAbs(string label, AdaptAttribute adaptAttribute, DecimalTextField visualInput)
+        private SaintsDecimalFieldAbs(string label, UnitAttribute adaptAttribute, DecimalTextField visualInput)
             : base(label, visualInput)
         {
             _adaptAttribute = adaptAttribute;
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                 () => SetValueWithoutNotify(value));
         }
 
-        protected SaintsDecimalFieldAbs(string label, AdaptAttribute adaptAttribute = null)
+        protected SaintsDecimalFieldAbs(string label, UnitAttribute adaptAttribute = null)
             : this(label, adaptAttribute, new DecimalTextField(""))
         {
         }

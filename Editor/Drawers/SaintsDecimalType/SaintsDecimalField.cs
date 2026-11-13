@@ -5,7 +5,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 {
     public class SaintsDecimalField: SaintsDecimalFieldAbs
     {
-        public SaintsDecimalField(string label, AdaptAttribute adaptAttribute = null) : base(label, adaptAttribute)
+        public SaintsDecimalField(string label, UnitAttribute adaptAttribute = null) : base(label, adaptAttribute)
         {
         }
 

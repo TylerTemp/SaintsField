@@ -1,6 +1,6 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
-using SaintsField.Editor.Drawers.AdaptDrawer;
+using SaintsField.Editor.Drawers.UnitDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 // using UnityEngine;
@@ -13,12 +13,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     {
         private readonly Slider _slider;
         private readonly DoubleField _doubleField;
-        private readonly AdaptAttribute _unitAttribute;
+        private readonly UnitAttribute _unitAttribute;
 
-        public PropRangeElementDouble(AdaptAttribute unitAttribute)
+        public PropRangeElementDouble(UnitAttribute unitAttribute)
         {
             _unitAttribute = unitAttribute;
-            AdaptAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
+            UnitAttributeDrawer.AddDisplayUnitChangedListener(_unitAttribute, RefreshDisplay);
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -313,7 +313,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
         }
 
-        public PropRangeDoubleField(string label, AdaptAttribute unitAttribute) : this(label, new PropRangeElementDouble(unitAttribute))
+        public PropRangeDoubleField(string label, UnitAttribute unitAttribute) : this(label, new PropRangeElementDouble(unitAttribute))
         {
         }
 

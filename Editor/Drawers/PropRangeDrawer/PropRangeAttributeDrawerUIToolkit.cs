@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     if (rawType == typeof(uint))
                     {
-                        PropRangeUIntField field = new PropRangeUIntField(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeUIntField field = new PropRangeUIntField(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault());
                         field.AddToClassList(PropRangeUIntField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
                         if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                     if (rawType == typeof(long))
                     {
-                        PropRangeLongField field = new PropRangeLongField(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeLongField field = new PropRangeLongField(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault());
                         field.AddToClassList(PropRangeLongField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
                         if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                     if (rawType == typeof(ulong))
                     {
-                        PropRangeULongField field = new PropRangeULongField(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeULongField field = new PropRangeULongField(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault());
                         field.AddToClassList(PropRangeULongField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
                         if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                     else
                     {
-                        PropRangeIntField field = new PropRangeIntField(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeIntField field = new PropRangeIntField(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault());
                         field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
                         if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -99,7 +99,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     if (rawType == typeof(float))
                     {
-                        PropRangeFloatField field = new PropRangeFloatField(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeFloatField field = new PropRangeFloatField(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault());
                         field.AddToClassList(PropRangeFloatField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
                         if (!string.IsNullOrEmpty(property.tooltip) && field.labelElement != null)
@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
 
                     PropRangeDoubleField doubleField =
-                        new PropRangeDoubleField(GetPreferredLabel(property), allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        new PropRangeDoubleField(GetPreferredLabel(property), allAttributes.OfType<UnitAttribute>().FirstOrDefault());
                     doubleField.AddToClassList(PropRangeDoubleField.alignedFieldUssClassName);
                     doubleField.AddToClassList(ClassAllowDisable);
                     if (!string.IsNullOrEmpty(property.tooltip) && doubleField.labelElement != null)
@@ -585,7 +585,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeIntField field =
-                new PropRangeIntField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeIntField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
@@ -632,7 +632,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeIntField field =
-                new PropRangeIntField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeIntField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
@@ -679,7 +679,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeIntField field =
-                new PropRangeIntField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeIntField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
@@ -726,7 +726,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeIntField field =
-                new PropRangeIntField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeIntField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
@@ -773,7 +773,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeIntField field =
-                new PropRangeIntField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeIntField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
@@ -814,7 +814,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeUIntField field =
-                new PropRangeUIntField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeUIntField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementUInt.SetConfig(minValue, maxValue, useStep);
@@ -856,7 +856,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeLongField field =
-                new PropRangeLongField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeLongField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementLong.SetConfig(minValue, maxValue, useStep);
@@ -898,7 +898,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeULongField field =
-                new PropRangeULongField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeULongField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementULong.SetConfig(minValue, maxValue, useStep);
@@ -941,7 +941,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeFloatField field =
-                new PropRangeFloatField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeFloatField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementFloat.SetConfig(minValue, min, maxValue, max,
@@ -983,7 +983,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             PropRangeDoubleField field =
-                new PropRangeDoubleField(label, allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                new PropRangeDoubleField(label, allAttributes.OfType<UnitAttribute>().FirstOrDefault());
             if (minError == "" && maxError == "")
             {
                 field.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, propRangeAttribute.Step);

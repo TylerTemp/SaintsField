@@ -647,6 +647,14 @@ namespace SaintsField.Editor.Core
                 return (attr, attributeDrawerType);
             }
 
+            return (null, GetTypeDrawerType(info, property));
+        }
+
+        public static Type GetTypeDrawerType(MemberInfo info,
+            SerializedProperty property)
+        {
+            EnsureAndGetTypeToDrawers();
+
             Type fieldType = info.MemberType == MemberTypes.Property
                 ? ((PropertyInfo)info).PropertyType
                 : ((FieldInfo)info).FieldType;
@@ -661,45 +669,7 @@ namespace SaintsField.Editor.Core
 
             Type foundDrawer = FindTypeDrawerAny(fieldElementType);
 
-            // ReSharper disable once InvertIf
-            if (foundDrawer != null)
-            {
-                return (null, foundDrawer);
-            }
-
-            // if (fieldElementType.IsClass || (fieldElementType.IsValueType && !fieldElementType.IsPrimitive))
-            // {
-            //     return (null, typeof(SaintsRowAttributeDrawer));
-            //     // Console.WriteLine("The type is a class.");
-            // }
-
-            return (null, null);
-            // else if ()
-            // {
-            //     Console.WriteLine("The type is a struct.");
-            // }
-            // else
-            // {
-            //     Console.WriteLine("The type is neither a class nor a struct.");
-            // }
-
-            // Debug.Log($"PropertyFieldFallbackUIToolkit on foundDrawer={foundDrawer}: {property.displayName}");
-            // return PropertyFieldFallbackUIToolkit(property);
-
-            // On Hold... Cuz SaintsRow does not support copy/paste yet.
-            // check if it's general class/struct. If so, use SaintsRow to draw it.
-            // if (info.FieldType.IsClass || info.FieldType.IsValueType)
-            // {
-            //     PropertyDrawer saintsRowAttributeDrawer = MakePropertyDrawer(typeof(SaintsRowAttributeDrawer),
-            //         info, new SaintsRowAttribute(), preferredLabel);
-            //     VisualElement saintsRowElement = saintsRowAttributeDrawer.CreatePropertyGUI(property);
-            //     return saintsRowElement;
-            //     // return PropertyFieldFallbackUIToolkit(property);
-            // }
-
-            // return (null, typeof(SaintsRowAttributeDrawer));
-
-            // return PropertyFieldFallbackUIToolkit(property);
+            return foundDrawer;
         }
 
         private SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(SerializedProperty property, ISaintsAttribute saintsAttribute, string preferredLabel)

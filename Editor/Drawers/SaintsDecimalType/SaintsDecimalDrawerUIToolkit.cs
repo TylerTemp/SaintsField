@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<Attribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
+            UnitAttribute adaptAttribute = allAttributes.OfType<UnitAttribute>().FirstOrDefault();
             SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property), adaptAttribute);
 
             field.AddToClassList(SaintsDecimalField.alignedFieldUssClassName);

@@ -1,14 +1,16 @@
+using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
 
 namespace SaintsField
 {
+    [Obsolete("Use Unit instead")]
     [Conditional("UNITY_EDITOR")]
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
     public class AdaptAttribute: UnitAttribute
     {
-        public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public override string GroupBy => "";
+        // public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
+        // public override string GroupBy => "";
 
         public AdaptAttribute(EUnit unit): base(unit)
         {

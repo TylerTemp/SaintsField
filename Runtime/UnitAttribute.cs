@@ -9,7 +9,7 @@ namespace SaintsField
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
     public class UnitAttribute: PropertyAttribute, ISaintsAttribute
     {
-        public virtual SaintsAttributeType AttributeType => SaintsAttributeType.Field;
+        public virtual SaintsAttributeType AttributeType => SaintsAttributeType.SubField;
         public virtual string GroupBy => "__LABEL_FIELD__";
 
         public readonly EUnit? Base;
