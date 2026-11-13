@@ -43,6 +43,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                 label,
                 property,
                 info,
+                allAttributes,
                 InHorizontalLayout,
                 parent
             );
@@ -62,7 +63,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
 
         private (VisualElement element, ISaintsSerializedActualDrawer actualDrawer) RenderSerializedActual(
             SaintsSerializedActualAttribute saintsSerializedActual, string label, SerializedProperty property,
-            FieldInfo serInfo, bool inHorizontalLayout, object parent)
+            FieldInfo serInfo, IReadOnlyList<Attribute> allAttributes, bool inHorizontalLayout, object parent)
         {
             Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
 
@@ -163,8 +164,9 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                 }
                 case SaintsPropertyType.Decimal:
                 {
+                    // Share the selector's UnitAttribute instance so both use the same UnitState.
                     VisualElement element = SaintsDecimalDrawer.RenderSerializedActual(label, property,
-                        attributes, inHorizontalLayout);
+                        allAttributes, inHorizontalLayout);
                     return (element,
                         element == null
                             ? null
