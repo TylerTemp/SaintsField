@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.31.5 ##
+
+`Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is not deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...
+
 ## 5.31.4 ##
 
 1.  Fix: `Above/BelowText`, `[Below]InfoBox` etc. can be searched correctly

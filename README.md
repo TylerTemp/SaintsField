@@ -111,11 +111,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.31.4**
+**5.31.5**
 
-1.  Fix: `Above/BelowText`, `[Below]InfoBox` etc. can be searched correctly
-2.  Improve: Layout with title now can hide when no children match the search
-3.  Fix: Searching tabs now will show all tab content, and clean search will HIDE not-selected tab items
+`Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is not deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...
 
 ## Usage ##
 
@@ -232,7 +230,6 @@ namespace: `SaintsField`
         *   [`ColorPalette`](https://saintsfield.comes.today/general-attributes/miscellaneous/colorpalette)
         *   [`OnInspectorInit`](https://saintsfield.comes.today/general-attributes/miscellaneous/oninspectorinit)
         *   [`OnInspectorDispose`](https://saintsfield.comes.today/general-attributes/miscellaneous/oninspectordispose)
-        *   [`Searchable`](https://saintsfield.comes.today/general-attributes/miscellaneous/searchable)
         *   [`DateTime`](https://saintsfield.comes.today/general-attributes/miscellaneous/datetime)
         *   [`TimeSpan`](https://saintsfield.comes.today/general-attributes/miscellaneous/timespan)
         *   [`Guid`](https://saintsfield.comes.today/general-attributes/miscellaneous/guid)
@@ -337,7 +334,6 @@ namespace: `SaintsField`
     *   [Toast](https://saintsfield.comes.today/misc/toast)
     *   [About GroupBy](https://saintsfield.comes.today/misc/about-groupby)
     *   [`EMode`](https://saintsfield.comes.today/misc/emode)
-    *   [Callback](https://saintsfield.comes.today/misc/callback)
     *   [Downpour System](https://saintsfield.comes.today/misc/downpour-system)
     *   Saints XPath-like Syntax
         *   [Overview](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/overview)
