@@ -113,7 +113,8 @@ namespace: `SaintsField`
 
 **5.31.5**
 
-`Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is not deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...
+1.  Improve: `Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is not deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...
+2.  Fix: `Unit` dropdown can be very narrow on old Unity.
 
 ## Usage ##
 

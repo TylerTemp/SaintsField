@@ -221,6 +221,9 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
         private static void ShowUnitMenu(Button button, UnitState state)
         {
             GenericDropdownMenu menu = new GenericDropdownMenu();
+#if !UNITY_6000_3_OR_NEWER
+            float menuWidth = button.worldBound.width;
+#endif
             foreach (UnitInfo unitInfo in UnitRegistry.GetAllUnitInfos(state.BaseUnit.Category))
             {
                 UnitInfo captured = unitInfo;
@@ -229,9 +232,18 @@ namespace SaintsField.Editor.Drawers.UnitDrawer
                     : $"{unitInfo.Name} ({unitInfo.PrimarySymbol})";
                 menu.AddItem(label, ReferenceEquals(unitInfo, state.DisplayUnit),
                     () => state.SetDisplayUnit(captured));
+#if !UNITY_6000_3_OR_NEWER
+                // Include room for the checkmark, padding, and vertical scrollbar.
+                menuWidth = Mathf.Max(menuWidth, EditorStyles.label.CalcSize(new GUIContent(label)).x + 40f);
+#endif
             }
 
-            menu.DropDown(button.worldBound, button,
+            Rect menuBound = button.worldBound;
+#if !UNITY_6000_3_OR_NEWER
+            // Legacy DropDown fits the supplied rect; grow left from the unit button.
+            menuBound.xMin = menuBound.xMax - menuWidth;
+#endif
+            menu.DropDown(menuBound, button,
 #if UNITY_6000_3_OR_NEWER
                 DropdownMenuSizeMode.Auto
 #else

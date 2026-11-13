@@ -2,7 +2,8 @@
 
 ## 5.31.5 ##
 
-`Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is not deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...
+1.  Improve: `Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is not deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...
+2.  Fix: `Unit` dropdown can be very narrow on old Unity.
 
 ## 5.31.4 ##
 
@@ -29,7 +30,7 @@
 
 ## 5.31.0 ##
 
-1.  Add: `Button`/`ShowInInspector`(on function) now save and restore the parameters within the Editor session 
+1.  Add: `Button`/`ShowInInspector`(on function) now save and restore the parameters within the Editor session
 2.  Fix: SaintsDictionary/SceneReference/SaintsList/SaintsArray might give an error when deserialize, especially when it's running on non-Unity-main-thread. This error only happens in Editor mode.
 
 ## 5.30.11 ##
@@ -67,7 +68,7 @@ Fix: Unity Dictionary Drawer disallow re-bind and lose response [#447](http://gi
 ## 5.30.5 ##
 
 1.  Fix: `Clips` can not track property changes for serializable class/struct type
-2.  Add: `Chips` now support type searching callback, which gives you experiences like MUI's [AutoComplete](https://mui.com/material-ui/react-autocomplete/#asynchronous-requests) experiences. 
+2.  Add: `Chips` now support type searching callback, which gives you experiences like MUI's [AutoComplete](https://mui.com/material-ui/react-autocomplete/#asynchronous-requests) experiences.
 3.  Fix: In some cases (where Unity does not give any API for tracking) the blue bar for prefab modification is not shown/hidden correctly after change/revert
 
 ## 5.30.4 ##
@@ -123,7 +124,7 @@ Fix: Unity Dictionary Drawer disallow re-bind and lose response [#447](http://gi
 ## 5.29.1 ##
 
 1.  Fix: `SaintsArray2DR<T>` failed to serialize in some cases
-2.  Fix: some fields failed to deserialize when `Instantiate` from prefab 
+2.  Fix: some fields failed to deserialize when `Instantiate` from prefab
 
 ## 5.29.0 ##
 
@@ -167,7 +168,7 @@ Add: Support for Wwise 2025
 1.  Fix: `ShaderParam` no longer support `integer` type because `Shader.PropertyToID` is not the same between runtime.
 2.  Fix: `SaintsEvent` invoke error
 3.  Improve: `SaintsEvent` now cache the method delegate for a better performance
-4.  Add: `ShaderParam` data type to easily hold a shader name and auto convert to (and cache) `Shader.PropertyToID`. 
+4.  Add: `ShaderParam` data type to easily hold a shader name and auto convert to (and cache) `Shader.PropertyToID`.
 
 ## 5.26.1 ##
 
@@ -215,7 +216,7 @@ Fix: Serialized Binding due to last version refactory. [#431](https://github.com
 1.  Add: SaintsDictionary (and `[ShowInInspector] Dictionary<>`) now has a menu button to toggle paging, searching, and scriptable object searching. Fix [#428](https://github.com/TylerTemp/SaintsField/issues/428)
 2.  Fix: `[ShowInInspector] Dictionary<>` constantly repaint on value changed
 3.  Fix: `AssetPreview` shown an empty space if the target has no preview of any kind
-4.  Change: `AssetPreview` default width & height to 128. This makes interactive preview do not shows too big by default  
+4.  Change: `AssetPreview` default width & height to 128. This makes interactive preview do not shows too big by default
 
 ## 5.25.6 ##
 
@@ -288,7 +289,7 @@ Fix: `ShowInInspector` now can display/edit `Nullable<>`
     *   default drawer of enum flags if you have SaintsEditor enabled
 
 4.  Add: `FlagsDropdown`, `Dropdown` add option `bool slashAsSub` so you can control path separator for different situations
-5.  Fix: `FlagsDropdown` button did not use `InspectorName` if there is an all-bit-on defined 
+5.  Fix: `FlagsDropdown` button did not use `InspectorName` if there is an all-bit-on defined
 
 ## 5.23.0 ##
 
