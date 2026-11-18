@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.31.6 ##
+
+1.  Fix: when falling back to IMGUI, the drawing calculator might get an incorrect base height, which makes the element out of space. e.g. Wwise Event Drawer.
+2.  Fix: when falling back to IMGUI, right click context menu was missing in some Unity version
+3.  Fix: when falling back to IMGUI, label width might get incorrect
+
 ## 5.31.5 ##
 
 1.  Improve: `Unit` can now work with `PropRange` etc just like `Adapt`. `Adapt` is now deprecated. Now you dont need to remember two attributes for different cases which has exactly the same actul functionality...

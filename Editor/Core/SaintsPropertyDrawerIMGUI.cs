@@ -140,17 +140,11 @@ namespace SaintsField.Editor.Core
             // }
             // Debug.Log($"GetPropertyHeight/{this}");
 
-            if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) &&
-                insideDrawCount > 0)
+            if (SubDrawerCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) &&
+                insideCount > 0)
             {
                 // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
-            }
-
-            if (SubGetHeightCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property),
-                    out int insideGetHeightCount) && insideGetHeightCount > 0)
-            {
                 // Debug.Log($"Sub GetHeight GetPropertyHeight/{this}");
                 // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
                 return GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
@@ -272,7 +266,22 @@ namespace SaintsField.Editor.Core
             else
             {
                 // fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
-                fieldBasicHeight = IMGUIRawDraw.GetPropertyHeightRawFallback(property, allAttributes, fieldInfo.FieldType, label, fieldInfo, InHorizontalLayout);
+                (Attribute fallbackAttribute, Type fallbackType) = GetFallbackDrawerType(fieldInfo, property, allAttributes);
+                PropertyDrawer fallbackDrawer = fallbackType != null && !typeof(SaintsPropertyDrawer).IsAssignableFrom(fallbackType)
+                    ? MakePropertyDrawer(fallbackType, fieldInfo, fallbackAttribute, GetPreferredLabel(property))
+                    : null;
+                if (fallbackDrawer != null)
+                {
+                    using (new InsideSaintsFieldScoop(SubDrawerCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                    using (UnityPropertyHandler.EnterDrawer(property, fallbackDrawer))
+                    {
+                        fieldBasicHeight = fallbackDrawer.GetPropertyHeight(property, label);
+                    }
+                }
+                else
+                {
+                    fieldBasicHeight = IMGUIRawDraw.GetPropertyHeightRawFallback(property, allAttributes, fieldInfo.FieldType, label, fieldInfo, InHorizontalLayout);
+                }
             }
 
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
@@ -347,7 +356,7 @@ namespace SaintsField.Editor.Core
             // }
 
             // TODO: check, if it has dec, this value might be wrong
-            using (new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+            using (new InsideSaintsFieldScoop(SubDrawerCounter, InsideSaintsFieldScoop.MakeKey(property)))
             {
                 return EditorGUI.GetPropertyHeight(property, label, true);
             }
@@ -455,7 +464,7 @@ namespace SaintsField.Editor.Core
             }
             // Debug.Log($"OnGUI: pos={position}");
 
-            if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) &&
+            if (SubDrawerCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideCount) &&
                 insideCount > 0)
             {
                 // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
@@ -1306,7 +1315,11 @@ namespace SaintsField.Editor.Core
                     MakePropertyDrawer(attributeDrawerType, fInfo, attributeInstance, prefLabel);
                 if (propertyDrawerInstance != null)
                 {
-                    propertyDrawerInstance.OnGUI(position, property, label);
+                    using (new InsideSaintsFieldScoop(SubDrawerCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                    using (UnityPropertyHandler.EnterDrawer(property, propertyDrawerInstance))
+                    {
+                        propertyDrawerInstance.OnGUI(position, property, label);
+                    }
                     DrawOverrideRichText(position, label, richTextChunks);
                     return;
                 }
@@ -1325,7 +1338,11 @@ namespace SaintsField.Editor.Core
                     if (drawerInstance != null)
                     {
                         // drawerInstance.GetPropertyHeight(property, label);
-                        drawerInstance.OnGUI(position, property, label);
+                        using (new InsideSaintsFieldScoop(SubDrawerCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        using (UnityPropertyHandler.EnterDrawer(property, drawerInstance))
+                        {
+                            drawerInstance.OnGUI(position, property, label);
+                        }
                         DrawOverrideRichText(position, label, richTextChunks);
                         return;
                     }

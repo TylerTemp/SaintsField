@@ -27,8 +27,9 @@ namespace SaintsField.Editor.Core
         // public const string EmptyRectLabel = "                ";
 
         // public static bool IsSubDrawer = false;
-        private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubDrawCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
-        private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubGetHeightCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
+        // Drawing and height queries share the same per-property SaintsField re-entry scope.
+        // This suppresses duplicate SaintsField processing; it does not advance Unity's drawer nesting.
+        private static readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> SubDrawerCounter = new Dictionary<InsideSaintsFieldScoop.PropertyKey, int>();
 
         public struct PropertyDrawerInfo
         {

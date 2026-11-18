@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class ToastExample : SaintsMonoBehaviour
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         [Button]
         private void ToastMe([PropRange(0, 10)] int num)
         {

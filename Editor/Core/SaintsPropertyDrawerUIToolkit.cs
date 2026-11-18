@@ -521,6 +521,7 @@ namespace SaintsField.Editor.Core
             #endregion
 
             bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
+            bool fieldUsesIMGUI = false;
             // Debug.Log($"fieldIsFallback={fieldIsFallback}/{property.propertyPath}");
             bool onChangeManuallyWatch;
 
@@ -543,6 +544,7 @@ namespace SaintsField.Editor.Core
                     Debug.Log("fallback field drawer");
 #endif
                     VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), SaintsPropertyDrawers, parent);
+                    fieldUsesIMGUI = fallback is IMGUIContainer;
                     fallback.AddToClassList(fallbackClass);
                     fallback.AddToClassList(ClassAllowDisable);
                     fieldContainer.Add(fallback);
@@ -693,6 +695,11 @@ namespace SaintsField.Editor.Core
 
 #if !UNITY_6000_3_OR_NEWER  // when < 6k, default context menu will be lost if we add menu here...
             UIToolkitUtils.AddContextualMenuManipulator(rootElement, property, () => { });
+#else
+            if (fieldUsesIMGUI)  // but IMGUI will need that! What The heck!
+            {
+                UIToolkitUtils.AddContextualMenuManipulator(rootElement, property, () => { });
+            }
 #endif
             UIToolkitUtils.AddContextualMenuReset(rootElement, property, fieldInfo, parent);
 
@@ -776,6 +783,38 @@ namespace SaintsField.Editor.Core
             // UIToolkitUtils.PropertyDrawerElementDirtyFix(property, typeDrawer, element);
 
             return element;
+        }
+
+        private readonly struct ImGuiFallbackLayoutScope : IDisposable
+        {
+            private readonly float _labelWidth;
+            private readonly bool _hierarchyMode;
+            private readonly bool _wideMode;
+
+            public ImGuiFallbackLayoutScope(VisualElement element)
+            {
+                _labelWidth = EditorGUIUtility.labelWidth;
+                _hierarchyMode = EditorGUIUtility.hierarchyMode;
+                _wideMode = EditorGUIUtility.wideMode;
+
+                float width = element.resolvedStyle.width;
+                if (float.IsNaN(width) || width <= 0)
+                {
+                    width = EditorGUIUtility.currentViewWidth;
+                }
+
+                // Match Unity's Inspector IMGUI defaults without inheriting another field's state.
+                EditorGUIUtility.hierarchyMode = true;
+                EditorGUIUtility.wideMode = width > 330f;
+                EditorGUIUtility.labelWidth = Mathf.Max(Mathf.Ceil(width * 0.45f) - 40f, 120f);
+            }
+
+            public void Dispose()
+            {
+                EditorGUIUtility.labelWidth = _labelWidth;
+                EditorGUIUtility.hierarchyMode = _hierarchyMode;
+                EditorGUIUtility.wideMode = _wideMode;
+            }
         }
 
         protected static VisualElement DrawUsingDrawerInstance(string passedLabel, Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property,
@@ -903,7 +942,8 @@ namespace SaintsField.Editor.Core
                 // This works fine with: AYellowPaper.SerializedDictionary, Wwise.Event, I2Language.LocalizedString
                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(passedLabel);
 
-                IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
+                IMGUIContainer imGuiContainer = null;
+                imGuiContainer = new IMGUIContainer(() =>
                 {
                     InsideSaintsFieldScoop.PropertyKey propertyKey;
                     try
@@ -934,6 +974,7 @@ namespace SaintsField.Editor.Core
                         ? GUIContent.none
                         : new GUIContent(imguiLabelHelper.RichLabel);
 
+                    using(new ImGuiFallbackLayoutScope(imGuiContainer))
                     using(new ImGuiFoldoutStyleRichTextScoop())
                     using(new ImGuiLabelStyleRichTextScoop())
                     using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
@@ -960,8 +1001,8 @@ namespace SaintsField.Editor.Core
                         // // ReSharper disable once AccessToModifiedClosure
                         // imGuiContainer.style.height = position.height;
 
-                        using(new InsideSaintsFieldScoop(SubDrawCounter, propertyKey))
-                        using(new InsideSaintsFieldScoop(SubGetHeightCounter, propertyKey))
+                        using(new InsideSaintsFieldScoop(SubDrawerCounter, propertyKey))
+                        using(UnityPropertyHandler.EnterDrawer(property, drawerInstance))
                         {
                             // Debug.Log($"Fall {property.propertyPath}");
                             // This works with Wwise.Bank/Event in list; not work with AYellowPaper.SerializedDictionary
