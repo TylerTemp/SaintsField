@@ -43,8 +43,10 @@ namespace SaintsField.Editor.Drawers.BuiltIn
                     whiteSpace = WhiteSpace.Normal,
                 },
             };
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
             field.verticalScrollerVisibility = ScrollerVisibility.Auto;
+#elif UNITY_2022_3_OR_NEWER
+            field.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
 #endif
 
             VisualElement textInput = field.Q(name: "unity-text-input");
