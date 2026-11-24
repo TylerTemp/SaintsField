@@ -7,13 +7,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
     {
         [ColorUsage(false, true)] public Color color;
 
-        [ColorUsage(false, true)]
-        [ShowInInspector]
-        public Color ShowColor
-        {
-            get => color;
-            set => color = value;
-        }
+        [ColorUsage(false, true)] [ShowInInspector]
+        public Color ShowColor;
 
         [ColorUsage(false, true)] [ShowInInspector]
         private int _showColorWrongType;
@@ -21,226 +16,92 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Multiline(6)]
         public string shortNote;
 
-        [Multiline(6)]
-        [ShowInInspector]
-        public string ShowShortNote
-        {
-            get => shortNote;
-            set => shortNote = value;
-        }
+        [Multiline(6)] [ShowInInspector] public string ShowShortNote;
 
         [TextArea] public string textArea;
 
-        [TextArea]
-        [ShowInInspector]
-        public string ShowTextArea
-        {
-            get => textArea;
-            set => textArea = value;
-        }
-
+        [TextArea] [ShowInInspector] public string ShowTextArea;
         [Min(10)] public sbyte minSByte;
 
-        [Min(10)]
-        [ShowInInspector]
-        public sbyte ShowMinSByte
-        {
-            get => minSByte;
-            set => minSByte = value;
-        }
+        [Min(10)] [ShowInInspector] public sbyte ShowMinSByte;
 
         [Min(10)] public byte minByte;
 
-        [Min(10)]
-        [ShowInInspector]
-        public byte ShowMinByte
-        {
-            get => minByte;
-            set => minByte = value;
-        }
+        [Min(10)] [ShowInInspector] public byte ShowMinByte;
 
         [Min(10)] public short minShort;
 
-        [Min(10)]
-        [ShowInInspector]
-        public short ShowMinShort
-        {
-            get => minShort;
-            set => minShort = value;
-        }
+        [Min(10)] [ShowInInspector] public short ShowMinShort;
 
         [Min(10)] public ushort minUShort;
 
-        [Min(10)]
-        [ShowInInspector]
-        public ushort ShowMinUShort
-        {
-            get => minUShort;
-            set => minUShort = value;
-        }
+        [Min(10)] [ShowInInspector] public ushort ShowMinUShort;
 
         [Min(10)] public int minInt;
 
-        [Min(10)]
-        [ShowInInspector]
-        public int ShowMinInt
-        {
-            get => minInt;
-            set => minInt = value;
-        }
+        [Min(10)] [ShowInInspector] public int ShowMinInt;
 
         [Min(10)] public uint minUInt;
 
-        [Min(10)]
-        [ShowInInspector]
-        public uint ShowMinUInt
-        {
-            get => minUInt;
-            set => minUInt = value;
-        }
+        [Min(10)] [ShowInInspector] public uint ShowMinUInt;
 
         [Min(10)] public long minLong;
 
-        [Min(10)]
-        [ShowInInspector]
-        public long ShowMinLong
-        {
-            get => minLong;
-            set => minLong = value;
-        }
+        [Min(10)] [ShowInInspector] public long ShowMinLong;
 
         [Min(10)] public ulong minULong;
 
-        [Min(10)]
-        [ShowInInspector]
-        public ulong ShowMinULong
-        {
-            get => minULong;
-            set => minULong = value;
-        }
+        [Min(10)] [ShowInInspector] public ulong ShowMinULong;
 
         [Min(0.5f)] public float minFloat;
 
-        [Min(0.5f)]
-        [ShowInInspector]
-        public float ShowMinFloat
-        {
-            get => minFloat;
-            set => minFloat = value;
-        }
+        [Min(0.5f)] [ShowInInspector] public float ShowMinFloat;
 
         [Min(0.5f)] public double minDouble;
 
-        [Min(0.5f)]
-        [ShowInInspector]
-        public double ShowMinDouble
-        {
-            get => minDouble;
-            set => minDouble = value;
-        }
+        [Min(0.5f)] [ShowInInspector] public double ShowMinDouble;
 
         [Min(10)] [ShowInInspector]
         private string _showMinWrongType;
 
         [Range(1, 10)] public sbyte rangeSByte;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public sbyte ShowRangeSByte
-        {
-            get => rangeSByte;
-            set => rangeSByte = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public sbyte ShowRangeSByte;
 
         [Range(1, 10)] public byte rangeByte;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public byte ShowRangeByte
-        {
-            get => rangeByte;
-            set => rangeByte = value;
-        }
-
+        [Range(1, 10)] [ShowInInspector] public byte ShowRangeByte;
         [Range(1, 10)] public short rangeShort;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public short ShowRangeShort
-        {
-            get => rangeShort;
-            set => rangeShort = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public short ShowRangeShort;
 
         [Range(1, 10)] public ushort rangeUShort;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public ushort ShowRangeUShort
-        {
-            get => rangeUShort;
-            set => rangeUShort = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public ushort ShowRangeUShort;
 
         [Range(1, 10)] public int rangeInt;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public int ShowRangeInt
-        {
-            get => rangeInt;
-            set => rangeInt = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public int ShowRangeInt;
 
         [Range(1, 10)] public uint rangeUInt;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public uint ShowRangeUInt
-        {
-            get => rangeUInt;
-            set => rangeUInt = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public uint ShowRangeUInt;
 
         [Range(1, 10)] public long rangeLong;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public long ShowRangeLong
-        {
-            get => rangeLong;
-            set => rangeLong = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public long ShowRangeLong;
 
         [Range(1, 10)] public ulong rangeULong;
 
-        [Range(1, 10)]
-        [ShowInInspector]
-        public ulong ShowRangeULong
-        {
-            get => rangeULong;
-            set => rangeULong = value;
-        }
+        [Range(1, 10)] [ShowInInspector] public ulong ShowRangeULong;
 
         [Range(0.5f, 2f)] public float rangeFloat;
 
-        [Range(0.5f, 2f)]
-        [ShowInInspector]
-        public float ShowRangeFloat
-        {
-            get => rangeFloat;
-            set => rangeFloat = value;
-        }
+        [Range(0.5f, 2f)] [ShowInInspector] public float ShowRangeFloat;
 
         [Range(0.5f, 2f)] public double rangeDouble;
 
-        [Range(0.5f, 2f)]
-        [ShowInInspector]
-        public double ShowRangeDouble
-        {
-            get => rangeDouble;
-            set => rangeDouble = value;
-        }
+        [Range(0.5f, 2f)] [ShowInInspector] public double ShowRangeDouble;
 
         [GradientUsage(true, ColorSpace.Linear)]
         public Gradient linearHdrGradient;
@@ -254,23 +115,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Header("Header On Field")]
         public int headerField;
 
-        [Header("Header On Property")]
-        [ShowInInspector]
-        public int ShowHeaderProp
-        {
-            get => headerField;
-            set => headerField = value;
-        }
+        [Header("Header On Property")] [ShowInInspector]
+        public int ShowHeaderProp;
 
         // `HeaderAttribute` is `AllowMultiple = true`
-        [Header("First Header")]
-        [Header("Second Header")]
-        [ShowInInspector]
-        public int ShowMultipleHeaderProp
-        {
-            get => headerField;
-            set => headerField = value;
-        }
+        [Header("First Header")] [Header("Second Header")] [ShowInInspector]
+        public int ShowMultipleHeaderProp;
 
 #if UNITY_6000_0_OR_NEWER
         public enum EEnumButtons
