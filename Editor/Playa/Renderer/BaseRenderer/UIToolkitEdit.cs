@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+﻿#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AnimatorParamDrawer;
 using SaintsField.Editor.Drawers.AnimatorStateDrawer;
+using SaintsField.Editor.Drawers.BuiltIn;
 using SaintsField.Editor.Drawers.CurveRangeDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.DropdownDrawer;
@@ -138,6 +139,35 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             inHorizontalLayout,
                             allAttributes,
                             targets), false);
+
+                    #region Unity Builtin
+                    case ColorUsageAttribute colorUsageAttribute:
+                        return (ColorUsageAttributeDrawer.UIToolkitValueEdit(
+                            oldElement,
+                            colorUsageAttribute,
+                            label,
+                            value,
+                            valueType,
+                            beforeSet,
+                            setterOrNull,
+                            labelGrayColor,
+                            inHorizontalLayout,
+                            allAttributes,
+                            targets), false);
+                    case GradientUsageAttribute gradientUsageAttribute:
+                        return (GradientUsageAttributeDrawer.UIToolkitValueEdit(
+                            oldElement,
+                            gradientUsageAttribute,
+                            label,
+                            value,
+                            valueType,
+                            beforeSet,
+                            setterOrNull,
+                            labelGrayColor,
+                            inHorizontalLayout,
+                            allAttributes,
+                            targets), false);
+                    #endregion
                 }
             }
 
@@ -229,6 +259,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditSByte(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditSByte(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (sbyte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
                 if (oldElement is IntegerField integerField)
@@ -307,6 +365,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditByte(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditByte(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (byte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -386,6 +472,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditShort(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditShort(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (short) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -464,6 +578,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditUShort(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditUShort(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (ushort) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -605,6 +747,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -674,6 +844,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditUInt(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditUInt(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (uint) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -798,6 +996,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditLong(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditLong(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (long) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -861,6 +1087,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditULong(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditULong(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (ulong) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 #if UNITY_2022_3_OR_NEWER
@@ -976,6 +1230,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditFloat(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditFloat(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (float) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
                 if (oldElement is FloatField oldFloatField)
@@ -1049,6 +1331,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MinAttribute minAttribute:
+                            return (MinAttributeDrawer.UIToolkitValueEditDouble(
+                                oldElement,
+                                minAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case RangeAttribute rangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditDouble(
+                                oldElement,
+                                new PropRangeAttribute(rangeAttribute.min, rangeAttribute.max),
+                                label,
+                                (double) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -1227,6 +1537,35 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+
+                        #region Unity Builtin
+                        case MultilineAttribute multilineAttribute:
+                            return (MultilineAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                multilineAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case TextAreaAttribute textAreaAttribute:
+                            return (TextAreaAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                textAreaAttribute,
+                                label,
+                                value,
+                                valueType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        #endregion
                     }
                 }
 
@@ -1856,6 +2195,49 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 allAttributes,
                                 targets), false);
                         }
+
+                        #region Unity Builtin
+#if UNITY_6000_0_OR_NEWER
+                        case EnumButtonsAttribute enumButtonsAttribute:
+                        {
+                            // Unity hides obsolete values unless asked, and always shows every button (no foldout)
+                            EnumToggleButtonsAttribute asToggleButtons = new EnumToggleButtonsAttribute(
+                                true,
+                                obsolete: enumButtonsAttribute.includeObsolete
+                                    ? EObsolete.Include
+                                    : EObsolete.Remove);
+
+                            if (isFlag)
+                            {
+                                return (EnumToggleButtonsAttributeDrawer.UIToolkitValueEdit(
+                                    oldElement,
+                                    asToggleButtons,
+                                    label,
+                                    value,
+                                    enumType,
+                                    beforeSet,
+                                    setterOrNull,
+                                    labelGrayColor,
+                                    inHorizontalLayout,
+                                    allAttributes,
+                                    targets), false);
+                            }
+
+                            return (ValueButtonsAttributeDrawer.UIToolkitValueEditEnum(
+                                oldElement,
+                                new ValueButtonsAttribute(obsolete: asToggleButtons.Obsolete),
+                                label,
+                                value,
+                                enumType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        }
+#endif
+                        #endregion
                     }
                 }
 
@@ -1946,26 +2328,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     value = value as Gradient,
                 };
 
-                if (labelGrayColor)
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
+                    labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
                 {
-                    element.labelElement.style.color = AbsRenderer.ReColor;
-                }
-                if (inHorizontalLayout)
-                {
-                    element.style.flexDirection = FlexDirection.Column;
-                }
-                else
-                {
-                    element.AddToClassList(GradientField.alignedFieldUssClassName);
-                }
-                if (setterOrNull == null)
-                {
-                    element.SetEnabled(false);
-                    element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
-                }
-                else
-                {
-                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     element.RegisterValueChangedCallback(evt =>
                     {
                         beforeSet?.Invoke(value);

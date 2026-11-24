@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.31.7 ##
+
+1.  Add: `ShowInInspector` now work with Unity builtin `ColorUsage`, `Multiline`, `TextArea`, `Min`, `Range`, `GradientUsage`, `EnumButtons`
+2.  Fix: Slightly visual adjust for `ShowInInspector` border gap
+
 ## 5.31.6 ##
 
 1.  Fix: when falling back to IMGUI, the drawing calculator might get an incorrect base height, which makes the element out of space. e.g. Wwise Event Drawer.

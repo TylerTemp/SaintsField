@@ -108,7 +108,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                     borderTopLeftRadius = 3,
                     borderBottomLeftRadius = 3,
                     marginLeft = isSaintsSerialized? 0: 1,
-                    marginRight = isSaintsSerialized? 0: 1,
+                    marginRight = (isSaintsSerialized ? 0 : 1) - 4,
+                    paddingRight = 4,
                 },
                 name = NameContainer(),
             };
