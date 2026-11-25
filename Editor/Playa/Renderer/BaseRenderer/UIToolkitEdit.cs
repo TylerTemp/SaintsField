@@ -85,6 +85,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             // Color reColor = EColor.EditorSeparator.GetColor();
 
+            // ReSharper disable once InvertIf
+            bool hasDelayed = false;
             foreach (Attribute attribute in allAttributes)
             {
                 switch (attribute)
@@ -167,6 +169,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             inHorizontalLayout,
                             allAttributes,
                             targets), false);
+                    case DelayedAttribute:
+                        hasDelayed = true;
+                        break;
                     #endregion
                 }
             }
@@ -299,6 +304,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (sbyte)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -406,6 +412,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (byte)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -513,6 +520,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (short)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -619,6 +627,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (ushort)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -788,6 +797,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (int)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -886,6 +896,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (uint)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -923,6 +934,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (int)(uint)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = ReColor;
@@ -1038,6 +1050,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (long)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -1129,6 +1142,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = ulongRawValue,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -1167,6 +1181,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = ulongRawValue,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = ReColor;
@@ -1270,6 +1285,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (float)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -1372,6 +1388,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (double)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;
@@ -1579,6 +1596,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (string)value,
                 };
+                DelayedAttributeDrawer.ApplyDelayed(element, hasDelayed);
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = AbsRenderer.ReColor;

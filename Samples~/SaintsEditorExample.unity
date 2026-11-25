@@ -9706,6 +9706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.UnityBuildinAttr
   color: {r: 0.20069484, g: 0, b: 0, a: 0}
+  ShowColor: {r: 0, g: 0, b: 0, a: 0}
   shortNote: '1
 
     2
@@ -9715,6 +9716,7 @@ MonoBehaviour:
     4
 
     5'
+  ShowShortNote: 
   textArea: '1
 
     2
@@ -9726,17 +9728,94 @@ MonoBehaviour:
     5
 
     6'
-  min: 10
+  ShowTextArea: 
+  minSByte: 0
+  ShowMinSByte: 0
+  minByte: 0
+  ShowMinByte: 0
+  minShort: 0
+  ShowMinShort: 0
+  minUShort: 0
+  ShowMinUShort: 0
+  minInt: 0
+  ShowMinInt: 0
+  minUInt: 0
+  ShowMinUInt: 0
+  minLong: 0
+  ShowMinLong: 0
+  minULong: 0
+  ShowMinULong: 0
+  minFloat: 0
+  ShowMinFloat: 0
+  minDouble: 0
+  ShowMinDouble: 0
   rangeSByte: 2
+  ShowRangeSByte: 1
   rangeByte: 6
+  ShowRangeByte: 1
   rangeShort: 4
+  ShowRangeShort: 1
   rangeUShort: 4
+  ShowRangeUShort: 1
   rangeInt: 4
+  ShowRangeInt: 1
   rangeUInt: 6
+  ShowRangeUInt: 1
   rangeLong: 3
+  ShowRangeLong: 1
   rangeULong: 6
+  ShowRangeULong: 1
   rangeFloat: 0.8095238
+  ShowRangeFloat: 0.5
   rangeDouble: 1.1825396732264561
+  ShowRangeDouble: 0.5
+  linearHdrGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  headerField: 0
+  ShowHeaderProp: 0
+  ShowMultipleHeaderProp: 0
+  enumButtons: 0
+  enumButtonsFlags: 0
+  orderByValueDesc: 0
+  orderByNameAsc: 0
+  orderFlags: 0
+  orderByNameAscButtons: 0
+  orderFlagsButtons: 0
+  orderFlagsDropdown: 0
+  delayedInt: 0
+  ShowDelayedInt: 0
+  delayedFloat: 0
+  ShowDelayedFloat: 0
+  delayedString: ds
+  delayedULong: 0
 --- !u!1 &1012463054
 GameObject:
   m_ObjectHideFlags: 0

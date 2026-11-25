@@ -235,10 +235,46 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [FlagsDropdown] public EOrderFlags orderFlagsDropdown;
 #endif
 
+        // `Delayed` only decorates the plain fallback widget: it holds the change event back until
+        // Enter or focus loss. Pairing it with a drawer attribute (`Min`, `Range`, ...) is a no-op,
+        // since those widgets own their own editing flow.
+        [Delayed] public int delayedInt;
+
+        [Delayed] [ShowInInspector]
+        public int ShowDelayedInt;
+
+        [Delayed] public float delayedFloat;
+
+        [Delayed] [ShowInInspector]
+        public float ShowDelayedFloat;
+
+        [Delayed]
+        [OnValueChanged(nameof(OnChanged))]
+        public string delayedString;
+
+        [Delayed] [ShowInInspector]
+        [OnValueChanged(nameof(OnChanged))]
+        private string ShowDelayedString;
+
+        // Unity's own `DelayedDrawer` only covers int/float/string; ours follows the fallback widgets
+        [OnValueChanged(nameof(OnChanged))]
+        [Delayed] public ulong delayedULong;
+
+        [Delayed] [ShowInInspector]
+        [OnValueChanged(nameof(OnChanged))]
+        private ulong ShowDelayedULong;
+
+        // no-op by design: `Min` supplies its own widget
+        [Delayed] [Min(10)] [ShowInInspector]
+        [OnValueChanged(nameof(OnChanged))]
+        private int ShowDelayedWithMin;
+
         [OnInspectorInit]
         private void EditorInit()
         {
             _showLinearHdrGradient = linearHdrGradient;
         }
+
+        private void OnChanged(object anything) => Debug.Log(anything);
     }
 }

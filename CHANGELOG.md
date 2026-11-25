@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+Fix: `ShowInInspector` now work with Unity builtin `Delayed`
+
 ## 5.31.8 ##
 
 Fix: `[InspectorOrder]` (Unity builtin attribute) is now supported by SaintsEditor, `EnumToggleButton`, `Dropdown` etc.
