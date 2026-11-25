@@ -566,14 +566,57 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static IEnumerable<FieldInfo> GetEnumFields(Type enumType)
+#if UNITY_2022_1_OR_NEWER
+        private static readonly PropertyInfo InspectorOrderSortProperty =
+            typeof(InspectorOrderAttribute).GetProperty("m_inspectorSort", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        private static readonly PropertyInfo InspectorOrderDirectionProperty =
+            typeof(InspectorOrderAttribute).GetProperty("m_sortDirection", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        private static T GetInspectorOrderSetting<T>(PropertyInfo propertyInfo, InspectorOrderAttribute attribute)
+            where T : struct =>
+            propertyInfo?.GetValue(attribute) is T value ? value : default;
+#endif
+
+        private static Func<FieldInfo, ulong> GetEnumRawValueKey(Type enumType)
         {
             bool isULong = Enum.GetUnderlyingType(enumType) == typeof(ulong);
-            // Match Enum.GetValues' unsigned ordering without losing alias field identities.
-            return enumType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                .OrderBy(field => isULong
-                    ? (ulong)field.GetRawConstantValue()
-                    : unchecked((ulong)Convert.ToInt64(field.GetRawConstantValue())));
+            return field => isULong
+                ? (ulong)field.GetRawConstantValue()
+                : unchecked((ulong)Convert.ToInt64(field.GetRawConstantValue()));
+        }
+
+        public static IEnumerable<FieldInfo> GetEnumFields(Type enumType)
+        {
+            FieldInfo[] fields = enumType.GetFields(BindingFlags.Public | BindingFlags.Static);
+
+#if UNITY_2022_1_OR_NEWER
+            InspectorOrderAttribute inspectorOrder = ReflectCache
+                .GetTypeCustomAttributes<InspectorOrderAttribute>(enumType, false)
+                .FirstOrDefault();
+            // ReSharper disable once InvertIf
+            if (inspectorOrder != null)
+            {
+                bool descending =
+                    GetInspectorOrderSetting<InspectorSortDirection>(InspectorOrderDirectionProperty, inspectorOrder)
+                    == InspectorSortDirection.Descending;
+
+                if (GetInspectorOrderSetting<InspectorSort>(InspectorOrderSortProperty, inspectorOrder)
+                    == InspectorSort.ByName)
+                {
+                    return descending
+                        ? fields.OrderByDescending(field => field.Name, StringComparer.Ordinal)
+                        : fields.OrderBy(field => field.Name, StringComparer.Ordinal);
+                }
+
+                if (descending)
+                {
+                    return fields.OrderByDescending(GetEnumRawValueKey(enumType));
+                }
+            }
+#endif
+
+            return fields.OrderBy(GetEnumRawValueKey(enumType));
         }
 
         public static EnumFieldInfo GetFieldInfoFromEnum(FieldInfo fieldInfo)

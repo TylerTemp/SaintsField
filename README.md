@@ -111,10 +111,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.31.7**
+**5.31.8**
 
-1.  Add: `ShowInInspector` now work with Unity builtin `ColorUsage`, `Multiline`, `TextArea`, `Min`, `Range`, `GradientUsage`, `EnumButtons`
-2.  Fix: Slightly visual adjust for `ShowInInspector` border gap
+Fix: `[InspectorOrder]` (Unity builtin attribute) is now supported by SaintsEditor, `EnumToggleButton`, `Dropdown` etc.
 
 ## Usage ##
 

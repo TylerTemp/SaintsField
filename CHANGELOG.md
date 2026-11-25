@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.31.8 ##
+
+Fix: `[InspectorOrder]` (Unity builtin attribute) is now supported by SaintsEditor, `EnumToggleButton`, `Dropdown` etc.
+
 ## 5.31.7 ##
 
 1.  Add: `ShowInInspector` now work with Unity builtin `ColorUsage`, `Multiline`, `TextArea`, `Min`, `Range`, `GradientUsage`, `EnumButtons`
